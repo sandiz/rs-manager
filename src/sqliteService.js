@@ -190,6 +190,7 @@ export async function getSongID(ID) {
   }
   const sql = `select distinct song from songs_owned where id='${ID}'`;
   const output = await db.get(sql);
+  if (typeof output === 'undefined') { return '' }
   return output.song;
 }
 export async function getArrangmentsMastered() {
