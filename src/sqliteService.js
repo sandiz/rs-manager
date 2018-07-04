@@ -228,7 +228,7 @@ export async function initSetlistPlaylistDB(dbname) {
     const dbfilename = window.dirname + "/../rsdb.sqlite";
     db = await window.sqlite.open(dbfilename);
   }
-  await db.run(`CREATE TABLE IF NOT EXISTS ${dbname} ( uniqkey char primary key, FOREIGN KEY(uniqkey) REFERENCES songs_owned(uniqkey));`);
+  await db.run(`CREATE TABLE IF NOT EXISTS ${dbname} ( uniqkey char UNIQUE primary key, FOREIGN KEY(uniqkey) REFERENCES songs_owned(uniqkey));`);
 }
 export async function initSetlistDB() {
   // console.log("__db_call__: initSetlistDB");
