@@ -68,7 +68,10 @@ export default class DashboardView extends React.Component {
     this.fetchWeeklySpotlight();
   }
   getStatsWidth = (input, min, max) => {
-    return ((input - min) * 100) / (max - min);
+    const w = ((input - min) * 100) / (max - min);
+    //eslint-disable-next-line
+    if (isNaN(w)) { return 0; }
+    return w;
   }
   convertMS = (ms) => {
     //eslint-disable-next-line
