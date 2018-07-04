@@ -18,7 +18,7 @@
     "electron": "^2.0.3",
     "electron-is-dev": "^0.3.0",
     "electron-prompt": "^1.0.0",
-    "electron-rebuild": "^1.7.3",
+    "electron-rebuild": "^1.8.1",
     "eslint": "^4.10.0",
     "eslint-config-airbnb": "^16.1.0",
     "eslint-config-react-app": "^2.1.0",
