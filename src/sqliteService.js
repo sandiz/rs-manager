@@ -115,7 +115,7 @@ export async function updateMasteryandPlayed(id, mastery, playedcount) {
 
 export default async function updateSongsOwned(psarcResult) {
   // console.log("__db_call__: updateSongsOwned");
-  let sqlstr = ";";
+  let sqlstr = "";
   //psarcResults.forEach((psarcResult) => {
   const album = escape(psarcResult.album);
   const artist = escape(psarcResult.artist);
@@ -131,10 +131,21 @@ export default async function updateSongsOwned(psarcResult) {
   const id = escape(psarcResult.id);
   const uniqkey = escape(psarcResult.uniquekey);
   const lct = escape(psarcResult.lastConversionTime);
-  sqlstr += `REPLACE INTO songs_owned (album, artist, song, arrangement, json, psarc, dlc, sku, difficulty, dlckey, songkey, id,uniqkey, lastConversionTime) VALUES ('${album}','${artist}',
+  let mastery = 0
+  let count = 0
+  sqlstr = `select mastery, count from songs_owned where song='${song}' AND
+  album='${album}' AND artist='${artist}' AND arrangement='${arrangement}'`;
+  const op = await db.all(sqlstr);
+  if (op.length > 0) {
+    //eslint-disable-next-line
+    mastery = op[0].mastery === null ? 0 : op[0].mastery;
+    count = op[0].count === null ? 0 : op[0].count;
+  }
+
+  sqlstr = `REPLACE INTO songs_owned (album, artist, song, arrangement, json, psarc, dlc, sku, difficulty, dlckey, songkey, id,uniqkey, lastConversionTime, mastery, count) VALUES ('${album}','${artist}',
       '${song}','${arrangement}','${json}','${psarc}',
       '${dlc}','${sku}',${difficulty},'${dlckey}',
-      '${songkey}','${id}', '${uniqkey}', '${lct}');`
+      '${songkey}','${id}', '${uniqkey}', '${lct}', '${mastery}','${count}');`
   //});
   //console.log(sqlstr);
   await db.run(sqlstr); // Run the query without returning anything

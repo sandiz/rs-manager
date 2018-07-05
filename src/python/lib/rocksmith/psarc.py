@@ -18,19 +18,28 @@ class Int40(Construct):
         return 5
 
 
-ENTRY = Struct('md5' / PaddedString(16, "ascii"), 'zindex' / Int32ub,
-               'length' / Int40(), 'offset' / Int40())
+ENTRY = Struct(
+    'md5' / String(16),
+    'zindex' / Int32ub,
+    'length' / Int40(),
+    'offset' / Int40()
+)
 
 
 class BOMAdapter(Adapter):
-    def _encode(self, obj, context, path):
-        data = Struct('entries' / ENTRY[:], 'zlength' / Int16ub[:]).build(obj)
+    def _encode(self, obj, context):
+        data = Struct(
+            'entries' / ENTRY[:],
+            'zlength' / Int16ub[:]
+        ).build(obj)
         return aes_bom().encrypt(pad(data))[:len(data)]
 
-    def _decode(self, obj, context, path):
+    def _decode(self, obj, context):
         decrypted_toc = aes_bom().decrypt(pad(obj))[:len(obj)]
-        return Struct('entries' / ENTRY[context.n_entries],
-                      'zlength' / GreedyRange(Int16ub)).parse(decrypted_toc)
+        return Struct(
+            'entries' / ENTRY[context.n_entries],
+            'zlength' / Int16ub[:]
+        ).parse(decrypted_toc)
 
 
 VERSION = 65540
@@ -72,7 +81,7 @@ def read_entry(stream, n, bom):
         length += len(chunk)
 
     data = data.getvalue()
-    assert (len(data) == entry.length)
+    assert(len(data) == entry.length)
     return data
 
 
@@ -81,7 +90,7 @@ def create_entry(name, data):
     output = BytesIO()
 
     for i in range(0, len(data), BLOCK_SIZE):
-        raw = data[i:i + BLOCK_SIZE]
+        raw = data[i: i + BLOCK_SIZE]
         compressed = zlib.compress(raw, zlib.Z_BEST_COMPRESSION)
         if len(compressed) < len(raw):
             output.write(compressed)
@@ -121,9 +130,8 @@ class PSARC(Construct):
 
     def _parse(self, stream, context, path):
         header = HEADER.parse_stream(stream)
-        listing, *entries = [
-            read_entry(stream, i, header.bom) for i in range(header.n_entries)
-        ]
+        listing, *entries = [read_entry(stream, i, header.bom)
+                             for i in range(header.n_entries)]
         listing = listing.decode().splitlines()
         content = dict(zip(listing, entries))
         if self.crypto:

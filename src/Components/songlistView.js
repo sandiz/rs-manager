@@ -232,6 +232,7 @@ export default class SonglistView extends React.Component {
       filters: {},
     })
   }
+
   handleSearchChange = (e) => {
     this.handleTableChange('filter', {
       page: 1,

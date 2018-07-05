@@ -27,7 +27,7 @@ def read_psarc(psarc):
         for filepath, data in content.items():
             files.append(filepath)
             if "json" in filepath:
-                arrgmentData = json.loads(data)
+                arrgmentData = json.loads(str(data, "utf-8").replace("\r\n",""))
                 if "Entries" not in arrgmentData:
                     continue
                 for id in arrgmentData["Entries"]:
@@ -52,9 +52,7 @@ def read_psarc(psarc):
                     songDict["fullName"] = data.get("FullName", "")
                     songDict["lastConversionTime"] = data.get(
                         "LastConversionDateTime", "")
-                    songDict["id"] = data.get("PersistentID", ''.join(
-                        random.choices(
-                            string.ascii_uppercase + string.digits, k=10)))
+                    songDict["id"] = data.get("PersistentID", '')
                     arrangments.append(songDict)
 
     psarcData["key"] = os.path.splitext(os.path.basename(psarc))[0]

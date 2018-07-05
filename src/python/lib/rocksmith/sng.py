@@ -35,14 +35,14 @@ SNG = Struct(
         Padding(1),
         'maxDifficulty' / Int32ul,
         'phraseIterationLinks' / Int32ul,
-        'name' / PaddedString(32, encoding='utf8')
+        'name' / String(32, encoding='utf8')
     ),
     'chordTemplates' / array(
         'mask' / Int32ul,
         'frets' / Int8sl[6],
         'fingers' / Int8sl[6],
         'notes' / Int32sl[6],
-        'name' / PaddedString(32, encoding='utf8')
+        'name' / String(32, encoding='utf8')
     ),
     'chordNotes' / array(
         'mask' / Int32ul[6],
@@ -58,19 +58,19 @@ SNG = Struct(
         'time' / Float32l,
         'note' / Int32sl,
         'length' / Float32l,
-        'lyrics' / PaddedString(48, encoding='utf8')
+        'lyrics' / String(48, encoding='utf8')
     ),
     'symbols' / If(len_(this.vocals) > 0, Struct(
         'header' / array(Int32sl[8]),
         'texture' / array(
-            'fontpath' / PaddedString(128, encoding='ascii'),
+            'fontpath' / String(128, encoding='ascii'),
             'fontpathLength' / Int32ul,
             Padding(4),
             'width' / Int32ul,
             'height' / Int32ul
         ),
         'definition' / array(
-            'name' / PaddedString(12, encoding='utf8'),
+            'name' / String(12, encoding='utf8'),
             'outerRect' / RECT,
             'innerRect' / RECT,
         )
@@ -95,11 +95,11 @@ SNG = Struct(
     ),
     'actions' / array(
         'time' / Float32l,
-        'name' / PaddedString(256, encoding='ascii')
+        'name' / String(256, encoding='ascii')
     ),
     'events' / array(
         'time' / Float32l,
-        'name' / PaddedString(256, encoding='ascii')
+        'name' / String(256, encoding='ascii')
     ),
     'tone' / array(
         'time' / Float32l,
@@ -110,7 +110,7 @@ SNG = Struct(
         'id' / Int32ul
     ),
     'sections' / array(
-        'name' / PaddedString(32, encoding='utf8'),
+        'name' / String(32, encoding='utf8'),
         'number' / Int32ul,
         'startTime' / Float32l,
         'endTime' / Float32l,
@@ -182,7 +182,7 @@ SNG = Struct(
         'firstBeatLength' / Float32l,
         'startTime' / Float32l,
         'capo' / Int8sl,
-        'lastConversionDateTime' / PaddedString(32, encoding='ascii'),
+        'lastConversionDateTime' / String(32, encoding='ascii'),
         'part' / Int16sl,
         'songLength' / Float32l,
         'tuning' / array(Int16sl),
