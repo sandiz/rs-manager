@@ -6,8 +6,13 @@ function sleep(ms) {
 async function getSongDetails(psarc) {
   const arrangementarr = [];
   try {
-    const bl = await window.spawn('python3', [`${window.dirname}/python/psarc-lib.py`, '-f', psarc])
+    const bl = await window.spawn('python', [`${window.dirname}/python/psarc-lib.py`, '-f', psarc])
     const json = JSON.parse(bl.toString());
+    if (json.error) {
+      console.log("error reading psarc")
+      console.log(psarc)
+      console.log(json);
+    }
     json.arrangements.forEach((arr) => {
       if (arr.song !== '' && arr.artist !== '') {
         arrangementarr.push(arr);
@@ -27,7 +32,7 @@ async function getSongDetails(psarc) {
 }
 export async function psarcToJSON(psarc) {
   try {
-    const bl = await window.spawn('python3', [`${window.dirname}/python/psarc-lib.py`, '-f', psarc])
+    const bl = await window.spawn('python', [`${window.dirname}/python/psarc-lib.py`, '-f', psarc])
     return JSON.parse(bl.toString());
   }
   catch (error) {
@@ -42,7 +47,7 @@ export async function psarcToJSON(psarc) {
 }
 export async function extractFile(psarc, file) {
   try {
-    const bl = await window.spawn('python3', [`${window.dirname}/python/psarc-lib.py`, '-f', psarc, '-e', file])
+    const bl = await window.spawn('python', [`${window.dirname}/python/psarc-lib.py`, '-f', psarc, '-e', file])
     return JSON.parse(bl.toString());
   }
   catch (error) {

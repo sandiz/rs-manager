@@ -15,7 +15,8 @@
 body {
   font-family: "Roboto Condensed", sans-serif;
   background: #fafafa;
-  background-image: url(https://static2.cdn.ubi.com/ncsa/rocksmith/forums/Rocksmith_Forums55.jpg);
+  background-image: url(assets/b2.jpg);
+  /*background-image: url(assets/bg.jpg);*/
   background-color: rgb(0, 0, 0);
   background-repeat: no-repeat;
   background-position: center 0;

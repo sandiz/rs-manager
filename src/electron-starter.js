@@ -18,7 +18,7 @@ function createWindow() {
         }
     });
     //mainWindow.maximize();
-    mainWindow.webContents.openDevTools();
+    mainWindow.webContents.openDevTools({mode: 'detach'});
     mainWindow.loadURL(
         process.env.ELECTRON_START_URL ||
         url.format({
