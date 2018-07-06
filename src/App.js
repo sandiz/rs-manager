@@ -71,7 +71,7 @@ class App extends Component {
     let profile = len > 0 ?
       path.basename(this.state.currentProfile).slice(0, 6) + "..." + this.state.currentProfile.slice(len - 6, len) : "-";
     profile = profile.toLowerCase();
-    const cookie = this.state.currentCookie.length > 0 ? this.state.currentCookie.slice(0, 6) + "..." : "-";
+    const cookie = this.state.currentCookie.length > 0 ? this.state.currentCookie.slice(0, 16) + "..." : "-";
     return (
       <div className="App">
         <div className="wrapper">

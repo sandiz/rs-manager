@@ -199,10 +199,10 @@ export async function getSongID(ID) {
     console.log(dbfilename);
     db = await window.sqlite.open(dbfilename);
   }
-  const sql = `select distinct song from songs_owned where id='${ID}'`;
+  const sql = `select distinct song, artist from songs_owned where id='${ID}'`;
   const output = await db.get(sql);
   if (typeof output === 'undefined') { return '' }
-  return output.song;
+  return output;
 }
 export async function getArrangmentsMastered() {
   //console.log("__db_call__: getArrangmentsMastered");
