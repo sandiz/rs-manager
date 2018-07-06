@@ -11,6 +11,7 @@ window.http = require("http");
 window.os = require("os");
 window.prompt = require('electron-prompt');
 window.processPSARC = require("./lib/libpsarc").processPSARC
+window.extractFile = require("./lib/libpsarc").extractFile
 const rp = require('request-promise');
 
 

@@ -32,8 +32,8 @@ async function getSongDetails(psarc) {
 }
 export async function psarcToJSON(psarc) {
   try {
-    const bl = await window.spawn('python', [`${window.dirname}/python/psarc-lib.py`, '-f', psarc])
-    return JSON.parse(bl.toString());
+    const json = await window.processPSARC(psarc)
+    return json
   }
   catch (error) {
     if (error.stderr != null) {
@@ -47,8 +47,8 @@ export async function psarcToJSON(psarc) {
 }
 export async function extractFile(psarc, file) {
   try {
-    const bl = await window.spawn('python', [`${window.dirname}/python/psarc-lib.py`, '-f', psarc, '-e', file])
-    return JSON.parse(bl.toString());
+    const c = await window.extractFile(psarc, file);
+    return c;
   }
   catch (error) {
     if (error.stderr != null) {
