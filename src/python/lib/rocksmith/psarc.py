@@ -1,6 +1,6 @@
-import zlib
+import zlib,pdb
 from io import BytesIO
-from hashlib import md5
+from hashlib import md5,sha256
 
 from construct import *
 
@@ -35,11 +35,14 @@ class BOMAdapter(Adapter):
         return aes_bom().encrypt(pad(data))[:len(data)]
 
     def _decode(self, obj, context):
-        decrypted_toc = aes_bom().decrypt(pad(obj))[:len(obj)]
-        return Struct(
+        padded = pad(obj)
+        decrypted = aes_bom().decrypt(padded)
+        decrypted_toc = decrypted[:len(obj)]
+        a=Struct(
             'entries' / ENTRY[context.n_entries],
             'zlength' / Int16ub[:]
         ).parse(decrypted_toc)
+        return a
 
 
 VERSION = 65540
@@ -64,7 +67,6 @@ def read_entry(stream, n, bom):
     entry = bom.entries[n]
     stream.seek(entry.offset)
     zlength = bom.zlength[entry.zindex:]
-
     data = BytesIO()
     length = 0
     for z in zlength:
