@@ -138,11 +138,6 @@ export default class Sidebar extends React.Component {
           {tabsList}
         </ul>
 
-        <ul className="list-unstyled CTAs">
-          <li>
-            <a href="https://github.com" className="download">Download source</a>
-          </li>
-        </ul>
       </nav>
     );
   }

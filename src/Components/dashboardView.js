@@ -109,7 +109,8 @@ export default class DashboardView extends React.Component {
         }
       }
       if (mostPlayed !== "") {
-        mostPlayed = unescape(await getSongID(mostPlayed));
+        const song = await getSongID(mostPlayed)
+        mostPlayed = unescape(song.song) + " by " + unescape(song.artist);
       }
       let playingText = "";
       const dateObj = this.convertMS(stats.TimePlayed * 1000);
@@ -291,7 +292,7 @@ export default class DashboardView extends React.Component {
                 <a
                   onClick={
                     () => { window.shell.openExternal(this.state.weeklysongspotlight.url) }}>
-                  Weekly Song Spotlight</a>
+                  Reddit Weekly Song Spotlight</a>
                 <hr />
               </div>
               <div style={{ marginTop: -6 + 'px' }}>
@@ -308,7 +309,7 @@ export default class DashboardView extends React.Component {
             </div>
             <div className="col col-md-3 ta-center dashboard-top dashboard-header">
               <div>
-                <a onClick={() => this.fetchRandomStats(true, false)}> Random Song</a>
+                <a onClick={() => this.fetchRandomStats(true, false)}> Random Learn a Song</a>
                 <hr />
               </div>
               <div style={{ marginTop: -10 + 'px' }}>
