@@ -79,6 +79,7 @@ export default class SongDetailView extends React.Component {
   handleHide = () => {
     this.choosePlay();
     this.props.close();
+    this.enableScroll();
   }
 
   addToSetlist = async (e) => {
@@ -98,6 +99,21 @@ export default class SongDetailView extends React.Component {
     }
     this.setState({ setlists: items, currentSetlist: output[0].key });
   }
+  forceNoScroll = () => {
+    document.getElementsByTagName("body")[0].scrollTop = 0;
+    document.getElementsByTagName("html")[0].scrollTop = 0;
+
+    document.getElementsByTagName("body")[0].style.height = "100%";
+    document.getElementsByTagName("body")[0].style.overflow = "hidden";
+    document.getElementsByTagName("html")[0].style.height = "100%";
+    document.getElementsByTagName("html")[0].style.overflow = "hidden";
+  }
+  enableScroll = () => {
+    document.getElementsByTagName("body")[0].style.height = "100%";
+    document.getElementsByTagName("body")[0].style.overflow = "inherit";
+    document.getElementsByTagName("html")[0].style.height = "100%";
+    document.getElementsByTagName("html")[0].style.overflow = "inherit";
+  }
   render = () => {
     const setlistyle = "extraPadding download " + (this.props.isSetlist ? "" : "hidden");
     const songliststyle = "extraPadding download " + (this.props.isSongview ? "" : "hidden");
@@ -113,6 +129,7 @@ export default class SongDetailView extends React.Component {
       modalinfostyle = "width-52";
     }
     if (this.props.showDetail === false) { return null; }
+    this.forceNoScroll();
     return (
       <div ref={(ref) => { this.modal_div = ref }} id="open-modal" className="modal-window" style={{ opacity: 1, pointerEvents: "auto" }}>
         <div id="modal-info" className={modalinfostyle}>
