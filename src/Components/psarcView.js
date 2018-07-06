@@ -188,7 +188,8 @@ export default class PSARCView extends React.Component {
         //filelist = this.walkSync(dir + file + "/", filelist);
         results = this.walkSync(dir + file + "/", results);
       } else {
-        if (window.os.platform() === 'darwin' && file.endsWith("_m.psarc")) {
+        if (file.includes("/tmp/")) { continue }
+        else if (window.os.platform() === 'darwin' && file.endsWith("_m.psarc")) {
           results.push([dir + file, statres]);
         }
         else if (window.os.platform() === 'win32' && file.endsWith("_p.psarc")) {
@@ -214,6 +215,7 @@ export default class PSARCView extends React.Component {
       const currentResults = await readPSARC(prObj[0], prObj[1], (500 + (index * 100)))
       if (currentResults === null || currentResults === 'undefined' || currentResults.length === 0) {
         this.props.updateHeader(this.tabname, "Failed to read " + path.basename(prObj[0]));
+        index += 1
         continue;
       }
       this.processedFiles = this.processedFiles.concat(currentResults);
