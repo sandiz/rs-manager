@@ -10,7 +10,7 @@ window.fetch = fetch;
 window.http = require("http");
 window.os = require("os");
 window.prompt = require('electron-prompt');
-
+window.processPSARC = require("./lib/libpsarc").processPSARC
 const rp = require('request-promise');
 
 

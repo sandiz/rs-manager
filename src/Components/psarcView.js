@@ -261,7 +261,7 @@ export default class PSARCView extends React.Component {
   updateSongList = async () => {
     await initSongsOwnedDB();
     //let cache = [];
-    console.log("arrangments: " + this.state.files.length + this.props.resetHeader);
+    console.log("arrangments: " + this.state.files.length);
     for (let i = 0; i < this.state.files.length; i += 1) {
       this.props.updateHeader(this.tabname, `Updating Songlist with PSARC:  ${this.state.files[i].psarc} (${i}/${this.state.files.length})`);
       //cache.push(this.state.files[i]);
@@ -494,10 +494,10 @@ export default class PSARCView extends React.Component {
 PSARCView.propTypes = {
   currentTab: PropTypes.object,
   updateHeader: PropTypes.func,
-  resetHeader: PropTypes.func,
+  //resetHeader: PropTypes.func,
 }
 PSARCView.defaultProps = {
   currentTab: null,
   updateHeader: () => { },
-  resetHeader: () => { },
+  //resetHeader: () => { },
 }

@@ -6,13 +6,13 @@ function sleep(ms) {
 async function getSongDetails(psarc) {
   const arrangementarr = [];
   try {
-    const bl = await window.spawn('python', [`${window.dirname}/python/psarc-lib.py`, '-f', psarc])
-    const json = JSON.parse(bl.toString());
+    const json = await window.processPSARC(psarc)
     if (json.error) {
       console.log("error reading psarc")
       console.log(psarc)
       console.log(json);
     }
+
     json.arrangements.forEach((arr) => {
       if (arr.song !== '' && arr.artist !== '') {
         arrangementarr.push(arr);
