@@ -14,13 +14,13 @@ const ARC_IV = "E915AA018FEF71FC508132E4BB4CEB42"
 const MAC_KEY = "9821330E34B91F70D0A48CBD625993126970CEA09192C0E6CDA676CC9838289D"
 const WIN_KEY = "CB648DF3D12A16BF71701414E69619EC171CCA5D2A142E3E59DE7ADDA18A3A30"
 
-/*
+
 const writeFile = (filePath, data) => new Promise((resolve, reject) => {
   fs.writeFile(filePath, data, (err) => {
     if (err) reject(err);
     else resolve();
   });
-});*/
+});
 const readFile = filePath => new Promise((resolve, reject) => {
   fs.readFile(filePath, (err, data) => {
     if (err) reject(err);
@@ -134,7 +134,6 @@ async function readEntry(fd, idx, bomentries) {
   let entryoffset = singlebom.offset.readUInt32BE(1)
   const entrylength = singlebom.length.readUInt32BE(1)
   const zlength = bomentries.zlength.slice(singlebom.zindex, bomentries.zlength.length)
-  //console.log(fd, entryoffset, entrylength)
   let retBuffer = Buffer.alloc(0)
   let length = 0
   for (let i = 0; i < zlength.length; i += 1) {
@@ -151,7 +150,6 @@ async function readEntry(fd, idx, bomentries) {
       buffer = await unzip(buffer)
     }
     catch (E) {
-      console.log("")
     }
     retBuffer = Buffer.concat([retBuffer, buffer])
     length += buffer.length
@@ -195,7 +193,6 @@ async function readPsarc(psarcFile, fastRead = true) {
     for (let i = 0; i < listing.length; i += 1) {
       if (fastRead) {
         if (contents[i] === "") {
-          //console.log(listing[i], " no data read");
           entries[listing[i]] = contents[i];
           continue;
         }
@@ -203,7 +200,6 @@ async function readPsarc(psarcFile, fastRead = true) {
       //eslint-disable-next-line
       const decrypted = await decryptPsarc(listing[i], contents[i])
       entries[listing[i]] = decrypted;
-      //console.log(listing[i], crypto.createHash("sha256").update(decrypted).digest("hex"))
     }
     return entries;
   }
@@ -263,7 +259,32 @@ async function processPSARC(psarcFile) {
   return psarcData
 }
 
+async function extractFile(psarcFile, fileToExtract) {
+  let filename = ""
+  try {
+    const entries = await readPsarc(psarcFile, false);
+    keys = Object.keys(entries);
+    for (let i = 0; i < keys.length; i += 1) {
+      const key = keys[i];
+      const value = entries[keys[i]];
+      if (key === fileToExtract) {
+        filename = "/tmp/" + Date.now() + "_" + path.basename(fileToExtract)
+        await writeFile(filename, value)
+      }
+    }
+  }
+  catch (e) {
+    error = true
+    exception = e
+  }
+  const psarcData = {
+    filename
+  }
+  return psarcData
+}
+
 exports.processPSARC = processPSARC
+exports.extractFile = extractFile
 
 /*
 handleCmd()

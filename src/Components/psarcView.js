@@ -468,7 +468,7 @@ export default class PSARCView extends React.Component {
                       <h1> Arrangements: {this.state.selectedpsarcData.arrangements.length}</h1>
                       <div className="psarcFiles">
                         <BootstrapTable
-                          keyField="uniquekey"
+                          keyField="fullName"
                           data={this.state.selectedpsarcData.arrangements}
                           columns={arrcolumns}
                           classes="psarcTable"
