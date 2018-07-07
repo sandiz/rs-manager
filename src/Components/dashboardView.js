@@ -417,7 +417,7 @@ export default class DashboardView extends React.Component {
           <br /> <br />
           <div className="row justify-content-md-center">
             <div className="col col-md-3 ta-center dashboard-middle">
-              Lead <br />
+              <span style={{ fontSize: 17 + 'px' }}>Lead </span>
               <StatsTableView
                 total={this.state.l}
                 highscoretotal={this.state.lh}
@@ -431,7 +431,7 @@ export default class DashboardView extends React.Component {
               />
             </div>
             <div className="col col-md-3 ta-center dashboard-middle">
-              Rhythm <br />
+              <span style={{ fontSize: 17 + 'px' }}>Rhythm </span>
               <StatsTableView
                 total={this.state.r}
                 highscoretotal={this.state.rh}
@@ -445,7 +445,7 @@ export default class DashboardView extends React.Component {
               />
             </div>
             <div className="col col-md-3 ta-center dashboard-middle">
-              Bass <br />
+              <span style={{ fontSize: 17 + 'px' }}>Bass </span>
               <StatsTableView
                 total={this.state.b}
                 highscoretotal={this.state.bh}
