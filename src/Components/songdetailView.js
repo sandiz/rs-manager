@@ -52,16 +52,17 @@ export default class SongDetailView extends React.Component {
       const result = entries.items[0];
       vid = result.id.videoId;
     }
+    const yturl = "http://localhost:8000/yt/" + vid
     switch (divID) {
       case "div_playthrough":
         this.setState({
-          pturl: "https://www.youtube.com/embed/" + vid,
+          pturl: yturl,
         });
-        if (this.ptplayer) { this.ptplayer.src = this.state.pturl; this.mvplayer.src = ""; }
+        if (this.ptplayer) { this.ptplayer.src = yturl; this.mvplayer.src = ""; }
         break;
       case "div_musicvideo":
         this.setState({
-          mvurl: "https://www.youtube.com/embed/" + vid,
+          mvurl: yturl,
         });
         break;
       default:

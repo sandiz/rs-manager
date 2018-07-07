@@ -31,7 +31,7 @@ body {
   display: block;
   width: 100%;
   height: 100%;
-  filter: blur(5px);
+  filter: blur(20px);
 }
 
 p {
@@ -52,9 +52,9 @@ a:focus {
 
 .navbar {
   padding: 15px 10px;
-  background:rgb(231,239,242) !important;
+  background:rgba(231,239,242,.3) !important;
   border: none;
-  border-radius: 0;
+  border-radius: 6px;
   margin-bottom: 30px;
   box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
 }
@@ -124,6 +124,7 @@ a:focus {
 #sidebar ul li a:hover {
   color: black;
   background:azure;
+  border-radius:2px;
 }
 
 a[data-toggle="collapse"] {
@@ -157,7 +158,7 @@ ul.CTAs a {
 
 a.download:hover {
   background: azure !important;
-  color: #7386d5 !important;
+  color: #000 !important;
 }
 a.download {
   color: #000 !important;
@@ -184,7 +185,7 @@ a.article:hover {
 #sidebarCollapse {
   width: 40px;
   height: 40px;
-  background: rgb(231,239,242);;
+  background:rgba(231,239,242,.0) !important;
   cursor: pointer;
 }
 a {
@@ -196,7 +197,7 @@ a {
   height: 2px;
   margin: 0 auto;
   display: block;
-  background: #555;
+  background: #000;
   transition: all 0.8s cubic-bezier(0.81, -0.33, 0.345, 1.375);
   transition-delay: 0.2s;
 }
@@ -259,6 +260,7 @@ a {
 .activeChildTab {
   color: black !important;
   background:azure;
+  border-radius: 2px;
 }
 .inactiveChildTab {
   background: none;
@@ -297,7 +299,6 @@ a {
   border-collapse: collapse;
   width: 100%;
   line-height: 10px !important;
-  background-color: white;
   border: 1px solid black;
 }
 
@@ -333,11 +334,17 @@ table thead tr:hover {
   cursor: pointer;
 }
 tbody tr:nth-child(even) {
-  background-color:beige;
+  background-color: rgba(112, 128, 144,.5);
+  color: black;
 }
 
 tbody tr:nth-child(odd) {
-  background-color: azure;
+    background-color: rgba(255, 255, 255,.4);
+    color: black;
+}
+tbody tr:hover {
+  background-color: azure !important;
+  color:black;
 }
 
 .isDisabled {
@@ -528,7 +535,6 @@ tbody tr:nth-child(odd) {
    top:45px;
  }
  .stat-container {
-    border-bottom: solid 1px rgba(187,187,187, .55);
     display: flex;
     justify-content: space-between;
     width: 100%;
@@ -545,8 +551,8 @@ tbody tr:nth-child(odd) {
  }
 .dashboard-top {
   height: 240px;
-  background-color: rgb(231,239,242);;
-  border:1px solid #000;
+  border: 1px solid black;
+  background-color: rgba(231,239,242,.3);;
   color: #252525;
   border-radius: 5px;
   padding: 10px;
@@ -554,12 +560,14 @@ tbody tr:nth-child(odd) {
   width: 100%;
   margin-left: 30px;
   margin-right: 30px;
+  box-shadow: 5px 10px 5px black;
+  font-size: 17px;
   /*filter: drop-shadow(0 0 0.10rem black);*/
 }
 .dashboard-middle {
   height: 272px;
-  background-color: rgb(231,239,242);;
-  border:1px solid #000;
+  border: 1px solid black;
+  background-color: rgba(231,239,242, 0.5);;
   color: #252525;
   border-radius: 5px;
   padding: 10px;
@@ -567,6 +575,7 @@ tbody tr:nth-child(odd) {
   width: 100%;
   margin-left:20px;
   margin-right: 20px;
+  box-shadow: 5px 10px 5px black;
   /*filter:drop-shadow(0 0 0.10rem black);*/
 }
 hr {

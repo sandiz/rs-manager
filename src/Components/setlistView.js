@@ -29,7 +29,7 @@ function round100Formatter(cell, row) {
     <span>
       <svg height="100%">
         <rect width={width} height="100%" style={{ fill: color, strokeWidth: 2, stroke: 'rgb(0, 0, 0)' }} />
-        <text x="40%" y="18" fontSize="15px">{cell} %</text>
+        <text style={{}} x="40%" y="18" fontSize="15px">{cell} %</text>
       </svg>
     </span>
   </span>);
