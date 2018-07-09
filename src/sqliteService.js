@@ -13,7 +13,7 @@ export async function initSongsAvailableDB() {
     const dbfilename = window.dirname + "/../rsdb.sqlite";
     db = await window.sqlite.open(dbfilename);
   }
-  await db.run("CREATE TABLE IF NOT EXISTS songs_available (appid char primary key, name char, release_date float, owned boolean default false);");
+  await db.run("CREATE TABLE IF NOT EXISTS songs_available (appid char primary key, name char, release_date float, owned boolean default false, acquired_date float default NULL);");
 }
 export async function addToSteamDLCCatalog(dlc, name, releaseDate) {
   // console.log("__db_call__: addToSteamDLCCatalog");
@@ -22,7 +22,7 @@ export async function addToSteamDLCCatalog(dlc, name, releaseDate) {
   //eslint-disable-next-line
   if (isNaN(date)) { date = 0; }
   const owned = false;
-  sqlstr += `REPLACE INTO songs_available (appid, name, release_date, owned) VALUES ('${dlc}','${name}', ${date}, '${owned}');`
+  sqlstr += `REPLACE INTO songs_available (appid, name, release_date, owned) VALUES ('${dlc}',"${name}", ${date}, '${owned}');`
   //});
   console.log(sqlstr);
   await db.run(sqlstr); // Run the query without returning anything
@@ -43,7 +43,7 @@ export async function getDLCDetails(start = 0, count = 10, sortField = "release_
     allownedstring = `and owned='${owned}'`
   }
   if (search === "") {
-    sql = `select c.acount as acount,d.nopackcount as nopackcount, appid, name, release_date, owned
+    sql = `select c.acount as acount,d.nopackcount as nopackcount, appid, name, acquired_date, release_date, owned
            from songs_available,  (
            SELECT count(*) as acount
             FROM songs_available
@@ -51,23 +51,23 @@ export async function getDLCDetails(start = 0, count = 10, sortField = "release_
           ) c , (
            SELECT count(*) as nopackcount
             FROM songs_available
-            where name NOT like '%${escape("Song Pack")}%' ${allownedstring}
+            where name NOT like '%${"Song Pack"}%' ${allownedstring}
           ) d
           ${ownedstring}
           ORDER BY ${sortField} ${sortOrder} LIMIT ${start},${count}`;
   }
   else {
-    sql = `select c.acount as acount, d.nopackcount as nopackcount, appid, name, release_date, owned from songs_available, (
+    sql = `select c.acount as acount, d.nopackcount as nopackcount, appid, name, acquired_date, release_date, owned from songs_available, (
           SELECT count(*) as acount 
             FROM songs_available
-            where (name like '%${escape(search)}%' or appid like '%${escape(search)}%')
+            where (name like '%${search}%' or appid like '%${search}%')
             ${allownedstring}
           ) c , (
            SELECT count(*) as nopackcount
             FROM songs_available
-            where (name NOT like '%${escape("Song Pack")}%' AND name like '%${escape(search)}%' or appid like '%${escape(search)}%') ${allownedstring}
+            where (name NOT like '%${"Song Pack"}%' AND name like '%${search}%' or appid like '%${search}%') ${allownedstring}
           ) d
-          where (name like '%${escape(search)}%' or appid like '%${escape(search)}%') ${allownedstring}
+          where (name like '%${search}%' or appid like '%${search}%') ${allownedstring}
           ORDER BY ${sortField} ${sortOrder} LIMIT ${start},${count}`;
   }
   const output = await db.all(sql);
@@ -111,6 +111,30 @@ export async function updateMasteryandPlayed(id, mastery, playedcount) {
   //await db.close();
   const op = await db.run("UPDATE songs_owned SET mastery=?,count=? where id=?", mastery, playedcount, id);
   return op.changes;
+}
+export async function updateAcquiredDate(date, item) {
+  // console.log("__db_call__: updateMasteryandPlayed");
+  //await db.close();
+  const sql = `UPDATE songs_available SET acquired_date='${date}' where name LIKE "%${item}"`
+  const op = await db.run(sql);
+  return op.changes;
+}
+export async function updateAcquiredDateByAppID(appid, date) {
+  // console.log("__db_call__: updateMasteryandPlayed");
+  //await db.close();
+  const sql = `UPDATE songs_available SET acquired_date='${date}' where appid LIKE '${appid}'`
+  const op = await db.run(sql);
+  return op.changes;
+}
+export async function getAppID(item) {
+  const sql = `select appid,release_date from songs_available where name LIKE '%${item}'`;
+  const output = await db.get(sql);
+  return output
+}
+export async function countAppID(item, rd) {
+  const sql = `select count(appid) as count,name from songs_available where release_date=${rd} AND appid LIKE '${item}'`;
+  const output = await db.get(sql);
+  return output
 }
 
 export default async function updateSongsOwned(psarcResult) {

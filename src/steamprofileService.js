@@ -48,3 +48,32 @@ export async function getOwnedPackages(cookie) {
 
   return JSON.parse(c);
 }
+
+export async function getOwnedHistory(cookie) {
+  const c = await window.request(
+    "https://store.steampowered.com/account/AjaxLoadMoreHistory/",
+    `steamLoginSecure=${cookie}`,
+    'https://store.steampowered.com',
+  );
+
+  //eslint-disable-next-line
+  const re1 = /<td class="wht_date">(.*)<\/td>.*<td data-tooltip-text="Click to get help with this purchase.*both">(.*)<\/div>.*<\/td>.*<td class="wht_type ">/gm
+  const d = JSON.parse(c);
+  const e = d.html.replace(/(\r\n\t|\n|\r\t)/gm, "").replace(/ +(?= )/g, '').replace(/\t/g, '');
+  const test = document.createElement("table");
+  test.innerHTML = e;
+  const { rows } = test;
+  const tuples = []
+  for (let i = 0; i < rows.length; i += 1) {
+    const date = rows[i].cells[0].innerText
+    const items = rows[i].cells[1]
+    const divs = items.getElementsByTagName("div");
+    for (let j = 0; j < divs.length; j += 1) {
+      const divtext = divs[j].innerHTML;
+      if (divtext.toLowerCase().includes("rocksmith")) {
+        tuples.push([date, divtext]);
+      }
+    }
+  }
+  return tuples;
+}

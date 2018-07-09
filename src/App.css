@@ -335,7 +335,7 @@ table thead tr:hover {
 }
 tbody tr:nth-child(even) {
   background-color: rgba(112, 128, 144,.5);
-  color: black;
+  color: cornsilk;
 }
 
 tbody tr:nth-child(odd) {

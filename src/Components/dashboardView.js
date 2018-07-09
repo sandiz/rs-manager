@@ -186,6 +186,7 @@ export default class DashboardView extends React.Component {
     }
     if (changepack) {
       const rpack = await getRandomSongAvailable();
+      if (typeof rpack === 'undefined') { return; }
       this.setState({
         randompackappid: unescape(rpack.appid),
         randompack: replaceRocksmithTerms(unescape(rpack.name)),
