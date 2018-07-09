@@ -1,13 +1,40 @@
 import React from 'react'
 import PropTypes from 'prop-types';
-import { initSongsAvailableDB, isDLCInDB, addToSteamDLCCatalog, getDLCDetails, countSongsAvailable, updateOwnedInDB } from '../sqliteService';
+import { initSongsAvailableDB, isDLCInDB, addToSteamDLCCatalog, getDLCDetails, countSongsAvailable, updateOwnedInDB, updateAcquiredDate, getAppID, countAppID, updateAcquiredDateByAppID } from '../sqliteService';
 import { RemoteAll } from './songlistView';
-import { getOwnedPackages } from '../steamprofileService';
+import { getOwnedPackages, getOwnedHistory } from '../steamprofileService';
 import SongDetailView from './songdetailView';
 import { getSteamLoginSecureCookie } from '../configService'
 
+export function decodeEntity(str) {
+  const elem = document.createElement('textarea');
+  elem.innerHTML = str;
+  return elem.value;
+}
 export function replaceRocksmithTerms(str) {
-  return str.replace("Rocksmith® 2014 Edition – Remastered –", "").replace("Rocksmith® 2014 – ", "").replace("Rocksmith® 2014 Edition – Remastered -", "").replace("Rocksmith® 2014 Edition - Remastered –", "");
+  return decodeEntity(str.replace("Rocksmith® 2014 Edition – Remastered –", "")
+    .replace("Rocksmith® 2014 – ", "")
+    .replace("Rocksmith® 2014 Edition – Remastered -", "")
+    .replace("Rocksmith® 2014 Edition - Remastered –", "")
+    .replace("Rocksmith 2014 -", "")
+    .replace("Rocksmith -", "")
+    .replace("Rocksmith 2014 Edition - Remastered -", "")
+    .replace("Rocksmith® 2014 Edition - Remastered -", "")
+    .replace("Rocksmith&amp;reg; 2014 Edition &amp;ndash; Remastered &amp;ndash;", "")
+    .replace("Rocksmith 2014", "")
+    .replace("Rocksmith® 2014 -", "")
+    .replace("Rocksmith\u00ae 2014 Edition  - Remastered \u2013", "")
+    .replace("Rocksmith\u0099 - ", "")
+    .replace("Rocksmith\u0099 - ", "")
+    .replace("Rocksmith\u00ae 2014 Edition \u2013 Remastered \u2013", "")
+    .replace("Rocksmith&amp;reg; 2014 Edition &amp;ndash; Remastered &amp;ndash;", "")
+    .replace('\\"', "")
+    .replace('\\""', "")
+    .replace(/[“”‘’]/g, '') //remove fancy quotes
+    .replace(/\u2013|\u2014/g, "-") //remove emdash
+    .replace(/ +(?= )/g, '') //remove multi spaces
+    .replace(/["']/g, '')
+    .trim());
 }
 export default class SongAvailableView extends React.Component {
   constructor(props) {
@@ -39,7 +66,7 @@ export default class SongAvailableView extends React.Component {
         text: "AppID",
         style: (cell, row, rowIndex, colIndex) => {
           return {
-            width: '25%',
+            width: '15%',
             cursor: 'pointer',
           };
         },
@@ -50,7 +77,7 @@ export default class SongAvailableView extends React.Component {
         text: "DLC Name",
         style: (cell, row, rowIndex, colIndex) => {
           return {
-            width: '55%',
+            width: '45%',
             cursor: 'pointer',
           };
         },
@@ -71,6 +98,24 @@ export default class SongAvailableView extends React.Component {
         },
         sort: true,
         formatter: (cell, row) => {
+          const d = new Date(0);
+          d.setUTCSeconds(cell / 1000);
+          const o = d.toDateString()
+          return <span>{o}</span>
+        },
+      },
+      {
+        dataField: "acquired_date",
+        text: "Acquired Date",
+        style: (cell, row, rowIndex, colIndex) => {
+          return {
+            width: '25%',
+            cursor: 'pointer',
+          };
+        },
+        sort: true,
+        formatter: (cell, row) => {
+          if (typeof cell === 'undefined' || cell === null) { return <span>-</span> }
           const d = new Date(0);
           d.setUTCSeconds(cell / 1000);
           const o = d.toDateString()
@@ -106,9 +151,20 @@ export default class SongAvailableView extends React.Component {
     })
   }
   updateSteamDLCCatalog = async () => {
+    this.props.updateHeader(
+      this.tabname,
+      this.childtabname,
+      `Fetching Steam DLC Data...`,
+    );
     const c = await window.fetch("https://store.steampowered.com/api/appdetails/?appids=221680&cc=us&l=english&v=1");
     const d = await c.json();
-    const e = d["221680"].data.dlc;
+    let e = d["221680"].data.dlc;
+
+    const c1 = await window.fetch("https://store.steampowered.com/api/appdetails/?appids=205190&cc=us&l=english&v=1");
+    const d1 = await c1.json();
+    const e1 = d1["205190"].data.dlc;
+
+    e = e.concat(e1);
     let newDLC = 0;
     await initSongsAvailableDB();
     let error = false;
@@ -127,15 +183,15 @@ export default class SongAvailableView extends React.Component {
           f = await window.fetch(`https://store.steampowered.com/api/appdetails/?appids=${dlc}&cc=us&l=english&v=1`);
           //eslint-disable-next-line
           const g = await f.json()
-          const h = decodeURIComponent(g[dlc].data.name)
+          const h = replaceRocksmithTerms(decodeURIComponent(g[dlc].data.name))
           const r = g[dlc].data.release_date.date
           this.props.updateHeader(
             this.tabname,
             this.childtabname,
-            `Adding DLC AppID: ${dlc} Name: ${replaceRocksmithTerms(h)}`,
+            `Adding DLC AppID: ${dlc} Name: ${h}`,
           );
           //eslint-disable-next-line
-          await addToSteamDLCCatalog(dlc, escape(h), r);
+          await addToSteamDLCCatalog(dlc, h, r);
           newDLC += 1;
         }
         catch (ex) {
@@ -167,6 +223,78 @@ export default class SongAvailableView extends React.Component {
     )
     this.setState({ dlcs: output, page: 1, totalSize: output[0].acount });
   }
+  updateAcquiredDates = async (tuples) => {
+    //eslint-disable-next-line
+    const songpacks = []
+    let songsupdated = 0;
+    for (let i = 0; i < tuples.length; i += 1) {
+      const data = tuples[i];
+      const date = data[0]
+      const itemname = decodeURIComponent(replaceRocksmithTerms(data[1]))
+      this.props.updateHeader(
+        this.tabname,
+        this.childtabname,
+        `Updating acquired date for ` + itemname,
+      )
+      //TODO: try artist/song split if not found, potential gotcha: london calling the clash
+      //eslint-disable-next-line
+      const res = await updateAcquiredDate(Date.parse(date), itemname);
+      songsupdated += res;
+      if (res === 0) { console.log("failed to update for", itemname); }
+      if (itemname.toLowerCase().includes("song pack")) {
+        songpacks.push([date, itemname]);
+      }
+    }
+    console.log(`TotalData: ${tuples.length} Updated: ${songsupdated} SP: ${songpacks.length}`);
+
+    for (let i = 0; i < songpacks.length; i += 1) {
+      const data = songpacks[i]
+      const date = data[0]
+      const itemname = data[1]
+      this.props.updateHeader(
+        this.tabname,
+        this.childtabname,
+        `Trying to find songpack items for ` + replaceRocksmithTerms(data[1]),
+      )
+      //eslint-disable-next-line
+      let appop = await getAppID(itemname);
+      if (typeof appop === 'undefined') { console.log("no entry for ", itemname); continue }
+      let appid = parseInt(appop.appid, 10)
+      const apprd = appop.release_date
+      //console.log("app id of itemname", data[1], appid, date);
+      let streakbroken = false;
+      const max = 10;
+      let idx = 0;
+      do {
+        // royal blood song pack,
+        // the songs in this pack onwards have child appids in increasing order
+        if (appid >= 590201) {
+          appid += 1
+        }
+        else { appid -= 1; }
+        //eslint-disable-next-line
+        const op = await countAppID(appid, apprd)
+        if (op.count > 0 && !op.name.includes("Song Pack") && idx <= max) {
+          //eslint-disable-next-line
+          const changes = await updateAcquiredDateByAppID(appid, Date.parse(date))
+          //console.log("valid appid", appid, op.name, changes);
+        }
+        else {
+          streakbroken = true;
+        }
+        idx += 1
+      } while (streakbroken === false)
+      //console.log("-----")
+    }
+
+    this.handleTableChange("cdm", {
+      page: this.state.page,
+      sizePerPage: this.state.sizePerPage,
+      filters: {},
+      sortField: "release_date",
+      sortOrder: "desc",
+    })
+  }
   updateOwnedStatus = async () => {
     const cookie = await getSteamLoginSecureCookie();
     if (cookie.length < 10 || cookie === '' || cookie == null) {
@@ -177,6 +305,13 @@ export default class SongAvailableView extends React.Component {
       );
       return;
     }
+    this.props.updateHeader(
+      this.tabname,
+      this.childtabname,
+      `Fetching acquired dates`,
+    );
+    const history = await getOwnedHistory(cookie);
+    await this.updateAcquiredDates(history);
     const pack = await getOwnedPackages(cookie);
     let totalPackages = pack.rgOwnedApps;
     totalPackages = totalPackages.concat(pack.rgOwnedPackages);
@@ -210,7 +345,7 @@ export default class SongAvailableView extends React.Component {
       page: this.state.page,
       sizePerPage: this.state.sizePerPage,
       filters: {},
-      sortField: "owned",
+      sortField: "release_date",
       sortOrder: "desc",
     })
   }
@@ -313,7 +448,7 @@ export default class SongAvailableView extends React.Component {
             <a
               onClick={this.updateOwnedStatus}
               className={ownedstyle}>
-              Update Owned Status
+              Update Owned/Acquired Date
             </a>
             <a
               onClick={this.generateYouTube}
