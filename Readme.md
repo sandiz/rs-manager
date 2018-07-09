@@ -3,9 +3,11 @@ Rocksmith's UI leaves a lot to be desired especially when you have a lot of song
 
 ![Dashboard](https://github.com/sandiz/rs-manager/raw/master/assets/images/dashboard.png)
 
-# Current Functionalities:
+## Screenshots
+
+## Current Functionalities:
     * Add more info
 
-# TODO:
+## TODO:
     * import all setlists from game
     * generate youtube playlist of current view
