@@ -35,7 +35,7 @@ Version alpha2 - [Mac](https://github.com/sandiz/rs-manager/releases/latest) | [
 ![Settings](https://github.com/sandiz/rs-manager/raw/master/assets/images/settings.png)
 
 
-## TODO:
+## TODO
 - read config/db from appData folder instead of `dirname`
 - import all setlists from game
 - generate youtube playlist of current view
