@@ -8,6 +8,3 @@ check_task:
 osx_instance:
   image: high-sierra-xcode-9.4
   script: npm run build && npm run package-mac
-windows_container:
-  image: cirrusci/windowsservercore:2016
-  script: npm run build \n npm run package-win
