@@ -3,6 +3,11 @@ Rocksmith's UI leaves a lot to be desired especially when you have a lot of song
 
 ![Dashboard](https://github.com/sandiz/rs-manager/raw/master/assets/images/dashboard.png)
 
+## Usage
+    Settings - Enter prfldb and steamLoginCookie
+    PSARC Explorer - scan rs2014 directory - update songlist
+    Songs Owned - if prfldb - update favs and mastery
+    RS Catalog 
 ## Current Functionalities:
     * Add more info
 ## Screenshots
@@ -25,3 +30,7 @@ Rocksmith's UI leaves a lot to be desired especially when you have a lot of song
 ## TODO:
     * import all setlists from game
     * generate youtube playlist of current view
+
+## Development
+    * Instructions for dev
+    * Instructions for build
