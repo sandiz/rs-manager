@@ -6,7 +6,7 @@ import readProfile from '../steamprofileService';
 import { addToFavorites, initSetlistPlaylistDB, getSongsFromPlaylistDB, removeSongFromSetlist, updateMasteryandPlayed, initSongsOwnedDB } from '../sqliteService';
 import getProfileConfig, { updateProfileConfig } from '../configService';
 
-const path = require('path');
+const { path } = window;
 
 function unescapeFormatter(cell, row) {
   return <span>{unescape(cell)}</span>;

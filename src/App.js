@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import path from 'path';
 import Sidebar from './Components/Sidebar'
 import PSARCView from './Components/psarcView'
 import SonglistView from './Components/songlistView'
@@ -9,6 +8,8 @@ import SongAvailableView from './Components/songavailableView';
 import SetlistView from './Components/setlistView';
 import SettingsView from './Components/settingsView';
 import './App.css'
+
+const { path } = window;
 
 class App extends Component {
   constructor(props) {

@@ -8,7 +8,7 @@ import { initSetlistPlaylistDB, getSongsOwned, countSongsOwned, updateMasteryand
 import getProfileConfig, { updateProfileConfig } from '../configService';
 import SongDetailView from './songdetailView';
 
-const path = require('path');
+const { path } = window;
 
 function unescapeFormatter(cell, row) {
   return <span>{unescape(cell)}</span>;

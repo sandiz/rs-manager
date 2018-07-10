@@ -1,8 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types';
-import path from 'path'
 import getProfileConfig, { updateSteamLoginSecureCookie, getSteamLoginSecureCookie, updateProfileConfig } from '../configService';
 
+const { path } = window;
 const { remote } = window.require('electron')
 export default class SettingsView extends React.Component {
   constructor(props) {

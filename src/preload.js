@@ -14,6 +14,17 @@ window.processPSARC = require("./lib/libpsarc").processPSARC
 window.extractFile = require("./lib/libpsarc").extractFile
 const rp = require('request-promise');
 
+//eslint-disable-next-line
+window.path = null;
+
+if (window.os.platform() === 'win32') {
+  //eslint-disable-next-line
+  window.path = require("path").win32;
+}
+else {
+  //eslint-disable-next-line
+  window.path = require("path"); 
+}
 
 
 window.request = async function (uri, cookie, cookieurl, qs) {

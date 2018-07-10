@@ -3,8 +3,8 @@ const aesjs = require('aes-js');
 const zlib = require('zlib')
 const fs = require('fs')
 const { promisify } = require('util');
+const path = require('path')
 //const crypto = require("crypto")
-const path = require("path")
 
 const openFD = promisify(fs.open)
 const readFD = promisify(fs.read)
@@ -13,7 +13,6 @@ const ARC_KEY = "C53DB23870A1A2F71CAE64061FDD0E1157309DC85204D4C5BFDF25090DF2572
 const ARC_IV = "E915AA018FEF71FC508132E4BB4CEB42"
 const MAC_KEY = "9821330E34B91F70D0A48CBD625993126970CEA09192C0E6CDA676CC9838289D"
 const WIN_KEY = "CB648DF3D12A16BF71701414E69619EC171CCA5D2A142E3E59DE7ADDA18A3A30"
-
 
 const writeFile = (filePath, data) => new Promise((resolve, reject) => {
   fs.writeFile(filePath, data, (err) => {
