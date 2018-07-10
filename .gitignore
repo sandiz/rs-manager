@@ -23,3 +23,5 @@ release-builds/
 config.json
 rsdb.sqlite
 /.vscode
+config.dev.json
+rsdb.dev.sqlite
