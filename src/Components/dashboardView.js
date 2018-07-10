@@ -7,7 +7,7 @@ import { updateMasteryandPlayed, initSongsOwnedDB, getSongID, countSongsOwned, g
 import { replaceRocksmithTerms } from './songavailableView';
 import SongDetailView from './songdetailView';
 
-const path = require('path');
+const { path } = window;
 
 export default class DashboardView extends React.Component {
   constructor(props) {

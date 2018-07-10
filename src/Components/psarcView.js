@@ -2,11 +2,11 @@ import React from 'react'
 import BootstrapTable from 'react-bootstrap-table-next'
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
-import path from 'path';
 import PropTypes from 'prop-types';
 import readPSARC, { psarcToJSON, extractFile } from '../psarcService';
 import updateSongsOwned, { initSongsOwnedDB, saveSongsOwnedDB } from '../sqliteService';
 
+const { path } = window;
 const { remote } = window.require('electron')
 function sizeFormatter(cell, row) {
   return <span>{Math.round(cell / 1024 / 1024)} MB</span>;
