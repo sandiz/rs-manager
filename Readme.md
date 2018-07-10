@@ -36,6 +36,7 @@ Version alpha1 - [Mac](https://github.com/sandiz/rs-manager/releases/download/al
 
 
 ## TODO:
+- read config/db from appData folder instead of `dirname`
 - import all setlists from game
 - generate youtube playlist of current view
 

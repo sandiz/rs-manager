@@ -68,9 +68,9 @@ function createWindow() {
 app.on("ready", createWindow);
 
 app.on("window-all-closed", () => {
-    if (process.platform !== "darwin") {
-        app.quit();
-    }
+    //if (process.platform !== "darwin") {
+    app.quit();
+    //}
 });
 
 app.on("activate", () => {
@@ -81,4 +81,4 @@ app.on("activate", () => {
 
 exp.get('/yt/:vid', (req, res) => res.send(`<iframe id="yt-video" style="height:95%;width:100%" src="https://www.youtube.com/embed/${req.params.vid}?modestbranding=0;&rel=0&amp;&amp;showinfo=0"" frameborder="0"></iframe>`))
 
-exp.listen(8000, () => console.log('Example app listening on port 3000!'))
+exp.listen(8000, () => console.log('RSManager listening on port 8000 for yt requests (/yt/:vid).'))
