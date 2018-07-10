@@ -5,6 +5,6 @@ check_task:
     folder: node_modules
     fingerprint_script: cat package-lock.json
     populate_script: npm install
-osx_instance:
-  image: high-sierra-xcode-9.4
-  script: npm run build && npm run package-mac
+  osx_instance:
+    image: high-sierra-xcode-9.4
+    script: npm run build && npm run package-mac
