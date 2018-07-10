@@ -3,7 +3,7 @@ Rocksmith's UI leaves a lot to be desired especially when you have a lot of song
 
 ![Dashboard](https://github.com/sandiz/rs-manager/raw/master/assets/images/dashboard.png)
 ## Release
-Version alpha1 - [Mac](https://github.com/sandiz/rs-manager/releases/download/alpha1/Rocksmith.Manager-macos-x64.zip) | [Windows](https://github.com/sandiz/rs-manager/releases/download/alpha1/Rocksmith.Manager-win32-x64.zip)
+Version alpha2 - [Mac](https://github.com/sandiz/rs-manager/releases/download/alpha2/Rocksmith.Manager-macos-x64.zip) | [Windows](https://github.com/sandiz/rs-manager/releases/download/alpha2/Rocksmith.Manager-win32-x64.zip)
 
 
 ## Usage
