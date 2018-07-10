@@ -3,8 +3,10 @@ container:
 check_task:
   node_modules_cache:
     folder: node_modules
-    fingerprint_script: cat package-lock.json
-    populate_script: npm install
+    fingerprint_script: cat yarn.lock
+    populate_script: yarn install
   osx_instance:
     image: high-sierra-xcode-9.4
-  script: npm run build && npm run package-mac
+  script: 
+    - yarn run build 
+    - npm run package-mac

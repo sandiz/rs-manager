@@ -199,7 +199,7 @@ export default class SongDetailView extends React.Component {
                       onClick={this.chooseMV}
                       className={mvstyle}>
                       Music Video
-                  </a>
+                    </a>
                     <a
                       onClick={async () => {
                         await this.props.removeFromSetlist();
@@ -207,12 +207,12 @@ export default class SongDetailView extends React.Component {
                       }}
                       className={setlistyle}>
                       Remove from Setlist
-                  </a>
+                    </a>
                     <a
                       onClick={async () => { this.addToSetlist(); this.props.close(); }}
                       className={songliststyle}>
                       Add to Setlist
-                  </a>
+                    </a>
                     <select onChange={this.saveSetlist} style={{ margin: 12 + 'px' }}>
                       {this.state.setlists}
                     </select></span>
