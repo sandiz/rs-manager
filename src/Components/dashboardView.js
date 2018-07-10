@@ -110,7 +110,9 @@ export default class DashboardView extends React.Component {
       }
       if (mostPlayed !== "") {
         const song = await getSongID(mostPlayed)
-        mostPlayed = unescape(song.song) + " by " + unescape(song.artist);
+        if (typeof song.song === 'undefined') { mostPlayed = "-"; }
+        else
+        { mostPlayed = unescape(song.song) + " by " + unescape(song.artist); }
       }
       let playingText = "";
       const dateObj = this.convertMS(stats.TimePlayed * 1000);
