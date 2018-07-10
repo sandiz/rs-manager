@@ -398,7 +398,7 @@ export default class SetlistView extends React.Component {
                   onClick={this.updateFavs}
                   className={choosepsarchstyle}>
                   Update Favorites from RS Profile
-            </a>
+                </a>
                 :
                 ""
             }
