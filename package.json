@@ -60,8 +60,8 @@
     "dist": "npm run build && build",
     "postinstall": "electron-rebuild  -f -w  sqlite3",
     "postinstall1": "cross-env DEBUG=electron-builder electron-builder install-app-deps",
-    "package-mac": "electron-packager . 'Rocksmith Manager' --overwrite --platform=darwin --arch=x64 --icon=src/assets/icons/mac/mac.icns --prune=true --out=release-builds",
-    "package-win": "electron-packager . \"Rocksmith Manager\" --overwrite --platform=win32 --arch=x64 --icon=src/assets/icons/win/rs.ico --prune=true --out=release-builds"
+    "package-mac": "electron-packager . 'Rocksmith Manager' --overwrite --platform=darwin --arch=x64 --icon=src/assets/icons/mac/mac.icns --prune=true --out=release-builds --ignore=config.dev.json --ignore=rsdb.dev.sqlite",
+    "package-win": "electron-packager . \"Rocksmith Manager\" --overwrite --platform=win32 --arch=x64 --icon=src/assets/icons/win/rs.ico --prune=true --out=release-builds --ignore=config.dev.json --ignore=rsdb.dev.sqlite"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
