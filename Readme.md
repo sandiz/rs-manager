@@ -4,13 +4,15 @@ Rocksmith's UI leaves a lot to be desired especially when you have a lot of song
 ![Dashboard](https://github.com/sandiz/rs-manager/raw/master/assets/images/dashboard.png)
 
 ## Usage
-    1. Settings [Settings][]
-        - Use the settings pane to link your Rocksmith and Steam Profile
-    2. PSARC Explorer - scan rs2014 directory - update songlist
-    3. Songs Owned - if prfldb - update favs and mastery
-    4. RS Catalog 
-## Current Functionalities:
-    * Add more info
+- [Settings](#settings)
+    - Use the settings pane to link your Rocksmith and Steam Profile
+- [PSARC Explorer](#psarc-explorer)
+    - Choose SteamApps/common/Rocksmith2014/ as your `psarc` folder to generate a list of all songs your own. Once the scan is complete the Songs->Owned section will be populated with all the info extracted from the psarc file. (Use this to also keep your song collection up to date after you buy new songs froms Steam)
+- [Songs Owned](#songs-owned)
+    - Songs->Owned section should now list songs that you own. You can use basic operations like search, sort, filter as well as view YouTube vidoes of your songs or add them to setlists. If you linked your Rocksmith profile in [Settings](#settings) you can Update RS Favorites/Mastery by clicking the appropriate button
+- [RS Catalog](#songs-available)
+    - This section should already be populated with all the dlc's release so far. You can use the options in this view, to keep the list up to date as well as retreive metadata from steam about ownership/acquire date. (requires steam profile to be linked in Settings)
+
 ## Screenshots
 ### Songs Owned
 ![Songs Owned](https://github.com/sandiz/rs-manager/raw/master/assets/images/songs.owned.png)
@@ -31,9 +33,14 @@ Rocksmith's UI leaves a lot to be desired especially when you have a lot of song
 
 
 ## TODO:
-    * import all setlists from game
-    * generate youtube playlist of current view
+- import all setlists from game
+- generate youtube playlist of current view
 
 ## Development
-    * Instructions for dev
-    * Instructions for build
+- Instructions for dev
+    - `npm install` to install all dependencies
+    - `npm run start` to launch app in debug mode
+- Instructions for build
+    - `npm run build` to generate build files
+    - `npm run package-mac` for mac builds
+    - `npm run package-win` for win builds
