@@ -3,7 +3,7 @@ Rocksmith's UI leaves a lot to be desired especially when you have a lot of song
 
 ![Dashboard](https://github.com/sandiz/rs-manager/raw/master/assets/images/dashboard.png)
 ## Release
-Version alpha2 - [Mac](https://github.com/sandiz/rs-manager/releases/download/alpha2/Rocksmith.Manager-macos-x64.zip) | [Windows](https://github.com/sandiz/rs-manager/releases/download/alpha2/Rocksmith.Manager-win32-x64.zip)
+Version alpha2 - [Mac](https://github.com/sandiz/rs-manager/releases/latest) | [Windows](https://github.com/sandiz/rs-manager/releases/latest)
 
 
 ## Usage
@@ -42,9 +42,9 @@ Version alpha2 - [Mac](https://github.com/sandiz/rs-manager/releases/download/al
 
 ## Development
 - Instructions for dev
-    - `npm install` to install all dependencies
-    - `npm run start` to launch app in debug mode
+    - `yarn install` to install all dependencies
+    - `yarn start` to launch app in debug mode
 - Instructions for build
-    - `npm run build` to generate build files
-    - `npm run package-mac` for mac builds
-    - `npm run package-win` for win builds
+    - `yarn run build` to generate build files
+    - `yarn run package-mac` for mac builds
+    - `yarn run package-win` for win builds
