@@ -78,8 +78,6 @@ RemoteAll.propTypes = {
 export default class SonglistView extends React.Component {
   constructor(props) {
     super(props);
-    this.tabname = this.props.requiredTab
-    this.childtabname = this.props.requiredChildTab
     this.state = {
       songs: [],
       page: 1,
@@ -89,6 +87,8 @@ export default class SonglistView extends React.Component {
       showSong: '',
       showArtist: '',
     };
+    this.tabname = "tab-songs"
+    this.childtabname = "songs-owned"
     this.lastsortfield = "song";
     this.lastsortorder = "asc";
     this.search = "";
@@ -393,72 +393,60 @@ export default class SonglistView extends React.Component {
     }
   }
   render = () => {
-    if (this.props.currentTab === null) {
-      return null;
-    } else if (this.props.currentTab.id === this.tabname &&
-      this.props.currentChildTab.id === this.childtabname) {
-      const { songs, sizePerPage, page } = this.state;
-      const choosepsarchstyle = "extraPadding download " + (this.state.totalSize <= 0 ? "isDisabled" : "");
-      return (
-        <div>
-          <div style={{ width: 100 + '%', margin: "auto", textAlign: "center" }}>
-            <input
-              ref={(node) => { this.search = node }}
-              style={{ width: 50 + '%', border: "1px solid black", padding: 5 + "px" }}
-              name="search"
-              onChange={this.handleSearchChange}
-              placeholder="Search..."
-              type="search"
-            />
-          </div>
-          <div className="centerButton list-unstyled">
-            <a
-              onClick={this.updateFavs}
-              className={choosepsarchstyle}>
-              Update Favorites from RS Profile
-            </a>
-            <a
-              onClick={this.updateMastery}
-              className={choosepsarchstyle}>
-              Update Mastery from RS Profile
-            </a>
-          </div>
-          <div>
-            <RemoteAll
-              keyField="id"
-              data={songs}
-              page={page}
-              sizePerPage={sizePerPage}
-              totalSize={this.state.totalSize}
-              onTableChange={this.handleTableChange}
-              columns={this.columns}
-              rowEvents={this.rowEvents}
-            />
-          </div>
-          <div>
-            <SongDetailView
-              song={this.state.showSong}
-              artist={this.state.showArtist}
-              album={this.state.showAlbum}
-              showDetail={this.state.showDetail}
-              close={() => this.setState({ showDetail: false })}
-              isSongview
-              isSetlist={false}
-            />
-          </div>
+    const { songs, sizePerPage, page } = this.state;
+    const choosepsarchstyle = "extraPadding download " + (this.state.totalSize <= 0 ? "isDisabled" : "");
+    return (
+      <div>
+        <div style={{ width: 100 + '%', margin: "auto", textAlign: "center" }}>
+          <input
+            ref={(node) => { this.search = node }}
+            style={{ width: 50 + '%', border: "1px solid black", padding: 5 + "px" }}
+            name="search"
+            onChange={this.handleSearchChange}
+            placeholder="Search..."
+            type="search"
+          />
         </div>
-      );
-    }
-    return null;
+        <div className="centerButton list-unstyled">
+          <a
+            onClick={this.updateFavs}
+            className={choosepsarchstyle}>
+            Update Favorites from RS Profile
+          </a>
+          <a
+            onClick={this.updateMastery}
+            className={choosepsarchstyle}>
+            Update Mastery from RS Profile
+          </a>
+        </div>
+        <div>
+          <RemoteAll
+            keyField="id"
+            data={songs}
+            page={page}
+            sizePerPage={sizePerPage}
+            totalSize={this.state.totalSize}
+            onTableChange={this.handleTableChange}
+            columns={this.columns}
+            rowEvents={this.rowEvents}
+          />
+        </div>
+        <div>
+          <SongDetailView
+            song={this.state.showSong}
+            artist={this.state.showArtist}
+            album={this.state.showAlbum}
+            showDetail={this.state.showDetail}
+            close={() => this.setState({ showDetail: false })}
+            isSongview
+            isSetlist={false}
+          />
+        </div>
+      </div>
+    );
   }
 }
 SonglistView.propTypes = {
-  currentTab: PropTypes.object,
-  currentChildTab: PropTypes.object,
-  requiredTab: PropTypes.string,
-  requiredChildTab: PropTypes.string,
-  // eslint-disable-next-line
-  sqliteTable: PropTypes.string,
   // eslint-disable-next-line
   updateHeader: PropTypes.func,
   // eslint-disable-next-line
@@ -466,11 +454,6 @@ SonglistView.propTypes = {
   handleChange: PropTypes.func,
 }
 SonglistView.defaultProps = {
-  currentTab: null,
-  currentChildTab: null,
-  requiredTab: '',
-  requiredChildTab: '',
-  sqliteTable: '',
   updateHeader: () => { },
   resetHeader: () => { },
   handleChange: () => { },

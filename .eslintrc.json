@@ -12,6 +12,7 @@
         "sourceType": "module"
     },
     "rules": {
+        "react/jsx-indent": "off",
         "linebreak-style": "off",
         "react/jsx-filename-extension": "off",
         "brace-style": "off",

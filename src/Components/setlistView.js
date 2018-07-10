@@ -43,7 +43,7 @@ function countFormmatter(cell, row) {
 export default class SetlistView extends React.Component {
   constructor(props) {
     super(props);
-    this.tabname = this.props.requiredTab
+    this.tabname = "tab-setlist"
     this.state = {
       songs: [],
       page: 1,
@@ -178,17 +178,20 @@ export default class SetlistView extends React.Component {
         })
       },
     };
-    this.lastChildID = ""
     this.lastsortfield = "mastery"
     this.lastsortorder = "desc"
+    this.lastChildID = props.currentChildTab.id;
+    this.handleTableChange("cdm", {
+      page: this.state.page,
+      sizePerPage: this.state.sizePerPage,
+      filters: {},
+    })
   }
-
   shouldComponentUpdate = async (nextprops, nextstate) => {
     if (nextprops.currentChildTab === null) { return false; }
     if (this.lastChildID === nextprops.currentChildTab.id) { return false; }
-    if (nextprops.currentChildTab.id.indexOf("setlist_") === -1) { return false; }
     this.lastChildID = nextprops.currentChildTab.id;
-    await this.handleTableChange("cdm", {
+    this.handleTableChange("cdm", {
       page: this.state.page,
       sizePerPage: this.state.sizePerPage,
       filters: {},
@@ -369,80 +372,75 @@ export default class SetlistView extends React.Component {
   }
 
   render = () => {
-    if (this.props.currentTab === null) {
-      return null;
-    } else if (this.props.currentTab.id === this.tabname) {
-      const { songs, sizePerPage, page } = this.state;
-      const choosepsarchstyle = "extraPadding download " + (this.state.totalSize <= 0 ? "isDisabled" : "");
-      return (
-        <div>
-          <div
-            className="centerButton list-unstyled"
-            style={{
-              width: 100 + '%',
-              margin: "auto",
-              textAlign: "center",
-            }}>
-            <input
-              ref={(node) => { this.search = node }}
-              style={{ width: 50 + '%', border: "1px solid black", padding: 5 + "px" }}
-              name="search"
-              onChange={this.handleSearchChange}
-              placeholder="Search..."
-              type="search"
-            />
-            <br /><br />
-            {
-              this.lastChildID === "setlist_favorites" ?
-                <a
-                  onClick={this.updateFavs}
-                  className={choosepsarchstyle}>
-                  Update Favorites from RS Profile
-                </a>
-                :
-                ""
-            }
-            <a
-              onClick={this.updateMastery}
-              className={choosepsarchstyle}>
-              Update Mastery from RS Profile
-            </a>
-            <br />
-          </div>
-          <div>
-            <RemoteAll
-              keyField="id"
-              data={songs}
-              page={page}
-              sizePerPage={sizePerPage}
-              totalSize={this.state.totalSize}
-              onTableChange={this.handleTableChange}
-              columns={this.columns}
-              rowEvents={this.rowEvents}
-            />
-          </div>
-          <div>
-            <SongDetailView
-              song={this.state.showSong}
-              artist={this.state.showArtist}
-              album={this.state.showAlbum}
-              showDetail={this.state.showDetail}
-              close={() => this.setState({ showDetail: false })}
-              isSetlist
-              removeFromSetlist={this.removeFromSetlist}
-            />
-          </div>
+    const { songs, sizePerPage, page } = this.state;
+    const choosepsarchstyle = "extraPadding download " + (this.state.totalSize <= 0 ? "isDisabled" : "");
+    return (
+      <div>
+        <div
+          className="centerButton list-unstyled"
+          style={{
+            width: 100 + '%',
+            margin: "auto",
+            textAlign: "center",
+          }}>
+          <input
+            ref={(node) => { this.search = node }}
+            style={{ width: 50 + '%', border: "1px solid black", padding: 5 + "px" }}
+            name="search"
+            onChange={this.handleSearchChange}
+            placeholder="Search..."
+            type="search"
+          />
+          <br /><br />
+          {
+            this.lastChildID === "setlist_favorites" ?
+              <a
+                onClick={this.updateFavs}
+                className={choosepsarchstyle}>
+                Update Favorites from RS Profile
+              </a>
+              :
+              ""
+          }
+          <a
+            onClick={this.updateMastery}
+            className={choosepsarchstyle}>
+            Update Mastery from RS Profile
+          </a>
+          <br />
         </div>
-      );
-    }
-    return null;
+        <div>
+          <RemoteAll
+            keyField="id"
+            data={songs}
+            page={page}
+            sizePerPage={sizePerPage}
+            totalSize={this.state.totalSize}
+            onTableChange={this.handleTableChange}
+            columns={this.columns}
+            rowEvents={this.rowEvents}
+          />
+        </div>
+        <div>
+          <SongDetailView
+            song={this.state.showSong}
+            artist={this.state.showArtist}
+            album={this.state.showAlbum}
+            showDetail={this.state.showDetail}
+            close={() => this.setState({ showDetail: false })}
+            isSetlist
+            removeFromSetlist={this.removeFromSetlist}
+          />
+        </div>
+      </div>
+    );
   }
 }
 SetlistView.propTypes = {
+  // eslint-disable-next-line
   currentTab: PropTypes.object,
   // eslint-disable-next-line
   currentChildTab: PropTypes.object,
-  requiredTab: PropTypes.string,
   // eslint-disable-next-line
   updateHeader: PropTypes.func,
   // eslint-disable-next-line
@@ -452,7 +450,6 @@ SetlistView.propTypes = {
 SetlistView.defaultProps = {
   currentTab: null,
   currentChildTab: null,
-  requiredTab: '',
   updateHeader: () => { },
   resetHeader: () => { },
   handleChange: () => { },

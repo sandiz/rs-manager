@@ -39,8 +39,8 @@ export function replaceRocksmithTerms(str) {
 export default class SongAvailableView extends React.Component {
   constructor(props) {
     super(props);
-    this.tabname = this.props.requiredTab
-    this.childtabname = this.props.requiredChildTab
+    this.tabname = "tab-songs"
+    this.childtabname = "songs-available"
     this.state = {
       dlcs: [],
       page: 1,
@@ -421,81 +421,69 @@ export default class SongAvailableView extends React.Component {
     }
   }
   render = () => {
-    if (this.props.currentTab === null) {
-      return null;
-    } else if (this.props.currentTab.id === this.tabname &&
-      this.props.currentChildTab.id === this.childtabname) {
-      const ownedstyle = "extraPadding download " + (this.state.dlcs.length > 0 ? " " : "hidden");
-      const { dlcs, sizePerPage, page } = this.state;
-      return (
-        <div>
-          <div style={{ width: 100 + '%', margin: "auto", textAlign: "center" }}>
-            <input
-              ref={(node) => { this.search = node }}
-              style={{ width: 50 + '%', border: "1px solid black", padding: 5 + "px" }}
-              name="search"
-              onChange={this.handleSearchChange}
-              placeholder="Search... (keywords: owned, available)"
-              type="search"
-            />
-          </div>
-          <div className="centerButton list-unstyled">
-            <a
-              onClick={this.updateSteamDLCCatalog}
-              className="extraPadding download">
-              Update Rocksmith DLC Catalog
-            </a>
-            <a
-              onClick={this.updateOwnedStatus}
-              className={ownedstyle}>
-              Update Owned/Acquired Date
-            </a>
-            <a
-              onClick={this.generateYouTube}
-              className="extraPadding download isDisabled">
-              Generate YouTube playlist
-            </a>
-          </div>
-          <div>
-            <RemoteAll
-              keyField="appid"
-              data={dlcs}
-              page={page}
-              classes="psarcTable"
-              sizePerPage={sizePerPage}
-              totalSize={this.state.totalSize}
-              onTableChange={this.handleTableChange}
-              columns={this.columns}
-              rowEvents={this.rowEvents}
-            />
-          </div>
-          <div>
-            <SongDetailView
-              song={this.state.randompack}
-              artist="Rocksmith"
-              album="Steam"
-              showDetail={this.state.showsongpackpreview}
-              close={() => this.setState({ showsongpackpreview: false })}
-              isSongview
-              isSongpack
-              dlcappid={this.state.randompackappid}
-              isSetlist={false}
-            />
-          </div>
+    const ownedstyle = "extraPadding download " + (this.state.dlcs.length > 0 ? " " : "hidden");
+    const { dlcs, sizePerPage, page } = this.state;
+    return (
+      <div>
+        <div style={{ width: 100 + '%', margin: "auto", textAlign: "center" }}>
+          <input
+            ref={(node) => { this.search = node }}
+            style={{ width: 50 + '%', border: "1px solid black", padding: 5 + "px" }}
+            name="search"
+            onChange={this.handleSearchChange}
+            placeholder="Search... (keywords: owned, available)"
+            type="search"
+          />
         </div>
-      );
-    }
-    return null;
+        <div className="centerButton list-unstyled">
+          <a
+            onClick={this.updateSteamDLCCatalog}
+            className="extraPadding download">
+            Update Rocksmith DLC Catalog
+          </a>
+          <a
+            onClick={this.updateOwnedStatus}
+            className={ownedstyle}>
+            Update Owned/Acquired Date
+          </a>
+          <a
+            onClick={this.generateYouTube}
+            className="extraPadding download isDisabled">
+            Generate YouTube playlist
+          </a>
+        </div>
+        <div>
+          <RemoteAll
+            keyField="appid"
+            data={dlcs}
+            page={page}
+            classes="psarcTable"
+            sizePerPage={sizePerPage}
+            totalSize={this.state.totalSize}
+            onTableChange={this.handleTableChange}
+            columns={this.columns}
+            rowEvents={this.rowEvents}
+          />
+        </div>
+        <div>
+          <SongDetailView
+            song={this.state.randompack}
+            artist="Rocksmith"
+            album="Steam"
+            showDetail={this.state.showsongpackpreview}
+            close={() => this.setState({ showsongpackpreview: false })}
+            isSongview
+            isSongpack
+            dlcappid={this.state.randompackappid}
+            isSetlist={false}
+          />
+        </div>
+      </div>
+    );
   }
 }
 
 SongAvailableView.propTypes = {
-  currentTab: PropTypes.object,
-  currentChildTab: PropTypes.object,
-  requiredTab: PropTypes.string,
-  requiredChildTab: PropTypes.string,
-  // eslint-disable-next-line
-  sqliteTable: PropTypes.string,
   // eslint-disable-next-line
   updateHeader: PropTypes.func,
   // eslint-disable-next-line
@@ -504,11 +492,6 @@ SongAvailableView.propTypes = {
   handleChange: PropTypes.func,
 }
 SongAvailableView.defaultProps = {
-  currentTab: null,
-  currentChildTab: null,
-  requiredTab: '',
-  requiredChildTab: '',
-  sqliteTable: '',
   updateHeader: () => { },
   resetHeader: () => { },
   handleChange: () => { },
