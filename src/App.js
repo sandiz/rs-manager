@@ -22,6 +22,7 @@ class App extends Component {
       currentProfile: '',
       currentCookie: '',
     };
+    this.songlistRef = null;
     //this.handleChange = this.handleChange.bind(this);
   }
   componentDidMount = async () => {
@@ -131,8 +132,10 @@ class App extends Component {
               <PSARCView
                 currentTab={this.state.currentTab}
                 updateHeader={this.updateHeader}
-                resetHeader={this.resetHeader} />
+                resetHeader={this.resetHeader}
+                songlistRef={this.songlistRef} />
               <SonglistView
+                ref={(child) => { this.songlistRef = child; }}
                 currentTab={this.state.currentTab}
                 currentChildTab={this.state.currentChildTab}
                 requiredTab="tab-songs"

@@ -277,6 +277,9 @@ export default class PSARCView extends React.Component {
     //setTimeout(() => { this.props.resetHeader(this.tabname) }, 5000);
     await saveSongsOwnedDB();
     this.props.updateHeader(this.tabname, "Updated Songlist with " + this.state.files.length + " Arrangements");
+    if (this.props.songlistRef !== null) {
+      this.props.songlistRef.refreshView();
+    }
   }
   render = () => {
     const stopprocessingstyle = this.state.processing ? "" : "none";
@@ -496,10 +499,12 @@ export default class PSARCView extends React.Component {
 PSARCView.propTypes = {
   currentTab: PropTypes.object,
   updateHeader: PropTypes.func,
+  songlistRef: PropTypes.object,
   //resetHeader: PropTypes.func,
 }
 PSARCView.defaultProps = {
   currentTab: null,
   updateHeader: () => { },
+  songlistRef: null,
   //resetHeader: () => { },
 }
