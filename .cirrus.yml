@@ -1,5 +1,5 @@
 container:
-  image: node:latest
+  image: circleci/node@sha256:895bd70ebcf4fd8a61a38f236fdea711859ac5d24357dc419559e53b06bac476
 check_task:
   node_modules_cache:
     folder: node_modules
@@ -9,4 +9,4 @@ check_task:
     image: high-sierra-xcode-9.4
   script: 
     - yarn run build 
-    - npm run package-mac
+    - yarn run package-mac
