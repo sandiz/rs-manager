@@ -232,16 +232,6 @@ export default class SonglistView extends React.Component {
       filters: {},
     })
   }
-  shouldComponentUpdate = async (nextprops, nextstate) => {
-    if (this.props === nextprops) { return false; }
-    this.handleTableChange("cdm", {
-      page: this.state.page,
-      sizePerPage: this.state.sizePerPage,
-      filters: {},
-    })
-    return true;
-  }
-
   handleSearchChange = (e) => {
     this.handleTableChange('filter', {
       page: 1,
@@ -359,7 +349,13 @@ export default class SonglistView extends React.Component {
       );
     }
   }
-
+  refreshView = async () => {
+    this.handleTableChange("cdm", {
+      page: this.state.page,
+      sizePerPage: this.state.sizePerPage,
+      filters: {},
+    })
+  }
   handleTableChange = async (type, {
     page,
     sizePerPage,
