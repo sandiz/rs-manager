@@ -18,7 +18,7 @@ const TabsData = [
       },
       {
         name: 'RS DLC Catalog',
-        id: 'songs-purchased',
+        id: 'songs-available',
       },
     ],
   },

@@ -111,8 +111,7 @@ export default class DashboardView extends React.Component {
       if (mostPlayed !== "") {
         const song = await getSongID(mostPlayed)
         if (typeof song.song === 'undefined') { mostPlayed = "-"; }
-        else
-        { mostPlayed = unescape(song.song) + " by " + unescape(song.artist); }
+        else { mostPlayed = unescape(song.song) + " by " + unescape(song.artist); }
       }
       let playingText = "";
       const dateObj = this.convertMS(stats.TimePlayed * 1000);
@@ -261,237 +260,233 @@ export default class DashboardView extends React.Component {
     await this.fetchStats();
   }
   render = () => {
-    if (this.props.currentTab === null) {
-      return null;
-    } else if (this.props.currentTab.id === this.tabname) {
-      return (
-        <div className="container-fluid">
-          <div className="centerButton list-unstyled">
-            <a
-              onClick={this.refreshStats}
-              className="extraPadding download">
-              Refresh Stats from Profile
-            </a>
-          </div>
-          <br />
-          <div className="row justify-content-md-center" style={{ marginTop: -30 + 'px' }}>
-            <div className="col col-md-3 ta-center dashboard-top dashboard-header">
-              <div>
-                <a onClick={() => this.fetchRandomStats(false, true)}>Random Purchasable DLC</a>
-                <hr />
-              </div>
-              <div style={{ marginTop: -6 + 'px' }}>
-                <span style={{ fontSize: 26 + 'px' }}>
-                  <a
-                    onClick={() => { this.setState({ showsongpackpreview: true }) }}>
-                    {this.state.randompack}
-                  </a>
-                </span>
-                <br />
-              </div>
+    return (
+      <div className="container-fluid">
+        <div className="centerButton list-unstyled">
+          <a
+            onClick={this.refreshStats}
+            className="extraPadding download">
+            Refresh Stats from Profile
+          </a>
+        </div>
+        <br />
+        <div className="row justify-content-md-center" style={{ marginTop: -30 + 'px' }}>
+          <div className="col col-md-3 ta-center dashboard-top dashboard-header">
+            <div>
+              <a onClick={() => this.fetchRandomStats(false, true)}>Random Purchasable DLC</a>
+              <hr />
             </div>
-            <div className="col col-md-3 ta-center dashboard-top dashboard-header">
-              <div>
+            <div style={{ marginTop: -6 + 'px' }}>
+              <span style={{ fontSize: 26 + 'px' }}>
                 <a
-                  onClick={
-                    () => { window.shell.openExternal(this.state.weeklysongspotlight.url) }}>
-                  Reddit Weekly Song Spotlight</a>
-                <hr />
-              </div>
-              <div style={{ marginTop: -6 + 'px' }}>
-                <span style={{ fontSize: 26 + 'px' }}>
-                  <a
-                    onClick={() => {
-                      this.setState({ showweekly: true, showsongpackpreview: true })
-                    }}>
-                    {this.state.weeklysongspotlight.title}
-                  </a>
-                </span>
-                <br />
-              </div>
-            </div>
-            <div className="col col-md-3 ta-center dashboard-top dashboard-header">
-              <div>
-                <a onClick={() => this.fetchRandomStats(true, false)}> Random Learn a Song</a>
-                <hr />
-              </div>
-              <div style={{ marginTop: -10 + 'px' }}>
-                <span
-                  style={{
-                    width: 100 + '%',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                    fontSize: 30 + 'px',
-                    display: 'inline-block',
-                  }}><a
-                    onClick={() => { this.setState({ showsongpreview: true }) }}>
-                    {this.state.randomsong}
-                  </a>
-                </span>
-                <br />
-                <span><a
-                  onClick={() => { this.setState({ showsongpreview: true }) }}>
-                  {this.state.randomartist} | {this.state.randomarr} | {this.state.randommastery} %
+                  onClick={() => { this.setState({ showsongpackpreview: true }) }}>
+                  {this.state.randompack}
                 </a>
-                </span>
-              </div>
-            </div>
-          </div>
-          <div className="row justify-content-md-center">
-            <div className="col col-lg-5 ta-center dashboard-top">
-              <div>
-                General
-                <hr />
-              </div>
-              <div className="stat-container">
-                <div style={{ width: 30 + '%' }} className="ta-left">
-                  Total Playing Time
-                </div>
-                <div style={{ width: 70 + '%' }} className="ta-right">
-                  {this.state.totalPlayingTime}
-                </div>
-              </div>
-              <div className="stat-container">
-                <div style={{ width: 30 + '%' }} className="ta-left">
-                  Max Consecutive Days
-                </div>
-                <div style={{ width: 30 + '%' }} className="ta-right">
-                  {this.state.maxConsecutiveDays}
-                </div>
-              </div>
-              <div className="stat-container">
-                <div style={{ width: 30 + '%' }} className="ta-left">
-                  Longest Note Streak
-                </div>
-                <div style={{ width: 30 + '%' }} className="ta-right">
-                  {this.state.longestStreak}
-                </div>
-              </div>
-              <div className="stat-container">
-                <div style={{ width: 30 + '%' }} className="ta-left">
-                  Highest Solo Accuracy
-                </div>
-                <div style={{ width: 70 + '%' }} className="ta-right">
-                  {this.state.highestSolo * 100}%
-                </div>
-              </div>
-            </div>
-            <div className="col col-lg-5 ta-center dashboard-top">
-              <div>
-                Songs
-                <hr />
-              </div>
-              <div className="stat-container">
-                <div style={{ width: 30 + '%' }} className="ta-left">
-                  Songs Owned
-                </div>
-                <div style={{ width: 30 + '%' }} className="ta-right">
-                  {this.state.songsOwned}
-                </div>
-              </div>
-              <div className="stat-container">
-                <div style={{ width: 30 + '%' }} className="ta-left">
-                  Songs Playthroughs
-                </div>
-                <div style={{ width: 30 + '%' }} className="ta-right">
-                  {this.state.songPlays}
-                </div>
-              </div>
-              <div className="stat-container">
-                <div style={{ width: 30 + '%' }} className="ta-left">
-                  Most Played Song
-                </div>
-                <div style={{ width: 60 + '%' }} className="ta-right">
-                  {this.state.mostPlayed}
-                </div>
-              </div>
-              <div className="stat-container">
-                <div style={{ width: 50 + '%' }} className="ta-left">
-                  Arrangements Mastered
-                </div>
-                <div style={{ width: 30 + '%' }} className="ta-right">
-                  {this.state.arrMaster}
-                </div>
-              </div>
+              </span>
               <br />
             </div>
           </div>
-          <br /> <br />
-          <div className="row justify-content-md-center">
-            <div className="col col-md-3 ta-center dashboard-middle">
-              <span style={{ fontSize: 17 + 'px' }}>Lead </span>
-              <StatsTableView
-                total={this.state.l}
-                highscoretotal={this.state.lh}
-                mediumscoretotal={this.state.lm}
-                lowscoretotal={this.state.ll}
-                unplayedtotal={this.state.lup}
-                highscorewidth={this.state.lhw}
-                mediumscorewidth={this.state.lmw}
-                lowscorewidth={this.state.llw}
-                unplayedwidth={this.state.luw}
-              />
+          <div className="col col-md-3 ta-center dashboard-top dashboard-header">
+            <div>
+              <a
+                onClick={() => { window.shell.openExternal(this.state.weeklysongspotlight.url) }}>
+                Reddit Weekly Song Spotlight
+              </a>
+              <hr />
             </div>
-            <div className="col col-md-3 ta-center dashboard-middle">
-              <span style={{ fontSize: 17 + 'px' }}>Rhythm </span>
-              <StatsTableView
-                total={this.state.r}
-                highscoretotal={this.state.rh}
-                mediumscoretotal={this.state.rm}
-                lowscoretotal={this.state.rl}
-                unplayedtotal={this.state.rup}
-                highscorewidth={this.state.rhw}
-                mediumscorewidth={this.state.rmw}
-                lowscorewidth={this.state.rlw}
-                unplayedwidth={this.state.ruw}
-              />
-            </div>
-            <div className="col col-md-3 ta-center dashboard-middle">
-              <span style={{ fontSize: 17 + 'px' }}>Bass </span>
-              <StatsTableView
-                total={this.state.b}
-                highscoretotal={this.state.bh}
-                mediumscoretotal={this.state.bm}
-                lowscoretotal={this.state.bl}
-                unplayedtotal={this.state.bup}
-                highscorewidth={this.state.bhw}
-                mediumscorewidth={this.state.bmw}
-                lowscorewidth={this.state.blw}
-                unplayedwidth={this.state.buw}
-              />
+            <div style={{ marginTop: -6 + 'px' }}>
+              <span style={{ fontSize: 26 + 'px' }}>
+                <a
+                  onClick={() => {
+                    this.setState({ showweekly: true, showsongpackpreview: true })
+                  }}>
+                  {this.state.weeklysongspotlight.title}
+                </a>
+              </span>
+              <br />
             </div>
           </div>
-          <div>
-            <SongDetailView
-              song={this.state.randomsong}
-              artist={this.state.randomartist}
-              album={this.state.randomalbum}
-              showDetail={this.state.showsongpreview}
-              close={() => this.setState({ showsongpreview: false })}
-              isSongview
-              isSetlist={false}
-            />
-            <SongDetailView
-              song={this.state.showweekly ?
-                this.state.weeklysongspotlight.title : this.state.randompack}
-              artist="Rocksmith"
-              album="Steam"
-              showDetail={this.state.showsongpackpreview}
-              close={() => this.setState({ showsongpackpreview: false, showweekly: false })}
-              isSongview
-              isSongpack
-              dlcappid={this.state.randompackappid}
-              isSetlist={false}
-              isWeekly={this.state.showweekly}
+          <div className="col col-md-3 ta-center dashboard-top dashboard-header">
+            <div>
+              <a onClick={() => this.fetchRandomStats(true, false)}> Random Learn a Song</a>
+              <hr />
+            </div>
+            <div style={{ marginTop: -10 + 'px' }}>
+              <span
+                style={{
+                  width: 100 + '%',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  fontSize: 30 + 'px',
+                  display: 'inline-block',
+                }}><a
+                  onClick={() => { this.setState({ showsongpreview: true }) }}>
+                  {this.state.randomsong}
+                </a>
+              </span>
+              <br />
+              <span><a
+                onClick={() => { this.setState({ showsongpreview: true }) }}>
+                {this.state.randomartist} | {this.state.randomarr} | {this.state.randommastery} %
+                </a>
+              </span>
+            </div>
+          </div>
+        </div>
+        <div className="row justify-content-md-center">
+          <div className="col col-lg-5 ta-center dashboard-top">
+            <div>
+              General
+                <hr />
+            </div>
+            <div className="stat-container">
+              <div style={{ width: 30 + '%' }} className="ta-left">
+                Total Playing Time
+                </div>
+              <div style={{ width: 70 + '%' }} className="ta-right">
+                {this.state.totalPlayingTime}
+              </div>
+            </div>
+            <div className="stat-container">
+              <div style={{ width: 30 + '%' }} className="ta-left">
+                Max Consecutive Days
+                </div>
+              <div style={{ width: 30 + '%' }} className="ta-right">
+                {this.state.maxConsecutiveDays}
+              </div>
+            </div>
+            <div className="stat-container">
+              <div style={{ width: 30 + '%' }} className="ta-left">
+                Longest Note Streak
+                </div>
+              <div style={{ width: 30 + '%' }} className="ta-right">
+                {this.state.longestStreak}
+              </div>
+            </div>
+            <div className="stat-container">
+              <div style={{ width: 30 + '%' }} className="ta-left">
+                Highest Solo Accuracy
+                </div>
+              <div style={{ width: 70 + '%' }} className="ta-right">
+                {this.state.highestSolo * 100}%
+                </div>
+            </div>
+          </div>
+          <div className="col col-lg-5 ta-center dashboard-top">
+            <div>
+              Songs
+                <hr />
+            </div>
+            <div className="stat-container">
+              <div style={{ width: 30 + '%' }} className="ta-left">
+                Songs Owned
+                </div>
+              <div style={{ width: 30 + '%' }} className="ta-right">
+                {this.state.songsOwned}
+              </div>
+            </div>
+            <div className="stat-container">
+              <div style={{ width: 30 + '%' }} className="ta-left">
+                Songs Playthroughs
+                </div>
+              <div style={{ width: 30 + '%' }} className="ta-right">
+                {this.state.songPlays}
+              </div>
+            </div>
+            <div className="stat-container">
+              <div style={{ width: 30 + '%' }} className="ta-left">
+                Most Played Song
+                </div>
+              <div style={{ width: 60 + '%' }} className="ta-right">
+                {this.state.mostPlayed}
+              </div>
+            </div>
+            <div className="stat-container">
+              <div style={{ width: 50 + '%' }} className="ta-left">
+                Arrangements Mastered
+                </div>
+              <div style={{ width: 30 + '%' }} className="ta-right">
+                {this.state.arrMaster}
+              </div>
+            </div>
+            <br />
+          </div>
+        </div>
+        <br /> <br />
+        <div className="row justify-content-md-center">
+          <div className="col col-md-3 ta-center dashboard-middle">
+            <span style={{ fontSize: 17 + 'px' }}>Lead </span>
+            <StatsTableView
+              total={this.state.l}
+              highscoretotal={this.state.lh}
+              mediumscoretotal={this.state.lm}
+              lowscoretotal={this.state.ll}
+              unplayedtotal={this.state.lup}
+              highscorewidth={this.state.lhw}
+              mediumscorewidth={this.state.lmw}
+              lowscorewidth={this.state.llw}
+              unplayedwidth={this.state.luw}
             />
           </div>
-        </div>);
-    }
-    return null;
+          <div className="col col-md-3 ta-center dashboard-middle">
+            <span style={{ fontSize: 17 + 'px' }}>Rhythm </span>
+            <StatsTableView
+              total={this.state.r}
+              highscoretotal={this.state.rh}
+              mediumscoretotal={this.state.rm}
+              lowscoretotal={this.state.rl}
+              unplayedtotal={this.state.rup}
+              highscorewidth={this.state.rhw}
+              mediumscorewidth={this.state.rmw}
+              lowscorewidth={this.state.rlw}
+              unplayedwidth={this.state.ruw}
+            />
+          </div>
+          <div className="col col-md-3 ta-center dashboard-middle">
+            <span style={{ fontSize: 17 + 'px' }}>Bass </span>
+            <StatsTableView
+              total={this.state.b}
+              highscoretotal={this.state.bh}
+              mediumscoretotal={this.state.bm}
+              lowscoretotal={this.state.bl}
+              unplayedtotal={this.state.bup}
+              highscorewidth={this.state.bhw}
+              mediumscorewidth={this.state.bmw}
+              lowscorewidth={this.state.blw}
+              unplayedwidth={this.state.buw}
+            />
+          </div>
+        </div>
+        <div>
+          <SongDetailView
+            song={this.state.randomsong}
+            artist={this.state.randomartist}
+            album={this.state.randomalbum}
+            showDetail={this.state.showsongpreview}
+            close={() => this.setState({ showsongpreview: false })}
+            isSongview
+            isSetlist={false}
+          />
+          <SongDetailView
+            song={this.state.showweekly ?
+              this.state.weeklysongspotlight.title : this.state.randompack}
+            artist="Rocksmith"
+            album="Steam"
+            showDetail={this.state.showsongpackpreview}
+            close={() => this.setState({ showsongpackpreview: false, showweekly: false })}
+            isSongview
+            isSongpack
+            dlcappid={this.state.randompackappid}
+            isSetlist={false}
+            isWeekly={this.state.showweekly}
+          />
+        </div>
+      </div>);
   }
 }
 DashboardView.propTypes = {
+  // eslint-disable-next-line
   currentTab: PropTypes.object,
   // eslint-disable-next-line
   updateHeader: PropTypes.func,

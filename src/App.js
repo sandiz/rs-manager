@@ -24,6 +24,7 @@ class App extends Component {
     };
     this.songlistRef = null;
     //this.handleChange = this.handleChange.bind(this);
+    this.selectedTab = null;
   }
   componentDidMount = async () => {
     await this.updateProfile();
@@ -42,6 +43,69 @@ class App extends Component {
       currentChildTab: child,
       appTitle: text,
     });
+    this.selectedTab = null;
+    switch (tab.id) {
+      default:
+      case "tab-dashboard":
+        this.selectedTab =
+          (<DashboardView
+            currentTab={tab}
+            updateHeader={this.updateHeader}
+            resetHeader={this.resetHeader}
+            handleChange={this.updateProfile}
+          />)
+        break;
+      case "tab-psarc":
+        this.selectedTab = (<PSARCView
+          currentTab={tab}
+          updateHeader={this.updateHeader}
+          resetHeader={this.resetHeader}
+        />)
+        break;
+      case "tab-settings":
+        this.selectedTab = (<SettingsView
+          currentTab={tab}
+          updateHeader={this.updateHeader}
+          resetHeader={this.resetHeader}
+          handleChange={this.updateProfile}
+        />)
+        break;
+      case "tab-setlist":
+        this.selectedTab = (<SetlistView
+          currentTab={tab}
+          currentChildTab={child}
+          updateHeader={this.updateChildHeader}
+          resetHeader={this.resetHeader}
+          handleChange={this.updateProfile}
+        />)
+        break;
+      case "tab-songs":
+        switch (child.id) {
+          default:
+          case "songs-owned":
+            this.selectedTab = (
+              <SonglistView
+                updateHeader={this.updateChildHeader}
+                resetHeader={this.resetHeader}
+                handleChange={this.updateProfile}
+              />
+            )
+            break;
+          case "songs-available":
+            this.selectedTab = (
+              <SongAvailableView
+                currentTab={tab}
+                currentChildTab={child}
+                requiredTab={tab.id}
+                requiredChildTab={child.id}
+                updateHeader={this.updateChildHeader}
+                resetHeader={this.resetHeader}
+                handleChange={this.updateProfile} />
+            )
+            break;
+        }
+        break;
+    }
   }
   updateHeader = (tabname, text) => {
     if (this.state.currentTab === null) {
@@ -129,51 +193,7 @@ class App extends Component {
               </div>
             </nav>
             <div>
-              <PSARCView
-                currentTab={this.state.currentTab}
-                updateHeader={this.updateHeader}
-                resetHeader={this.resetHeader}
-                songlistRef={this.songlistRef} />
-              <SonglistView
-                ref={(child) => { this.songlistRef = child; }}
-                currentTab={this.state.currentTab}
-                currentChildTab={this.state.currentChildTab}
-                requiredTab="tab-songs"
-                requiredChildTab="songs-owned"
-                sqliteTable="songs_owned"
-                updateHeader={this.updateChildHeader}
-                resetHeader={this.resetHeader}
-                handleChange={this.updateProfile}
-              />
-              <DashboardView
-                currentTab={this.state.currentTab}
-                updateHeader={this.updateHeader}
-                resetHeader={this.resetHeader}
-                handleChange={this.updateProfile}
-              />
-              <SongAvailableView
-                currentTab={this.state.currentTab}
-                currentChildTab={this.state.currentChildTab}
-                requiredTab="tab-songs"
-                requiredChildTab="songs-purchased"
-                sqliteTable="songs_available"
-                updateHeader={this.updateChildHeader}
-                resetHeader={this.resetHeader}
-                handleChange={this.updateProfile} />
-              <SetlistView
-                currentTab={this.state.currentTab}
-                currentChildTab={this.state.currentChildTab}
-                requiredTab="tab-setlist"
-                updateHeader={this.updateChildHeader}
-                resetHeader={this.resetHeader}
-                handleChange={this.updateProfile}
-              />
-              <SettingsView
-                currentTab={this.state.currentTab}
-                updateHeader={this.updateHeader}
-                resetHeader={this.resetHeader}
-                handleChange={this.updateProfile}
-              />
+              {this.selectedTab}
             </div>
           </div>
         </div>
