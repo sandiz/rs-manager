@@ -1,5 +1,5 @@
 container:
-  image: circleci/node@sha256:895bd70ebcf4fd8a61a38f236fdea711859ac5d24357dc419559e53b06bac476
+  image: node:9.11.2-jessie
 check_task:
   node_modules_cache:
     folder: node_modules
