@@ -1,0 +1,13 @@
+container:
+  image: node:latest
+check_task:
+  node_modules_cache:
+    folder: node_modules
+    fingerprint_script: cat package-lock.json
+    populate_script: npm install
+osx_instance:
+  image: high-sierra-xcode-9.4
+  script: npm run build && npm run package-mac
+windows_container:
+  image: cirrusci/windowsservercore:2016
+  script: npm run build \n npm run package-win
