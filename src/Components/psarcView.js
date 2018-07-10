@@ -312,7 +312,7 @@ export default class PSARCView extends React.Component {
             onClick={this.updateSongList}
             className="extraPadding download"
             style={{ display: `${hasdatastyle}` }}>
-            Update Songlist (Owned)
+            Update Songs &gt; Owned
             </a>
         </div>
         <div>
