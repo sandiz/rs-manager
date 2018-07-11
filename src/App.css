@@ -598,3 +598,8 @@ hr {
   margin: auto;
   width: 100%;
 }
+.react-bootstrap-table-pagination {
+  float: left;
+  margin: 0px;
+  display: block;
+}
