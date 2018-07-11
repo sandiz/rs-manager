@@ -203,13 +203,13 @@ export default class SongDetailView extends React.Component {
                     <a
                       onClick={async () => {
                         await this.props.removeFromSetlist();
-                        this.props.close();
+                        this.handleHide();
                       }}
                       className={setlistyle}>
                       Remove from Setlist
                     </a>
                     <a
-                      onClick={async () => { this.addToSetlist(); this.props.close(); }}
+                      onClick={async () => { this.addToSetlist(); this.handleHide(); }}
                       className={songliststyle}>
                       Add to Setlist
                     </a>
