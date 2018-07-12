@@ -376,7 +376,7 @@ tbody tr:hover {
 .modal-window>div {
   width: 720px;
   position: relative;
-  margin: 10% auto;
+  margin: 5% auto;
   padding: 2rem;
   background: azure;
   color: #444;
@@ -384,7 +384,7 @@ tbody tr:hover {
 }
 .width-75 {
   width: 76% !important;
-  height: 65% !important;
+  height: 77% !important;
 }
 .width-75-2 {
   width: 66% !important;
