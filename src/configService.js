@@ -13,7 +13,14 @@ const readFile = filePath => new Promise((resolve, reject) => {
 let JsonObj = null;
 export async function getConfig(type) {
   try {
-    const data = await readFile(window.dirname + "/../config.json");
+    if (!window.electronFS.existsSync(window.configPath)) {
+      console.log("creating empty config file")
+      const obj = {}
+      obj.prfldb = ""
+      obj.steamLoginSecure = ""
+      await writeFile(window.configPath, JSON.stringify(obj));
+    }
+    const data = await readFile(window.configPath);
     JsonObj = JSON.parse(data);
     if (type in JsonObj) { return JsonObj[type]; }
     return '';
@@ -25,7 +32,7 @@ export async function getConfig(type) {
 }
 export async function updateConfig(type, value) {
   try {
-    const filename = window.dirname + "/../config.json";
+    const filename = window.configPath;
     const data = await readFile(filename);
     JsonObj = JSON.parse(data);
     JsonObj[type] = value;

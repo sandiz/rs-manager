@@ -2,7 +2,7 @@ let db = null;
 export async function initSongsOwnedDB() {
   //console.log("__db_call__: initSongsOwnedDB ");
   if (db === null) {
-    const dbfilename = window.dirname + "/../rsdb.sqlite";
+    const dbfilename = window.sqlitePath;
     db = await window.sqlite.open(dbfilename);
   }
   await db.run("CREATE TABLE IF NOT EXISTS songs_owned (album char, artist char, song char, arrangement char, json char, psarc char, dlc char, sku char, difficulty float, dlckey char, songkey char, id char, uniqkey char primary key, mastery float default 0, count int default 0, lastConversionTime real);");
@@ -10,7 +10,7 @@ export async function initSongsOwnedDB() {
 export async function initSongsAvailableDB() {
   //console.log("__db_call__: initSongsAvailableDB");
   if (db === null) {
-    const dbfilename = window.dirname + "/../rsdb.sqlite";
+    const dbfilename = window.sqlitePath;
     db = await window.sqlite.open(dbfilename);
   }
   await db.run("CREATE TABLE IF NOT EXISTS songs_available (appid char primary key, name char, release_date float, owned boolean default false, acquired_date float default NULL);");
@@ -30,7 +30,7 @@ export async function addToSteamDLCCatalog(dlc, name, releaseDate) {
 export async function getDLCDetails(start = 0, count = 10, sortField = "release_date", sortOrder = "desc", search = "", owned = "") {
   // console.log("__db_call__: getDLCDetails");
   if (db == null) {
-    const dbfilename = window.dirname + "/../rsdb.sqlite";
+    const dbfilename = window.sqlitePath;
     db = await window.sqlite.open(dbfilename);
   }
   let sql;
@@ -94,7 +94,7 @@ export async function updateOwnedInDB(dlc) {
 export async function countSongsAvailable() {
   // console.log("__db_call__: countSongsAvailable");
   if (db == null) {
-    const dbfilename = window.dirname + "/../rsdb.sqlite";
+    const dbfilename = window.sqlitePath;
     db = await window.sqlite.open(dbfilename);
   }
   const sql = `select count(*) as count from songs_available`;
@@ -178,7 +178,7 @@ export default async function updateSongsOwned(psarcResult) {
 export async function getSongsOwned(start = 0, count = 10, sortField = "mastery", sortOrder = "desc", search = "") {
   //  console.log("__db_call__: getSongsOwned");
   if (db == null) {
-    const dbfilename = window.dirname + "/../rsdb.sqlite";
+    const dbfilename = window.sqlitePath;
     db = await window.sqlite.open(dbfilename);
   }
   let sql;
@@ -207,7 +207,7 @@ export async function getSongsOwned(start = 0, count = 10, sortField = "mastery"
 export async function countSongsOwned() {
   // console.log("__db_call__: countSongsOwned");
   if (db == null) {
-    const dbfilename = window.dirname + "/../rsdb.sqlite";
+    const dbfilename = window.sqlitePath;
     console.log(dbfilename);
     db = await window.sqlite.open(dbfilename);
   }
@@ -219,7 +219,7 @@ export async function countSongsOwned() {
 export async function getSongID(ID) {
   // console.log("__db_call__: getSongID");
   if (db == null) {
-    const dbfilename = window.dirname + "/../rsdb.sqlite";
+    const dbfilename = window.sqlitePath;
     console.log(dbfilename);
     db = await window.sqlite.open(dbfilename);
   }
@@ -231,7 +231,7 @@ export async function getSongID(ID) {
 export async function getArrangmentsMastered() {
   //console.log("__db_call__: getArrangmentsMastered");
   if (db == null) {
-    const dbfilename = window.dirname + "/../rsdb.sqlite";
+    const dbfilename = window.sqlitePath;
     console.log(dbfilename);
     db = await window.sqlite.open(dbfilename);
   }
@@ -260,7 +260,7 @@ export async function getBassStats() {
 export async function initSetlistPlaylistDB(dbname) {
   // console.log("__db_call__: initSetlistPlaylistDB");
   if (db === null) {
-    const dbfilename = window.dirname + "/../rsdb.sqlite";
+    const dbfilename = window.sqlitePath;
     db = await window.sqlite.open(dbfilename);
   }
   await db.run(`CREATE TABLE IF NOT EXISTS ${dbname} ( uniqkey char UNIQUE primary key, FOREIGN KEY(uniqkey) REFERENCES songs_owned(uniqkey));`);
@@ -268,7 +268,7 @@ export async function initSetlistPlaylistDB(dbname) {
 export async function initSetlistDB() {
   // console.log("__db_call__: initSetlistDB");
   if (db === null) {
-    const dbfilename = window.dirname + "/../rsdb.sqlite";
+    const dbfilename = window.sqlitePath;
     db = await window.sqlite.open(dbfilename);
   }
   await db.run("CREATE TABLE IF NOT EXISTS setlist_meta (key char primary key, name char);");
@@ -301,7 +301,7 @@ export async function getSongCountFromPlaylistDB(dbname) {
 export async function getSongsFromPlaylistDB(dbname, start = 0, count = 10, sortField = "mastery", sortOrder = "desc", search = "") {
   // console.log("__db_call__: getSongsFromPlaylistDB");
   if (db == null) {
-    const dbfilename = window.dirname + "/../rsdb.sqlite";
+    const dbfilename = window.sqlitePath;
     db = await window.sqlite.open(dbfilename);
   }
   let sql;
