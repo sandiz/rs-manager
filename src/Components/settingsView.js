@@ -66,9 +66,39 @@ export default class SettingsView extends React.Component {
       return (
         <div className="container-fluid">
           <div className="row justify-content-lg-center">
-            <div className="col col-lg-7 settings">
+            <div className="col col-lg-10 settings">
+              <br /> <br />
               <div style={{ marginTop: -6 + 'px', paddingLeft: 30 + 'px', paddingRight: 30 + 'px' }}>
-                <br /><br />
+                <span>
+                  Config Path:
+                </span>
+                <span style={{
+                  float: 'right',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  width: 90 + '%',
+                  textAlign: 'right',
+                }}>
+                  {window.configPath}
+                </span>
+              </div>
+              <br />
+              <div style={{ marginTop: -6 + 'px', paddingLeft: 30 + 'px', paddingRight: 30 + 'px' }}>
+                <span>
+                  SQLite Path:
+                </span>
+                <span style={{
+                  float: 'right',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  width: 90 + '%',
+                  textAlign: 'right',
+                }}>
+                  {window.sqlitePath}
+                </span>
+              </div>
+              <div style={{ marginTop: -6 + 'px', paddingLeft: 30 + 'px', paddingRight: 30 + 'px' }}>
+                <br />
                 <span style={{ float: 'left' }}>
                   <a onClick={this.enterPrfldb}>
                     Rocksmith Profile (_prfldb):

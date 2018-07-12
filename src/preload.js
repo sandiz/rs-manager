@@ -13,17 +13,18 @@ window.prompt = require('electron-prompt');
 window.processPSARC = require("./lib/libpsarc").processPSARC
 window.extractFile = require("./lib/libpsarc").extractFile
 const rp = require('request-promise');
+const isDev = require('electron-is-dev');
 
 //eslint-disable-next-line
 window.path = null;
 
 if (window.os.platform() === 'win32') {
-  //eslint-disable-next-line
-  window.path = require("path").win32;
+    //eslint-disable-next-line
+    window.path = require("path").win32;
 }
 else {
-  //eslint-disable-next-line
-  window.path = require("path"); 
+    //eslint-disable-next-line
+    window.path = require("path");
 }
 
 
@@ -45,3 +46,11 @@ window.request = async function (uri, cookie, cookieurl, qs) {
 }
 
 
+if (isDev) {
+    window.configPath = path.resolve(window.dirname + "/../config.json");
+    window.sqlitePath = path.resolve(window.dirname + "/../rsdb.sqlite");
+}
+else {
+    window.configPath = path.resolve(window.remote.app.getPath("userData") + "/config.json");
+    window.sqlitePath = path.resolve(window.remote.app.getPath("userData") + "/rsdb.sqlite");
+}
