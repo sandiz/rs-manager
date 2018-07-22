@@ -52,26 +52,57 @@ function countFormmatter(cell, row) {
   return <span>{cell + row.sa_playcount}</span>;
 }
 function badgeFormatter(cell, row) {
+  let badgeClass = "iconPreview ";
+  let adjustedBadge = 0;
+  if (row.sa_highest_badge > 40) {
+    adjustedBadge = row.sa_highest_badge - 40;
+  }
+  else if (row.sa_highest_badge > 30) {
+    adjustedBadge = row.sa_highest_badge - 30;
+  }
+  else if (row.sa_highest_badge > 20) {
+    adjustedBadge = row.sa_highest_badge - 20;
+  }
+  else if (row.sa_highest_badge > 10) {
+    adjustedBadge = row.sa_highest_badge - 10;
+  }
+  switch (adjustedBadge) {
+    case 5:
+      badgeClass += "gp_platinum bggray"
+      break;
+    case 4:
+      badgeClass += "gp_gold bggray"
+      break;
+    case 3:
+      badgeClass += "gp_silver bggray"
+      break;
+    case 2:
+      badgeClass += "gp_bronze bggray"
+      break;
+    default:
+      badgeClass += ""
+      break;
+  }
   const hs = Math.max(row.sa_hs_easy, row.sa_hs_medium, row.sa_hs_hard, row.sa_hs_master).toLocaleString('en');
   if (cell > 40) {
     const absoluteBadge = getBadgeName(cell - 40);
     const message = `Highest Badge: ${absoluteBadge}\nDifficulty: Master\nHigh Score: ${hs}`;
-    return <span className="badgeText" title={message}>Mast.</span>;
+    return <div style={{ float: 'left' }} title={message}><div className={badgeClass} alt="" />Master</div>;
   }
   else if (cell > 30) {
     const absoluteBadge = getBadgeName(cell - 30);
     const message = `Highest Badge: ${absoluteBadge}\nDifficulty: Hard\nHigh Score: ${hs}`;
-    return <span className="badgeText" title={message}>Hard</span>;
+    return <div style={{ float: 'left' }} title={message}><div className={badgeClass} alt="" /><div className="pick-text"><div>Hard</div></div></div>;
   }
   else if (cell > 20) {
     const absoluteBadge = getBadgeName(cell - 20);
     const message = `Highest Badge: ${absoluteBadge}\nDifficulty: Medium\nHigh Score: ${hs}`;
-    return <span className="badgeText" title={message}>Med</span>;
+    return <div style={{ float: 'left' }} title={message}><div className={badgeClass} alt="" /><div className="pick-text"><div>Medium</div></div></div>;
   }
   else if (cell > 10) {
     const absoluteBadge = getBadgeName(cell - 10);
     const message = `Highest Badge: ${absoluteBadge}\nDifficulty: Easy\nHigh Score: ${hs}`;
-    return <span className="badgeText" title={message}>Easy</span>;
+    return <div style={{ float: 'left' }} title={message}><div className={badgeClass} alt="" /><div className="pick-text"><div>Easy</div></div></div>;
   }
   return <span> None </span>;
 }
@@ -132,7 +163,7 @@ export default class SonglistView extends React.Component {
         text: "ID",
         style: (cell, row, rowIndex, colIndex) => {
           return {
-            width: '25%',
+            width: '20%',
             cursor: 'pointer',
           };
         },
@@ -143,7 +174,7 @@ export default class SonglistView extends React.Component {
         text: "Song",
         style: (cell, row, rowIndex, colIndex) => {
           return {
-            width: '25%',
+            width: '20%',
             cursor: 'pointer',
           };
         },
@@ -155,7 +186,7 @@ export default class SonglistView extends React.Component {
         text: "Artist",
         style: (cell, row, rowIndex, colIndex) => {
           return {
-            width: '20%',
+            width: '15%',
             cursor: 'pointer',
           };
         },
@@ -179,7 +210,7 @@ export default class SonglistView extends React.Component {
         text: "Arrangement",
         style: (cell, row, rowIndex, colIndex) => {
           return {
-            width: '15%',
+            width: '5%',
             cursor: 'pointer',
           };
         },
@@ -202,7 +233,7 @@ export default class SonglistView extends React.Component {
         text: "Count",
         style: (cell, row, rowIndex, colIndex) => {
           return {
-            width: '15%',
+            width: '5%',
           };
         },
         sort: true,
@@ -233,7 +264,7 @@ export default class SonglistView extends React.Component {
         text: "Difficulty",
         style: (cell, row, rowIndex, colIndex) => {
           return {
-            width: '10%',
+            width: '5%',
           };
         },
         sort: true,
@@ -275,51 +306,17 @@ export default class SonglistView extends React.Component {
         sort: true,
         style: (cell, row, rowIndex, colIndex) => {
           return {
-            width: '20%',
+            width: '28%',
             display: this.state.showSAStats ? "" : "none",
           };
         },
         headerStyle: (cell, row, rowIndex, colIndex) => {
           return {
-            width: '20%',
+            width: '28%',
             display: this.state.showSAStats ? "" : "none",
           };
         },
         formatter: badgeFormatter,
-        classes: (cell, row, rowIndex, colIndex) => {
-          let badgeClass = "iconPreview ";
-          let adjustedBadge = 0;
-          if (row.sa_highest_badge > 40) {
-            adjustedBadge = row.sa_highest_badge - 40;
-          }
-          else if (row.sa_highest_badge > 30) {
-            adjustedBadge = row.sa_highest_badge - 30;
-          }
-          else if (row.sa_highest_badge > 20) {
-            adjustedBadge = row.sa_highest_badge - 20;
-          }
-          else if (row.sa_highest_badge > 10) {
-            adjustedBadge = row.sa_highest_badge - 10;
-          }
-          switch (adjustedBadge) {
-            case 5:
-              badgeClass += "gp_platinum bggray"
-              break;
-            case 4:
-              badgeClass += "gp_gold bggray"
-              break;
-            case 3:
-              badgeClass += "gp_silver bggray"
-              break;
-            case 2:
-              badgeClass += "gp_bronze bggray"
-              break;
-            default:
-              badgeClass += ""
-              break;
-          }
-          return badgeClass;
-        },
       },
     ];
     this.rowEvents = {
