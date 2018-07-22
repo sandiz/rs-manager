@@ -516,7 +516,13 @@ tbody tr:hover {
   color:black;
   font-size: 15px;
 }
-
+.badgeTextSmall {
+  color:black;
+  font-size: 12px;
+}
+.dashboardGP {
+  background-size: 140% !important;
+}
 .iconPreview {
     background-position: 50%;
     background-repeat: no-repeat;
@@ -603,7 +609,7 @@ hr {
   margin-top: 6px !important;
 }
 .col-md-3 {
-    flex: 0 0 31% !important;
+    flex: 0 0 22% !important;
 }
 .dblock {
   display:block;
