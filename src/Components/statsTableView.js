@@ -23,7 +23,7 @@ export default class StatsTableView extends React.Component {
             <td
               className={this.props.scoreattack ? "iconPreview gp_platinum badgeText dashboardGP" : ""}
               title={this.props.scoreattack ? "Total Platinum Badges" : "Mastery between 95-100%"}>
-              {!this.props.scoreattack ? "95-100%" : "PLT"}
+              {!this.props.scoreattack ? "95-100%" : "Plat"}
             </td>
             <td className="ta-left skinny">
               <span>
@@ -41,7 +41,7 @@ export default class StatsTableView extends React.Component {
               className={this.props.scoreattack ? "iconPreview gp_gold badgeText dashboardGP" : ""}
               title={this.props.scoreattack ? "Total Gold Badges" : "Mastery between 90-95%"}
             >
-              {!this.props.scoreattack ? "90-95%" : "GLD"}
+              {!this.props.scoreattack ? "90-95%" : "Gold"}
             </td>
             <td className="ta-left skinny">
               <span>
@@ -59,7 +59,7 @@ export default class StatsTableView extends React.Component {
               className={this.props.scoreattack ? "iconPreview gp_silver badgeText dashboardGP" : ""}
               title={this.props.scoreattack ? "Total Silver Badges" : "Mastery between 1-90%"}
             >
-              {!this.props.scoreattack ? "1-90%" : "SIL"}
+              {!this.props.scoreattack ? "1-90%" : "Silv"}
             </td>
             <td className="ta-left skinny">
               <span>
@@ -77,7 +77,7 @@ export default class StatsTableView extends React.Component {
               className={this.props.scoreattack ? "iconPreview gp_bronze badgeText dashboardGP" : ""}
               title={this.props.scoreattack ? "Total Bronze Badges" : "Unplayed Arrangments"}
             >
-              {!this.props.scoreattack ? "Unplayed" : "BRZ"}
+              {!this.props.scoreattack ? "Unplayed" : "Brnz"}
             </td>
             <td className="ta-left skinny">
               <span>
