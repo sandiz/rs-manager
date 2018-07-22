@@ -4,7 +4,7 @@ import paginationFactory from 'react-bootstrap-table2-paginator';
 import filterFactory from 'react-bootstrap-table2-filter';
 import PropTypes from 'prop-types';
 import readProfile from '../steamprofileService';
-import { initSetlistPlaylistDB, getSongsOwned, countSongsOwned, updateMasteryandPlayed, initSongsOwnedDB, addToFavorites } from '../sqliteService';
+import { initSetlistPlaylistDB, getSongsOwned, countSongsOwned, updateMasteryandPlayed, initSongsOwnedDB, addToFavorites, updateScoreAttackStats } from '../sqliteService';
 import getProfileConfig, { updateProfileConfig } from '../configService';
 import SongDetailView from './songdetailView';
 
@@ -40,7 +40,22 @@ function countFormmatter(cell, row) {
   if (cell == null) {
     return <span>0</span>;
   }
-  return <span>{cell}</span>;
+  return <span>{cell + row.sa_playcount}</span>;
+}
+function badgeFormatter(cell, row) {
+  if (cell > 40) {
+    return <span className="badgeText">Mast.</span>;
+  }
+  else if (cell > 30) {
+    return <span className="badgeText">Hard</span>;
+  }
+  else if (cell > 20) {
+    return <span className="badgeText">Med</span>;
+  }
+  else if (cell > 10) {
+    return <span className="badgeText">Easy</span>;
+  }
+  return <span> None </span>;
 }
 //eslint-disable-next-line
 export const RemoteAll = ({ keyField, columns, data, page, sizePerPage, onTableChange, totalSize, rowEvents }) => (
@@ -121,7 +136,7 @@ export default class SonglistView extends React.Component {
         text: "Artist",
         style: (cell, row, rowIndex, colIndex) => {
           return {
-            width: '25%',
+            width: '20%',
             cursor: 'pointer',
           };
         },
@@ -133,7 +148,7 @@ export default class SonglistView extends React.Component {
         text: "Album",
         style: (cell, row, rowIndex, colIndex) => {
           return {
-            width: '25%',
+            width: '20%',
             cursor: 'pointer',
           };
         },
@@ -156,7 +171,7 @@ export default class SonglistView extends React.Component {
         text: "Mastery",
         style: (cell, row, rowIndex, colIndex) => {
           return {
-            width: '25%',
+            width: '20%',
             cursor: 'pointer',
           };
         },
@@ -168,7 +183,7 @@ export default class SonglistView extends React.Component {
         text: "Count",
         style: (cell, row, rowIndex, colIndex) => {
           return {
-            width: '10%',
+            width: '15%',
           };
         },
         sort: true,
@@ -204,6 +219,82 @@ export default class SonglistView extends React.Component {
         },
         sort: true,
         formatter: difficultyFormatter,
+      },
+      {
+        dataField: "sa_playcount",
+        text: 'Play Count',
+        hidden: true,
+      },
+      {
+        dataField: "sa_hs_easy",
+        text: 'High Score (Easy)',
+        hidden: true,
+      },
+      {
+        dataField: "sa_hs_medium",
+        text: 'High Score (Medium)',
+        hidden: true,
+      },
+      {
+        dataField: "sa_hs_hard",
+        text: 'High Score (Hard)',
+        hidden: true,
+      },
+      {
+        dataField: "sa_hs_master",
+        text: 'High Score (Master)',
+        hidden: true,
+      },
+      {
+        dataField: "sa_badge_master",
+        text: 'Badge (Master)',
+        hidden: true,
+      },
+      {
+        dataField: "sa_highest_badge",
+        text: 'Badge',
+        sort: true,
+        style: (cell, row, rowIndex, colIndex) => {
+          return {
+            width: '20%',
+          };
+        },
+        formatter: badgeFormatter,
+        classes: (cell, row, rowIndex, colIndex) => {
+          let badgeClass = "iconPreview ";
+          let adjustedBadge = 0;
+          if (row.sa_highest_badge > 40) {
+            adjustedBadge = row.sa_highest_badge - 40;
+          }
+          else if (row.sa_highest_badge > 30) {
+            adjustedBadge = row.sa_highest_badge - 30;
+          }
+          else if (row.sa_highest_badge > 20) {
+            adjustedBadge = row.sa_highest_badge - 20;
+          }
+          else if (row.sa_highest_badge > 10) {
+            adjustedBadge = row.sa_highest_badge - 10;
+          }
+          switch (adjustedBadge) {
+            case 5:
+              badgeClass += "gp_platinum bggray"
+              break;
+            case 4:
+              badgeClass += "gp_gold bggray"
+              break;
+            case 3:
+              badgeClass += "gp_silver bggray"
+              break;
+            case 2:
+              badgeClass += "gp_bronze bggray"
+              break;
+            default:
+              badgeClass += ""
+              break;
+          }
+
+          return badgeClass;
+        },
       },
     ];
     this.rowEvents = {
@@ -260,16 +351,19 @@ export default class SonglistView extends React.Component {
       );
       const steamProfile = await readProfile(prfldb);
       const stats = steamProfile.Stats.Songs;
+      const sastats = steamProfile.SongsSA;
+      const total = Object.keys(stats).length + Object.keys(sastats).length;
       await updateProfileConfig(prfldb);
       this.props.handleChange();
       this.props.updateHeader(
         this.tabname,
         this.childtabname,
-        `Song Stats Found: ${Object.keys(stats).length}`,
+        `Song Stats Found: ${total}`,
       );
       await initSongsOwnedDB();
-      const keys = Object.keys(stats);
+      let keys = Object.keys(stats);
       let updatedRows = 0;
+      //find mastery stats
       for (let i = 0; i < keys.length; i += 1) {
         const stat = stats[keys[i]];
         const mastery = stat.MasteryPeak;
@@ -286,11 +380,47 @@ export default class SonglistView extends React.Component {
         }
         updatedRows += rows;
       }
+      //find score attack stats
+      keys = Object.keys(sastats);
+      for (let i = 0; i < keys.length; i += 1) {
+        const stat = sastats[keys[i]];
+        let highestBadge = 0;
+        if (stat.Badges.Easy > 0) {
+          stat.Badges.Easy += 10;
+          highestBadge = stat.Badges.Easy;
+        }
+        if (stat.Badges.Medium > 0) {
+          stat.Badges.Medium += 20;
+          highestBadge = stat.Badges.Medium;
+        }
+        if (stat.Badges.Hard > 0) {
+          stat.Badges.Hard += 30;
+          highestBadge = stat.Badges.Hard;
+        }
+        if (stat.Badges.Master > 0) {
+          stat.Badges.Master += 40;
+          highestBadge = stat.Badges.Master;
+        }
+        this.props.updateHeader(
+          this.tabname,
+          this.childtabname,
+          `Updating Stat for SongID:  ${keys[i]} (${i}/${keys.length})`,
+        );
+        // eslint-disable-next-line
+        const rows = await updateScoreAttackStats(stat, highestBadge, keys[i]);
+        if (rows === 0) {
+          console.log("Missing ID: " + keys[i]);
+        }
+        updatedRows += rows;
+      }
+
       this.props.updateHeader(
         this.tabname,
         this.childtabname,
-        "Stats Found: " + updatedRows + ", Total Stats: " + keys.length,
+        "Stats Found: " + updatedRows,
       );
+
+      // refresh view
       const output = await getSongsOwned(
         0,
         this.state.sizePerPage,
