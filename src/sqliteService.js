@@ -287,6 +287,18 @@ export async function getArrangmentsMastered() {
   const output = await db.get(sql);
   return output;
 }
+export async function getSAStats() {
+  // console.log("__db_call__: getLeadStats");
+  //eslint-disable-next-line
+  const sqlstr = "select sa.count as satotal, saplat.count as saplat, sagold.count as sagold, sasilver.count as sasilver,sabronze.count as sabronze from \
+  (select count(*) as count from songs_owned where sa_playcount > 0) sa, (select count(*) as count from songs_owned where sa_playcount > 0 AND (sa_badge_master == 45 OR sa_badge_hard == 35 OR sa_badge_medium == 25 OR sa_badge_easy == 15)) saplat, \
+  (select count(*) as count from songs_owned where sa_playcount > 0 AND (sa_badge_master == 44 OR sa_badge_hard == 34 OR sa_badge_medium == 24 OR sa_badge_easy == 14)) sagold, \
+  (select count(*) as count from songs_owned where sa_playcount > 0 AND (sa_badge_master == 43 OR sa_badge_hard == 33 OR sa_badge_medium == 23 OR sa_badge_easy == 13)) sasilver, \
+  (select count(*) as count from songs_owned where sa_playcount > 0 AND (sa_badge_master == 42 OR sa_badge_hard == 32 OR sa_badge_medium == 22 OR sa_badge_easy == 12)) sabronze;"
+  const output = await db.get(sqlstr);
+  console.log(output);
+  return output;
+}
 export async function getLeadStats() {
   // console.log("__db_call__: getLeadStats");
   const sqlstr = "select l.count as l,lh.count as lh,lm.count as lm,ll.count as ll,up.count as lup from (select count(*) as count from songs_owned where arrangement like '%lead%')l, (select count(*) as count from songs_owned where mastery > .95 AND arrangement like '%lead%') lh, (select count(*) as count from songs_owned where mastery > .90 AND mastery <= .95 AND arrangement like '%lead%') lm, (select count(*) as count from songs_owned where mastery >= .1 AND mastery <= .90 AND arrangement like '%lead%') ll, (select count(*) as count from songs_owned where mastery < .1 AND arrangement like '%lead%') up;"

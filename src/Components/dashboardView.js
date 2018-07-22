@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import StatsTableView from './statsTableView';
 import getProfileConfig, { updateProfileConfig } from '../configService';
 import readProfile from '../steamprofileService';
-import { updateMasteryandPlayed, initSongsOwnedDB, getSongID, countSongsOwned, getArrangmentsMastered, getLeadStats, getRhythmStats, getBassStats, getRandomSongOwned, getRandomSongAvailable } from '../sqliteService';
+import { updateMasteryandPlayed, initSongsOwnedDB, getSongID, countSongsOwned, getArrangmentsMastered, getLeadStats, getRhythmStats, getBassStats, getRandomSongOwned, getRandomSongAvailable, getSAStats } from '../sqliteService';
 import { replaceRocksmithTerms } from './songavailableView';
 import SongDetailView from './songdetailView';
 
@@ -60,6 +60,14 @@ export default class DashboardView extends React.Component {
       bmw: 0,
       blw: 0,
       buw: 0,
+      saplat: 0,
+      saplatw: 0,
+      sagold: 0,
+      sagoldw: 0,
+      sasilver: 0,
+      sasilverw: 0,
+      sabronze: 0,
+      sabronzew: 0,
     }
   }
   componentWillMount = () => {
@@ -139,6 +147,7 @@ export default class DashboardView extends React.Component {
       const rup = rhythmStats.r - (rhythmStats.rh + rhythmStats.rm + rhythmStats.rl)
       const bassStats = await getBassStats();
       const bup = bassStats.b - (bassStats.bh + bassStats.bm + bassStats.bl)
+      const saStats = await getSAStats();
       this.setState({
         l: leadStats.l,
         lh: leadStats.lh,
@@ -167,6 +176,15 @@ export default class DashboardView extends React.Component {
         bmw: this.getStatsWidth(bassStats.bm, 0, bassStats.b),
         blw: this.getStatsWidth(bassStats.bl, 0, bassStats.b),
         buw: this.getStatsWidth(bup, 0, bassStats.b),
+        satotal: saStats.satotal,
+        saplat: saStats.saplat,
+        saplatw: this.getStatsWidth(saStats.saplat, 0, saStats.satotal),
+        sagold: saStats.sagold,
+        sagoldw: this.getStatsWidth(saStats.sagold, 0, saStats.satotal),
+        sasilver: saStats.sasilver,
+        sasilverw: this.getStatsWidth(saStats.sasilver, 0, saStats.satotal),
+        sabronze: saStats.sabronze,
+        sabronzew: this.getStatsWidth(saStats.sabronze, 0, saStats.satotal),
       })
       this.props.updateHeader(this.tabname, "Rocksmith 2014 Dashboard");
     }
@@ -455,6 +473,21 @@ export default class DashboardView extends React.Component {
               mediumscorewidth={this.state.bmw}
               lowscorewidth={this.state.blw}
               unplayedwidth={this.state.buw}
+            />
+          </div>
+          <div className="col col-md-3 ta-center dashboard-middle">
+            <span style={{ fontSize: 17 + 'px' }}>Score Attack </span>
+            <StatsTableView
+              scoreattack
+              total={this.state.satotal}
+              plattotal={this.state.saplat}
+              platwidth={this.state.saplatw}
+              goldtotal={this.state.sagold}
+              goldwidth={this.state.sagoldw}
+              silvertotal={this.state.sasilver}
+              silverwidth={this.state.sasilverw}
+              bronzetotal={this.state.sabronze}
+              bronzewidth={this.state.sabronzew}
             />
           </div>
         </div>
