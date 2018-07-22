@@ -18,6 +18,7 @@ export async function getConfig(type) {
       const obj = {}
       obj.prfldb = ""
       obj.steamLoginSecure = ""
+      obj.showScoreAttack = true
       await writeFile(window.configPath, JSON.stringify(obj));
     }
     const data = await readFile(window.configPath);
@@ -46,14 +47,22 @@ export async function updateConfig(type, value) {
 export async function updateProfileConfig(value) {
   await updateConfig("prfldb", value);
 }
-export default async function getProfileConfig() {
-  const d = await getConfig("prfldb");
-  return d;
+export async function updateScoreAttackConfig(value) {
+  await updateConfig("showScoreAttack", value);
 }
 export async function updateSteamLoginSecureCookie(value) {
   await updateConfig("steamLoginSecure", value);
 }
+export default async function getProfileConfig() {
+  const d = await getConfig("prfldb");
+  return d;
+}
 export async function getSteamLoginSecureCookie() {
   const d = await getConfig("steamLoginSecure");
+  return d;
+}
+export async function getScoreAttackConfig() {
+  const d = await getConfig("showScoreAttack");
+  if (d === '') return true; //default value
   return d;
 }

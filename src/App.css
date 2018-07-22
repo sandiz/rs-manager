@@ -608,8 +608,11 @@ hr {
   border-bottom: .5px solid black !important;
   margin-top: 6px !important;
 }
-.col-md-3 {
+.col-md-25 {
     flex: 0 0 22% !important;
+}
+.col-md-3 {
+    flex: 0 0 31% !important;
 }
 .dblock {
   display:block;
