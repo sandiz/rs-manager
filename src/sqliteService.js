@@ -1,4 +1,13 @@
 let db = null;
+export async function getUserVersion() {
+  const sql = "pragma user_version;";
+  const op = await db.get(sql);
+  return op.user_version;
+}
+export async function setUserVersion(version) {
+  const sql = `pragma user_version=${version};`;
+  await db.get(sql);
+}
 export async function initSongsOwnedDB() {
   //console.log("__db_call__: initSongsOwnedDB ");
   if (db === null) {
@@ -6,6 +15,26 @@ export async function initSongsOwnedDB() {
     db = await window.sqlite.open(dbfilename);
   }
   await db.run("CREATE TABLE IF NOT EXISTS songs_owned (album char, artist char, song char, arrangement char, json char, psarc char, dlc char, sku char, difficulty float, dlckey char, songkey char, id char, uniqkey char primary key, mastery float default 0, count int default 0, lastConversionTime real);");
+  const version = await getUserVersion();
+  if (version === 0) {
+    let sql = "";
+    sql += "alter table songs_owned add sa_playcount int default 0;"
+    sql += "alter table songs_owned add sa_ts real;"
+
+    sql += "alter table songs_owned add sa_hs_easy real;"
+    sql += "alter table songs_owned add sa_hs_medium real;"
+    sql += "alter table songs_owned add sa_hs_hard real;"
+    sql += "alter table songs_owned add sa_hs_master real;"
+
+    sql += "alter table songs_owned add sa_badge_easy int default 0;"
+    sql += "alter table songs_owned add sa_badge_medium int default 0;"
+    sql += "alter table songs_owned add sa_badge_hard int default 0;"
+    sql += "alter table songs_owned add sa_badge_master int default 0;"
+    sql += "alter table songs_owned add sa_highest_badge int default 0;"
+
+    await db.exec(sql);
+    await setUserVersion(version + 1);
+  }
 }
 export async function initSongsAvailableDB() {
   //console.log("__db_call__: initSongsAvailableDB");
@@ -112,6 +141,17 @@ export async function updateMasteryandPlayed(id, mastery, playedcount) {
   const op = await db.run("UPDATE songs_owned SET mastery=?,count=? where id=?", mastery, playedcount, id);
   return op.changes;
 }
+export async function updateScoreAttackStats(stat, badgeHighest, id) {
+  const op = await db.run(
+    "UPDATE songs_owned SET sa_playcount=?, sa_ts=?, sa_hs_easy=?, sa_hs_medium=?, sa_hs_hard=?, sa_hs_master=?, sa_badge_easy=?, sa_badge_medium=?, sa_badge_hard=?, sa_badge_master=?, sa_highest_badge= ? where id=?",
+    stat.PlayCount, stat.TimeStamp,
+    stat.HighScores.Easy, stat.HighScores.Medium, stat.HighScores.Hard, stat.HighScores.Master,
+    stat.Badges.Easy, stat.Badges.Medium, stat.Badges.Hard, stat.Badges.Master,
+    badgeHighest,
+    id,
+  );
+  return op.changes;
+}
 export async function updateAcquiredDate(date, item) {
   // console.log("__db_call__: updateMasteryandPlayed");
   //await db.close();
@@ -184,7 +224,11 @@ export async function getSongsOwned(start = 0, count = 10, sortField = "mastery"
   let sql;
   if (search === "") {
     sql = `select c.acount as acount, c.songcount as songcount, song, album, artist, arrangement, mastery,
-          count, difficulty, uniqkey, id, lastConversionTime from songs_owned,  (
+          count, difficulty, uniqkey, id, lastConversionTime,
+          sa_playcount, sa_ts, 
+          sa_hs_easy, sa_hs_medium, sa_hs_hard, sa_hs_master, 
+          sa_badge_easy, sa_badge_medium,sa_badge_hard, sa_badge_master, sa_highest_badge
+          from songs_owned,  (
           SELECT count(*) as acount, count(distinct song) as songcount
             FROM songs_owned
           ) c 
@@ -192,7 +236,11 @@ export async function getSongsOwned(start = 0, count = 10, sortField = "mastery"
   }
   else {
     sql = `select c.acount as acount, c.songcount as songcount, song, album, artist, arrangement, mastery,
-          count, difficulty, uniqkey, id, lastConversionTime from songs_owned, (
+          count, difficulty, uniqkey, id, lastConversionTime,
+          sa_playcount, sa_ts, 
+          sa_hs_easy, sa_hs_medium, sa_hs_hard, sa_hs_master, 
+          sa_badge_easy, sa_badge_medium,sa_badge_hard, sa_badge_master, sa_highest_badge
+          from songs_owned, (
           SELECT count(*) as acount, count(distinct song) as songcount
             FROM songs_owned
             where song like '%${escape(search)}%' or artist like '%${escape(search)}%' or album like '%${escape(search)}%'
