@@ -296,7 +296,6 @@ export async function getSAStats() {
   (select count(*) as count from songs_owned where sa_playcount > 0 AND (sa_badge_master == 43 OR sa_badge_hard == 33 OR sa_badge_medium == 23 OR sa_badge_easy == 13)) sasilver, \
   (select count(*) as count from songs_owned where sa_playcount > 0 AND (sa_badge_master == 42 OR sa_badge_hard == 32 OR sa_badge_medium == 22 OR sa_badge_easy == 12)) sabronze;"
   const output = await db.get(sqlstr);
-  console.log(output);
   return output;
 }
 export async function getLeadStats() {

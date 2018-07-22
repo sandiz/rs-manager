@@ -20,7 +20,11 @@ export default class StatsTableView extends React.Component {
             </td>
           </tr>
           <tr>
-            <td className={this.props.scoreattack ? "iconPreview gp_platinum badgeText dashboardGP" : ""}>{!this.props.scoreattack ? "95-100%" : "Plat"}</td>
+            <td
+              className={this.props.scoreattack ? "iconPreview gp_platinum badgeText dashboardGP" : ""}
+              title={this.props.scoreattack ? "Total Platinum Badges" : "Mastery between 95-100%"}>
+              {!this.props.scoreattack ? "95-100%" : "PLT"}
+            </td>
             <td className="ta-left skinny">
               <span>
                 <svg id="lead_tier_1_svg" height="100%" width="100%">
@@ -33,7 +37,12 @@ export default class StatsTableView extends React.Component {
             </td>
           </tr>
           <tr>
-            <td className={this.props.scoreattack ? "iconPreview gp_gold badgeText dashboardGP" : ""}>{!this.props.scoreattack ? "90-95%" : "Gold"}</td>
+            <td
+              className={this.props.scoreattack ? "iconPreview gp_gold badgeText dashboardGP" : ""}
+              title={this.props.scoreattack ? "Total Gold Badges" : "Mastery between 90-95%"}
+            >
+              {!this.props.scoreattack ? "90-95%" : "GLD"}
+            </td>
             <td className="ta-left skinny">
               <span>
                 <svg id="lead_tier_1_svg" height="100%" width="100%">
@@ -46,7 +55,12 @@ export default class StatsTableView extends React.Component {
             </td>
           </tr>
           <tr>
-            <td className={this.props.scoreattack ? "iconPreview gp_silver badgeText dashboardGP" : ""}>{!this.props.scoreattack ? "1-90%" : "Silv"}</td>
+            <td
+              className={this.props.scoreattack ? "iconPreview gp_silver badgeText dashboardGP" : ""}
+              title={this.props.scoreattack ? "Total Silver Badges" : "Mastery between 1-90%"}
+            >
+              {!this.props.scoreattack ? "1-90%" : "SIL"}
+            </td>
             <td className="ta-left skinny">
               <span>
                 <svg id="lead_tier_1_svg" height="100%" width="100%">
@@ -59,7 +73,12 @@ export default class StatsTableView extends React.Component {
             </td>
           </tr>
           <tr>
-            <td className={this.props.scoreattack ? "iconPreview gp_bronze badgeText dashboardGP" : ""}>{!this.props.scoreattack ? "Unplayed" : <span className="badgeTextSmall">Brnz</span>}</td>
+            <td
+              className={this.props.scoreattack ? "iconPreview gp_bronze badgeText dashboardGP" : ""}
+              title={this.props.scoreattack ? "Total Bronze Badges" : "Unplayed Arrangments"}
+            >
+              {!this.props.scoreattack ? "Unplayed" : "BRZ"}
+            </td>
             <td className="ta-left skinny">
               <span>
                 <svg id="lead_tier_1_svg" height="100%" width="100%">

@@ -5,11 +5,20 @@ import filterFactory from 'react-bootstrap-table2-filter';
 import PropTypes from 'prop-types';
 import readProfile from '../steamprofileService';
 import { initSetlistPlaylistDB, getSongsOwned, countSongsOwned, updateMasteryandPlayed, initSongsOwnedDB, addToFavorites, updateScoreAttackStats } from '../sqliteService';
-import getProfileConfig, { updateProfileConfig } from '../configService';
+import getProfileConfig, { updateProfileConfig, getScoreAttackConfig } from '../configService';
 import SongDetailView from './songdetailView';
 
 const { path } = window;
 
+function getBadgeName(num) {
+  switch (num) {
+    case 5: return 'Platinum';
+    case 4: return 'Gold';
+    case 3: return 'Silver';
+    case 2: return 'Bronze';
+    default: return '';
+  }
+}
 function unescapeFormatter(cell, row) {
   return <span>{unescape(cell)}</span>;
 }
@@ -43,17 +52,26 @@ function countFormmatter(cell, row) {
   return <span>{cell + row.sa_playcount}</span>;
 }
 function badgeFormatter(cell, row) {
+  const hs = Math.max(row.sa_hs_easy, row.sa_hs_medium, row.sa_hs_hard, row.sa_hs_master).toLocaleString('en');
   if (cell > 40) {
-    return <span className="badgeText">Mast.</span>;
+    const absoluteBadge = getBadgeName(cell - 40);
+    const message = `Highest Badge: ${absoluteBadge}\nDifficulty: Master\nHigh Score: ${hs}`;
+    return <span className="badgeText" title={message}>Mast.</span>;
   }
   else if (cell > 30) {
-    return <span className="badgeText">Hard</span>;
+    const absoluteBadge = getBadgeName(cell - 30);
+    const message = `Highest Badge: ${absoluteBadge}\nDifficulty: Hard\nHigh Score: ${hs}`;
+    return <span className="badgeText" title={message}>Hard</span>;
   }
   else if (cell > 20) {
-    return <span className="badgeText">Med</span>;
+    const absoluteBadge = getBadgeName(cell - 20);
+    const message = `Highest Badge: ${absoluteBadge}\nDifficulty: Medium\nHigh Score: ${hs}`;
+    return <span className="badgeText" title={message}>Med</span>;
   }
   else if (cell > 10) {
-    return <span className="badgeText">Easy</span>;
+    const absoluteBadge = getBadgeName(cell - 10);
+    const message = `Highest Badge: ${absoluteBadge}\nDifficulty: Easy\nHigh Score: ${hs}`;
+    return <span className="badgeText" title={message}>Easy</span>;
   }
   return <span> None </span>;
 }
@@ -101,6 +119,7 @@ export default class SonglistView extends React.Component {
       showDetail: false,
       showSong: '',
       showArtist: '',
+      showSAStats: true,
     };
     this.tabname = "tab-songs"
     this.childtabname = "songs-owned"
@@ -257,6 +276,13 @@ export default class SonglistView extends React.Component {
         style: (cell, row, rowIndex, colIndex) => {
           return {
             width: '20%',
+            display: this.state.showSAStats ? "" : "none",
+          };
+        },
+        headerStyle: (cell, row, rowIndex, colIndex) => {
+          return {
+            width: '20%',
+            display: this.state.showSAStats ? "" : "none",
           };
         },
         formatter: badgeFormatter,
@@ -292,7 +318,6 @@ export default class SonglistView extends React.Component {
               badgeClass += ""
               break;
           }
-
           return badgeClass;
         },
       },
@@ -316,7 +341,8 @@ export default class SonglistView extends React.Component {
       this.childtabname,
       `Songs: ${so.songcount}, Arrangements: ${so.count}`,
     );
-    this.setState({ totalSize: so.count });
+    const showSAStats = await getScoreAttackConfig();
+    this.setState({ totalSize: so.count, showSAStats });
     this.handleTableChange("cdm", {
       page: this.state.page,
       sizePerPage: this.state.sizePerPage,

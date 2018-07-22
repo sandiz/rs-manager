@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types';
 import StatsTableView from './statsTableView';
-import getProfileConfig, { updateProfileConfig } from '../configService';
+import getProfileConfig, { updateProfileConfig, getScoreAttackConfig } from '../configService';
 import readProfile from '../steamprofileService';
 import { updateMasteryandPlayed, initSongsOwnedDB, getSongID, countSongsOwned, getArrangmentsMastered, getLeadStats, getRhythmStats, getBassStats, getRandomSongOwned, getRandomSongAvailable, getSAStats } from '../sqliteService';
 import { replaceRocksmithTerms } from './songavailableView';
@@ -68,6 +68,7 @@ export default class DashboardView extends React.Component {
       sasilverw: 0,
       sabronze: 0,
       sabronzew: 0,
+      showsastats: true,
     }
   }
   componentWillMount = () => {
@@ -98,6 +99,8 @@ export default class DashboardView extends React.Component {
   };
   fetchStats = async (disbleDialog) => {
     const prfldb = await getProfileConfig();
+    const showsastats = await getScoreAttackConfig();
+    this.setState({ showsastats });
     if (prfldb === "" || prfldb === null) {
       return;
     }
@@ -278,6 +281,8 @@ export default class DashboardView extends React.Component {
     await this.fetchStats();
   }
   render = () => {
+    const scoreattackstyle = "col ta-center dashboard-middle " + (this.state.showsastats ? "col-md-25" : "hidden");
+    const arrstyle = "col ta-center dashboard-middle " + (this.state.showsastats ? "col-md-25" : "col-md-3")
     return (
       <div className="container-fluid">
         <div className="centerButton list-unstyled">
@@ -433,7 +438,7 @@ export default class DashboardView extends React.Component {
         </div>
         <br /> <br />
         <div className="row justify-content-md-center">
-          <div className="col col-md-3 ta-center dashboard-middle">
+          <div className={arrstyle}>
             <span style={{ fontSize: 17 + 'px' }}>Lead </span>
             <StatsTableView
               total={this.state.l}
@@ -447,7 +452,7 @@ export default class DashboardView extends React.Component {
               unplayedwidth={this.state.luw}
             />
           </div>
-          <div className="col col-md-3 ta-center dashboard-middle">
+          <div className={arrstyle}>
             <span style={{ fontSize: 17 + 'px' }}>Rhythm </span>
             <StatsTableView
               total={this.state.r}
@@ -461,7 +466,7 @@ export default class DashboardView extends React.Component {
               unplayedwidth={this.state.ruw}
             />
           </div>
-          <div className="col col-md-3 ta-center dashboard-middle">
+          <div className={arrstyle}>
             <span style={{ fontSize: 17 + 'px' }}>Bass </span>
             <StatsTableView
               total={this.state.b}
@@ -475,7 +480,7 @@ export default class DashboardView extends React.Component {
               unplayedwidth={this.state.buw}
             />
           </div>
-          <div className="col col-md-3 ta-center dashboard-middle">
+          <div className={scoreattackstyle}>
             <span style={{ fontSize: 17 + 'px' }}>Score Attack </span>
             <StatsTableView
               scoreattack

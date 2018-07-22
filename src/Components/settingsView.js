@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types';
-import getProfileConfig, { updateSteamLoginSecureCookie, getSteamLoginSecureCookie, updateProfileConfig } from '../configService';
+import getProfileConfig, { updateSteamLoginSecureCookie, getSteamLoginSecureCookie, updateProfileConfig, getScoreAttackConfig, updateScoreAttackConfig } from '../configService';
 
 const { path } = window;
 const { remote } = window.require('electron')
@@ -11,13 +11,22 @@ export default class SettingsView extends React.Component {
     this.state = {
       prfldb: '',
       steamLoginSecure: '',
+      showScoreAttack: true,
     };
     this.readConfigs();
+  }
+  handleScoreAttack = (event) => {
+    const t = event.target;
+    const value = t.type === 'checkbox' ? t.checked : t.value;
+    this.setState({
+      showScoreAttack: value,
+    });
   }
   readConfigs = async () => {
     const d = await getProfileConfig();
     const e = await getSteamLoginSecureCookie();
-    this.setState({ prfldb: d, steamLoginSecure: e });
+    const f = await getScoreAttackConfig();
+    this.setState({ prfldb: d, steamLoginSecure: e, showScoreAttack: f });
   }
   saveSettings = async () => {
     if (this.state.steamLoginSecure !== "" && this.state.steamLoginSecure != null) {
@@ -26,6 +35,7 @@ export default class SettingsView extends React.Component {
     if (this.state.prfldb !== "" && this.state.prfldb != null) {
       await updateProfileConfig(this.state.prfldb);
     }
+    await updateScoreAttackConfig(this.state.showScoreAttack);
     this.props.handleChange();
     this.props.updateHeader(this.tabname, "Settings Saved!");
   }
@@ -164,6 +174,30 @@ export default class SettingsView extends React.Component {
                     &nbsp;
                     to fetch your dlc&#39;s. You can check your data
                   by logging on to steam and clicking the link.
+                  </span>
+                </div>
+                <br />
+                <span style={{ float: 'left' }}>
+                  <a onClick={this.enterCookie}>
+                    Show Score Attack Stats:
+                  </a>
+                </span>
+                <span style={{
+                  float: 'right',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  width: 400 + 'px',
+                  textAlign: 'right',
+                }}>
+                  <input
+                    type="checkbox"
+                    checked={this.state.showScoreAttack}
+                    onChange={this.handleScoreAttack} />
+                </span>
+                <br />
+                <div className="ta-center">
+                  <span style={{ color: '#ccc' }}>
+                    Show/Hides score attack stats from Dashboard and Songs view.
                   </span>
                 </div>
                 <br />
