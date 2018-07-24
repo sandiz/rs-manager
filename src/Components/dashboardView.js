@@ -150,7 +150,8 @@ export default class DashboardView extends React.Component {
       const rup = rhythmStats.r - (rhythmStats.rh + rhythmStats.rm + rhythmStats.rl)
       const bassStats = await getBassStats();
       const bup = bassStats.b - (bassStats.bh + bassStats.bm + bassStats.bl)
-      const saStats = await getSAStats();
+      const saStats = await getSAStats("sa_badge_hard");
+      const samStats = await getSAStats("sa_badge_master")
       this.setState({
         l: leadStats.l,
         lh: leadStats.lh,
@@ -179,15 +180,23 @@ export default class DashboardView extends React.Component {
         bmw: this.getStatsWidth(bassStats.bm, 0, bassStats.b),
         blw: this.getStatsWidth(bassStats.bl, 0, bassStats.b),
         buw: this.getStatsWidth(bup, 0, bassStats.b),
-        satotal: saStats.satotal,
+        satotal: songscount.count,
         saplat: saStats.saplat,
-        saplatw: this.getStatsWidth(saStats.saplat, 0, saStats.satotal),
+        saplatw: this.getStatsWidth(saStats.saplat, 0, songscount.count),
         sagold: saStats.sagold,
-        sagoldw: this.getStatsWidth(saStats.sagold, 0, saStats.satotal),
+        sagoldw: this.getStatsWidth(saStats.sagold, 0, songscount.count),
         sasilver: saStats.sasilver,
-        sasilverw: this.getStatsWidth(saStats.sasilver, 0, saStats.satotal),
-        sabronze: saStats.sabronze,
-        sabronzew: this.getStatsWidth(saStats.sabronze, 0, saStats.satotal),
+        sasilverw: this.getStatsWidth(saStats.sasilver, 0, songscount.count),
+        sabronze: songscount.count - saStats.satotal,
+        sabronzew: this.getStatsWidth(songscount.count - saStats.satotal, 0, songscount.count),
+        samplat: samStats.saplat,
+        samplatw: this.getStatsWidth(samStats.saplat, 0, songscount.count),
+        samgold: samStats.sagold,
+        samgoldw: this.getStatsWidth(samStats.sagold, 0, songscount.count),
+        samsilver: samStats.sasilver,
+        samsilverw: this.getStatsWidth(samStats.sasilver, 0, songscount.count),
+        sambronze: songscount.count - samStats.satotal,
+        sambronzew: this.getStatsWidth(songscount.count - samStats.satotal, 0, songscount.count),
       })
       this.props.updateHeader(this.tabname, "Rocksmith 2014 Dashboard");
     }
@@ -281,8 +290,8 @@ export default class DashboardView extends React.Component {
     await this.fetchStats();
   }
   render = () => {
-    const scoreattackstyle = "col ta-center dashboard-middle " + (this.state.showsastats ? "col-md-25" : "hidden");
-    const arrstyle = "col ta-center dashboard-middle " + (this.state.showsastats ? "col-md-25" : "col-md-3")
+    const scoreattackstyle = "col ta-center dashboard-middle " + (this.state.showsastats ? "col-md-3" : "hidden");
+    const arrstyle = "col ta-center dashboard-middle col-md-3";
     return (
       <div className="container-fluid">
         <div className="centerButton list-unstyled">
@@ -480,8 +489,10 @@ export default class DashboardView extends React.Component {
               unplayedwidth={this.state.buw}
             />
           </div>
+        </div>
+        <div className="row justify-content-md-center dashboard-scoreattack" >
           <div className={scoreattackstyle}>
-            <span style={{ fontSize: 17 + 'px' }}>Score Attack </span>
+            <span style={{ fontSize: 17 + 'px' }}>Score Attack - Hard</span>
             <StatsTableView
               scoreattack
               total={this.state.satotal}
@@ -491,8 +502,23 @@ export default class DashboardView extends React.Component {
               goldwidth={this.state.sagoldw}
               silvertotal={this.state.sasilver}
               silverwidth={this.state.sasilverw}
-              bronzetotal={this.state.sabronze}
-              bronzewidth={this.state.sabronzew}
+              unplayedtotal={this.state.sabronze}
+              unplayedwidth={this.state.sabronzew}
+            />
+          </div>
+          <div className={scoreattackstyle}>
+            <span style={{ fontSize: 17 + 'px' }}>Score Attack - Master</span>
+            <StatsTableView
+              scoreattack
+              total={this.state.satotal}
+              plattotal={this.state.samplat}
+              platwidth={this.state.samplatw}
+              goldtotal={this.state.samgold}
+              goldwidth={this.state.samgoldw}
+              silvertotal={this.state.samsilver}
+              silverwidth={this.state.samsilverw}
+              unplayedtotal={this.state.sambronze}
+              unplayedwidth={this.state.sambronzew}
             />
           </div>
         </div>
