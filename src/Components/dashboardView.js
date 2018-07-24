@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import StatsTableView from './statsTableView';
 import getProfileConfig, { updateProfileConfig, getScoreAttackConfig } from '../configService';
 import readProfile from '../steamprofileService';
-import { updateMasteryandPlayed, initSongsOwnedDB, getSongID, countSongsOwned, getArrangmentsMastered, getLeadStats, getRhythmStats, getBassStats, getRandomSongOwned, getRandomSongAvailable, getSAStats } from '../sqliteService';
+import { updateMasteryandPlayed, initSongsOwnedDB, getSongID, countSongsOwned, getArrangmentsMastered, getLeadStats, getRhythmStats, getBassStats, getRandomSongOwned, getRandomSongAvailable, getSAStats, updateScoreAttackStats } from '../sqliteService';
 import { replaceRocksmithTerms } from './songavailableView';
 import SongDetailView from './songdetailView';
 
@@ -152,6 +152,14 @@ export default class DashboardView extends React.Component {
       const bup = bassStats.b - (bassStats.bh + bassStats.bm + bassStats.bl)
       const saStats = await getSAStats("sa_badge_hard");
       const samStats = await getSAStats("sa_badge_master")
+      /*
+      saStats.saplat = 240;
+      saStats.sagold = 540;
+      saStats.sasilver = 140;
+      samStats.saplat = 140;
+      samStats.sagold = 240;
+      samStats.sasilver = 440;
+      */
       this.setState({
         l: leadStats.l,
         lh: leadStats.lh,
@@ -255,14 +263,16 @@ export default class DashboardView extends React.Component {
       );
       const steamProfile = await readProfile(prfldb);
       const stats = steamProfile.Stats.Songs;
+      const sastats = steamProfile.SongsSA;
+      const total = Object.keys(stats).length + Object.keys(sastats).length;
       await updateProfileConfig(prfldb);
       this.props.handleChange();
       this.props.updateHeader(
         this.tabname,
-        `Song Stats Found: ${Object.keys(stats).length}`,
+        `Song Stats Found: ${total}`,
       );
       await initSongsOwnedDB();
-      const keys = Object.keys(stats);
+      let keys = Object.keys(stats);
       let updatedRows = 0;
       for (let i = 0; i < keys.length; i += 1) {
         const stat = stats[keys[i]];
@@ -279,9 +289,44 @@ export default class DashboardView extends React.Component {
         }
         updatedRows += rows;
       }
+      //find score attack stats
+      keys = Object.keys(sastats);
+      for (let i = 0; i < keys.length; i += 1) {
+        const stat = sastats[keys[i]];
+        let highestBadge = 0;
+        if (stat.Badges.Easy > 0) {
+          stat.Badges.Easy += 10;
+          highestBadge = stat.Badges.Easy;
+        }
+        if (stat.Badges.Medium > 0) {
+          stat.Badges.Medium += 20;
+          highestBadge = stat.Badges.Medium;
+        }
+        if (stat.Badges.Hard > 0) {
+          stat.Badges.Hard += 30;
+          highestBadge = stat.Badges.Hard;
+        }
+        if (stat.Badges.Master > 0) {
+          stat.Badges.Master += 40;
+          highestBadge = stat.Badges.Master;
+        }
+        this.props.updateHeader(
+          this.tabname,
+          this.childtabname,
+          `Updating Stat for SongID:  ${keys[i]} (${i}/${keys.length})`,
+        );
+        // eslint-disable-next-line
+        const rows = await updateScoreAttackStats(stat, highestBadge, keys[i]);
+        if (rows === 0) {
+          console.log("Missing ID: " + keys[i]);
+        }
+        updatedRows += rows;
+      }
+
       this.props.updateHeader(
         this.tabname,
-        "Stats Found: " + updatedRows + ", Total Stats: " + keys.length,
+        this.childtabname,
+        "Stats Found: " + updatedRows,
       );
     }
   }
