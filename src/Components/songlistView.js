@@ -2,6 +2,7 @@ import React from 'react'
 import BootstrapTable from 'react-bootstrap-table-next'
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import filterFactory from 'react-bootstrap-table2-filter';
+import ReactTooltip from 'react-tooltip'
 import PropTypes from 'prop-types';
 import readProfile from '../steamprofileService';
 import { initSetlistPlaylistDB, getSongsOwned, countSongsOwned, updateMasteryandPlayed, initSongsOwnedDB, addToFavorites, updateScoreAttackStats } from '../sqliteService';
@@ -10,12 +11,12 @@ import SongDetailView from './songdetailView';
 
 const { path } = window;
 
-function getBadgeName(num) {
+function getBadgeName(num, retClass = false) {
   switch (num) {
-    case 5: return 'Platinum';
-    case 4: return 'Gold';
-    case 3: return 'Silver';
-    case 2: return 'Bronze';
+    case 5: return retClass ? "gp_platinum" : "Platinum";
+    case 4: return retClass ? "gp_gold" : "Gold";
+    case 3: return retClass ? "gp_silver" : "Silver";
+    case 2: return retClass ? "gp_bronze" : "Bronze";
     default: return '';
   }
 }
@@ -52,57 +53,57 @@ function countFormmatter(cell, row) {
   return <span>{cell + row.sa_playcount}</span>;
 }
 function badgeFormatter(cell, row) {
-  let badgeClass = "iconPreview ";
-  let adjustedBadge = 0;
-  if (row.sa_highest_badge > 40) {
-    adjustedBadge = row.sa_highest_badge - 40;
+  const badgeClassDefault = "col col-md-3 col-md-34 ta-center iconPreview ";
+  const badgeClasses = [];
+  if (row.sa_badge_easy > 10) {
+    badgeClasses.push([row.sa_badge_easy, row.sa_hs_easy, "Easy", getBadgeName(row.sa_badge_easy - 10, true), getBadgeName(row.sa_badge_easy - 10, false)]);
   }
-  else if (row.sa_highest_badge > 30) {
-    adjustedBadge = row.sa_highest_badge - 30;
+  if (row.sa_badge_medium > 20) {
+    badgeClasses.push([row.sa_badge_medium, row.sa_hs_medium, "Medium", getBadgeName(row.sa_badge_medium - 20, true), getBadgeName(row.sa_badge_medium - 20, false)]);
   }
-  else if (row.sa_highest_badge > 20) {
-    adjustedBadge = row.sa_highest_badge - 20;
+  if (row.sa_badge_hard > 30) {
+    badgeClasses.push([row.sa_badge_hard, row.sa_hs_hard, "Hard", getBadgeName(row.sa_badge_hard - 30, true), getBadgeName(row.sa_badge_hard - 30, false)]);
   }
-  else if (row.sa_highest_badge > 10) {
-    adjustedBadge = row.sa_highest_badge - 10;
+  if (row.sa_badge_master > 40) {
+    badgeClasses.push([row.sa_badge_master, row.sa_hs_master, "Master", getBadgeName(row.sa_badge_master - 40, true), getBadgeName(row.sa_badge_master - 40, false)]);
   }
-  switch (adjustedBadge) {
-    case 5:
-      badgeClass += "gp_platinum bggray"
-      break;
-    case 4:
-      badgeClass += "gp_gold bggray"
-      break;
-    case 3:
-      badgeClass += "gp_silver bggray"
-      break;
-    case 2:
-      badgeClass += "gp_bronze bggray"
-      break;
-    default:
-      badgeClass += ""
-      break;
-  }
-  const hs = Math.max(row.sa_hs_easy, row.sa_hs_medium, row.sa_hs_hard, row.sa_hs_master).toLocaleString('en');
-  if (cell > 40) {
-    const absoluteBadge = getBadgeName(cell - 40);
-    const message = `Highest Badge: ${absoluteBadge}\nDifficulty: Master\nHigh Score: ${hs}`;
-    return <div style={{ float: 'left' }} title={message}><div className={badgeClass} alt="" />Master</div>;
-  }
-  else if (cell > 30) {
-    const absoluteBadge = getBadgeName(cell - 30);
-    const message = `Highest Badge: ${absoluteBadge}\nDifficulty: Hard\nHigh Score: ${hs}`;
-    return <div style={{ float: 'left' }} title={message}><div className={badgeClass} alt="" /><div className="pick-text"><div>Hard</div></div></div>;
-  }
-  else if (cell > 20) {
-    const absoluteBadge = getBadgeName(cell - 20);
-    const message = `Highest Badge: ${absoluteBadge}\nDifficulty: Medium\nHigh Score: ${hs}`;
-    return <div style={{ float: 'left' }} title={message}><div className={badgeClass} alt="" /><div className="pick-text"><div>Medium</div></div></div>;
-  }
-  else if (cell > 10) {
-    const absoluteBadge = getBadgeName(cell - 10);
-    const message = `Highest Badge: ${absoluteBadge}\nDifficulty: Easy\nHigh Score: ${hs}`;
-    return <div style={{ float: 'left' }} title={message}><div className={badgeClass} alt="" /><div className="pick-text"><div>Easy</div></div></div>;
+  if (badgeClasses.length > 0) {
+    badgeClasses.reverse();
+    return (
+      <div>
+        <ReactTooltip id={row.id} aria-haspopup="true" place="left" type="dark" effect="solid" className="tooltipClass">
+          <p>Score Attack Badges</p>
+          <table style={{ width: 100 + '%', height: 100 + '%' }} className="tooltipTable">
+            {
+              badgeClasses.map(([badgeCount, highScore,
+                badgeType, badgeClass, badgeName], index) => {
+                const divclass = "iconPreview gp_icon_small " + badgeClass;
+                return (
+                  <tr className="row" key={badgeClass}>
+                    <td style={{ width: 26 + '%', textAlign: 'right' }} className="tooltip-td-pad"><b>{badgeType}: </b></td>
+                    <td style={{ width: 14 + '%' }} className="tooltip-td-low-pad"><div key={badgeClass} className={divclass} alt="" /></td>
+                    <td style={{ width: 30 + '%', textAlign: 'left' }} className="tooltip-td-pad">{badgeName}</td>
+                    <td style={{ width: 30 + '%', textAlign: 'left' }} className="tooltip-td-pad"> {highScore.toLocaleString('en')} </td>
+                  </tr>
+                );
+              })
+            }
+          </table>
+        </ReactTooltip>
+        <div data-tip data-for={row.id} data-class="tooltip-badge tooltipClass">
+          <div className="row justify-content-md-center pointer" >
+            {
+              badgeClasses.map(([badgeCount, highScore, badgeType, badgeClass], index) => {
+                const divclass = badgeClassDefault + badgeClass;
+                return (
+                  <div key={badgeClass} className={divclass} alt="" />
+                );
+              })
+            }
+          </div>
+        </div>
+      </div >
+    )
   }
   return <span> None </span>;
 }
@@ -302,17 +303,17 @@ export default class SonglistView extends React.Component {
       },
       {
         dataField: "sa_highest_badge",
-        text: 'Badge',
+        text: 'Badges',
         sort: true,
         style: (cell, row, rowIndex, colIndex) => {
           return {
-            width: '28%',
+            width: '20%',
             display: this.state.showSAStats ? "" : "none",
           };
         },
         headerStyle: (cell, row, rowIndex, colIndex) => {
           return {
-            width: '28%',
+            width: '20%',
             display: this.state.showSAStats ? "" : "none",
           };
         },
