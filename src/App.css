@@ -669,6 +669,7 @@ hr {
 }
 .col-md-34 {
   flex: 0 0 34% !important;
+  padding: 17px;
 }
 .tooltipMoreData {
   margin-left: -60px;

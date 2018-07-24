@@ -187,7 +187,7 @@ export default class SonglistView extends React.Component {
         text: "Artist",
         style: (cell, row, rowIndex, colIndex) => {
           return {
-            width: '15%',
+            width: '19%',
             cursor: 'pointer',
           };
         },
