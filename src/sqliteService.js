@@ -14,24 +14,41 @@ export async function initSongsOwnedDB() {
     const dbfilename = window.sqlitePath;
     db = await window.sqlite.open(dbfilename);
   }
-  await db.run("CREATE TABLE IF NOT EXISTS songs_owned (album char, artist char, song char, arrangement char, json char, psarc char, dlc char, sku char, difficulty float, dlckey char, songkey char, id char, uniqkey char primary key, mastery float default 0, count int default 0, lastConversionTime real);");
+  const createTableSql = "CREATE TABLE IF NOT EXISTS songs_owned (album char, artist char, song char, arrangement char, json char, psarc char, dlc char, sku char, difficulty float, dlckey char, songkey char, id char, uniqkey char primary key, mastery float default 0, count int default 0, lastConversionTime real, constraint id_unique unique (id) );";
+  await db.run(createTableSql);
   const version = await getUserVersion();
+
+  let altersql = "";
+  altersql += "alter table songs_owned add sa_playcount int default 0;"
+  altersql += "alter table songs_owned add sa_ts real;"
+
+  altersql += "alter table songs_owned add sa_hs_easy real;"
+  altersql += "alter table songs_owned add sa_hs_medium real;"
+  altersql += "alter table songs_owned add sa_hs_hard real;"
+  altersql += "alter table songs_owned add sa_hs_master real;"
+
+  altersql += "alter table songs_owned add sa_badge_easy int default 0;"
+  altersql += "alter table songs_owned add sa_badge_medium int default 0;"
+  altersql += "alter table songs_owned add sa_badge_hard int default 0;"
+  altersql += "alter table songs_owned add sa_badge_master int default 0;"
+  altersql += "alter table songs_owned add sa_highest_badge int default 0;"
+
   if (version === 0) {
+    await db.exec(altersql);
+    await setUserVersion(version + 1);
+  }
+  else if (version === 1) {
     let sql = "";
-    sql += "alter table songs_owned add sa_playcount int default 0;"
-    sql += "alter table songs_owned add sa_ts real;"
-
-    sql += "alter table songs_owned add sa_hs_easy real;"
-    sql += "alter table songs_owned add sa_hs_medium real;"
-    sql += "alter table songs_owned add sa_hs_hard real;"
-    sql += "alter table songs_owned add sa_hs_master real;"
-
-    sql += "alter table songs_owned add sa_badge_easy int default 0;"
-    sql += "alter table songs_owned add sa_badge_medium int default 0;"
-    sql += "alter table songs_owned add sa_badge_hard int default 0;"
-    sql += "alter table songs_owned add sa_badge_master int default 0;"
-    sql += "alter table songs_owned add sa_highest_badge int default 0;"
-
+    sql += "DELETE FROM songs_owned WHERE rowid NOT IN (SELECT MIN(rowid) FROM songs_owned GROUP BY id);";
+    sql += "PRAGMA foreign_keys=off;";
+    sql += "BEGIN TRANSACTION;";
+    sql += "ALTER TABLE songs_owned RENAME TO songs_owned_old;";
+    sql += createTableSql;
+    sql += altersql;
+    sql += "INSERT INTO songs_owned SELECT * FROM songs_owned_old;";
+    sql += "COMMIT;";
+    sql += "PRAGMA foreign_keys=on;";
+    sql += "DROP TABLE songs_owned_old;"
     await db.exec(sql);
     await setUserVersion(version + 1);
   }
@@ -211,8 +228,12 @@ export default async function updateSongsOwned(psarcResult) {
       '${dlc}','${sku}',${difficulty},'${dlckey}',
       '${songkey}','${id}', '${uniqkey}', '${lct}', '${mastery}','${count}');`
   //});
-  //console.log(sqlstr);
-  await db.run(sqlstr); // Run the query without returning anything
+  try {
+    await db.run(sqlstr); // Run the query without returning anything
+  }
+  catch (error) {
+    console.log(error);
+  }
 }
 
 export async function getSongsOwned(start = 0, count = 10, sortField = "mastery", sortOrder = "desc", search = "") {
@@ -286,6 +307,10 @@ export async function getArrangmentsMastered() {
   const sql = `select count(mastery) as count from songs_owned where mastery > 0.95`;
   const output = await db.get(sql);
   return output;
+}
+export async function resetDB(table = 'songs_owned') {
+  const sql = `delete from ${table};`
+  await db.exec(sql);
 }
 export async function getSAStats(type = "sa_badge_hard") {
   // console.log("__db_call__: getLeadStats");

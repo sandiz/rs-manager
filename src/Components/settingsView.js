@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types';
 import getProfileConfig, { updateSteamLoginSecureCookie, getSteamLoginSecureCookie, updateProfileConfig, getScoreAttackConfig, updateScoreAttackConfig } from '../configService';
+import { resetDB } from '../sqliteService';
 
 const { path } = window;
 const { remote } = window.require('electron')
@@ -48,6 +49,10 @@ export default class SettingsView extends React.Component {
       this.setState({ prfldb: prfldbs[0] });
       this.props.handleChange();
     }
+  }
+  resetdb = async () => {
+    await resetDB('songs_owned');
+    this.props.updateHeader(this.tabname, "Songs Owned collection is now reset!");
   }
   enterCookie = async () => {
     //eslint-disable-next-line
@@ -200,6 +205,26 @@ export default class SettingsView extends React.Component {
                     Show/Hides score attack stats from Dashboard and Songs view.
                   </span>
                 </div>
+                <br />
+                <span style={{ float: 'left', color: 'red', marginTop: 18 + 'px' }}>
+                  <a onClick={this.enterCookie}>
+                    Reset Songs Owned Collection
+                  </a>
+                </span>
+                <span style={{
+                  float: 'right',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  width: 400 + 'px',
+                  textAlign: 'right',
+                }}>
+                  <a
+                    onClick={this.resetdb}
+                    className="extraPadding download">
+                    Reset
+                  </a>
+                </span>
+                <br /> <br />
                 <br />
               </div>
             </div>
