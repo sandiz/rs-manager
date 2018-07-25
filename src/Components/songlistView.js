@@ -207,6 +207,11 @@ export default class SonglistView extends React.Component {
         formatter: unescapeFormatter,
       },
       {
+        dataField: "json",
+        text: 'JSON',
+        hidden: true,
+      },
+      {
         dataField: "arrangement",
         text: "Arrangement",
         style: (cell, row, rowIndex, colIndex) => {
@@ -216,6 +221,29 @@ export default class SonglistView extends React.Component {
           };
         },
         sort: true,
+        formatter: (cell, row) => {
+          const str = path.basename(row.json);
+          const regex = /.*(\d)\.json$/gm;
+          let m;
+          let addAlt = false;
+
+          //eslint-disable-next-line
+          while ((m = regex.exec(str)) !== null) {
+            // This is necessary to avoid infinite loops with zero-width matches
+            if (m.index === regex.lastIndex) {
+              regex.lastIndex += 1;
+            }
+
+            //eslint-disable-next-line
+            m.forEach((match, groupIndex) => {
+              addAlt = true;
+            });
+          }
+          if (addAlt) {
+            return <span>Alt. {cell}</span>
+          }
+          return <span>{cell}</span>
+        },
       },
       {
         dataField: "mastery",

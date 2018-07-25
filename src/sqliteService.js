@@ -245,7 +245,7 @@ export async function getSongsOwned(start = 0, count = 10, sortField = "mastery"
   let sql;
   if (search === "") {
     sql = `select c.acount as acount, c.songcount as songcount, song, album, artist, arrangement, mastery,
-          count, difficulty, uniqkey, id, lastConversionTime,
+          count, difficulty, uniqkey, id, lastConversionTime, json,
           sa_playcount, sa_ts, 
           sa_hs_easy, sa_hs_medium, sa_hs_hard, sa_hs_master, 
           sa_badge_easy, sa_badge_medium,sa_badge_hard, sa_badge_master, sa_highest_badge
@@ -257,7 +257,7 @@ export async function getSongsOwned(start = 0, count = 10, sortField = "mastery"
   }
   else {
     sql = `select c.acount as acount, c.songcount as songcount, song, album, artist, arrangement, mastery,
-          count, difficulty, uniqkey, id, lastConversionTime,
+          count, difficulty, uniqkey, id, lastConversionTime, json, 
           sa_playcount, sa_ts, 
           sa_hs_easy, sa_hs_medium, sa_hs_hard, sa_hs_master, 
           sa_badge_easy, sa_badge_medium,sa_badge_hard, sa_badge_master, sa_highest_badge
@@ -392,7 +392,7 @@ export async function getSongsFromPlaylistDB(dbname, start = 0, count = 10, sort
   let sql;
   if (search === "") {
     sql = `select c.acount as acount, c.songcount as songcount, song, artist, album, arrangement, mastery,
-          count, difficulty, id, lastConversionTime from songs_owned,  (
+          count, difficulty, id, lastConversionTime, json from songs_owned,  (
           SELECT count(*) as acount, count(distinct song) as songcount
             FROM songs_owned
             JOIN ${dbname} ON ${dbname}.uniqkey = songs_owned.uniqkey
@@ -403,7 +403,7 @@ export async function getSongsFromPlaylistDB(dbname, start = 0, count = 10, sort
   }
   else {
     sql = `select c.acount as acount, c.songcount as songcount, song, artist, album, arrangement, mastery,
-          count, difficulty, id, lastConversionTime from songs_owned, (
+          count, difficulty, id, lastConversionTime, json from songs_owned, (
           SELECT count(*) as acount, count(distinct song) as songcount
             FROM songs_owned
             JOIN ${dbname} ON ${dbname}.uniqkey = songs_owned.uniqkey
