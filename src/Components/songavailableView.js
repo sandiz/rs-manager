@@ -311,6 +311,14 @@ export default class SongAvailableView extends React.Component {
       `Fetching acquired dates`,
     );
     const history = await getOwnedHistory(cookie);
+    if (history == null || history.length === 0) {
+      this.props.updateHeader(
+        this.tabname,
+        this.childtabname,
+        `Error fetching history, please check Steam Login Cookie in Settings!`,
+      );
+      return;
+    }
     await this.updateAcquiredDates(history);
     const pack = await getOwnedPackages(cookie);
     let totalPackages = pack.rgOwnedApps;

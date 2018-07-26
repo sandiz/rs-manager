@@ -147,7 +147,6 @@ export async function countSongsAvailable() {
   const output = await db.get(sql);
   return output
 }
-
 export async function saveSongsOwnedDB() {
   //console.log("__db_call__: saveSongsOwnedDB");
   //await db.close();
@@ -193,7 +192,6 @@ export async function countAppID(item, rd) {
   const output = await db.get(sql);
   return output
 }
-
 export default async function updateSongsOwned(psarcResult) {
   // console.log("__db_call__: updateSongsOwned");
   let sqlstr = "";
@@ -235,7 +233,6 @@ export default async function updateSongsOwned(psarcResult) {
     console.log(error);
   }
 }
-
 export async function getSongsOwned(start = 0, count = 10, sortField = "mastery", sortOrder = "desc", search = "") {
   //  console.log("__db_call__: getSongsOwned");
   if (db == null) {
@@ -375,14 +372,12 @@ export async function getAllSetlist(filter = false) {
   const all = await db.all(sql);
   return all;
 }
-
 export async function getSongCountFromPlaylistDB(dbname) {
   //console.log("__db_call__: getSongCountFromPlaylistDB");
   const sql = `SELECT count(*) as songcount, count(distinct song) as count FROM ${dbname} order by uniqkey collate nocase;`
   const all = await db.get(sql);
   return all;
 }
-
 export async function getSongsFromPlaylistDB(dbname, start = 0, count = 10, sortField = "mastery", sortOrder = "desc", search = "") {
   // console.log("__db_call__: getSongsFromPlaylistDB");
   if (db == null) {
@@ -418,7 +413,6 @@ export async function getSongsFromPlaylistDB(dbname, start = 0, count = 10, sort
   const output = await db.all(sql);
   return output
 }
-
 export async function removeSongFromSetlist(dbname, song, artist, album) {
   // console.log("__db_call__: removeSongFromSetlist");
   let sql = `select uniqkey from songs_owned where song like '%${song}%' and artist like '%${artist}%' and album like '%${album}%'`;
