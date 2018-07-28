@@ -5,7 +5,7 @@ import filterFactory from 'react-bootstrap-table2-filter';
 import ReactTooltip from 'react-tooltip'
 import PropTypes from 'prop-types';
 import readProfile from '../steamprofileService';
-import { initSetlistPlaylistDB, getSongsOwned, countSongsOwned, updateMasteryandPlayed, initSongsOwnedDB, addToFavorites, updateScoreAttackStats } from '../sqliteService';
+import { initSetlistPlaylistDB, getSongsOwned, countSongsOwned, updateMasteryandPlayed, initSongsOwnedDB, addToFavorites, updateScoreAttackStats, removeFromSongsOwned } from '../sqliteService';
 import getProfileConfig, { updateProfileConfig, getScoreAttackConfig } from '../configService';
 import SongDetailView from './songdetailView';
 
@@ -74,20 +74,22 @@ function badgeFormatter(cell, row) {
         <ReactTooltip id={row.id} aria-haspopup="true" place="left" type="dark" effect="solid" className="tooltipClass">
           <p>Score Attack Badges</p>
           <table style={{ width: 100 + '%', height: 100 + '%' }} className="tooltipTable">
-            {
-              badgeClasses.map(([badgeCount, highScore,
-                badgeType, badgeClass, badgeName], index) => {
-                const divclass = "iconPreview gp_icon_small " + badgeClass;
-                return (
-                  <tr className="row" key={badgeClass}>
-                    <td style={{ width: 26 + '%', textAlign: 'right' }} className="tooltip-td-pad"><b>{badgeType}: </b></td>
-                    <td style={{ width: 14 + '%' }} className="tooltip-td-low-pad"><div key={badgeClass} className={divclass} alt="" /></td>
-                    <td style={{ width: 30 + '%', textAlign: 'left' }} className="tooltip-td-pad">{badgeName}</td>
-                    <td style={{ width: 30 + '%', textAlign: 'left' }} className="tooltip-td-pad"> {highScore.toLocaleString('en')} </td>
-                  </tr>
-                );
-              })
-            }
+            <tbody>
+              {
+                badgeClasses.map(([badgeCount, highScore,
+                  badgeType, badgeClass, badgeName], index) => {
+                  const divclass = "iconPreview gp_icon_small " + badgeClass;
+                  return (
+                    <tr className="row" key={badgeClass}>
+                      <td style={{ width: 26 + '%', textAlign: 'right' }} className="tooltip-td-pad"><b>{badgeType}: </b></td>
+                      <td style={{ width: 14 + '%' }} className="tooltip-td-low-pad"><div key={badgeClass} className={divclass} alt="" /></td>
+                      <td style={{ width: 30 + '%', textAlign: 'left' }} className="tooltip-td-pad">{badgeName}</td>
+                      <td style={{ width: 30 + '%', textAlign: 'left' }} className="tooltip-td-pad"> {highScore.toLocaleString('en')} </td>
+                    </tr>
+                  );
+                })
+              }
+            </tbody>
           </table>
         </ReactTooltip>
         <div data-tip data-for={row.id} data-class="tooltip-badge tooltipClass">
@@ -355,6 +357,7 @@ export default class SonglistView extends React.Component {
           showSong: row.song,
           showArtist: row.artist,
           showAlbum: row.album,
+          showSongID: row.id,
         })
       },
     };
@@ -538,6 +541,10 @@ export default class SonglistView extends React.Component {
       filters: {},
     })
   }
+  removeFromDB = async () => {
+    await removeFromSongsOwned(this.state.showSongID);
+    await this.refreshView();
+  }
   handleTableChange = async (type, {
     page,
     sizePerPage,
@@ -620,6 +627,7 @@ export default class SonglistView extends React.Component {
             album={this.state.showAlbum}
             showDetail={this.state.showDetail}
             close={() => this.setState({ showDetail: false })}
+            removeFromDB={this.removeFromDB}
             isSongview
             isSetlist={false}
           />

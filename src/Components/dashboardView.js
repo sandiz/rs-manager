@@ -357,7 +357,7 @@ export default class DashboardView extends React.Component {
               <span style={{ fontSize: 26 + 'px' }}>
                 <a
                   onClick={() => { this.setState({ showsongpackpreview: true }) }}>
-                  {this.state.randompack}
+                  {this.state.randompack.length > 48 ? this.state.randompack.slice(0, 48) + "..." : this.state.randompack}
                 </a>
               </span>
               <br />
@@ -575,6 +575,7 @@ export default class DashboardView extends React.Component {
             showDetail={this.state.showsongpreview}
             close={() => this.setState({ showsongpreview: false })}
             isSongview
+            isDashboard
             isSetlist={false}
           />
           <SongDetailView
@@ -584,8 +585,8 @@ export default class DashboardView extends React.Component {
             album="Steam"
             showDetail={this.state.showsongpackpreview}
             close={() => this.setState({ showsongpackpreview: false, showweekly: false })}
-            isSongview
             isSongpack
+            isDashboard
             dlcappid={this.state.randompackappid}
             isSetlist={false}
             isWeekly={this.state.showweekly}

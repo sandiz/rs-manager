@@ -192,6 +192,11 @@ export async function countAppID(item, rd) {
   const output = await db.get(sql);
   return output
 }
+export async function removeFromSongsOwned(songid) {
+  console.log(songid);
+  const sql = `delete from songs_owned where id = '${songid}'`;
+  await db.run(sql);
+}
 export default async function updateSongsOwned(psarcResult) {
   // console.log("__db_call__: updateSongsOwned");
   let sqlstr = "";
