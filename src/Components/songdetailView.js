@@ -117,12 +117,13 @@ export default class SongDetailView extends React.Component {
   }
   render = () => {
     const setlistyle = "extraPadding download " + (this.props.isSetlist ? "" : "hidden");
-    const songliststyle = "extraPadding download " + (this.props.isSongview ? "" : "hidden");
+    const songlistanddashstyle = "extraPadding download " + (this.props.isSongview ? "" : "hidden");
+    const songliststyle = "extraPadding download " + (this.props.isSongview && !this.props.isDashboard ? "" : "hidden");
     const ptstyle = "extraPadding download " + (!this.state.showPlaythrough ? "" : "isDisabled");
     const mvstyle = "extraPadding download " + (!this.state.showMusicVideo ? "" : "isDisabled");
     const ptdivstyle = this.state.showPlaythrough ? "dblock" : "hidden";
     const mvdivstyle = this.state.showMusicVideo ? "dblock" : "hidden";
-    let modalinfostyle = "";
+    let modalinfostyle = "width-52";
     if (this.props.isSetlist) {
       modalinfostyle = "width-75-2"
     }
@@ -176,6 +177,15 @@ export default class SongDetailView extends React.Component {
             </div>
           </div>
           <div className="centerButton list-unstyled">
+
+            <a
+              className={songliststyle}
+              onClick={async () => {
+                await this.props.removeFromDB();
+                this.handleHide();
+              }}>
+              <span >Delete Song from DB</span>
+            </a>
             <a
               onClick={this.choosePlay}
               className={ptstyle}>
@@ -210,7 +220,7 @@ export default class SongDetailView extends React.Component {
                     </a>
                     <a
                       onClick={async () => { this.addToSetlist(); this.handleHide(); }}
-                      className={songliststyle}>
+                      className={songlistanddashstyle}>
                       Add to Setlist
                     </a>
                     <select onChange={this.saveSetlist} style={{ margin: 12 + 'px' }}>
@@ -233,9 +243,11 @@ SongDetailView.propTypes = {
   isSongview: PropTypes.bool,
   isSetlist: PropTypes.bool,
   isSongpack: PropTypes.bool,
+  isDashboard: PropTypes.bool,
   isWeekly: PropTypes.bool,
   dlcappid: PropTypes.string,
   removeFromSetlist: PropTypes.func,
+  removeFromDB: PropTypes.func,
 }
 SongDetailView.defaultProps = {
   showDetail: false,
@@ -243,10 +255,12 @@ SongDetailView.defaultProps = {
   artist: '',
   album: '',
   isSetlist: true,
+  isDashboard: false,
   isSongview: false,
   isSongpack: false,
   isWeekly: false,
   dlcappid: '',
   close: () => { },
   removeFromSetlist: () => { },
+  removeFromDB: () => { },
 }
