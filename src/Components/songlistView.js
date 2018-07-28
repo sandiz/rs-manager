@@ -71,7 +71,17 @@ function badgeFormatter(cell, row) {
     badgeClasses.reverse();
     return (
       <div>
-        <ReactTooltip id={row.id} aria-haspopup="true" place="left" type="dark" effect="solid" className="tooltipClass">
+        <ReactTooltip
+          id={row.id}
+          aria-haspopup="true"
+          place="left"
+          type="dark"
+          effect="solid"
+          className="tooltipClass"
+          afterShow={() => {
+            const top = parseInt(document.getElementById(row.id).style.top, 10) + window.scrollY;
+            document.getElementById(row.id).style.top = top + "px";
+          }}>
           <p>Score Attack Badges</p>
           <table style={{ width: 100 + '%', height: 100 + '%' }} className="tooltipTable">
             <tbody>
@@ -93,7 +103,7 @@ function badgeFormatter(cell, row) {
           </table>
         </ReactTooltip>
         <div data-tip data-for={row.id} data-class="tooltip-badge tooltipClass">
-          <div className="row justify-content-md-center pointer" >
+          <div id={row.id + "_col"} className="row justify-content-md-center pointer" >
             {
               badgeClasses.map(([badgeCount, highScore, badgeType, badgeClass], index) => {
                 const divclass = badgeClassDefault + badgeClass;
