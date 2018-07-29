@@ -11,7 +11,7 @@ import SongDetailView from './songdetailView';
 
 const { path } = window;
 
-const allTunings = {
+export const allTunings = {
   "E Standard": [0, 0, 0, 0, 0, 0],
   "Eb Standard": [-1, -1, -1, -1, -1, -1],
   "Drop D": [-2, 0, 0, 0, 0, 0],
@@ -29,7 +29,7 @@ const allTunings = {
   "Open G": [-2, -2, 0, 0, 0, -2],
   "Open E": [0, 2, 2, 1, 0, 0],
 }
-function getBadgeName(num, retClass = false) {
+export function getBadgeName(num, retClass = false) {
   switch (num) {
     case 5: return retClass ? "gp_platinum" : "Platinum";
     case 4: return retClass ? "gp_gold" : "Gold";
@@ -39,16 +39,17 @@ function getBadgeName(num, retClass = false) {
     default: return '';
   }
 }
-function unescapeFormatter(cell, row) {
-  if (cell.length > 44) {
-    cell = unescape(cell).slice(0, 44) + "..."
+export function unescapeFormatter(cell, row) {
+  cell = unescape(cell)
+  if (cell.length > 30) {
+    cell = cell.slice(0, 30) + "..."
   }
-  return <span>{unescape(cell)}</span>;
+  return <span>{cell}</span>;
 }
-function difficultyFormatter(cell, row) {
+export function difficultyFormatter(cell, row) {
   return <span />;
 }
-function round100Formatter(cell, row) {
+export function round100Formatter(cell, row) {
   if (cell == null) { cell = 0; }
   cell = (cell * 100).toFixed(2);
   if (cell >= 100) { cell = 100; }
@@ -68,13 +69,13 @@ function round100Formatter(cell, row) {
     </span>
   </span>);
 }
-function countFormmatter(cell, row) {
+export function countFormmatter(cell, row) {
   if (cell == null) {
     return <span>0</span>;
   }
   return <span>{cell + row.sa_playcount}</span>;
 }
-function badgeFormatter(cell, row) {
+export function badgeFormatter(cell, row) {
   const badgeClassDefault = "col col-md-3 col-md-34 ta-center iconPreview ";
   const badgeClasses = [];
   if (row.sa_badge_easy > 10) {
