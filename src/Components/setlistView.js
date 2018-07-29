@@ -1,48 +1,16 @@
 import React from 'react'
 import PropTypes from 'prop-types';
-import { RemoteAll } from './songlistView';
+import {
+  RemoteAll, allTunings,
+  unescapeFormatter, difficultyFormatter, round100Formatter, countFormmatter, badgeFormatter,
+} from './songlistView';
 import SongDetailView from './songdetailView';
 import readProfile from '../steamprofileService';
 import { addToFavorites, initSetlistPlaylistDB, getSongsFromPlaylistDB, removeSongFromSetlist, updateMasteryandPlayed, initSongsOwnedDB } from '../sqliteService';
-import getProfileConfig, { updateProfileConfig } from '../configService';
+import getProfileConfig, { updateProfileConfig, getScoreAttackConfig } from '../configService';
 
 const { path } = window;
 
-function unescapeFormatter(cell, row) {
-  if (cell.length > 50) {
-    cell = cell.slice(0, 50) + "..."
-  }
-  return <span>{unescape(cell)}</span>;
-}
-function difficultyFormatter(cell, row) {
-  return <span />;
-}
-function round100Formatter(cell, row) {
-  if (cell == null) { cell = 0; }
-  cell = (cell * 100).toFixed(2);
-  if (cell >= 100) { cell = 100; }
-  let color = "lightgreen";
-  if (cell > 95) { color = "lightgreen" }
-  else if (cell < 95 && cell > 90) { color = "#C8F749" }
-  else color = "yellow";
-
-  const width = cell + "%";
-  return (<span>
-    <span className="mastery">{cell}%</span>
-    <span>
-      <svg height="100%">
-        <rect width={width} height="100%" style={{ fill: color, strokeWidth: 2, stroke: 'rgb(0, 0, 0)' }} />
-        <text style={{}} x="40%" y="18" fontSize="15px">{cell} %</text>
-      </svg>
-    </span>
-  </span>);
-}
-function countFormmatter(cell, row) {
-  if (cell == null) {
-    return <span>0</span>;
-  }
-  return <span>{cell}</span>;
-}
 export default class SetlistView extends React.Component {
   constructor(props) {
     super(props);
@@ -55,6 +23,7 @@ export default class SetlistView extends React.Component {
       showDetail: false,
       showSong: '',
       showArtist: '',
+      showSAStats: true,
     };
     this.search = null;
     this.columns = [
@@ -63,7 +32,7 @@ export default class SetlistView extends React.Component {
         text: "ID",
         style: (cell, row, rowIndex, colIndex) => {
           return {
-            width: '25%',
+            width: '20%',
             cursor: 'pointer',
           };
         },
@@ -74,7 +43,7 @@ export default class SetlistView extends React.Component {
         text: "Song",
         style: (cell, row, rowIndex, colIndex) => {
           return {
-            width: '25%',
+            width: '20%',
             cursor: 'pointer',
           };
         },
@@ -86,7 +55,7 @@ export default class SetlistView extends React.Component {
         text: "Artist",
         style: (cell, row, rowIndex, colIndex) => {
           return {
-            width: '25%',
+            width: '19%',
             cursor: 'pointer',
           };
         },
@@ -98,7 +67,7 @@ export default class SetlistView extends React.Component {
         text: "Album",
         style: (cell, row, rowIndex, colIndex) => {
           return {
-            width: '25%',
+            width: '20%',
             cursor: 'pointer',
           };
         },
@@ -107,7 +76,7 @@ export default class SetlistView extends React.Component {
       },
       {
         dataField: "json",
-        text: "JSON",
+        text: 'JSON',
         hidden: true,
       },
       {
@@ -115,7 +84,7 @@ export default class SetlistView extends React.Component {
         text: "Arrangement",
         style: (cell, row, rowIndex, colIndex) => {
           return {
-            width: '15%',
+            width: '5%',
             cursor: 'pointer',
           };
         },
@@ -149,7 +118,7 @@ export default class SetlistView extends React.Component {
         text: "Mastery",
         style: (cell, row, rowIndex, colIndex) => {
           return {
-            width: '25%',
+            width: '15%',
             cursor: 'pointer',
           };
         },
@@ -157,11 +126,60 @@ export default class SetlistView extends React.Component {
         formatter: round100Formatter,
       },
       {
+        dataField: "tuning",
+        text: "Tuning",
+        style: (cell, row, rowIndex, colIndex) => {
+          return {
+            width: '5%',
+            cursor: 'pointer',
+          };
+        },
+        sort: true,
+        formatter: (cell, row) => {
+          const tuning = JSON.parse(unescape(row.tuning));
+          const concertpitch = 440.0;
+          const {
+            string0, string1, string2, string3, string4, string5,
+          } = tuning;
+          const combinedt = [string0, string1, string2, string3, string4, string5];
+          const tuningkeys = Object.keys(allTunings);
+          for (let i = 0; i < tuningkeys.length; i += 1) {
+            const tuningtocheck = allTunings[tuningkeys[i]];
+            if (combinedt.equals(tuningtocheck)) {
+              let offset = ""
+              const freq = Math.round((concertpitch * (2.0 ** (row.centoffset / 1200.0))))
+              if (freq !== Math.round(concertpitch)) {
+                offset = `(${freq} Hz)`
+              }
+              let suffix = "";
+              if (row.capofret !== 0 && row.capofret !== "" && row.capofret !== "0") {
+                switch (row.capofret) {
+                  case 1:
+                    suffix = "st";
+                    break;
+                  case 2:
+                    suffix = "nd";
+                    break;
+                  case 3:
+                    suffix = "rd";
+                    break;
+                  default:
+                    suffix = "th";
+                    break;
+                }
+              }
+              return <span>{tuningkeys[i]} <span className={suffix === "" ? "hidden" : ""}>(Capo: {row.capofret}<sup>{suffix})</sup></span> {offset}</span>
+            }
+          }
+          return <span>Custom</span>
+        },
+      },
+      {
         dataField: "count",
         text: "Count",
         style: (cell, row, rowIndex, colIndex) => {
           return {
-            width: '10%',
+            width: '5%',
           };
         },
         sort: true,
@@ -192,11 +210,79 @@ export default class SetlistView extends React.Component {
         text: "Difficulty",
         style: (cell, row, rowIndex, colIndex) => {
           return {
-            width: '10%',
+            width: '5%',
           };
         },
         sort: true,
         formatter: difficultyFormatter,
+      },
+      {
+        dataField: "sa_playcount",
+        text: 'Play Count',
+        hidden: true,
+      },
+      {
+        dataField: "sa_hs_easy",
+        text: 'High Score (Easy)',
+        hidden: true,
+      },
+      {
+        dataField: "sa_hs_medium",
+        text: 'High Score (Medium)',
+        hidden: true,
+      },
+      {
+        dataField: "sa_hs_hard",
+        text: 'High Score (Hard)',
+        hidden: true,
+      },
+      {
+        dataField: "sa_hs_master",
+        text: 'High Score (Master)',
+        hidden: true,
+      },
+      {
+        dataField: "sa_badge_master",
+        text: 'Badge (Master)',
+        hidden: true,
+      },
+      {
+        dataField: "sa_highest_badge",
+        text: 'Badges',
+        sort: true,
+        style: (cell, row, rowIndex, colIndex) => {
+          return {
+            width: '20%',
+            display: this.state.showSAStats ? "" : "none",
+          };
+        },
+        headerStyle: (cell, row, rowIndex, colIndex) => {
+          return {
+            width: '20%',
+            display: this.state.showSAStats ? "" : "none",
+          };
+        },
+        formatter: badgeFormatter,
+      },
+      {
+        dataField: "arrangementProperties",
+        text: 'ArrProp',
+        hidden: true,
+      },
+      {
+        dataField: "tuning",
+        text: 'Tuning',
+        hidden: true,
+      },
+      {
+        dataField: "capofret",
+        text: 'Capo',
+        hidden: true,
+      },
+      {
+        dataField: "centoffset",
+        text: 'Cent',
+        hidden: true,
       },
     ];
     this.rowEvents = {
@@ -222,6 +308,8 @@ export default class SetlistView extends React.Component {
     if (nextprops.currentChildTab === null) { return false; }
     if (this.lastChildID === nextprops.currentChildTab.id) { return false; }
     this.lastChildID = nextprops.currentChildTab.id;
+    const showSAStats = await getScoreAttackConfig();
+    this.setState({ showSAStats });
     this.handleTableChange("cdm", {
       page: this.state.page,
       sizePerPage: this.state.sizePerPage,
