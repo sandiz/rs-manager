@@ -68,6 +68,12 @@ export default class DashboardView extends React.Component {
       sasilverw: 0,
       sabronze: 0,
       sabronzew: 0,
+      safailed: 0,
+      safailedw: 0,
+      saunplayed: 0,
+      saunplayedw: 0,
+      samunplayed: 0,
+      samunplayedw: 0,
       showsastats: true,
     }
   }
@@ -195,16 +201,25 @@ export default class DashboardView extends React.Component {
         sagoldw: this.getStatsWidth(saStats.sagold, 0, songscount.count),
         sasilver: saStats.sasilver,
         sasilverw: this.getStatsWidth(saStats.sasilver, 0, songscount.count),
-        sabronze: songscount.count - saStats.satotal,
-        sabronzew: this.getStatsWidth(songscount.count - saStats.satotal, 0, songscount.count),
+        sabronze: saStats.sabronze,
+        sabronzew: this.getStatsWidth(saStats.sabronze, 0, songscount.count),
+        safailed: saStats.safailed,
+        safailedw: this.getStatsWidth(saStats.safailed, 0, songscount.count),
+        saunplayed: songscount.count - saStats.satotal,
+        saunplayedw: this.getStatsWidth(songscount.count - saStats.satotal, 0, songscount.count),
+
         samplat: samStats.saplat,
         samplatw: this.getStatsWidth(samStats.saplat, 0, songscount.count),
         samgold: samStats.sagold,
         samgoldw: this.getStatsWidth(samStats.sagold, 0, songscount.count),
         samsilver: samStats.sasilver,
         samsilverw: this.getStatsWidth(samStats.sasilver, 0, songscount.count),
-        sambronze: songscount.count - samStats.satotal,
-        sambronzew: this.getStatsWidth(songscount.count - samStats.satotal, 0, songscount.count),
+        sambronze: samStats.sabronze,
+        sambronzew: this.getStatsWidth(samStats.sabronze, 0, songscount.count),
+        samfailed: samStats.safailed,
+        samfailedw: this.getStatsWidth(samStats.safailed, 0, songscount.count),
+        samunplayed: songscount.count - samStats.satotal,
+        samunplayedw: this.getStatsWidth(songscount.count - samStats.satotal, 0, songscount.count),
       })
       this.props.updateHeader(this.tabname, "Rocksmith 2014 Dashboard");
     }
@@ -335,7 +350,7 @@ export default class DashboardView extends React.Component {
     await this.fetchStats();
   }
   render = () => {
-    const scoreattackstyle = "col ta-center dashboard-middle " + (this.state.showsastats ? "col-md-3" : "hidden");
+    const scoreattackstyle = "col ta-center dashboard-bottom " + (this.state.showsastats ? "col-md-3" : "hidden");
     const arrstyle = "col ta-center dashboard-middle col-md-3";
     return (
       <div className="container-fluid">
@@ -547,8 +562,12 @@ export default class DashboardView extends React.Component {
               goldwidth={this.state.sagoldw}
               silvertotal={this.state.sasilver}
               silverwidth={this.state.sasilverw}
-              unplayedtotal={this.state.sabronze}
-              unplayedwidth={this.state.sabronzew}
+              bronzetotal={this.state.sabronze}
+              bronzewidth={this.state.sabronzew}
+              failedtotal={this.state.safailed}
+              failedwidth={this.state.safailedw}
+              unplayedtotal={this.state.saunplayed}
+              unplayedwidth={this.state.saunplayedw}
             />
           </div>
           <div className={scoreattackstyle}>
@@ -562,8 +581,12 @@ export default class DashboardView extends React.Component {
               goldwidth={this.state.samgoldw}
               silvertotal={this.state.samsilver}
               silverwidth={this.state.samsilverw}
-              unplayedtotal={this.state.sambronze}
-              unplayedwidth={this.state.sambronzew}
+              bronzetotal={this.state.sambronze}
+              bronzewidth={this.state.sambronzew}
+              failedtotal={this.state.samfailed}
+              failedwidth={this.state.samfailedw}
+              unplayedtotal={this.state.samunplayed}
+              unplayedwidth={this.state.samunplayedw}
             />
           </div>
         </div>

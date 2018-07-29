@@ -317,12 +317,13 @@ export async function resetDB(table = 'songs_owned') {
 export async function getSAStats(type = "sa_badge_hard") {
   // console.log("__db_call__: getLeadStats");
   const badgeHard = (type === "sa_badge_hard");
-  const sqlstr = `select sa.count as satotal, saplat.count as saplat, sagold.count as sagold, sasilver.count as sasilver,sabronze.count as sabronze from \
+  const sqlstr = `select sa.count as satotal, saplat.count as saplat, sagold.count as sagold, sasilver.count as sasilver,sabronze.count as sabronze, safailed.count as safailed from \
   (select count(*) as count from songs_owned where sa_playcount > 0 AND ${type} > ${badgeHard ? 30 : 40}) sa, \
   (select count(*) as count from songs_owned where sa_playcount > 0 AND (${type} == ${badgeHard ? 35 : 45})) saplat, \
   (select count(*) as count from songs_owned where sa_playcount > 0 AND (${type} == ${badgeHard ? 34 : 44})) sagold, \
   (select count(*) as count from songs_owned where sa_playcount > 0 AND (${type} == ${badgeHard ? 33 : 43})) sasilver, \
-  (select count(*) as count from songs_owned where sa_playcount > 0 AND (${type} == ${badgeHard ? 32 : 42})) sabronze;`
+  (select count(*) as count from songs_owned where sa_playcount > 0 AND (${type} == ${badgeHard ? 32 : 42})) sabronze, \
+  (select count(*) as count from songs_owned where sa_playcount > 0 AND (${type} == ${badgeHard ? 31 : 41})) safailed; `
   const output = await db.get(sqlstr);
   return output;
 }

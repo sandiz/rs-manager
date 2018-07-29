@@ -17,6 +17,7 @@ function getBadgeName(num, retClass = false) {
     case 4: return retClass ? "gp_gold" : "Gold";
     case 3: return retClass ? "gp_silver" : "Silver";
     case 2: return retClass ? "gp_bronze" : "Bronze";
+    case 1: return retClass ? "gp_failed" : "Failed";
     default: return '';
   }
 }
