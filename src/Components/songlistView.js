@@ -29,6 +29,32 @@ export const allTunings = {
   "Open G": [-2, -2, 0, 0, 0, -2],
   "Open E": [0, 2, 2, 1, 0, 0],
 }
+export const techniqueNames = {
+  barreChords: "Barre Chords",
+  bassPick: "Picked Bass",
+  bends: "Bends",
+  doubleStops: "Double Stops",
+  dropDPower: "DropD Power Chords",
+  fifthsAndOctaves: "Fifths & Octaves",
+  fingerPicking: "Finger Picking",
+  fretHandMutes: "Fret-Hand Mutes",
+  harmonics: "Harmonics",
+  hopo: "Hammer On/Pull Offs",
+  nonStandardChords: "Non Standard Chords",
+  openChords: "Open/Cowboy Chords",
+  palmMutes: "Palm Mutes",
+  pinchHarmonics: "Pinch Harmonics",
+  powerChords: "Power Chords",
+  slapPop: "Slap/Pop",
+  slides: "Slides",
+  sustain: "Sustain",
+  syncopation: "Syncopation",
+  tapping: "Tapping",
+  tremolo: "Tremolo",
+  twoFingerPicking: "Two Finger Picking",
+  unpitchedSlides: "Unpitched Slides",
+  vibrato: "Vibrato",
+}
 export function getBadgeName(num, retClass = false) {
   switch (num) {
     case 5: return retClass ? "gp_platinum" : "Platinum";
@@ -95,15 +121,16 @@ export function badgeFormatter(cell, row) {
     return (
       <div>
         <ReactTooltip
-          id={row.id}
+          id={row.id + "_badge"}
           aria-haspopup="true"
           place="left"
           type="dark"
           effect="solid"
           className="tooltipClass"
           afterShow={() => {
-            const top = parseInt(document.getElementById(row.id).style.top, 10) + window.scrollY;
-            document.getElementById(row.id).style.top = top + "px";
+            const elem = document.getElementById(row.id + "_badge");
+            const top = parseInt(elem.style.top, 10) + window.scrollY;
+            elem.style.top = top + "px";
           }}>
           <p>Score Attack Badges</p>
           <table style={{ width: 100 + '%', height: 100 + '%' }} className="tooltipTable">
@@ -125,7 +152,7 @@ export function badgeFormatter(cell, row) {
             </tbody>
           </table>
         </ReactTooltip>
-        <div data-tip data-for={row.id} data-class="tooltip-badge tooltipClass">
+        <div data-tip data-for={row.id + "_badge"} data-class="tooltip-badge tooltipClass">
           <div id={row.id + "_col"} className="row justify-content-md-center pointer" >
             {
               badgeClasses.map(([badgeCount, highScore, badgeType, badgeClass], index) => {
@@ -137,7 +164,7 @@ export function badgeFormatter(cell, row) {
             }
           </div>
         </div>
-      </div >
+      </div>
     )
   }
   return <span> None </span>;
@@ -153,20 +180,65 @@ export function arrangmentFormatter(cell, row) {
   const {
     represent, bonusArr, pathLead, pathBass, pathRhythm,
   } = arrprop
+  const ignoreProp = [
+    "bonusArr", "pathBass", "pathLead", "pathRhythm",
+    "represent", "routeMask", "standardTuning",
+  ];
+  let arrobj = null;
   const arrinfo = [represent, bonusArr, pathLead, pathRhythm, pathBass]
-  if (arrinfo.equals([1, 0, 1, 0, 0])) { return <span>Lead</span> }
-  else if (arrinfo.equals([0, 1, 1, 0, 0])) { return <span>Bonus Lead</span> }
-  else if (arrinfo.equals([0, 0, 1, 0, 0])) { return <span>Alternate Lead</span> }
+  if (arrinfo.equals([1, 0, 1, 0, 0])) { arrobj = <span>Lead</span> }
+  else if (arrinfo.equals([0, 1, 1, 0, 0])) { arrobj = <span>Bonus Lead</span> }
+  else if (arrinfo.equals([0, 0, 1, 0, 0])) { arrobj = <span>Alternate Lead</span> }
 
-  else if (arrinfo.equals([1, 0, 0, 1, 0])) { return <span>Rhythm</span> }
-  else if (arrinfo.equals([0, 1, 0, 1, 0])) { return <span>Bonus Rhythm</span> }
-  else if (arrinfo.equals([0, 0, 0, 1, 0])) { return <span>Alternate Rhythm</span> }
+  else if (arrinfo.equals([1, 0, 0, 1, 0])) { arrobj = <span>Rhythm</span> }
+  else if (arrinfo.equals([0, 1, 0, 1, 0])) { arrobj = <span>Bonus Rhythm</span> }
+  else if (arrinfo.equals([0, 0, 0, 1, 0])) { arrobj = <span>Alternate Rhythm</span> }
 
-  else if (arrinfo.equals([1, 0, 0, 0, 1])) { return <span>Bass</span> }
-  else if (arrinfo.equals([0, 1, 0, 0, 1])) { return <span>Bonus Bass</span> }
-  else if (arrinfo.equals([0, 0, 0, 0, 1])) { return <span>Alternate Bass</span> }
+  else if (arrinfo.equals([1, 0, 0, 0, 1])) { arrobj = <span>Bass</span> }
+  else if (arrinfo.equals([0, 1, 0, 0, 1])) { arrobj = <span>Bonus Bass</span> }
+  else if (arrinfo.equals([0, 0, 0, 0, 1])) { arrobj = <span>Alternate Bass</span> }
 
-  return <span>{cell}</span>
+  return (
+    <div>
+      <ReactTooltip
+        id={row.id + "_arr"}
+        aria-haspopup="true"
+        place="left"
+        type="dark"
+        effect="solid"
+        className="tooltipClass"
+        afterShow={(t) => {
+          const elem = document.getElementById(row.id + "_arr")
+          setTimeout(() => {
+            const top = parseInt(elem.style.top, 10) + window.scrollY;
+            elem.style.top = top + "px";
+          }, 1);
+        }}>
+        <p>Techniques Used</p> <br />
+        <table style={{ width: 100 + '%', height: 100 + '%' }} className="tooltipTable">
+          <tbody>
+            {
+              Object.keys(arrprop).map((key, index) => {
+                const val = arrprop[key];
+                const properkey = key in techniqueNames ? techniqueNames[key] : ""
+                if (val > 0 && ignoreProp.indexOf(key) === -1) {
+                  return (
+                    <tr className="row" key={key + row.id}>
+                      <td style={{ width: 100 + '%', textAlign: 'center' }}>{properkey}</td>
+                    </tr>
+                  );
+                }
+                return null;
+              })
+            }
+          </tbody>
+        </table>
+      </ReactTooltip>
+      <div data-tip data-for={row.id + "_arr"} data-class="tooltip-arr tooltipClass">
+        {arrobj}
+      </div>
+    </div>
+  )
 }
 //eslint-disable-next-line
 export const RemoteAll = ({ keyField, columns, data, page, sizePerPage, onTableChange, totalSize, rowEvents }) => (
