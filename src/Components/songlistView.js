@@ -177,6 +177,9 @@ export function arrangmentFormatter(cell, row) {
   catch (error) {
     return <span />
   }
+  if (arrprop === null) {
+    return <span />
+  }
   const {
     represent, bonusArr, pathLead, pathBass, pathRhythm,
   } = arrprop
@@ -384,6 +387,9 @@ export default class SonglistView extends React.Component {
             tuning = JSON.parse(unescape(row.tuning));
           }
           catch (error) {
+            return <span />
+          }
+          if (tuning === null) {
             return <span />
           }
           const concertpitch = 440.0;
