@@ -10,7 +10,7 @@ let mainWindow;
 
 function createWindow() {
     mainWindow = new BrowserWindow({
-        width: 1650,
+        width: 1750,
         height: 1036,
         icon: path.join(__dirname, "./icons/png/icon-1024x1024.png"),
         webPreferences: {

@@ -263,6 +263,9 @@ export default class PSARCView extends React.Component {
   updateSongList = async () => {
     await initSongsOwnedDB();
     console.log("arrangments: " + this.state.files.length);
+    let count = 0;
+    let fcount = 0;
+    let filtered = "";
     for (let i = 0; i < this.state.files.length; i += 1) {
       this.props.updateHeader(this.tabname, `Updating Songlist with PSARC:  ${this.state.files[i].psarc} (${i}/${this.state.files.length})`);
       const { song } = this.state.files[i];
@@ -270,13 +273,18 @@ export default class PSARCView extends React.Component {
       if (song.startsWith("RS2 Test") ||
         song.startsWith("RS2 Chord")) {
         console.log("Skipped song: " + song);
+        fcount += 1;
         continue;
       }
+      count += 1
       // eslint-disable-next-line
       await updateSongsOwned(this.state.files[i]);
     }
     await saveSongsOwnedDB();
-    this.props.updateHeader(this.tabname, "Updated Songlist with " + this.state.files.length + " Arrangements");
+    if (fcount > 0) {
+      filtered = `(Filtered: ${fcount})`
+    }
+    this.props.updateHeader(this.tabname, "Updated Songlist with " + count + " Arrangements. " + filtered);
   }
   render = () => {
     const stopprocessingstyle = this.state.processing ? "" : "none";

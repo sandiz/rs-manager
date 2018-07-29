@@ -21,6 +21,7 @@
         "no-this-before-super": "warn",
         "no-undef": "warn",
         "no-continue": "off",
+        "no-fallthrough": "off",
         "no-unreachable": "warn",
         "no-unused-vars": [
             "error",

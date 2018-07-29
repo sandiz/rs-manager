@@ -240,6 +240,10 @@ async function processPSARC(psarcFile) {
         songDict.fullName = Object.prototype.hasOwnProperty.call(attr, "FullName") ? attr.FullName : "";
         songDict.lastConversionTime = Object.prototype.hasOwnProperty.call(attr, "LastConversionDateTime") ? attr.LastConversionDateTime : "";
         songDict.id = Object.prototype.hasOwnProperty.call(attr, "PersistentID") ? attr.PersistentID : "";
+        songDict.arrangementProperties = Object.prototype.hasOwnProperty.call(attr, "ArrangementProperties") ? JSON.stringify(attr.ArrangementProperties) : "";
+        songDict.capofret = Object.prototype.hasOwnProperty.call(attr, "CapoFret") ? attr.CapoFret : "";
+        songDict.centoffset = Object.prototype.hasOwnProperty.call(attr, "CentOffset") ? attr.CentOffset : "";
+        songDict.tuning = Object.prototype.hasOwnProperty.call(attr, "Tuning") ? JSON.stringify(attr.Tuning) : "";
         arrangements.push(songDict)
       }
     }
