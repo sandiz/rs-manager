@@ -142,6 +142,32 @@ export function badgeFormatter(cell, row) {
   }
   return <span> None </span>;
 }
+export function arrangmentFormatter(cell, row) {
+  let arrprop = null;
+  try {
+    arrprop = JSON.parse(unescape(row.arrangementProperties));
+  }
+  catch (error) {
+    return <span />
+  }
+  const {
+    represent, bonusArr, pathLead, pathBass, pathRhythm,
+  } = arrprop
+  const arrinfo = [represent, bonusArr, pathLead, pathRhythm, pathBass]
+  if (arrinfo.equals([1, 0, 1, 0, 0])) { return <span>Lead</span> }
+  else if (arrinfo.equals([0, 1, 1, 0, 0])) { return <span>Bonus Lead</span> }
+  else if (arrinfo.equals([0, 0, 1, 0, 0])) { return <span>Alternate Lead</span> }
+
+  else if (arrinfo.equals([1, 0, 0, 1, 0])) { return <span>Rhythm</span> }
+  else if (arrinfo.equals([0, 1, 0, 1, 0])) { return <span>Bonus Rhythm</span> }
+  else if (arrinfo.equals([0, 0, 0, 1, 0])) { return <span>Alternate Rhythm</span> }
+
+  else if (arrinfo.equals([1, 0, 0, 0, 1])) { return <span>Bass</span> }
+  else if (arrinfo.equals([0, 1, 0, 0, 1])) { return <span>Bonus Bass</span> }
+  else if (arrinfo.equals([0, 0, 0, 0, 1])) { return <span>Alternate Bass</span> }
+
+  return <span>{cell}</span>
+}
 //eslint-disable-next-line
 export const RemoteAll = ({ keyField, columns, data, page, sizePerPage, onTableChange, totalSize, rowEvents }) => (
   <div>
@@ -256,29 +282,7 @@ export default class SonglistView extends React.Component {
           };
         },
         sort: true,
-        formatter: (cell, row) => {
-          const str = path.basename(row.json);
-          const regex = /.*(\d)\.json$/gm;
-          let m;
-          let addAlt = false;
-
-          //eslint-disable-next-line
-          while ((m = regex.exec(str)) !== null) {
-            // This is necessary to avoid infinite loops with zero-width matches
-            if (m.index === regex.lastIndex) {
-              regex.lastIndex += 1;
-            }
-
-            //eslint-disable-next-line
-            m.forEach((match, groupIndex) => {
-              addAlt = true;
-            });
-          }
-          if (addAlt) {
-            return <span>Alt. {cell}</span>
-          }
-          return <span>{cell}</span>
-        },
+        formatter: arrangmentFormatter,
       },
       {
         dataField: "mastery",
@@ -303,7 +307,13 @@ export default class SonglistView extends React.Component {
         },
         sort: true,
         formatter: (cell, row) => {
-          const tuning = JSON.parse(unescape(row.tuning));
+          let tuning = null;
+          try {
+            tuning = JSON.parse(unescape(row.tuning));
+          }
+          catch (error) {
+            return <span />
+          }
           const concertpitch = 440.0;
           const {
             string0, string1, string2, string3, string4, string5,
