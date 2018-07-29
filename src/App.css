@@ -679,6 +679,9 @@ hr {
 .tooltip-badge {
   width: 325px;
 }
+.tooltip-arr {
+  width: 250px;
+}
 
 .tooltipClass {
  font-size: 17px !important;
