@@ -11,6 +11,24 @@ import SongDetailView from './songdetailView';
 
 const { path } = window;
 
+const allTunings = {
+  "E Standard": [0, 0, 0, 0, 0, 0],
+  "Eb Standard": [-1, -1, -1, -1, -1, -1],
+  "Drop D": [-2, 0, 0, 0, 0, 0],
+  "F Standard": [1, 1, 1, 1, 1, 1],
+  "Eb Drop Db": [-3, -1, -1, -1, -1, -1],
+  "D Standard": [-2, -2, -2, -2, -2, -2],
+  "D Drop C": [-4, -2, -2, -2, -2, -2],
+  "C# Standard": [-3, -3, -3, -3, -3, -3],
+  "C# Drop B": [-5, -3, -3, -3, -3, -3],
+  "C Standard": [-4, -4, -4, -4, -4, -4],
+  "B Standard": [-5, -5, -5, -5, -5, -5],
+  "B Drop A": [-7, -5, -5, -5, -5, -5],
+  "Open A": [0, 0, 2, 2, 2, 0],
+  "Open D": [-2, 0, 0, -1, -2, -2],
+  "Open G": [-2, -2, 0, 0, 0, -2],
+  "Open E": [0, 2, 2, 1, 0, 0],
+}
 function getBadgeName(num, retClass = false) {
   switch (num) {
     case 5: return retClass ? "gp_platinum" : "Platinum";
@@ -22,6 +40,9 @@ function getBadgeName(num, retClass = false) {
   }
 }
 function unescapeFormatter(cell, row) {
+  if (cell.length > 44) {
+    cell = unescape(cell).slice(0, 44) + "..."
+  }
   return <span>{unescape(cell)}</span>;
 }
 function difficultyFormatter(cell, row) {
@@ -263,12 +284,61 @@ export default class SonglistView extends React.Component {
         text: "Mastery",
         style: (cell, row, rowIndex, colIndex) => {
           return {
-            width: '20%',
+            width: '15%',
             cursor: 'pointer',
           };
         },
         sort: true,
         formatter: round100Formatter,
+      },
+      {
+        dataField: "tuning",
+        text: "Tuning",
+        style: (cell, row, rowIndex, colIndex) => {
+          return {
+            width: '5%',
+            cursor: 'pointer',
+          };
+        },
+        sort: true,
+        formatter: (cell, row) => {
+          const tuning = JSON.parse(unescape(row.tuning));
+          const concertpitch = 440.0;
+          const {
+            string0, string1, string2, string3, string4, string5,
+          } = tuning;
+          const combinedt = [string0, string1, string2, string3, string4, string5];
+          const tuningkeys = Object.keys(allTunings);
+          for (let i = 0; i < tuningkeys.length; i += 1) {
+            const tuningtocheck = allTunings[tuningkeys[i]];
+            if (combinedt.equals(tuningtocheck)) {
+              let offset = ""
+              const freq = Math.round((concertpitch * (2.0 ** (row.centoffset / 1200.0))))
+              if (freq !== Math.round(concertpitch)) {
+                offset = `(${freq} Hz)`
+              }
+              let suffix = "";
+              if (row.capofret !== 0 && row.capofret !== "" && row.capofret !== "0") {
+                switch (row.capofret) {
+                  case 1:
+                    suffix = "st";
+                    break;
+                  case 2:
+                    suffix = "nd";
+                    break;
+                  case 3:
+                    suffix = "rd";
+                    break;
+                  default:
+                    suffix = "th";
+                    break;
+                }
+              }
+              return <span>{tuningkeys[i]} <span className={suffix === "" ? "hidden" : ""}>(Capo: {row.capofret}<sup>{suffix})</sup></span> {offset}</span>
+            }
+          }
+          return <span>Custom</span>
+        },
       },
       {
         dataField: "count",
@@ -359,6 +429,26 @@ export default class SonglistView extends React.Component {
           };
         },
         formatter: badgeFormatter,
+      },
+      {
+        dataField: "arrangementProperties",
+        text: 'ArrProp',
+        hidden: true,
+      },
+      {
+        dataField: "tuning",
+        text: 'Tuning',
+        hidden: true,
+      },
+      {
+        dataField: "capofret",
+        text: 'Capo',
+        hidden: true,
+      },
+      {
+        dataField: "centoffset",
+        text: 'Cent',
+        hidden: true,
       },
     ];
     this.rowEvents = {

@@ -16,7 +16,7 @@ export async function initSongsOwnedDB() {
   }
   const createTableSql = "CREATE TABLE IF NOT EXISTS songs_owned (album char, artist char, song char, arrangement char, json char, psarc char, dlc char, sku char, difficulty float, dlckey char, songkey char, id char, uniqkey char primary key, mastery float default 0, count int default 0, lastConversionTime real, constraint id_unique unique (id) );";
   await db.run(createTableSql);
-  const version = await getUserVersion();
+  let version = await getUserVersion();
 
   let altersql = "";
   altersql += "alter table songs_owned add sa_playcount int default 0;"
@@ -33,24 +33,41 @@ export async function initSongsOwnedDB() {
   altersql += "alter table songs_owned add sa_badge_master int default 0;"
   altersql += "alter table songs_owned add sa_highest_badge int default 0;"
 
-  if (version === 0) {
-    await db.exec(altersql);
-    await setUserVersion(version + 1);
-  }
-  else if (version === 1) {
-    let sql = "";
-    sql += "DELETE FROM songs_owned WHERE rowid NOT IN (SELECT MIN(rowid) FROM songs_owned GROUP BY id);";
-    sql += "PRAGMA foreign_keys=off;";
-    sql += "BEGIN TRANSACTION;";
-    sql += "ALTER TABLE songs_owned RENAME TO songs_owned_old;";
-    sql += createTableSql;
-    sql += altersql;
-    sql += "INSERT INTO songs_owned SELECT * FROM songs_owned_old;";
-    sql += "COMMIT;";
-    sql += "PRAGMA foreign_keys=on;";
-    sql += "DROP TABLE songs_owned_old;"
-    await db.exec(sql);
-    await setUserVersion(version + 1);
+  let altersql2 = "";
+  altersql2 += "alter table songs_owned add arrangementProperties blob;"
+  altersql2 += "alter table songs_owned add capofret float default 0;"
+  altersql2 += "alter table songs_owned add centoffset float default 0;"
+  altersql2 += "alter table songs_owned add tuning blob;"
+
+  switch (version) {
+    case 0: {
+      await db.exec(altersql);
+      version += 1
+      await setUserVersion(version);
+    }
+    case 1: {
+      let sql = "";
+      sql += "DELETE FROM songs_owned WHERE rowid NOT IN (SELECT MIN(rowid) FROM songs_owned GROUP BY id);";
+      sql += "PRAGMA foreign_keys=off;";
+      sql += "BEGIN TRANSACTION;";
+      sql += "ALTER TABLE songs_owned RENAME TO songs_owned_old;";
+      sql += createTableSql;
+      sql += altersql;
+      sql += "INSERT INTO songs_owned SELECT * FROM songs_owned_old;";
+      sql += "COMMIT;";
+      sql += "PRAGMA foreign_keys=on;";
+      sql += "DROP TABLE songs_owned_old;"
+      await db.exec(sql);
+      version += 1
+      await setUserVersion(version);
+    }
+    case 2:
+      await db.exec(altersql2);
+      version += 1
+      await setUserVersion(version);
+      break;
+    default:
+      break;
   }
 }
 export async function initSongsAvailableDB() {
@@ -215,6 +232,10 @@ export default async function updateSongsOwned(psarcResult) {
   const id = escape(psarcResult.id);
   const uniqkey = escape(psarcResult.uniquekey);
   const lct = escape(psarcResult.lastConversionTime);
+  const ap = escape(psarcResult.arrangementProperties);
+  const capo = psarcResult.capofret;
+  const cent = psarcResult.centoffset;
+  const tuning = escape(psarcResult.tuning);
   let mastery = 0
   let count = 0
   sqlstr = `select mastery, count from songs_owned where song='${song}' AND
@@ -226,10 +247,12 @@ export default async function updateSongsOwned(psarcResult) {
     count = op[0].count === null ? 0 : op[0].count;
   }
 
-  sqlstr = `REPLACE INTO songs_owned (album, artist, song, arrangement, json, psarc, dlc, sku, difficulty, dlckey, songkey, id,uniqkey, lastConversionTime, mastery, count) VALUES ('${album}','${artist}',
+  sqlstr = `REPLACE INTO songs_owned (album, artist, song, arrangement, json, psarc, dlc, sku, difficulty, dlckey, songkey,\
+                                       id,uniqkey, lastConversionTime, mastery, count, arrangementProperties, capofret, centoffset,tuning)\
+                                       VALUES ('${album}','${artist}',
       '${song}','${arrangement}','${json}','${psarc}',
       '${dlc}','${sku}',${difficulty},'${dlckey}',
-      '${songkey}','${id}', '${uniqkey}', '${lct}', '${mastery}','${count}');`
+      '${songkey}','${id}', '${uniqkey}', '${lct}', '${mastery}','${count}', '${ap}', '${capo}','${cent}','${tuning}');`
   //});
   try {
     await db.run(sqlstr); // Run the query without returning anything
@@ -250,7 +273,8 @@ export async function getSongsOwned(start = 0, count = 10, sortField = "mastery"
           count, difficulty, uniqkey, id, lastConversionTime, json,
           sa_playcount, sa_ts, 
           sa_hs_easy, sa_hs_medium, sa_hs_hard, sa_hs_master, 
-          sa_badge_easy, sa_badge_medium,sa_badge_hard, sa_badge_master, sa_highest_badge
+          sa_badge_easy, sa_badge_medium,sa_badge_hard, sa_badge_master, sa_highest_badge,
+          arrangementProperties, capofret, centoffset, tuning
           from songs_owned,  (
           SELECT count(*) as acount, count(distinct song) as songcount
             FROM songs_owned
@@ -262,7 +286,8 @@ export async function getSongsOwned(start = 0, count = 10, sortField = "mastery"
           count, difficulty, uniqkey, id, lastConversionTime, json, 
           sa_playcount, sa_ts, 
           sa_hs_easy, sa_hs_medium, sa_hs_hard, sa_hs_master, 
-          sa_badge_easy, sa_badge_medium,sa_badge_hard, sa_badge_master, sa_highest_badge
+          sa_badge_easy, sa_badge_medium,sa_badge_hard, sa_badge_master, sa_highest_badge,
+          arrangementProperties, capofret, centoffset, tuning
           from songs_owned, (
           SELECT count(*) as acount, count(distinct song) as songcount
             FROM songs_owned

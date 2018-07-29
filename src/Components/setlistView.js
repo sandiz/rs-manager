@@ -9,6 +9,9 @@ import getProfileConfig, { updateProfileConfig } from '../configService';
 const { path } = window;
 
 function unescapeFormatter(cell, row) {
+  if (cell.length > 50) {
+    cell = cell.slice(0, 50) + "..."
+  }
   return <span>{unescape(cell)}</span>;
 }
 function difficultyFormatter(cell, row) {
