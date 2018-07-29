@@ -402,9 +402,9 @@ export default class SonglistView extends React.Component {
             const tuningtocheck = allTunings[tuningkeys[i]];
             if (combinedt.equals(tuningtocheck)) {
               let offset = ""
-              const freq = Math.round((concertpitch * (2.0 ** (row.centoffset / 1200.0))))
-              if (freq !== Math.round(concertpitch)) {
-                offset = `(${freq} Hz)`
+              const freq = (concertpitch * (2.0 ** (row.centoffset / 1200.0)))
+              if (freq !== (concertpitch)) {
+                offset = `(${Math.floor(freq)} Hz)`
               }
               let suffix = "";
               if (row.capofret !== 0 && row.capofret !== "" && row.capofret !== "0") {
