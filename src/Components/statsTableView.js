@@ -72,6 +72,42 @@ export default class StatsTableView extends React.Component {
               </span>
             </td>
           </tr>
+          <tr className={this.props.scoreattack ? "" : "hidden"}>
+            <td
+              className={this.props.scoreattack ? "iconPreview gp_bronze badgeText  GP" : "hidden"}
+              title={this.props.scoreattack ? "Total Bronze Badges" : ""}
+            >
+              Brnz
+            </td>
+            <td className="ta-left skinny">
+              <span>
+                <svg id="lead_tier_1_svg" height="100%" width="100%" className="dashboardsvg">
+                  <rect width={(this.props.scoreattack ? this.props.bronzewidth : this.props.lowscorewidth) + "%"} height="100%" style={{ fill: 'yellow', strokeWidth: 2, stroke: 'rgb(0,0,0)' }} />
+                </svg>
+              </span>
+              <span className="ta-right right-align">
+                {this.props.scoreattack ? this.props.bronzetotal : this.props.lowscoretotal}
+              </span>
+            </td>
+          </tr>
+          <tr className={this.props.scoreattack ? "" : "hidden"}>
+            <td
+              className={this.props.scoreattack ? "iconPreview gp_failed badgeText dashboardGP" : "hidden"}
+              title={this.props.scoreattack ? "Total Failed" : ""}
+            >
+              Fail
+            </td>
+            <td className="ta-left skinny">
+              <span>
+                <svg id="lead_tier_1_svg" height="100%" width="100%" className="dashboardsvg">
+                  <rect width={(this.props.scoreattack ? this.props.failedwidth : this.props.lowscorewidth) + "%"} height="100%" style={{ fill: 'yellow', strokeWidth: 2, stroke: 'rgb(0,0,0)' }} />
+                </svg>
+              </span>
+              <span className="ta-right right-align">
+                {this.props.scoreattack ? this.props.failedtotal : this.props.lowscoretotal}
+              </span>
+            </td>
+          </tr>
           <tr>
             <td
               title="Unplayed Arrangments">
@@ -110,6 +146,10 @@ StatsTableView.propTypes = {
   goldwidth: PropTypes.number,
   silvertotal: PropTypes.number,
   silverwidth: PropTypes.number,
+  bronzetotal: PropTypes.number,
+  bronzewidth: PropTypes.number,
+  failedtotal: PropTypes.number,
+  failedwidth: PropTypes.number,
 }
 StatsTableView.defaultProps = {
   total: 0,
@@ -128,4 +168,8 @@ StatsTableView.defaultProps = {
   goldwidth: 0,
   silvertotal: 0,
   silverwidth: 0,
+  bronzetotal: 0,
+  bronzewidth: 0,
+  failedtotal: 0,
+  failedwidth: 0,
 }
