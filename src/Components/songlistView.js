@@ -447,16 +447,16 @@ export default class SonglistView extends React.Component {
           if (cell <= 20) {
             diff = "diff_0"
           }
-          else if (cell >= 21 && cell <= 40) {
+          else if (cell > 20 && cell <= 40) {
             diff = "diff_1"
           }
-          else if (cell >= 41 && cell <= 60) {
+          else if (cell > 40 && cell <= 60) {
             diff = "diff_2"
           }
-          else if (cell >= 61 && cell <= 80) {
+          else if (cell > 60 && cell <= 80) {
             diff = "diff_3"
           }
-          else if (cell >= 81) {
+          else if (cell > 81) {
             diff = "diff_4"
           }
           return def + diff;
