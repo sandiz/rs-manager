@@ -480,7 +480,6 @@ export default class SongAvailableView extends React.Component {
             album="Steam"
             showDetail={this.state.showsongpackpreview}
             close={() => this.setState({ showsongpackpreview: false })}
-            isSongview
             isSongpack
             dlcappid={this.state.randompackappid}
             isSetlist={false}
