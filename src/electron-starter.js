@@ -4,7 +4,7 @@ const express = require('express')
 const path = require("path");
 const url = require("url");
 const d = require('debug')('index');
-
+const isDev = require('electron-is-dev');
 const exp = express()
 let mainWindow;
 
@@ -19,7 +19,9 @@ function createWindow() {
         }
     });
     //mainWindow.maximize();
-    mainWindow.webContents.openDevTools({ mode: 'detach' });
+    if (isDev) {
+        mainWindow.webContents.openDevTools({ mode: 'detach' });
+    }
     mainWindow.loadURL(
         process.env.ELECTRON_START_URL ||
         url.format({
