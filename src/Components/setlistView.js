@@ -1,9 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types';
 import {
-  RemoteAll, allTunings,
+  RemoteAll,
   unescapeFormatter, difficultyFormatter, round100Formatter,
-  countFormmatter, badgeFormatter, arrangmentFormatter,
+  countFormmatter, badgeFormatter, arrangmentFormatter, tuningFormatter,
 } from './songlistView';
 import SongDetailView from './songdetailView';
 import readProfile from '../steamprofileService';
@@ -114,44 +114,7 @@ export default class SetlistView extends React.Component {
           };
         },
         sort: true,
-        formatter: (cell, row) => {
-          const tuning = JSON.parse(unescape(row.tuning));
-          const concertpitch = 440.0;
-          const {
-            string0, string1, string2, string3, string4, string5,
-          } = tuning;
-          const combinedt = [string0, string1, string2, string3, string4, string5];
-          const tuningkeys = Object.keys(allTunings);
-          for (let i = 0; i < tuningkeys.length; i += 1) {
-            const tuningtocheck = allTunings[tuningkeys[i]];
-            if (combinedt.equals(tuningtocheck)) {
-              let offset = ""
-              const freq = Math.round((concertpitch * (2.0 ** (row.centoffset / 1200.0))))
-              if (freq !== Math.round(concertpitch)) {
-                offset = `(${freq} Hz)`
-              }
-              let suffix = "";
-              if (row.capofret !== 0 && row.capofret !== "" && row.capofret !== "0") {
-                switch (row.capofret) {
-                  case 1:
-                    suffix = "st";
-                    break;
-                  case 2:
-                    suffix = "nd";
-                    break;
-                  case 3:
-                    suffix = "rd";
-                    break;
-                  default:
-                    suffix = "th";
-                    break;
-                }
-              }
-              return <span>{tuningkeys[i]} <span className={suffix === "" ? "hidden" : ""}>(Capo: {row.capofret}<sup>{suffix})</sup></span> {offset}</span>
-            }
-          }
-          return <span>Custom</span>
-        },
+        formatter: tuningFormatter,
       },
       {
         dataField: "count",

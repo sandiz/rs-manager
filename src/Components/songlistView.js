@@ -73,7 +73,7 @@ export function unescapeFormatter(cell, row) {
   return <span>{cell}</span>;
 }
 export function difficultyFormatter(cell, row) {
-  return <span />;
+  return <span />
 }
 export function round100Formatter(cell, row) {
   if (cell == null) { cell = 0; }
@@ -243,6 +243,53 @@ export function arrangmentFormatter(cell, row) {
     </div>
   )
 }
+export function tuningFormatter(cell, row) {
+  let tuning = null;
+  try {
+    tuning = JSON.parse(unescape(row.tuning));
+  }
+  catch (error) {
+    return <span />
+  }
+  if (tuning == null) {
+    return <span />
+  }
+  const concertpitch = 440.0;
+  const {
+    string0, string1, string2, string3, string4, string5,
+  } = tuning;
+  const combinedt = [string0, string1, string2, string3, string4, string5];
+  const tuningkeys = Object.keys(allTunings);
+  for (let i = 0; i < tuningkeys.length; i += 1) {
+    const tuningtocheck = allTunings[tuningkeys[i]];
+    if (combinedt.equals(tuningtocheck)) {
+      let offset = ""
+      const freq = (concertpitch * (2.0 ** (row.centoffset / 1200.0)))
+      if (freq !== (concertpitch)) {
+        offset = `(${Math.floor(freq)} Hz)`
+      }
+      let suffix = "";
+      if (row.capofret !== 0 && row.capofret !== "" && row.capofret !== "0") {
+        switch (row.capofret) {
+          case 1:
+            suffix = "st";
+            break;
+          case 2:
+            suffix = "nd";
+            break;
+          case 3:
+            suffix = "rd";
+            break;
+          default:
+            suffix = "th";
+            break;
+        }
+      }
+      return <span>{tuningkeys[i]} <span className={suffix === "" ? "hidden" : ""}>(Capo: {row.capofret}<sup>{suffix})</sup></span> {offset}</span>
+    }
+  }
+  return <span>Custom</span>
+}
 //eslint-disable-next-line
 export const RemoteAll = ({ keyField, columns, data, page, sizePerPage, onTableChange, totalSize, rowEvents }) => (
   <div>
@@ -381,53 +428,7 @@ export default class SonglistView extends React.Component {
           };
         },
         sort: true,
-        formatter: (cell, row) => {
-          let tuning = null;
-          try {
-            tuning = JSON.parse(unescape(row.tuning));
-          }
-          catch (error) {
-            return <span />
-          }
-          if (tuning === null) {
-            return <span />
-          }
-          const concertpitch = 440.0;
-          const {
-            string0, string1, string2, string3, string4, string5,
-          } = tuning;
-          const combinedt = [string0, string1, string2, string3, string4, string5];
-          const tuningkeys = Object.keys(allTunings);
-          for (let i = 0; i < tuningkeys.length; i += 1) {
-            const tuningtocheck = allTunings[tuningkeys[i]];
-            if (combinedt.equals(tuningtocheck)) {
-              let offset = ""
-              const freq = (concertpitch * (2.0 ** (row.centoffset / 1200.0)))
-              if (freq !== (concertpitch)) {
-                offset = `(${Math.floor(freq)} Hz)`
-              }
-              let suffix = "";
-              if (row.capofret !== 0 && row.capofret !== "" && row.capofret !== "0") {
-                switch (row.capofret) {
-                  case 1:
-                    suffix = "st";
-                    break;
-                  case 2:
-                    suffix = "nd";
-                    break;
-                  case 3:
-                    suffix = "rd";
-                    break;
-                  default:
-                    suffix = "th";
-                    break;
-                }
-              }
-              return <span>{tuningkeys[i]} <span className={suffix === "" ? "hidden" : ""}>(Capo: {row.capofret}<sup>{suffix})</sup></span> {offset}</span>
-            }
-          }
-          return <span>Custom</span>
-        },
+        formatter: tuningFormatter,
       },
       {
         dataField: "count",
