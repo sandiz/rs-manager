@@ -604,8 +604,8 @@ export default class DashboardView extends React.Component {
           <SongDetailView
             song={this.state.showweekly ?
               this.state.weeklysongspotlight.title : this.state.randompack}
-            artist="Rocksmith"
-            album="Steam"
+            artist=""
+            album=""
             showDetail={this.state.showsongpackpreview}
             close={() => this.setState({ showsongpackpreview: false, showweekly: false })}
             isSongpack

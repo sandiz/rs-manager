@@ -476,8 +476,8 @@ export default class SongAvailableView extends React.Component {
         <div>
           <SongDetailView
             song={this.state.randompack}
-            artist="Rocksmith"
-            album="Steam"
+            artist=""
+            album=""
             showDetail={this.state.showsongpackpreview}
             close={() => this.setState({ showsongpackpreview: false })}
             isSongpack
