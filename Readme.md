@@ -36,7 +36,6 @@ Version alpha5 - [Mac](https://github.com/sandiz/rs-manager/releases/latest) | [
 
 
 ## TODO
-- import all setlists from game
 - generate youtube playlist of current view
 
 ## Development
