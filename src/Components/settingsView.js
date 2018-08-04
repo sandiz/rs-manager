@@ -329,7 +329,6 @@ export default class SettingsView extends React.Component {
                   </div>
                 </Collapsible>
               </div>
-              <br />
               <div style={{ marginTop: -6 + 'px', paddingLeft: 30 + 'px', paddingRight: 30 + 'px' }}>
                 <br />
                 <h3>Score Attack</h3>

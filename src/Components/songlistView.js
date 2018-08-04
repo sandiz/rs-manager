@@ -752,6 +752,8 @@ export default class SonglistView extends React.Component {
       sortField === null ? this.lastsortfield : sortField,
       sortOrder === null ? this.lastsortorder : sortOrder,
       this.search.value,
+      document.getElementById("search_field") ?
+        document.getElementById("search_field").value : "",
     )
     if (sortField !== null) { this.lastsortfield = sortField; }
     if (sortOrder !== null) { this.lastsortorder = sortOrder; }
@@ -786,6 +788,13 @@ export default class SonglistView extends React.Component {
             placeholder="Search..."
             type="search"
           />
+          &nbsp;&nbsp;
+          <select id="search_field" onChange={this.refreshView}>
+            <option value="anything">Anything</option>
+            <option value="song">Song</option>
+            <option value="artist">Artist</option>
+            <option value="album">Album</option>
+          </select>
         </div>
         <div className="centerButton list-unstyled">
           <a

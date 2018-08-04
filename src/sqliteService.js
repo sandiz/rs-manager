@@ -210,7 +210,6 @@ export async function countAppID(item, rd) {
   return output
 }
 export async function removeFromSongsOwned(songid) {
-  console.log(songid);
   const sql = `delete from songs_owned where id = '${songid}'`;
   await db.run(sql);
 }
@@ -261,13 +260,28 @@ export default async function updateSongsOwned(psarcResult) {
     console.log(error);
   }
 }
-export async function getSongsOwned(start = 0, count = 10, sortField = "mastery", sortOrder = "desc", search = "") {
+export async function getSongsOwned(start = 0, count = 10, sortField = "mastery", sortOrder = "desc", search = "", searchField = "") {
   //  console.log("__db_call__: getSongsOwned");
   if (db == null) {
     const dbfilename = window.sqlitePath;
     db = await window.sqlite.open(dbfilename);
   }
   let sql;
+  let searchSql = `song like '%${escape(search)}%' or 
+            artist like '%${escape(search)}%' or 
+            album like '%${escape(search)}%'`
+  switch (searchField) {
+    case "song":
+      searchSql = `song like '%${escape(search)}%'`
+      break;
+    case "album":
+      searchSql = `album like '%${escape(search)}%'`
+      break;
+    case "artist":
+      searchSql = `artist like '%${escape(search)}%'`
+      break;
+    default: break;
+  }
   if (search === "") {
     sql = `select c.acount as acount, c.songcount as songcount, song, album, artist, arrangement, mastery,
           count, difficulty, uniqkey, id, lastConversionTime, json,
@@ -291,12 +305,13 @@ export async function getSongsOwned(start = 0, count = 10, sortField = "mastery"
           from songs_owned, (
           SELECT count(*) as acount, count(distinct song) as songcount
             FROM songs_owned
-            where song like '%${escape(search)}%' or artist like '%${escape(search)}%' or album like '%${escape(search)}%'
+            where 
+            ${searchSql}
           ) c 
-          where song like '%${escape(search)}%' or artist like '%${escape(search)}%' or album like '%${escape(search)}%'
+          where
+          ${searchSql}
           ORDER BY ${sortField} ${sortOrder} LIMIT ${start},${count}`;
   }
-  //console.log(sql);
   const output = await db.all(sql);
   return output
 }
@@ -304,7 +319,6 @@ export async function countSongsOwned() {
   // console.log("__db_call__: countSongsOwned");
   if (db == null) {
     const dbfilename = window.sqlitePath;
-    console.log(dbfilename);
     db = await window.sqlite.open(dbfilename);
   }
   const sql = `select count(*) as count, count(distinct song) as songcount from songs_owned`;
@@ -316,7 +330,6 @@ export async function getSongID(ID) {
   // console.log("__db_call__: getSongID");
   if (db == null) {
     const dbfilename = window.sqlitePath;
-    console.log(dbfilename);
     db = await window.sqlite.open(dbfilename);
   }
   const sql = `select distinct song, artist from songs_owned where id='${ID}'`;
@@ -328,7 +341,6 @@ export async function getArrangmentsMastered() {
   //console.log("__db_call__: getArrangmentsMastered");
   if (db == null) {
     const dbfilename = window.sqlitePath;
-    console.log(dbfilename);
     db = await window.sqlite.open(dbfilename);
   }
   const sql = `select count(mastery) as count from songs_owned where mastery > 0.95`;
@@ -396,7 +408,6 @@ export async function getAllSetlist(filter = false) {
   let sql = ''
   if (filter) {
     sql = "SELECT * FROM setlist_meta where key not like '%setlist_favorites%' and key not like '%rs_song_list%' order by name collate nocase";
-    console.log(sql)
   }
   else {
     sql = "SELECT * FROM setlist_meta  order by name collate nocase;"
@@ -431,13 +442,28 @@ export async function getSongCountFromPlaylistDB(dbname) {
   const all = await db.get(sql);
   return all;
 }
-export async function getSongsFromPlaylistDB(dbname, start = 0, count = 10, sortField = "mastery", sortOrder = "desc", search = "") {
+export async function getSongsFromPlaylistDB(dbname, start = 0, count = 10, sortField = "mastery", sortOrder = "desc", search = "", searchField = "") {
   // console.log("__db_call__: getSongsFromPlaylistDB");
   if (db == null) {
     const dbfilename = window.sqlitePath;
     db = await window.sqlite.open(dbfilename);
   }
   let sql;
+  let searchSql = `song like '%${escape(search)}%' or 
+            artist like '%${escape(search)}%' or 
+            album like '%${escape(search)}%'`
+  switch (searchField) {
+    case "song":
+      searchSql = `song like '%${escape(search)}%'`
+      break;
+    case "album":
+      searchSql = `album like '%${escape(search)}%'`
+      break;
+    case "artist":
+      searchSql = `artist like '%${escape(search)}%'`
+      break;
+    default: break;
+  }
   if (search === "") {
     sql = `select c.acount as acount, c.songcount as songcount, song, artist, album, arrangement, mastery,
           count, difficulty, id, lastConversionTime, json,
@@ -465,10 +491,12 @@ export async function getSongsFromPlaylistDB(dbname, start = 0, count = 10, sort
           SELECT count(*) as acount, count(distinct song) as songcount
             FROM songs_owned
             JOIN ${dbname} ON ${dbname}.uniqkey = songs_owned.uniqkey
-            where song like '%${escape(search)}%' or artist like '%${escape(search)}%' or album like '%${escape(search)}%'
+            where 
+            ${searchSql}
           ) c 
           JOIN ${dbname} ON ${dbname}.uniqkey = songs_owned.uniqkey
-          where song like '%${escape(search)}%' or artist like '%${escape(search)}%' or album like '%${escape(search)}%'
+          where
+          ${searchSql}
           ORDER BY ${sortField} ${sortOrder} LIMIT ${start},${count}
           `;
   }
