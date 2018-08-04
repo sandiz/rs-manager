@@ -737,3 +737,65 @@ hr {
   margin-left:3px;
   margin-bottom: -3px;
 }
+
+#settingsExpand span {
+  width: 80%;
+  height: 2px;
+  margin: 0 auto;
+  display: block;
+  background: #000;
+  transition: all 0.8s cubic-bezier(0.81, -0.33, 0.345, 1.375);
+  transition-delay: 0.2s;
+}
+
+#settingsExpand span:first-of-type {
+  transform: rotate(0deg) translate(2px, 2px);
+}
+#settingsExpand span:nth-of-type(2) {
+  opacity: 0;
+}
+#settingsExpand span:last-of-type {
+  transform: rotate(90deg) translate(-1px, -2px);
+}
+#settingsExpand.active span {
+  transform: none;
+  opacity: 1;
+  margin: 5px auto;
+}
+#settingsExpand {
+  width: 40px;
+  height: 40px;
+  background:rgba(231,239,242,.0) !important;
+  cursor: pointer;
+}
+
+#settingsCollapse span {
+  width: 80%;
+  height: 2px;
+  margin: 0 auto;
+  display: block;
+  background: #000;
+  transition: all 0.8s cubic-bezier(0.81, -0.33, 0.345, 1.375);
+  transition-delay: 0.2s;
+}
+
+#settingsCollapse span:first-of-type {
+  transform: rotate(0deg) translate(2px, 2px);
+}
+#settingsCollapse span:nth-of-type(2) {
+  opacity: 0;
+}
+#settingsCollapse span:last-of-type {
+  opacity: 0;
+}
+#settingsCollapse.active span {
+  transform: none;
+  opacity: 1;
+  margin: 5px auto;
+}
+#settingsCollapse {
+  width: 40px;
+  height: 40px;
+  background:rgba(231,239,242,.0) !important;
+  cursor: pointer;
+}

@@ -1,4 +1,5 @@
 import React from 'react'
+import Collapsible from 'react-collapsible';
 import PropTypes from 'prop-types';
 import getProfileConfig, { updateSteamLoginSecureCookie, getSteamLoginSecureCookie, updateProfileConfig, getScoreAttackConfig, updateScoreAttackConfig } from '../configService';
 import { resetDB } from '../sqliteService';
@@ -15,6 +16,48 @@ export default class SettingsView extends React.Component {
       showScoreAttack: true,
     };
     this.readConfigs();
+    this.setlistOptions = [];
+    for (let i = 1; i <= 6; i += 1) {
+      this.setlistOptions.push((
+        <div key={"setlist_import_" + i}>
+          <span style={{ float: 'left' }}>
+            <a onClick={this.enterCookie}>
+              Song List {i}:
+                  </a>
+          </span>
+          <span style={{
+            float: 'right',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            width: 400 + 'px',
+            textAlign: 'right',
+          }}>
+            <a onClick={this.enterCookie}>Click to Import </a>
+          </span>
+          <br />
+        </div>
+      ));
+    }
+    this.expandButton = (
+      <button
+        type="button"
+        id="settingsExpand"
+        className="navbar-btn"
+        style={{ float: 'right', marginTop: -62 + 'px' }}
+      >
+        <span /><span /><span />
+      </button>
+    );
+    this.collapseButton = (
+      <button
+        type="button"
+        id="settingsCollapse"
+        className="navbar-btn"
+        style={{ float: 'right', marginTop: -62 + 'px' }}
+      >
+        <span /><span /><span />
+      </button>
+    );
   }
   handleScoreAttack = (event) => {
     const t = event.target;
@@ -83,148 +126,192 @@ export default class SettingsView extends React.Component {
           <div className="row justify-content-lg-center">
             <div className="col col-lg-10 settings">
               <br /> <br />
-              <div style={{ marginTop: -6 + 'px', paddingLeft: 30 + 'px', paddingRight: 30 + 'px' }}>
-                <span>
-                  Config Path:
+              <div style={{ marginTop: -30 + 'px', paddingLeft: 30 + 'px', paddingRight: 30 + 'px' }}>
+                <h3>General</h3>
+                <hr />
+                <Collapsible
+                  trigger={this.expandButton}
+                  triggerWhenOpen={this.collapseButton}
+                  transitionTime={200}
+                  easing="ease-in"
+                  open
+                >
+                  <span>
+                    Config Path:
                 </span>
-                <span style={{
-                  float: 'right',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  width: 90 + '%',
-                  textAlign: 'right',
-                }}>
-                  {window.configPath}
+                  <span style={{
+                    float: 'right',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    width: 90 + '%',
+                    textAlign: 'right',
+                  }}>
+                    {window.configPath}
+                  </span>
+                  <br /> <br />
+                  <span>
+                    SQLite Path:
                 </span>
+                  <span style={{
+                    float: 'right',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    width: 90 + '%',
+                    textAlign: 'right',
+                  }}>
+                    {window.sqlitePath}
+                  </span>
+                  <br /> <br />
+                  <span style={{ float: 'left' }}>
+                    <a onClick={this.enterPrfldb}>
+                      Rocksmith Profile (_prfldb):
+                  </a>
+                  </span>
+                  <span style={{
+                    float: 'right',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    width: 400 + 'px',
+                    textAlign: 'right',
+                    paddingRight: 1 + 'px',
+                  }}>
+                    {
+                      this.state.prfldb === '' ?
+                        <a onClick={this.enterPrfldb}>Click to Change </a>
+                        :
+                        <a onClick={this.enterPrfldb}>
+                          <i>{path.basename(this.state.prfldb).toLowerCase()}</i>
+                        </a>
+                    }
+                  </span>
+                  <br />
+                  <div className="">
+                    <span style={{ color: '#ccc' }}>
+                      Choose the rocksmith profile to read the stats from.
+                    The profile is only read and never written to.<br />
+                      RS profile ends with _prfldb and is typically found
+                      in your __SteamFolder__/Steam/userdata/__random_number__/221680/remote/
+                  </span>
+                  </div>
+                  <br />
+                  <span style={{ float: 'left' }}>
+                    <a onClick={this.enterCookie}>
+                      Steam Login Cookie (steamLoginSecure):
+                  </a>
+                  </span>
+                  <span style={{
+                    float: 'right',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    width: 400 + 'px',
+                    textAlign: 'right',
+                    paddingRight: 1 + 'px',
+                  }}>
+                    {
+                      this.state.steamLoginSecure === '' ?
+                        <a onClick={this.enterCookie}>Click to Change </a>
+                        :
+                        <i>
+                          <a onClick={this.enterCookie}>
+                            {(this.state.steamLoginSecure).toLowerCase()}
+                          </a>
+                        </i>
+                    }
+                  </span>
+                  <br />
+                  <div className="">
+                    <span style={{ color: '#ccc' }}>
+                      Steam Login Cookie is used to update owned status in
+                      Songs &gt; RS DLC Catalog.
+                      The login cookie is valid as long the browser session is valid.
+                      The app queries your&nbsp;
+                    <a style={{ color: 'blue' }} onClick={() => window.shell.openExternal("http://store.steampowered.com/dynamicstore/userdata/")}>
+                        userdata</a>
+                      &nbsp;
+                      to fetch your dlc&#39;s. You can check your data
+                    by logging on to steam and clicking the link.
+                  </span>
+                  </div>
+                </Collapsible>
               </div>
               <br />
               <div style={{ marginTop: -6 + 'px', paddingLeft: 30 + 'px', paddingRight: 30 + 'px' }}>
-                <span>
-                  SQLite Path:
-                </span>
-                <span style={{
-                  float: 'right',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  width: 90 + '%',
-                  textAlign: 'right',
-                }}>
-                  {window.sqlitePath}
-                </span>
-              </div>
-              <div style={{ marginTop: -6 + 'px', paddingLeft: 30 + 'px', paddingRight: 30 + 'px' }}>
                 <br />
-                <span style={{ float: 'left' }}>
-                  <a onClick={this.enterPrfldb}>
-                    Rocksmith Profile (_prfldb):
+                <h3>Score Attack</h3>
+                <hr />
+                <Collapsible
+                  trigger={this.expandButton}
+                  triggerWhenOpen={this.collapseButton}
+                  transitionTime={200}
+                  easing="ease-in"
+                >
+                  <span style={{ float: 'left' }}>
+                    <a onClick={this.enterCookie}>
+                      Show Score Attack Stats:
                   </a>
-                </span>
-                <span style={{
-                  float: 'right',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  width: 400 + 'px',
-                  textAlign: 'right',
-                }}>
+                  </span>
+                  <span style={{
+                    float: 'right',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    width: 400 + 'px',
+                    textAlign: 'right',
+                  }}>
+                    <input
+                      type="checkbox"
+                      checked={this.state.showScoreAttack}
+                      onChange={this.handleScoreAttack} />
+                  </span>
+                  <br />
+                  <div className="">
+                    <span style={{ color: '#ccc' }}>
+                      Show/Hides score attack stats from Dashboard and Songs view.
+                  </span>
+                  </div>
+                </Collapsible>
+                <br />
+                <h3>Setlist</h3>
+                <hr />
+                <Collapsible
+                  trigger={this.expandButton}
+                  triggerWhenOpen={this.collapseButton}
+                  transitionTime={200}
+                  easing="ease-in"
+                  open
+                >
                   {
-                    this.state.prfldb === '' ?
-                      <a onClick={this.enterPrfldb}>Click to Change </a>
-                      :
-                      <a onClick={this.enterPrfldb}>
-                        <i>{path.basename(this.state.prfldb).toLowerCase()}</i>
-                      </a>
+                    this.setlistOptions
                   }
-                </span>
+                </Collapsible>
                 <br />
-                <div className="ta-center">
-                  <span style={{ color: '#ccc' }}>
-                    Choose the rocksmith profile to read the stats from.
-                    The profile is only read and never written to.<br />
-                    RS profile ends with _prfldb and is typically found
-                    in your __SteamFolder__/Steam/userdata/__random_number__/221680/remote/
+                <h3>Song Collection</h3>
+                <hr />
+                <Collapsible
+                  trigger={this.expandButton}
+                  triggerWhenOpen={this.collapseButton}
+                  transitionTime={200}
+                  easing="ease-in"
+                >
+                  <span style={{ float: 'left', color: 'red', marginTop: 18 + 'px' }}>
+                    <a onClick={this.enterCookie}>
+                      Reset Songs Owned Collection
+                  </a>
                   </span>
-                </div>
-                <br />
-                <span style={{ float: 'left' }}>
-                  <a onClick={this.enterCookie}>
-                    Steam Login Cookie (steamLoginSecure):
+                  <span style={{
+                    float: 'right',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    width: 400 + 'px',
+                    textAlign: 'right',
+                  }}>
+                    <a
+                      onClick={this.resetdb}
+                      className="extraPadding download">
+                      Reset
                   </a>
-                </span>
-                <span style={{
-                  float: 'right',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  width: 400 + 'px',
-                  textAlign: 'right',
-                }}>
-                  {
-                    this.state.steamLoginSecure === '' ?
-                      <a onClick={this.enterCookie}>Click to Change </a>
-                      :
-                      <i>
-                        <a onClick={this.enterCookie}>
-                          {(this.state.steamLoginSecure).toLowerCase()}
-                        </a>
-                      </i>
-                  }
-                </span>
-                <br />
-                <div className="ta-center">
-                  <span style={{ color: '#ccc' }}>
-                    Steam Login Cookie is used to update owned status in Songs Available view.
-                    The login cookie is valid as long the browser session is valid. The app queries
-                    &nbsp;
-                    <a style={{ color: 'blue' }} onClick={() => window.shell.openExternal("http://store.steampowered.com/dynamicstore/userdata/")}>
-                      your userdata</a>
-                    &nbsp;
-                    to fetch your dlc&#39;s. You can check your data
-                  by logging on to steam and clicking the link.
                   </span>
-                </div>
-                <br />
-                <span style={{ float: 'left' }}>
-                  <a onClick={this.enterCookie}>
-                    Show Score Attack Stats:
-                  </a>
-                </span>
-                <span style={{
-                  float: 'right',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  width: 400 + 'px',
-                  textAlign: 'right',
-                }}>
-                  <input
-                    type="checkbox"
-                    checked={this.state.showScoreAttack}
-                    onChange={this.handleScoreAttack} />
-                </span>
-                <br />
-                <div className="ta-center">
-                  <span style={{ color: '#ccc' }}>
-                    Show/Hides score attack stats from Dashboard and Songs view.
-                  </span>
-                </div>
-                <br />
-                <span style={{ float: 'left', color: 'red', marginTop: 18 + 'px' }}>
-                  <a onClick={this.enterCookie}>
-                    Reset Songs Owned Collection
-                  </a>
-                </span>
-                <span style={{
-                  float: 'right',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  width: 400 + 'px',
-                  textAlign: 'right',
-                }}>
-                  <a
-                    onClick={this.resetdb}
-                    className="extraPadding download">
-                    Reset
-                  </a>
-                </span>
-                <br /> <br />
+                  <br /> <br />
+                </Collapsible>
                 <br />
               </div>
             </div>
