@@ -3,18 +3,18 @@ Rocksmith's UI leaves a lot to be desired especially when you have a lot of song
 
 ![Dashboard](https://github.com/sandiz/rs-manager/raw/master/assets/images/dashboard.png)
 ## Release
-Version alpha5 - [Mac](https://github.com/sandiz/rs-manager/releases/latest) | [Windows](https://github.com/sandiz/rs-manager/releases/latest)
+Version alpha6 - [Mac](https://github.com/sandiz/rs-manager/releases/latest) | [Windows](https://github.com/sandiz/rs-manager/releases/latest)
 
 
 ## Usage
 - [Settings](#settings)
     - Use the settings view to link your Rocksmith and Steam Profile
 - [PSARC Explorer](#psarc-explorer)
-    - Choose Steam/SteamApps/common/Rocksmith2014/ as your `psarc` folder to generate a list of all songs your own. Once the scan is complete the Songs->Owned section will be populated with all the info extracted from the psarc files. (Use this to also keep your song collection up to date after you buy new songs froms Steam)
+    - Choose Steam/SteamApps/common/Rocksmith2014/ as your `psarc` folder to generate a list of all songs you own. Once the scan is complete, click the `Update Songs Owned` button. The Songs->Owned section will be populated with all the info extracted from the psarc files. (Use this to also keep your song collection up to date after you buy new songs froms Steam)
 - [Songs Owned](#songs-owned)
     - Songs->Owned section should now list songs that you own. You can use basic operations like search, sort, filter as well as view YouTube vidoes of your songs or add them to setlists. If you linked your Rocksmith profile in [Settings](#settings) you can Update RS Favorites/Mastery by clicking the appropriate button
 - [RS Catalog](#songs-available)
-    - This section should already be populated with all the dlc's released so far. You can use the options in this view, to keep the list up to date as well as retreive metadata from steam about ownership/acquire date. (requires steam profile to be linked in Settings)
+    - This section should already be populated with all the dlc's released so far. You can use the options in this view to keep the list up to date as well as retreive metadata from steam about ownership/acquire date. (requires steam profile to be linked in Settings)
 
 ## Screenshots
 ### Songs Owned
