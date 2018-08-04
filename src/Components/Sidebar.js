@@ -1,43 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types';
-import { initSetlistDB, getAllSetlist } from '../sqliteService';
 
-const TabsData = [
-  {
-    id: 'tab-dashboard',
-    name: 'Dashboard',
-    child: [],
-  },
-  {
-    id: 'tab-songs',
-    name: 'Songs',
-    child: [
-      {
-        name: 'Owned',
-        id: 'songs-owned',
-      },
-      {
-        name: 'RS DLC Catalog',
-        id: 'songs-available',
-      },
-    ],
-  },
-  {
-    id: 'tab-setlist',
-    name: 'Setlist',
-    child: [],
-  },
-  {
-    id: 'tab-psarc',
-    name: '.psarc Explorer',
-    child: [],
-  },
-  {
-    id: 'tab-settings',
-    name: 'Settings',
-    child: [],
-  },
-]
 export default class Sidebar extends React.Component {
   constructor(props) {
     super(props)
@@ -51,16 +14,9 @@ export default class Sidebar extends React.Component {
     }
   }
   componentWillMount = async () => {
-    await initSetlistDB();
-    const setlists = await getAllSetlist();
-    for (let i = 0; i < setlists.length; i += 1) {
-      const setlist = setlists[i];
-      const setlistObj = { name: setlist.name, id: setlist.key }
-      TabsData[2].child.push(setlistObj);
-    }
     // default tabs on startup
-    this.props.handleChange(TabsData[0]);
-    this.toggleActive(TabsData[0]);
+    this.props.handleChange(this.props.TabsData[0]);
+    this.toggleActive(this.props.TabsData[0]);
     //this.props.handleChange(TabsData[2], TabsData[2].child[0])
     //this.toggleActive(TabsData[2]);
   }
@@ -84,7 +40,7 @@ export default class Sidebar extends React.Component {
   }
   render() {
     let tabsList = {};
-    tabsList = TabsData.map((tab, index) => {
+    tabsList = this.props.TabsData.map((tab, index) => {
       let ulclassList = '';
       if (this.state.currentTab === tab.id) {
         ulclassList += this.activeClass;
@@ -148,9 +104,11 @@ Sidebar.propTypes = {
   currentProfile: PropTypes.string,
   steamConnected: PropTypes.string,
   ytConnected: PropTypes.bool,
+  TabsData: PropTypes.array,
 }
 Sidebar.defaultProps = {
   currentProfile: 'sandi',
   steamConnected: false,
   ytConnected: false,
+  TabsData: [],
 }

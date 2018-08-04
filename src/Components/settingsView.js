@@ -2,7 +2,8 @@ import React from 'react'
 import Collapsible from 'react-collapsible';
 import PropTypes from 'prop-types';
 import getProfileConfig, { updateSteamLoginSecureCookie, getSteamLoginSecureCookie, updateProfileConfig, getScoreAttackConfig, updateScoreAttackConfig } from '../configService';
-import { resetDB } from '../sqliteService';
+import { resetDB, createRSSongList, addtoRSSongList, isTablePresent, deleteRSSongList } from '../sqliteService';
+import readProfile from '../steamprofileService';
 
 const { path } = window;
 const { remote } = window.require('electron')
@@ -14,30 +15,11 @@ export default class SettingsView extends React.Component {
       prfldb: '',
       steamLoginSecure: '',
       showScoreAttack: true,
+      setlistImported: [false, false, false, false, false, false],
+      processingSetlist: false,
     };
     this.readConfigs();
-    this.setlistOptions = [];
-    for (let i = 1; i <= 6; i += 1) {
-      this.setlistOptions.push((
-        <div key={"setlist_import_" + i}>
-          <span style={{ float: 'left' }}>
-            <a onClick={this.enterCookie}>
-              Song List {i}:
-                  </a>
-          </span>
-          <span style={{
-            float: 'right',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            width: 400 + 'px',
-            textAlign: 'right',
-          }}>
-            <a onClick={this.enterCookie}>Click to Import </a>
-          </span>
-          <br />
-        </div>
-      ));
-    }
+    this.refreshSetlist();
     this.expandButton = (
       <button
         type="button"
@@ -59,6 +41,104 @@ export default class SettingsView extends React.Component {
       </button>
     );
   }
+  generateSetlistOptions = () => {
+    const setlistOptions = []
+    for (let i = 0; i <= 5; i += 1) {
+      setlistOptions.push((
+        <div key={"setlist_import_" + i}>
+          <span style={{ float: 'left' }}>
+            Song List {i + 1}:
+          </span>
+          <span style={{
+            float: 'right',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            width: 400 + 'px',
+            textAlign: 'right',
+          }}>
+            {
+              //eslint-disable-next-line
+              this.state.processingSetlist ? "Processing..." :
+                (
+                  this.state.setlistImported[i] ?
+                    <span> <a style={{ color: 'red' }} onClick={() => this.importDeleteSetlist(i, "delete")}>Delete Setlist</a> &nbsp;| &nbsp;
+                    <a onClick={() => this.importDeleteSetlist(i, "import")}>Reimport Setlist</a> </span>
+                    :
+                    <a onClick={() => this.importDeleteSetlist(i, "import")}>Click to Import</a>
+                )
+            }
+          </span>
+          <br />
+        </div>
+      ));
+    }
+    return setlistOptions;
+  }
+  importDeleteSetlist = async (setlistnum, method) => {
+    if (this.state.prfldb === '' || this.state.prfldb === null) {
+      this.props.updateHeader(
+        this.tabname,
+        `No Profile found, please update General Settings`,
+      );
+      return;
+    }
+    if (method === "delete") {
+      //delete setlist
+      console.log("delete setlist", setlistnum);
+      const tablename = "rs_song_list_" + (setlistnum + 1);
+      //set header to starting
+      this.props.updateHeader(this.tabname, `Deleting Song List ${setlistnum + 1}`);
+      //set state to processing
+      this.setState({
+        processingSetlist: true,
+      });
+      //remove setlist from setlist_meta
+      //drop table setlist
+      await deleteRSSongList(tablename);
+      //set header with success + stats
+      this.props.updateHeader(this.tabname, `Deleted Song List ${setlistnum + 1}!`);
+      //reset processing state
+      this.setState({
+        processingSetlist: false,
+      });
+    }
+    else if (method === "import") {
+      //import setlist
+      console.log("create setlist", setlistnum);
+      const tablename = "rs_song_list_" + (setlistnum + 1);
+      const displayname = "RS Song List " + (setlistnum + 1);
+      //set header to starting
+      this.props.updateHeader(this.tabname, `Importing Song List ${setlistnum + 1}`);
+      //set state to processing
+      this.setState({
+        processingSetlist: true,
+      });
+
+      //create table for setlist
+      //insert setlist to setlist_meta
+      await createRSSongList(tablename, displayname);
+      const steamProfile = await readProfile(this.state.prfldb);
+      const songRoot = steamProfile.SongListsRoot.SongLists;
+      const currentSetlist = songRoot[setlistnum] === 'undefined' ? [] : songRoot[setlistnum];
+
+      //insert values to setlist (set header with item)
+      for (let i = 0; i < currentSetlist.length; i += 1) {
+        const songkey = currentSetlist[i];
+        this.props.updateHeader(this.tabname, `Importing Song List ${setlistnum + 1}: ${i}/${currentSetlist.length}`);
+        //eslint-disable-next-line
+        await addtoRSSongList(tablename, songkey);
+      }
+      //set header with success + stats
+      this.props.updateHeader(this.tabname, `Finished importing Song List ${setlistnum + 1}!`);
+      //reset processing state
+      this.setState({
+        processingSetlist: false,
+      });
+    }
+    //set imported state to true
+    this.refreshSetlist();
+    this.props.refreshTabs();
+  }
   handleScoreAttack = (event) => {
     const t = event.target;
     const value = t.type === 'checkbox' ? t.checked : t.value;
@@ -66,11 +146,26 @@ export default class SettingsView extends React.Component {
       showScoreAttack: value,
     });
   }
+  refreshSetlist = async () => {
+    const setliststatus = []
+    for (let i = 0; i <= 5; i += 1) {
+      const tablename = "rs_song_list_" + (i + 1);
+      //eslint-disable-next-line
+      setliststatus[i] = await isTablePresent(tablename);
+    }
+    this.setState({
+      setlistImported: setliststatus,
+    });
+  }
   readConfigs = async () => {
     const d = await getProfileConfig();
     const e = await getSteamLoginSecureCookie();
     const f = await getScoreAttackConfig();
-    this.setState({ prfldb: d, steamLoginSecure: e, showScoreAttack: f });
+    this.setState({
+      prfldb: d,
+      steamLoginSecure: e,
+      showScoreAttack: f,
+    });
   }
   saveSettings = async () => {
     if (this.state.steamLoginSecure !== "" && this.state.steamLoginSecure != null) {
@@ -277,11 +372,8 @@ export default class SettingsView extends React.Component {
                   triggerWhenOpen={this.collapseButton}
                   transitionTime={200}
                   easing="ease-in"
-                  open
                 >
-                  {
-                    this.setlistOptions
-                  }
+                  {this.generateSetlistOptions()}
                 </Collapsible>
                 <br />
                 <h3>Song Collection</h3>
@@ -337,10 +429,12 @@ SettingsView.propTypes = {
   updateHeader: PropTypes.func,
   // eslint-disable-next-line
   resetHeader: PropTypes.func,
+  refreshTabs: PropTypes.func,
 }
 SettingsView.defaultProps = {
   currentTab: null,
   handleChange: () => { },
   updateHeader: () => { },
   resetHeader: () => { },
+  refreshTabs: () => { },
 }

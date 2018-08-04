@@ -7,6 +7,7 @@ import getProfileConfig, { getSteamLoginSecureCookie } from './configService';
 import SongAvailableView from './Components/songavailableView';
 import SetlistView from './Components/setlistView';
 import SettingsView from './Components/settingsView';
+import { initSetlistDB, getAllSetlist } from './sqliteService';
 import './App.css'
 
 const { path } = window;
@@ -21,10 +22,57 @@ class App extends Component {
       appTitle: '',
       currentProfile: '',
       currentCookie: '',
+      TabsData: [
+        {
+          id: 'tab-dashboard',
+          name: 'Dashboard',
+          child: [],
+        },
+        {
+          id: 'tab-songs',
+          name: 'Songs',
+          child: [
+            {
+              name: 'Owned',
+              id: 'songs-owned',
+            },
+            {
+              name: 'RS DLC Catalog',
+              id: 'songs-available',
+            },
+          ],
+        },
+        {
+          id: 'tab-setlist',
+          name: 'Setlist',
+          child: [],
+        },
+        {
+          id: 'tab-psarc',
+          name: '.psarc Explorer',
+          child: [],
+        },
+        {
+          id: 'tab-settings',
+          name: 'Settings',
+          child: [],
+        },
+      ],
     };
     this.songlistRef = null;
     //this.handleChange = this.handleChange.bind(this);
     this.selectedTab = null;
+  }
+  componentWillMount = async () => {
+    await initSetlistDB();
+    const setlists = await getAllSetlist();
+    const t = this.state.TabsData;
+    for (let i = 0; i < setlists.length; i += 1) {
+      const setlist = setlists[i];
+      const setlistObj = { name: setlist.name, id: setlist.key }
+      t[2].child.push(setlistObj);
+    }
+    this.setState({ TabsData: t });
   }
   componentDidMount = async () => {
     await this.updateProfile();
@@ -68,6 +116,7 @@ class App extends Component {
           updateHeader={this.updateHeader}
           resetHeader={this.resetHeader}
           handleChange={this.updateProfile}
+          refreshTabs={this.refreshTabs}
         />)
         break;
       case "tab-setlist":
@@ -132,6 +181,19 @@ class App extends Component {
   collapseSidebar = () => {
     this.setState({ showSidebar: !this.state.showSidebar });
   }
+  refreshTabs = async () => {
+    await initSetlistDB();
+    const setlists = await getAllSetlist();
+    console.log("Refresh tabs");
+    const t = this.state.TabsData;
+    t[2].child = []
+    for (let i = 0; i < setlists.length; i += 1) {
+      const setlist = setlists[i];
+      const setlistObj = { name: setlist.name, id: setlist.key }
+      t[2].child.push(setlistObj);
+    }
+    this.setState({ TabsData: t });
+  }
   render = () => {
     const len = this.state.currentProfile.length;
     let profile = len > 0 ?
@@ -147,6 +209,7 @@ class App extends Component {
             currentProfile={profile}
             steamConnected={cookie}
             ytConnected={false}
+            TabsData={this.state.TabsData}
           />
           <div id="content">
             <nav className="navbar navbar-expand-lg navbar-light bg-light">
