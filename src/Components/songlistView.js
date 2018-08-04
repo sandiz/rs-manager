@@ -101,6 +101,27 @@ export function countFormmatter(cell, row) {
   }
   return <span>{cell + row.sa_playcount}</span>;
 }
+export function difficultyClass(cell, row, rowIndex, colIndex) {
+  const def = "iconPreview difficulty ";
+  let diff = "diff_0";
+  console.log(row);
+  if (cell <= 20) {
+    diff = "diff_0"
+  }
+  else if (cell > 20 && cell <= 40) {
+    diff = "diff_1"
+  }
+  else if (cell > 40 && cell <= 60) {
+    diff = "diff_2"
+  }
+  else if (cell > 60 && cell <= 80) {
+    diff = "diff_3"
+  }
+  else if (cell > 80) {
+    diff = "diff_4"
+  }
+  return def + diff;
+}
 export function badgeFormatter(cell, row) {
   const badgeClassDefault = "col col-md-3 col-md-34 ta-center iconPreview ";
   const badgeClasses = [];
@@ -442,26 +463,7 @@ export default class SonglistView extends React.Component {
         formatter: countFormmatter,
       },
       {
-        classes: (cell, row, rowIndex, colIndex) => {
-          const def = "iconPreview difficulty ";
-          let diff = "diff_0";
-          if (cell <= 20) {
-            diff = "diff_0"
-          }
-          else if (cell > 20 && cell <= 40) {
-            diff = "diff_1"
-          }
-          else if (cell > 40 && cell <= 60) {
-            diff = "diff_2"
-          }
-          else if (cell > 60 && cell <= 80) {
-            diff = "diff_3"
-          }
-          else if (cell > 81) {
-            diff = "diff_4"
-          }
-          return def + diff;
-        },
+        classes: difficultyClass,
         dataField: "difficulty",
         text: "Difficulty",
         style: (cell, row, rowIndex, colIndex) => {
