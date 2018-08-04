@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types';
 import {
   RemoteAll,
-  unescapeFormatter, difficultyFormatter, round100Formatter,
+  unescapeFormatter, difficultyFormatter, difficultyClass, round100Formatter,
   countFormmatter, badgeFormatter, arrangmentFormatter, tuningFormatter,
 } from './songlistView';
 import SongDetailView from './songdetailView';
@@ -128,26 +128,7 @@ export default class SetlistView extends React.Component {
         formatter: countFormmatter,
       },
       {
-        classes: (cell, row, rowIndex, colIndex) => {
-          const def = "iconPreview difficulty ";
-          let diff = "diff_0";
-          if (cell <= 20) {
-            diff = "diff_0"
-          }
-          else if (cell >= 21 && cell <= 40) {
-            diff = "diff_1"
-          }
-          else if (cell >= 41 && cell <= 60) {
-            diff = "diff_2"
-          }
-          else if (cell >= 61 && cell <= 80) {
-            diff = "diff_3"
-          }
-          else if (cell >= 81) {
-            diff = "diff_4"
-          }
-          return def + diff;
-        },
+        classes: difficultyClass,
         dataField: "difficulty",
         text: "Difficulty",
         style: (cell, row, rowIndex, colIndex) => {
