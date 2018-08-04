@@ -395,13 +395,35 @@ export async function getAllSetlist(filter = false) {
   await initSetlistDB();
   let sql = ''
   if (filter) {
-    sql = "SELECT * FROM setlist_meta where key not like '%setlist_favorites%' order by name collate nocase";
+    sql = "SELECT * FROM setlist_meta where key not like '%setlist_favorites%' and key not like '%rs_song_list%' order by name collate nocase";
+    console.log(sql)
   }
   else {
     sql = "SELECT * FROM setlist_meta  order by name collate nocase;"
   }
   const all = await db.all(sql);
   return all;
+}
+export async function isTablePresent(tablename) {
+  const sql = `SELECT count(*) as count FROM sqlite_master WHERE type='table' and name='${tablename}'`;
+  const op = await db.get(sql);
+  if (op.count === 0) {
+    return false;
+  }
+  return true;
+}
+export async function createRSSongList(tablename, displayname) {
+  await initSetlistPlaylistDB(tablename);
+  await db.run(`REPLACE INTO setlist_meta VALUES('${tablename}','${displayname}');`)
+}
+export async function addtoRSSongList(tablename, songkey) {
+  const sql = `replace into '${tablename}' (uniqkey) select uniqkey from songs_owned where songkey like '%${songkey}%'`
+  const op = await db.run(sql)
+  return op.changes;
+}
+export async function deleteRSSongList(tablename) {
+  const sql = `DELETE from setlist_meta where key='${tablename}'; DROP TABLE '${tablename}';`;
+  await db.exec(sql)
 }
 export async function getSongCountFromPlaylistDB(dbname) {
   //console.log("__db_call__: getSongCountFromPlaylistDB");
