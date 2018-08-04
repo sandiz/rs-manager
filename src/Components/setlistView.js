@@ -328,6 +328,13 @@ export default class SetlistView extends React.Component {
       this.setState({ songs: output, page: 1, totalSize: output[0].acount });
     }
   }
+  refreshView = async () => {
+    this.handleTableChange("cdm", {
+      page: this.state.page,
+      sizePerPage: this.state.sizePerPage,
+      filters: {},
+    })
+  }
   handleTableChange = async (type, {
     page,
     sizePerPage,
@@ -346,6 +353,8 @@ export default class SetlistView extends React.Component {
       sortField === null ? this.lastsortfield : sortField,
       sortOrder === null ? this.lastsortorder : sortOrder,
       this.search ? this.search.value : "",
+      document.getElementById("search_field") ?
+        document.getElementById("search_field").value : "",
     )
     if (sortField !== null) { this.lastsortfield = sortField; }
     if (sortOrder !== null) { this.lastsortorder = sortOrder; }
@@ -452,6 +461,13 @@ export default class SetlistView extends React.Component {
             placeholder="Search..."
             type="search"
           />
+          &nbsp;&nbsp;
+          <select id="search_field" onChange={this.refreshView}>
+            <option value="anything">Anything</option>
+            <option value="song">Song</option>
+            <option value="artist">Artist</option>
+            <option value="album">Album</option>
+          </select>
           <br /><br />
           {
             this.lastChildID === "setlist_favorites" ?
