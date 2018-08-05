@@ -104,7 +104,6 @@ export function countFormmatter(cell, row) {
 export function difficultyClass(cell, row, rowIndex, colIndex) {
   const def = "iconPreview difficulty ";
   let diff = "diff_0";
-  console.log(row);
   if (cell <= 20) {
     diff = "diff_0"
   }
