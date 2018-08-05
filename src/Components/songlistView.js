@@ -675,6 +675,8 @@ export default class SonglistView extends React.Component {
         this.lastsortfield,
         this.lastsortorder,
         this.search.value,
+        document.getElementById("search_field") ?
+          document.getElementById("search_field").value : "",
       )
       this.setState({ songs: output, page: 1, totalSize: output[0].acount });
     }
