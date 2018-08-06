@@ -25,3 +25,4 @@ rsdb.sqlite
 /.vscode
 config.dev.json
 rsdb.dev.sqlite
+release-to-github.sh
