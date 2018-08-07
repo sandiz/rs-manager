@@ -137,7 +137,6 @@ export function badgeFormatter(cell, row) {
     badgeClasses.push([row.sa_badge_master, row.sa_hs_master, "Master", getBadgeName(row.sa_badge_master - 40, true), getBadgeName(row.sa_badge_master - 40, false)]);
   }
   if (badgeClasses.length > 0) {
-    badgeClasses.reverse();
     return (
       <div>
         <ReactTooltip
