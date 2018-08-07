@@ -77,7 +77,8 @@ export default class DashboardView extends React.Component {
       showsastats: true,
     }
   }
-  componentWillMount = () => {
+  componentWillMount = async () => {
+    await initSongsOwnedDB();
     this.fetchStats();
     this.fetchRandomStats();
     this.fetchWeeklySpotlight();

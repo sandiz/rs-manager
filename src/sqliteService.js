@@ -41,11 +41,13 @@ export async function initSongsOwnedDB() {
 
   switch (version) {
     case 0: {
+      // add score attack stats
       await db.exec(altersql);
       version += 1
       await setUserVersion(version);
     }
     case 1: {
+      // remove duplicates
       let sql = "";
       sql += "DELETE FROM songs_owned WHERE rowid NOT IN (SELECT MIN(rowid) FROM songs_owned GROUP BY id);";
       sql += "PRAGMA foreign_keys=off;";
@@ -62,6 +64,7 @@ export async function initSongsOwnedDB() {
       await setUserVersion(version);
     }
     case 2:
+      // add arrangement info
       await db.exec(altersql2);
       version += 1
       await setUserVersion(version);
@@ -290,7 +293,7 @@ export async function getSongsOwned(start = 0, count = 10, sortField = "mastery"
           sa_badge_easy, sa_badge_medium,sa_badge_hard, sa_badge_master, sa_highest_badge,
           arrangementProperties, capofret, centoffset, tuning
           from songs_owned,  (
-          SELECT count(*) as acount, count(distinct song) as songcount
+          SELECT count(*) as acount, count(distinct songkey) as songcount
             FROM songs_owned
           ) c 
           ORDER BY ${sortField} ${sortOrder} LIMIT ${start},${count}`;
@@ -303,7 +306,7 @@ export async function getSongsOwned(start = 0, count = 10, sortField = "mastery"
           sa_badge_easy, sa_badge_medium,sa_badge_hard, sa_badge_master, sa_highest_badge,
           arrangementProperties, capofret, centoffset, tuning
           from songs_owned, (
-          SELECT count(*) as acount, count(distinct song) as songcount
+          SELECT count(*) as acount, count(distinct songkey) as songcount
             FROM songs_owned
             where 
             ${searchSql}
@@ -321,7 +324,7 @@ export async function countSongsOwned() {
     const dbfilename = window.sqlitePath;
     db = await window.sqlite.open(dbfilename);
   }
-  const sql = `select count(*) as count, count(distinct song) as songcount from songs_owned`;
+  const sql = `select count(*) as count, count(distinct songkey) as songcount from songs_owned`;
   // console.log(sql);
   const output = await db.get(sql);
   return output
@@ -438,7 +441,7 @@ export async function deleteRSSongList(tablename) {
 }
 export async function getSongCountFromPlaylistDB(dbname) {
   //console.log("__db_call__: getSongCountFromPlaylistDB");
-  const sql = `SELECT count(*) as songcount, count(distinct song) as count FROM ${dbname} order by uniqkey collate nocase;`
+  const sql = `SELECT count(*) as songcount, count(distinct songkey) as count FROM ${dbname} order by uniqkey collate nocase;`
   const all = await db.get(sql);
   return all;
 }
@@ -472,7 +475,7 @@ export async function getSongsFromPlaylistDB(dbname, start = 0, count = 10, sort
           sa_badge_easy, sa_badge_medium,sa_badge_hard, sa_badge_master, sa_highest_badge,
           arrangementProperties, capofret, centoffset, tuning
           from songs_owned,  (
-          SELECT count(*) as acount, count(distinct song) as songcount
+          SELECT count(*) as acount, count(distinct songkey) as songcount
             FROM songs_owned
             JOIN ${dbname} ON ${dbname}.uniqkey = songs_owned.uniqkey
           ) c 
@@ -488,7 +491,7 @@ export async function getSongsFromPlaylistDB(dbname, start = 0, count = 10, sort
           sa_badge_easy, sa_badge_medium,sa_badge_hard, sa_badge_master, sa_highest_badge,
           arrangementProperties, capofret, centoffset, tuning
           from songs_owned, (
-          SELECT count(*) as acount, count(distinct song) as songcount
+          SELECT count(*) as acount, count(distinct songkey) as songcount
             FROM songs_owned
             JOIN ${dbname} ON ${dbname}.uniqkey = songs_owned.uniqkey
             where 
