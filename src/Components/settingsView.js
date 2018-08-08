@@ -20,25 +20,37 @@ export default class SettingsView extends React.Component {
     };
     this.readConfigs();
     this.refreshSetlist();
-    this.expandButton = (
-      <button
-        type="button"
-        id="settingsExpand"
-        className="navbar-btn"
-        style={{ float: 'right', marginTop: -62 + 'px' }}
-      >
-        <span /><span /><span />
-      </button>
+  }
+  expandButton = (text) => {
+    return (
+      <div>
+        <h3><a>{text}</a></h3>
+        <hr />
+        <button
+          type="button"
+          id="settingsExpand"
+          className="navbar-btn"
+          style={{ float: 'right', marginTop: -62 + 'px' }}
+        >
+          <span /><span /><span />
+        </button>
+      </div>
     );
-    this.collapseButton = (
-      <button
-        type="button"
-        id="settingsCollapse"
-        className="navbar-btn"
-        style={{ float: 'right', marginTop: -62 + 'px' }}
-      >
-        <span /><span /><span />
-      </button>
+  }
+  collapseButton = (text) => {
+    return (
+      <div>
+        <h3><a>{text}</a></h3>
+        <hr />
+        <button
+          type="button"
+          id="settingsCollapse"
+          className="navbar-btn"
+          style={{ float: 'right', marginTop: -62 + 'px' }}
+        >
+          <span /><span /><span />
+        </button>
+      </div>
     );
   }
   generateSetlistOptions = () => {
@@ -222,18 +234,16 @@ export default class SettingsView extends React.Component {
             <div className="col col-lg-10 settings">
               <br /> <br />
               <div style={{ marginTop: -30 + 'px', paddingLeft: 30 + 'px', paddingRight: 30 + 'px' }}>
-                <h3>General</h3>
-                <hr />
                 <Collapsible
-                  trigger={this.expandButton}
-                  triggerWhenOpen={this.collapseButton}
+                  trigger={this.expandButton('General')}
+                  triggerWhenOpen={this.collapseButton('General')}
                   transitionTime={200}
                   easing="ease-in"
                   open
                 >
                   <span>
                     Config Path:
-                </span>
+                  </span>
                   <span style={{
                     float: 'right',
                     overflow: 'hidden',
@@ -246,7 +256,7 @@ export default class SettingsView extends React.Component {
                   <br /> <br />
                   <span>
                     SQLite Path:
-                </span>
+                  </span>
                   <span style={{
                     float: 'right',
                     overflow: 'hidden',
@@ -319,22 +329,26 @@ export default class SettingsView extends React.Component {
                       Steam Login Cookie is used to update owned/acquired date in
                       Songs &gt; RS DLC Catalog.
                       The login cookie is valid as long the browser session is valid.
-                      The app queries your&nbsp;<a style={{ color: 'blue' }} onClick={() => window.shell.openExternal("http://store.steampowered.com/dynamicstore/userdata/")}>
-                        userdata</a> to fetch your dlc&#39;s and <a style={{ color: 'blue' }} onClick={() => window.shell.openExternal("https://store.steampowered.com/account/AjaxLoadMoreHistory/")}>
-                        purchase history</a> to fetch owned/acquired date.
-                    You can check your data by logging on to steam in a
-                    browser and clicking those links.
+                      The app queries your&nbsp;
+                      <a style={{ color: 'blue' }} onClick={() => window.shell.openExternal("http://store.steampowered.com/dynamicstore/userdata/")}>
+                        userdata
+                      </a>
+                      to fetch your dlc&#39;s and
+                      <a style={{ color: 'blue' }} onClick={() => window.shell.openExternal("https://store.steampowered.com/account/AjaxLoadMoreHistory/")}>
+                        purchase history
+                      </a>
+                      to fetch owned/acquired date.
+                      You can check your data by logging on to steam in a browser
+                      and clicking those links.
                   </span>
                   </div>
                 </Collapsible>
               </div>
               <div style={{ marginTop: -6 + 'px', paddingLeft: 30 + 'px', paddingRight: 30 + 'px' }}>
                 <br />
-                <h3>Score Attack</h3>
-                <hr />
                 <Collapsible
-                  trigger={this.expandButton}
-                  triggerWhenOpen={this.collapseButton}
+                  trigger={this.expandButton("Score Attack")}
+                  triggerWhenOpen={this.collapseButton("Score Attack")}
                   transitionTime={200}
                   easing="ease-in"
                 >
@@ -363,22 +377,18 @@ export default class SettingsView extends React.Component {
                   </div>
                 </Collapsible>
                 <br />
-                <h3>Setlist</h3>
-                <hr />
                 <Collapsible
-                  trigger={this.expandButton}
-                  triggerWhenOpen={this.collapseButton}
+                  trigger={this.expandButton("Setlist")}
+                  triggerWhenOpen={this.collapseButton("Setlist")}
                   transitionTime={200}
                   easing="ease-in"
                 >
                   {this.generateSetlistOptions()}
                 </Collapsible>
                 <br />
-                <h3>Song Collection</h3>
-                <hr />
                 <Collapsible
-                  trigger={this.expandButton}
-                  triggerWhenOpen={this.collapseButton}
+                  trigger={this.expandButton("Song Collection")}
+                  triggerWhenOpen={this.collapseButton("Song Collection")}
                   transitionTime={200}
                   easing="ease-in"
                 >
