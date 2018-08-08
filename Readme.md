@@ -53,7 +53,7 @@ Thanks goes to these wonderful people ([emoji key](https://github.com/kentcdodds
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore -->
-| [<img src="https://avatars3.githubusercontent.com/u/1568662?v=4" width="100px;"/><br /><sub><b>Justin Aiken</b></sub>](https://justinaiken.com)<br />[🐛](https://github.com/sandiz/rs-manager/issues?q=author%3AJustinAiken "Bug reports") [🤔](#ideas-JustinAiken "Ideas, Planning, & Feedback") |
+| [<img src="https://avatars3.githubusercontent.com/u/1568662?v=4" width="100px;"/><br /><sub><b>Justin Aiken</b></sub>](https://justinaiken.com)<br />[🐛](https://github.com/sandiz/rs-manager/issues?q=author%3AJustinAiken "Bug reports") [🤔](#ideas-JustinAiken "Ideas, Planning, & Feedback") [💻](https://github.com/sandiz/rs-manager/commits?author=JustinAiken "Code") |
 | :---: |
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
