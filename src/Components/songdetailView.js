@@ -52,7 +52,8 @@ export default class SongDetailView extends React.Component {
       const result = entries.items[0];
       vid = result.id.videoId;
     }
-    const yturl = "http://localhost:8000/yt/" + vid
+    const yturl = `http://localhost:${window.YT_PORT}/yt/` + vid
+    console.log("yt localhost proxyurl:", yturl);
     switch (divID) {
       case "div_playthrough":
         this.setState({
