@@ -1,11 +1,9 @@
 const electron = require("electron");
 var { app, BrowserWindow, Menu } = electron;
-const express = require('express')
 const path = require("path");
 const url = require("url");
 const d = require('debug')('index');
 const isDev = require('electron-is-dev');
-const exp = express()
 let mainWindow;
 
 function createWindow() {
@@ -80,7 +78,3 @@ app.on("activate", () => {
         createWindow();
     }
 });
-
-exp.get('/yt/:vid', (req, res) => res.send(`<iframe id="yt-video" allowFullScreen style="height:95%;width:100%" src="https://www.youtube.com/embed/${req.params.vid}?modestbranding=0;&rel=0&amp;&amp;showinfo=0"" frameborder="0"></iframe>`))
-
-exp.listen(8000, () => console.log('RSManager listening on port 8000 for yt requests (/yt/:vid).'))
