@@ -36,6 +36,8 @@ Version v0.6.3 - [Mac](https://github.com/sandiz/rs-manager/releases/latest) | [
 
 
 ## TODO
+- auto updater
+- rocksmith live stats (windows for now / mac [investigation](https://github.com/sandiz/RockSnifferLib/commits/mac) in progress)
 - generate youtube playlist of current view
 
 ## Development
