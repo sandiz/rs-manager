@@ -44,13 +44,19 @@ class App extends Component {
         },
         {
           id: 'tab-setlist',
-          name: 'Setlist',
+          name: 'Setlists',
           child: [],
         },
         {
           id: 'tab-psarc',
-          name: '.psarc Explorer',
+          name: 'psarc Explorer',
           child: [],
+        },
+        {
+          id: 'tab-rslive',
+          name: 'Rocksmith Live',
+          child: [],
+          platform: 'darwin', //works only in windows for now
         },
         {
           id: 'tab-settings',
