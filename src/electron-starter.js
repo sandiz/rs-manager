@@ -14,8 +14,9 @@ function createWindow() {
         webPreferences: {
             preload: path.join(__dirname, "./preload.js"),
             webSecurity: false,
-        }
+        },
     });
+    mainWindow.setAutoHideMenuBar(true)
     //mainWindow.maximize();
     if (isDev) {
         mainWindow.webContents.openDevTools({ mode: 'detach' });
@@ -38,7 +39,7 @@ function createWindow() {
 
     // Create the Application's main menu
     var template = [{
-        label: "Application",
+        label: "About",
         submenu: [
             { label: "About Application", selector: "orderFrontStandardAboutPanel:" },
             { type: "separator" },
