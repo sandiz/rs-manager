@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types';
 
-const albumArt = require('album-art');
+//const albumArt = require('album-art');
 
 export default class RSLiveView extends React.Component {
   constructor(props) {
@@ -22,7 +22,7 @@ export default class RSLiveView extends React.Component {
       this.tabname,
       "Rocksmith Live Stats",
     );
-
+    /*
     const artist = "The Killers";
     const song = "Mr. Brightside"
     const album = "Hot Fuss";
@@ -33,6 +33,7 @@ export default class RSLiveView extends React.Component {
     });
     const url = await albumArt(artist, { album, size: 'large' })
     this.setState({ albumArt: url });
+    */
   }
   getMinutesSecs = (time) => {
     const minutes = Math.floor(time / 60);
@@ -43,10 +44,24 @@ export default class RSLiveView extends React.Component {
     return (number < 10 ? '0' : '') + number
   }
   startTracking = () => {
-
+    this.stopTracking(); //stop process if already running
+    // spawn process
+    // track file changes
+    this.setState({ tracking: true });
   }
   stopTracking = () => {
-
+    //find process
+    //kill process
+    //reset all values
+    const artist = '';
+    const song = "No Song Selected";
+    const album = "";
+    const aart = "";
+    const timeTotal = 0;
+    const timeCurrent = 0;
+    this.setState({
+      tracking: false, song, artist, album, albumArt: aart, timeCurrent, timeTotal,
+    });
   }
   render = () => {
     let { minutes, seconds } = this.getMinutesSecs(this.state.timeCurrent);
