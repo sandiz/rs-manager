@@ -18,10 +18,6 @@ export default class RSLiveView extends React.Component {
     this.tabname = 'tab-rslive';
   }
   componentDidMount = async () => {
-    this.props.updateHeader(
-      this.tabname,
-      "Rocksmith Live Stats",
-    );
     /*
     const artist = "The Killers";
     const song = "Mr. Brightside"
@@ -35,6 +31,9 @@ export default class RSLiveView extends React.Component {
     this.setState({ albumArt: url });
     */
   }
+  componentWillUnmount = async () => {
+    this.stopTracking(false);
+  }
   getMinutesSecs = (time) => {
     const minutes = Math.floor(time / 60);
     const seconds = this.pad2(time - (minutes * 60));
@@ -43,15 +42,58 @@ export default class RSLiveView extends React.Component {
   pad2 = (number) => {
     return (number < 10 ? '0' : '') + number
   }
-  startTracking = () => {
-    this.stopTracking(); //stop process if already running
+  startTracking = async () => {
+    console.log("start tracking");
+    const killcmd = await this.killPIDs(await this.findPID());
+    console.log("kill command: " + killcmd);
     // spawn process
-    // track file changes
+    const cwd = window.dirname + "/tools/RockSniffer/"
+    window.process.chdir(cwd);
+    this.rssniffer = `bash -c "${killcmd}; cd ${cwd}; mono RockSniffer.exe"`
+    const options = { name: 'RockSniffer', cwd };
+    window.sudo.exec(
+      this.rssniffer,
+      options,
+      (error, stdout, stderr) => {
+        if (error) { console.log("start-track-stderr: " + error) }
+        if (stdout) { console.log('start-track-stdout: ' + stdout); }
+      },
+    );
     this.setState({ tracking: true });
+    this.props.updateHeader(
+      this.tabname,
+      `Tracking: Active`,
+    );
   }
-  stopTracking = (reset = true) => {
-    //find process
-    //kill process
+  findPID = async () => {
+    const pids = await window.findProcess("name", "RockSniffer.exe");
+    return pids;
+  }
+  killPIDs = async (pids) => {
+    const pidarr = []
+    for (let i = 0; i < pids.length; i += 1) {
+      pidarr.push(pids[i].pid);
+    }
+    if (pidarr.length > 0) {
+      return "kill -9 " + pidarr.join(" ");
+    }
+    return "echo 'no pids'"
+  }
+  stopTracking = async (reset = true) => {
+    console.log("stop tracking");
+    const killcmd = await this.killPIDs(await this.findPID());
+    console.log("kill command: " + killcmd);
+    this.rskiller = killcmd;
+    const options = { name: 'Kill RockSniffer' };
+    window.sudo.exec(
+      this.rskiller,
+      options,
+      (error, stdout, stderr) => {
+        if (error) { console.log("stop-track-stderr: " + error) }
+        if (stdout) { console.log('stoptrackstdout: ' + stdout) }
+      },
+    );
+    window.process.chdir(window.dirname);
     //reset all values
     if (reset) {
       const artist = '';
@@ -64,6 +106,7 @@ export default class RSLiveView extends React.Component {
         tracking: false, song, artist, album, albumArt: aart, timeCurrent, timeTotal,
       });
     }
+    this.props.resetHeader(this.tabname);
   }
   render = () => {
     let { minutes, seconds } = this.getMinutesSecs(this.state.timeCurrent);
@@ -155,10 +198,10 @@ RSLiveView.propTypes = {
   //eslint-disable-next-line
   currentTab: PropTypes.object,
   updateHeader: PropTypes.func,
-  //resetHeader: PropTypes.func,
+  resetHeader: PropTypes.func,
 }
 RSLiveView.defaultProps = {
   currentTab: null,
   updateHeader: () => { },
-  //resetHeader: () => {},
+  resetHeader: () => { },
 }

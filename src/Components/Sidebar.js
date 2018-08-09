@@ -43,7 +43,7 @@ export default class Sidebar extends React.Component {
     tabsList = this.props.TabsData.map((tab, index) => {
       const { platform } = tab;
       if (typeof platform !== 'undefined' && platform.length > 0 && window.os.platform() !== platform) {
-        return null;
+        //return null;
       }
       let ulclassList = '';
       if (this.state.currentTab === tab.id) {
