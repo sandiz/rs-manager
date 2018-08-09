@@ -1,0 +1,6 @@
+{
+  "_NOTE": "Enabling addons will enable a local web server",
+  "enableAddons": true,
+  "ipAddress": "127.0.0.1",
+  "port": 9938
+}
