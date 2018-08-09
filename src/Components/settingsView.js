@@ -329,17 +329,17 @@ export default class SettingsView extends React.Component {
                       Steam Login Cookie is used to update owned/acquired date in
                       Songs &gt; RS DLC Catalog.
                       The login cookie is valid as long the browser session is valid.
-                      The app queries your&nbsp;
+                      The app queries your
                       <a style={{ color: 'blue' }} onClick={() => window.shell.openExternal("http://store.steampowered.com/dynamicstore/userdata/")}>
-                        userdata
+                        &nbsp;userdata&nbsp;
                       </a>
                       to fetch your dlc&#39;s and
                       <a style={{ color: 'blue' }} onClick={() => window.shell.openExternal("https://store.steampowered.com/account/AjaxLoadMoreHistory/")}>
-                        purchase history
+                        &nbsp;purchase history&nbsp;
                       </a>
                       to fetch owned/acquired date.
-                      You can check your data by logging on to steam in a browser
-                      and clicking those links.
+                     You can check your data by logging on to steam in a browser
+                     and clicking those links.
                   </span>
                   </div>
                 </Collapsible>
