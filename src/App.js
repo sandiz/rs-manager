@@ -7,6 +7,7 @@ import getProfileConfig, { getSteamLoginSecureCookie } from './configService';
 import SongAvailableView from './Components/songavailableView';
 import SetlistView from './Components/setlistView';
 import SettingsView from './Components/settingsView';
+import RSLiveView from './Components/rsliveView';
 import { initSetlistDB, getAllSetlist } from './sqliteService';
 import './App.css'
 
@@ -159,6 +160,13 @@ class App extends Component {
             )
             break;
         }
+        break;
+      case "tab-rslive":
+        this.selectedTab = (<RSLiveView
+          currentTab={tab}
+          updateHeader={this.updateHeader}
+          resetHeader={this.resetHeader}
+        />)
         break;
     }
   }
