@@ -269,7 +269,7 @@ module.exports = {
     net: 'empty',
     tls: 'empty',
     child_process: 'empty',
-    __dirname: false,
+    __dirname: true,
     __filename: false
   },
   // Turn off performance hints during development because we don't do any
