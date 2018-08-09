@@ -609,7 +609,7 @@ tbody tr:hover {
     margin-right: 20px !important;
  }
 .dashboard-top {
-  height: 240px;
+  height: 220px;
   border: 1px solid black;
   background-color: rgba(231,239,242,.3);;
   color: #252525;

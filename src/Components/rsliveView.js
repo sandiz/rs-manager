@@ -83,6 +83,9 @@ export default class RSLiveView extends React.Component {
     console.log("stop tracking");
     const killcmd = await this.killPIDs(await this.findPID());
     console.log("kill command: " + killcmd);
+    if (killcmd.includes("no pids")) {
+      return;
+    }
     this.rskiller = killcmd;
     const options = { name: 'Kill RockSniffer' };
     window.sudo.exec(
@@ -121,6 +124,22 @@ export default class RSLiveView extends React.Component {
     const albumartstyle = this.state.albumArt.length > 0 ? "" : "hidden";
     return (
       <div className="container-fluid">
+        <div className="ta-center">
+          {
+            this.state.tracking ?
+              <a
+                onClick={this.stopTracking}
+                className="extraPadding download">
+                Stop Tracking
+              </a>
+              :
+              <a
+                onClick={this.startTracking}
+                className="extraPadding download">
+                Start Tracking
+              </a>
+          }
+        </div>
         <br />
         <div className="row justify-content-md-center" style={{ marginTop: -30 + 'px' }}>
           <div className="col col-lg-auto ta-center dashboard-top dashboard-rslive-song-details">
@@ -173,22 +192,6 @@ export default class RSLiveView extends React.Component {
               </span>
             </div>
           </div>
-        </div>
-        <div className="centerButton list-unstyled">
-          {
-            this.state.tracking ?
-              <a
-                onClick={this.stopTracking}
-                className="extraPadding download">
-                Stop Tracking
-              </a>
-              :
-              <a
-                onClick={this.startTracking}
-                className="extraPadding download">
-                Start Tracking
-              </a>
-          }
         </div>
       </div>
     );
