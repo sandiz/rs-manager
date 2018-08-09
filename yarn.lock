@@ -2618,9 +2618,9 @@ electron-rebuild@^1.8.1:
     spawn-rx "^2.0.10"
     yargs "^7.0.2"
 
-electron-sudo@^4.0.12:
+electron-sudo@mullvad/electron-sudo:
   version "4.0.12"
-  resolved "https://registry.yarnpkg.com/electron-sudo/-/electron-sudo-4.0.12.tgz#17d27fcb33837b7f6fd3a7946f168d6590566a53"
+  resolved "https://codeload.github.com/mullvad/electron-sudo/tar.gz/f71134f86541b15359f4813715d721818fb2b1f4"
   dependencies:
     babel-runtime "^6.18.0"
     bluebird "^3.4.6"
