@@ -12,6 +12,7 @@ window.os = require("os");
 window.prompt = require('electron-prompt');
 window.processPSARC = require("./lib/libpsarc").processPSARC
 window.extractFile = require("./lib/libpsarc").extractFile
+window.Sudoer = require("electron-sudo").Sudoer;
 const rp = require('request-promise');
 const isDev = require('electron-is-dev');
 const express = require('express')
