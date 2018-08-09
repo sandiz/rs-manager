@@ -594,6 +594,13 @@ tbody tr:hover {
     padding-left: 10px; 
     padding-right: 10px; 
  }
+ .dashboard-rslive-song-details {
+    margin: 24px auto !important;
+    height: 237px !important;
+    max-width: 719px !important;
+    margin-left: 20px !important;
+    margin-right: 20px !important;
+ }
  .dashboard-header {
     margin: 24px auto !important;
     height: 140px !important;
@@ -798,4 +805,15 @@ hr {
   height: 40px;
   background:rgba(231,239,242,.0) !important;
   cursor: pointer;
+}
+
+#albumart {
+  float: right;
+  margin-top: -8px;
+}
+#albumart img {
+  width: 120px;
+  height: 120px;
+  border: 1px solid black;
+  border-radius: 5px;
 }

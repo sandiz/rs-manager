@@ -90,5 +90,6 @@ Array.prototype.equals = function (array) {
 // Hide method from for-in loops
 Object.defineProperty(Array.prototype, "equals", { enumerable: false });
 
+/* we start a local youtube http proxy because youtube doesnt like serving monetized videos to file:// sources */
 exp.listen(window.YT_PORT, () => console.log(`RSManager listening on port ${window.YT_PORT} for yt requests (/yt/:vid).`))
 exp.get('/yt/:vid', (req, res) => res.send(`<iframe id="yt-video" allowFullScreen style="height:95%;width:100%" src="https://www.youtube.com/embed/${req.params.vid}?modestbranding=0;&rel=0&amp;&amp;showinfo=0"" frameborder="0"></iframe>`))
