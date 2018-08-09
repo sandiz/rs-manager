@@ -49,19 +49,21 @@ export default class RSLiveView extends React.Component {
     // track file changes
     this.setState({ tracking: true });
   }
-  stopTracking = () => {
+  stopTracking = (reset = true) => {
     //find process
     //kill process
     //reset all values
-    const artist = '';
-    const song = "No Song Selected";
-    const album = "";
-    const aart = "";
-    const timeTotal = 0;
-    const timeCurrent = 0;
-    this.setState({
-      tracking: false, song, artist, album, albumArt: aart, timeCurrent, timeTotal,
-    });
+    if (reset) {
+      const artist = '';
+      const song = "No Song Selected";
+      const album = "";
+      const aart = "";
+      const timeTotal = 0;
+      const timeCurrent = 0;
+      this.setState({
+        tracking: false, song, artist, album, albumArt: aart, timeCurrent, timeTotal,
+      });
+    }
   }
   render = () => {
     let { minutes, seconds } = this.getMinutesSecs(this.state.timeCurrent);
