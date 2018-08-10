@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types';
 
-//const albumArt = require('album-art');
+const albumArt = require('album-art');
 
 export default class RSLiveView extends React.Component {
   constructor(props) {
@@ -18,7 +18,6 @@ export default class RSLiveView extends React.Component {
     this.tabname = 'tab-rslive';
   }
   componentDidMount = async () => {
-    /*
     const artist = "The Killers";
     const song = "Mr. Brightside"
     const album = "Hot Fuss";
@@ -29,7 +28,6 @@ export default class RSLiveView extends React.Component {
     });
     const url = await albumArt(artist, { album, size: 'large' })
     this.setState({ albumArt: url });
-    */
   }
   componentWillUnmount = async () => {
     this.stopTracking(false);
@@ -116,7 +114,7 @@ export default class RSLiveView extends React.Component {
     const timeCurrent = `${minutes}:${seconds}`;
     ({ minutes, seconds } = this.getMinutesSecs(this.state.timeTotal));
     const timeTotal = `${minutes}:${seconds}`;
-    let progress = Math.round(this.state.timeCurrent / this.state.timeTotal) * 100;
+    let progress = (this.state.timeCurrent / this.state.timeTotal) * 100;
     //eslint-disable-next-line
     if (isNaN(progress)) {
       progress = 0;
