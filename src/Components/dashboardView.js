@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import StatsTableView from './statsTableView';
 import getProfileConfig, { updateProfileConfig, getScoreAttackConfig } from '../configService';
 import readProfile from '../steamprofileService';
-import { updateMasteryandPlayed, initSongsOwnedDB, getSongID, countSongsOwned, getArrangmentsMastered, getLeadStats, getRhythmStats, getBassStats, getRandomSongOwned, getRandomSongAvailable, getSAStats, updateScoreAttackStats } from '../sqliteService';
+import { updateMasteryandPlayed, initSongsOwnedDB, getSongByID, countSongsOwned, getArrangmentsMastered, getLeadStats, getRhythmStats, getBassStats, getRandomSongOwned, getRandomSongAvailable, getSAStats, updateScoreAttackStats } from '../sqliteService';
 import { replaceRocksmithTerms } from './songavailableView';
 import SongDetailView from './songdetailView';
 
@@ -127,7 +127,7 @@ export default class DashboardView extends React.Component {
         }
       }
       if (mostPlayed !== "") {
-        const song = await getSongID(mostPlayed)
+        const song = await getSongByID(mostPlayed)
         if (typeof song.song === 'undefined') { mostPlayed = "-"; }
         else { mostPlayed = unescape(song.song) + " by " + unescape(song.artist); }
       }

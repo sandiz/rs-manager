@@ -329,8 +329,33 @@ export async function countSongsOwned() {
   const output = await db.get(sql);
   return output
 }
-export async function getSongID(ID) {
-  // console.log("__db_call__: getSongID");
+export async function getSongBySongKey(key, start = 0, count = 10, sortField = "mastery", sortOrder = "desc") {
+  // console.log("__db_call__: getSongByID");
+  if (db == null) {
+    const dbfilename = window.sqlitePath;
+    db = await window.sqlite.open(dbfilename);
+  }
+  const sql = `select c.acount as acount, c.songcount as songcount, song, album, artist, arrangement, mastery,
+          count, difficulty, uniqkey, id, lastConversionTime, json, 
+          sa_playcount, sa_ts, 
+          sa_hs_easy, sa_hs_medium, sa_hs_hard, sa_hs_master, 
+          sa_badge_easy, sa_badge_medium,sa_badge_hard, sa_badge_master, sa_highest_badge,
+          arrangementProperties, capofret, centoffset, tuning
+          from songs_owned, (
+          SELECT count(*) as acount, count(distinct songkey) as songcount
+            FROM songs_owned
+            where 
+            songkey='${key}'
+          ) c 
+          where songkey='${key}'
+          ORDER BY ${sortField} ${sortOrder} LIMIT ${start},${count}
+          `;
+  const output = await db.all(sql);
+  if (typeof output === 'undefined') { return '' }
+  return output;
+}
+export async function getSongByID(ID) {
+  // console.log("__db_call__: getSongByID");
   if (db == null) {
     const dbfilename = window.sqlitePath;
     db = await window.sqlite.open(dbfilename);
