@@ -310,7 +310,7 @@ export function tuningFormatter(cell, row) {
   return <span>Custom</span>
 }
 //eslint-disable-next-line
-export const RemoteAll = ({ keyField, columns, data, page, sizePerPage, onTableChange, totalSize, rowEvents }) => (
+export const RemoteAll = ({ keyField, columns, data, page, sizePerPage, onTableChange, totalSize, rowEvents, paginate = true }) => (
   <div>
     <BootstrapTable
       remote={{ pagination: true }}
@@ -318,7 +318,7 @@ export const RemoteAll = ({ keyField, columns, data, page, sizePerPage, onTableC
       data={data}
       columns={columns}
       filter={filterFactory()}
-      pagination={paginationFactory({
+      pagination={!paginate ? null : paginationFactory({
         page,
         sizePerPage,
         totalSize,
