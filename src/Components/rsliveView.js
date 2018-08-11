@@ -1,22 +1,27 @@
 import React from 'react'
 import PropTypes from 'prop-types';
-import ReactChartkick, { LineChart } from 'react-chartkick'
-import Chart from 'chart.js'
 import {
   RemoteAll,
   unescapeFormatter, difficultyFormatter, difficultyClass, round100Formatter,
   countFormmatter, badgeFormatter, arrangmentFormatter, tuningFormatter,
 } from './songlistView';
 import SongDetailView from './songdetailView';
+import ChartView from './chartView';
 import { getSongBySongKey } from '../sqliteService'
-
 
 const albumArt = require('album-art');
 
+export function pad2(number) {
+  return (number < 10 ? '0' : '') + number
+}
+export function getMinutesSecs(time) {
+  const minutes = Math.floor(time / 60);
+  const seconds = pad2(time - (minutes * 60));
+  return ({ minutes, seconds });
+}
 export default class RSLiveView extends React.Component {
   constructor(props) {
     super(props);
-    ReactChartkick.addAdapter(Chart)
     this.state = {
       artist: '',
       song: 'No Song Selected',
@@ -36,7 +41,6 @@ export default class RSLiveView extends React.Component {
       showArtist: '',
       showSAStats: true,
       /* end table */
-      chartData: [],
     }
     this.tabname = 'tab-rslive';
     this.columns = [
@@ -106,7 +110,7 @@ export default class RSLiveView extends React.Component {
       },
       {
         dataField: "mastery",
-        text: "Mastery",
+        text: "Last Updated Mastery",
         style: (cell, row, rowIndex, colIndex) => {
           return {
             width: '15%',
@@ -235,39 +239,18 @@ export default class RSLiveView extends React.Component {
     const artist = "The Killers";
     const song = "Mr. Brightside"
     const album = "Hot Fuss";
-    const timeTotal = 500;
-    const timeCurrent = 120;
+    const timeTotal = 120;
+    const timeCurrent = 0;
     const songKey = "MrBrightside";
     this.setState({
       artist, song, album, timeTotal, timeCurrent, songKey,
     });
     const url = await albumArt(artist, { album, size: 'large' })
-    const chartData = [
-      {
-        name: "Accuracy",
-        data: {
-          "00:01": 100, "00:02": 95, "00:03": 90, "00:04": 92, "00:05": 95,
-        },
-        dataset: { yAxisID: 'y-axis-1' },
-      },
-      {
-        name: "Notes Missed",
-        data: {
-          "00:01": 0, "00:02": 5, "00:03": 10, "00:04": 10, "00:05": 40,
-        },
-        dataset: { yAxisID: 'y-axis-2' },
-      },
-    ]
-    this.setState({ albumArt: url, chartData })
+    this.setState({ albumArt: url })
     this.refreshTable();
   }
   componentWillUnmount = async () => {
     this.stopTracking(false);
-  }
-  getMinutesSecs = (time) => {
-    const minutes = Math.floor(time / 60);
-    const seconds = this.pad2(time - (minutes * 60));
-    return ({ minutes, seconds });
   }
   refreshTable = async () => {
     this.handleTableChange("cdm", {
@@ -275,9 +258,6 @@ export default class RSLiveView extends React.Component {
       sizePerPage: this.state.sizePerPage,
       filters: {},
     })
-  }
-  pad2 = (number) => {
-    return (number < 10 ? '0' : '') + number
   }
   startTracking = async () => {
     console.log("start tracking");
@@ -376,9 +356,9 @@ export default class RSLiveView extends React.Component {
     }
   }
   render = () => {
-    let { minutes, seconds } = this.getMinutesSecs(this.state.timeCurrent);
+    let { minutes, seconds } = getMinutesSecs(this.state.timeCurrent);
     const timeCurrent = `${minutes}:${seconds}`;
-    ({ minutes, seconds } = this.getMinutesSecs(this.state.timeTotal));
+    ({ minutes, seconds } = getMinutesSecs(this.state.timeTotal));
     const timeTotal = `${minutes}:${seconds}`;
     let progress = (this.state.timeCurrent / this.state.timeTotal) * 100;
     //eslint-disable-next-line
@@ -458,50 +438,7 @@ export default class RSLiveView extends React.Component {
           </div>
         </div>
         <div id="chart">
-          <LineChart
-            library={{
-              legend: {
-                labels: {
-                  // This more specific font property overrides the global property
-                  fontFamily: "Roboto Condensed",
-                },
-              },
-              scales: {
-                xAxes: [{
-                  type: 'time',
-                  time: {
-                    displayFormats: {
-                      quarter: 'mm:ss',
-                    },
-                    unit: 'seconds',
-                  },
-                }],
-                yAxes: [{
-                  type: 'linear',
-                  display: true,
-                  position: 'left',
-                  id: 'y-axis-1',
-                }, {
-                  type: 'linear',
-                  display: true,
-                  position: 'right',
-                  id: 'y-axis-2',
-                  gridLines: {
-                    drawOnChartArea: false, // only want the grid lines for one axis to show up
-                  },
-                  ticks: {
-                    suggestedMin: 0,
-
-                  },
-                }],
-              },
-              responsive: true,
-              stacked: false,
-              hoverMode: 'index',
-            }}
-            messages={{ empty: "Waiting for data..." }}
-            data={this.state.chartData}
-            className="lineChart" />
+          <ChartView timeTotal={this.state.timeTotal} />
         </div>
         <div>
           <RemoteAll
