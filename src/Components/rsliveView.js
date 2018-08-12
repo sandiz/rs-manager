@@ -31,6 +31,12 @@ export default class RSLiveView extends React.Component {
       timeCurrent: 0,
       tracking: false,
       songKey: '',
+      accuracy: 0,
+      currentStreak: 0,
+      highestStreak: 0,
+      totalNotes: 0,
+      notesHit: 0,
+      notesMissed: 0,
       /* table state vars */
       songs: [],
       page: 1,
@@ -110,7 +116,7 @@ export default class RSLiveView extends React.Component {
       },
       {
         dataField: "mastery",
-        text: "Last Updated Mastery",
+        text: "Current Mastery",
         style: (cell, row, rowIndex, colIndex) => {
           return {
             width: '15%',
@@ -236,18 +242,57 @@ export default class RSLiveView extends React.Component {
     };
   }
   componentDidMount = async () => {
-    const artist = "The Killers";
-    const song = "Mr. Brightside"
-    const album = "Hot Fuss";
-    const timeTotal = 120;
-    const timeCurrent = 0;
-    const songKey = "MrBrightside";
+    const songData = {
+      success: true,
+      currentState: 4,
+      memoryReadout: {
+        songTimer: 25.091,
+        songID: "JoniBigY",
+        totalNotesHit: 0,
+        currentHitStreak: 0,
+        highestHitStreak: 0,
+        totalNotesMissed: 25,
+        currentMissStreak: 25,
+        mode: 1,
+        TotalNotes: 25,
+      },
+      songDetails: {
+        songID: "JoniBigY",
+        songName: "Big Yellow Taxi",
+        artistName: "Joni Mitchell",
+        albumName: "Ladies of the Canyon",
+        songLength: 146.703,
+        albumYear: 1970,
+        numArrangements: 4,
+      },
+    };
+    const { songDetails, memoryReadout } = songData;
+    let accuracy = memoryReadout.totalNotesHit /
+      (memoryReadout.totalNotesHit + memoryReadout.totalNotesMissed);
+    accuracy *= 100;
+
+    //eslint-disable-next-line
+    if (isNaN(accuracy)) {
+      accuracy = 0;
+    }
     this.setState({
-      artist, song, album, timeTotal, timeCurrent, songKey,
+      accuracy,
+      song: songDetails.songName,
+      artist: songDetails.artistName,
+      album: songDetails.albumName,
+      timeTotal: songDetails.songLength,
+      timeCurrent: memoryReadout.songTimer,
+      songKey: memoryReadout.songID,
+      currentStreak: memoryReadout.currentHitStreak,
+      highestStreak: memoryReadout.highestHitStreak,
+      totalNotes: memoryReadout.TotalNotes,
+      notesHit: memoryReadout.totalNotesHit,
+      notesMissed: memoryReadout.totalNotesMissed,
+      albumArt: await albumArt(songDetails.artistName, { album: songDetails.albumName, size: 'large' }),
+    }, () => {
+      this.refreshTable();
     });
-    const url = await albumArt(artist, { album, size: 'large' })
-    this.setState({ albumArt: url })
-    this.refreshTable();
+    console.log(songData);
   }
   componentWillUnmount = async () => {
     this.stopTracking(false);
@@ -357,9 +402,9 @@ export default class RSLiveView extends React.Component {
   }
   render = () => {
     let { minutes, seconds } = getMinutesSecs(this.state.timeCurrent);
-    const timeCurrent = `${minutes}:${seconds}`;
+    const timeCurrent = `${minutes}:${Math.round(seconds)}`;
     ({ minutes, seconds } = getMinutesSecs(this.state.timeTotal));
-    const timeTotal = `${minutes}:${seconds}`;
+    const timeTotal = `${minutes}:${Math.round(seconds)}`;
     let progress = (this.state.timeCurrent / this.state.timeTotal) * 100;
     //eslint-disable-next-line
     if (isNaN(progress)) {
@@ -386,7 +431,66 @@ export default class RSLiveView extends React.Component {
         </div>
         <br />
         <div className="row justify-content-md-center" style={{ marginTop: -30 + 'px' }}>
-          <div className="col col-lg-auto ta-center dashboard-top dashboard-rslive-song-details">
+          <div className="col col-md-3 ta-center dashboard-top dashboard-rslive-song-details">
+            <div>
+              Live Stats
+              <hr />
+            </div>
+            <div>
+              <div className="flex-container">
+                <div className="flex-div">
+                  <div>
+                    Accuracy
+                    <hr style={{ width: 65 + '%' }} />
+                    <div style={{ fontSize: 35 + 'px', marginTop: -10 + 'px' }}>
+                      {this.state.accuracy}%
+                    </div>
+                  </div>
+                </div>
+                <div className="flex-div">
+                  <div>
+                    Current Streak
+                    <hr style={{ width: 65 + '%' }} />
+                    <div style={{ fontSize: 35 + 'px', marginTop: -10 + 'px' }}>
+                      {this.state.currentStreak}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="flex-container" style={{ marginTop: 10 + 'px' }}>
+                <div className="flex-div">
+                  Total Notes
+                  <hr />
+                  <div style={{ marginTop: -10 + 'px' }}>
+                    {this.state.totalNotes}
+                  </div>
+                </div>
+                <div className="flex-div">
+                  Notes Hit
+                  <hr />
+                  <div style={{ marginTop: -10 + 'px' }}>
+                    {this.state.notesHit}
+                  </div>
+                </div>
+                <div className="flex-div">
+                  Notes Missed
+                  <hr />
+                  <div style={{ marginTop: -10 + 'px' }}>
+                    {this.state.notesMissed}
+                  </div>
+                </div>
+                <div className="flex-div">
+                  Highest Streak
+
+                  <hr />
+                  <div style={{ marginTop: -10 + 'px' }}>
+                    {this.state.highestStreak}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="col col-lg-5 ta-center dashboard-top dashboard-rslive-song-details">
             <div>
               Current Song
               <hr />
