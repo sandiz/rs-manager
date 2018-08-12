@@ -1,0 +1,15 @@
+patch-package
+--- a/node_modules/find-process/lib/find_process.js
++++ b/node_modules/find-process/lib/find_process.js
+@@ -93,7 +93,10 @@ const finders = {
+               if ('pid' in cond) {
+                 return row.ProcessId === String(cond.pid)
+               } else {
+-                return matchName(row.CommandLine, cond.name)
++                if (process.platform === "win32")
++                  return matchName(row.Name, cond.name)
++                else
++                  return matchName(row.CommandLine, cond.name)
+               }
+             })
+             .map(row => {

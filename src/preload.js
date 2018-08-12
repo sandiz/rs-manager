@@ -15,6 +15,7 @@ window.findProcess = require('find-process');
 window.processPSARC = require("./lib/libpsarc").processPSARC
 window.extractFile = require("./lib/libpsarc").extractFile
 window.sudo = require('sudo-prompt');
+window.exec = require('child_process').exec;
 const rp = require('request-promise');
 const isDev = require('electron-is-dev');
 const express = require('express')

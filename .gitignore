@@ -26,3 +26,4 @@ rsdb.sqlite
 config.dev.json
 rsdb.dev.sqlite
 release-to-github.sh
+src/tools/RockSniffer/cache/
