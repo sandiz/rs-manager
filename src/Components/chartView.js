@@ -11,12 +11,44 @@ export default class ChartView extends React.Component {
     ReactChartkick.addAdapter(Chart)
     this.state = {
       chartData: [],
-      timeCurrent: 0,
     }
     this.timer = null;
+    this.lastsongid = "";
     console.log(zoom);
   }
-  componentDidMount = () => {
+  shouldComponentUpdate = (nextstate, nextprops) => {
+    if (nextprops.startTrack) {
+      this.startCollecting()
+    }
+    if (nextprops.stopTrack) {
+      if (this.timer) clearInterval(this.timer);
+      const chartData = [
+        {
+          name: "Accuracy",
+          data: {
+          },
+          dataset: { yAxisID: 'y-axis-1' },
+        },
+        {
+          name: "Notes Missed",
+          data: {
+          },
+          dataset: { yAxisID: 'y-axis-2' },
+        },
+      ]
+      this.setState({ chartData })
+    }
+    return true;
+  }
+  componentWillUnmount = () => {
+    if (this.timer) clearInterval(this.timer);
+  }
+  getRandomInt = (min, max) => {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min)) + min;
+  }
+  startCollecting = async () => {
     const chartData = [
       {
         name: "Accuracy",
@@ -32,29 +64,45 @@ export default class ChartView extends React.Component {
       },
     ]
     this.setState({ chartData })
-    //this.fakeDataTimer(chartData);
+    await this.DataTimer(chartData);
   }
-  componentWillUnmount = () => {
-    if (this.timer) clearInterval(this.timer);
-  }
-  getRandomInt = (min, max) => {
-    min = Math.ceil(min);
-    max = Math.floor(max);
-    return Math.floor(Math.random() * (max - min)) + min;
-  }
-  fakeDataTimer = (chartData) => {
-    this.timer = setInterval(() => {
-      const newTime = this.state.timeCurrent + 1;
-      if (newTime >= this.props.timeTotal && this.timer) clearInterval(this.timer);
-      const { minutes, seconds } = getMinutesSecs(newTime)
-      const timeKey = `${minutes}:${seconds}`
-      const accrRandom = this.getRandomInt(90, 100);
-      const notesRandom = this.getRandomInt(0, 10);
-      const obj = {}
-      obj[timeKey] = accrRandom;
-      chartData[0].data[timeKey] = accrRandom;
-      chartData[1].data[timeKey] = notesRandom;
-      this.setState({ timeCurrent: newTime, chartData })
+  DataTimer = async (chartData) => {
+    this.timer = setInterval(async () => {
+      const songData = await window.fetch("http://127.0.0.1:9938");
+      if (!songData) return;
+      if (typeof songData === 'undefined') { return; }
+      const jsonObj = await songData.json();
+      console.log(jsonObj)
+
+      if (jsonObj.memoryReadout && jsonObj.memoryReadout.songTimer > 0)
+      {
+        const { memoryReadout } = jsonObj;
+        if (typeof memoryReadout === 'undefined') { return; }
+        if (this.lastsongid !== memoryReadout.songID) {
+          this.lastsongid = memoryReadout.songID;
+          chartData[0].data = {}
+          chartData[1].data = {}
+        }
+        const newTime = Math.round(memoryReadout.songTimer);
+        if (newTime >= this.props.timeTotal && this.timer) clearInterval(this.timer);
+        const { minutes, seconds } = getMinutesSecs(newTime)
+        const timeKey = `${minutes}:${seconds}`
+        const tnh = memoryReadout ? memoryReadout.totalNotesHit : 0;
+        const tnm = memoryReadout ? memoryReadout.totalNotesMissed : 0;
+        let accuracy = tnh /
+          (tnh + tnm);
+        accuracy *= 100;
+
+        //eslint-disable-next-line
+        if (isNaN(accuracy)) {
+          accuracy = 0;
+        }
+        const notesRandom = jsonObj.memoryReadout.totalNotesMissed;
+        chartData[0].data[timeKey] = accuracy;
+        chartData[1].data[timeKey] = notesRandom;
+        this.setState({ chartData })
+        console.log(chartData);
+      }
     }, 1000);
   }
   render = () => {
@@ -117,7 +165,13 @@ export default class ChartView extends React.Component {
 ChartView.propTypes = {
   //eslint-disable-next-line
   timeTotal: PropTypes.number,
+  //eslint-disable-next-line
+  startTrack: PropTypes.bool,
+  //eslint-disable-next-line
+  stopTrack: PropTypes.bool,
 }
 ChartView.defaultProps = {
   timeTotal: 0,
+  startTrack: false,
+  stopTrack: false,
 }

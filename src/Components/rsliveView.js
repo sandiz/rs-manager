@@ -47,6 +47,8 @@ export default class RSLiveView extends React.Component {
       showArtist: '',
       showSAStats: true,
       /* end table */
+      startTrack: false,
+      stopTrack: false,
     }
     this.tabname = 'tab-rslive';
     this.columns = [
@@ -240,9 +242,15 @@ export default class RSLiveView extends React.Component {
         })
       },
     };
+    this.fetchrstimer = null;
+    this.lastalbumname = "";
+    this.lastsongkey = "";
+    this.lastsongdetail = null;
+    this.songkeyresults = null;
+    this.albumarturl = "";
   }
   componentDidMount = async () => {
-    const songData = {
+    /*const songData = {
       success: true,
       currentState: 4,
       memoryReadout: {
@@ -265,37 +273,66 @@ export default class RSLiveView extends React.Component {
         albumYear: 1970,
         numArrangements: 4,
       },
-    };
+    };*/
+  }
+  componentWillUnmount = async () => {
+    this.stopTracking(false);
+  }
+  parseSongResults = async (songData) => {
     const { songDetails, memoryReadout } = songData;
-    let accuracy = memoryReadout.totalNotesHit /
-      (memoryReadout.totalNotesHit + memoryReadout.totalNotesMissed);
+    const tnh = memoryReadout ? memoryReadout.totalNotesHit : 0;
+    const tnm = memoryReadout ? memoryReadout.totalNotesMissed : 0;
+    let accuracy = tnh /
+      (tnh + tnm);
     accuracy *= 100;
 
     //eslint-disable-next-line
     if (isNaN(accuracy)) {
       accuracy = 0;
     }
+    if (songDetails) {
+      this.lastsongdetail = songDetails;
+    }
+    if (memoryReadout &&
+      memoryReadout.songID.length > 0 &&
+      memoryReadout.songID !== this.state.songKey) {
+      const skr = await getSongBySongKey(memoryReadout.songID);
+      //eslint-disable-next-line
+      if (skr.length > 0) this.songkeyresults = skr[0];
+    }
+    if (this.songkeyresults && this.lastalbumname !== unescape(this.songkeyresults.album)) {
+      try
+      {
+        this.albumarturl = await albumArt(
+          unescape(this.songkeyresults.artist),
+          { album: unescape(this.songkeyresults.album), size: 'large' },
+        );
+        this.lastalbumname = unescape(this.songkeyresults.album)
+      }
+      catch (e) {
+        console.log(e);
+      }
+    }
     this.setState({
       accuracy,
-      song: songDetails.songName,
-      artist: songDetails.artistName,
-      album: songDetails.albumName,
-      timeTotal: songDetails.songLength,
-      timeCurrent: memoryReadout.songTimer,
-      songKey: memoryReadout.songID,
-      currentStreak: memoryReadout.currentHitStreak,
-      highestStreak: memoryReadout.highestHitStreak,
-      totalNotes: memoryReadout.TotalNotes,
-      notesHit: memoryReadout.totalNotesHit,
-      notesMissed: memoryReadout.totalNotesMissed,
-      albumArt: await albumArt(songDetails.artistName, { album: songDetails.albumName, size: 'large' }),
+      song: this.songkeyresults ? unescape(this.songkeyresults.song) : "",
+      artist: this.songkeyresults ? unescape(this.songkeyresults.artist) : "",
+      album: this.songkeyresults ? unescape(this.songkeyresults.album) : "",
+      timeTotal: this.lastsongdetail ? songDetails.songLength : 0,
+      timeCurrent: memoryReadout ? memoryReadout.songTimer : 0,
+      songKey: memoryReadout ? memoryReadout.songID : "",
+      currentStreak: memoryReadout ? memoryReadout.currentHitStreak : 0,
+      highestStreak: memoryReadout ? memoryReadout.highestHitStreak : 0,
+      totalNotes: memoryReadout ? memoryReadout.TotalNotes : 0,
+      notesHit: memoryReadout ? memoryReadout.totalNotesHit : 0,
+      notesMissed: memoryReadout ? memoryReadout.totalNotesMissed : 0,
+      albumArt: this.albumarturl,
     }, () => {
-      this.refreshTable();
+      if (memoryReadout && this.lastsongkey !== memoryReadout.songID) {
+        this.refreshTable();
+        this.lastsongkey = memoryReadout.songID;
+      }
     });
-    console.log(songData);
-  }
-  componentWillUnmount = async () => {
-    this.stopTracking(false);
   }
   refreshTable = async () => {
     this.handleTableChange("cdm", {
@@ -305,30 +342,67 @@ export default class RSLiveView extends React.Component {
     })
   }
   startTracking = async () => {
+    this.setState({ startTrack: true, stopTrack: false })
     console.log("start tracking");
     const killcmd = await this.killPIDs(await this.findPID());
     console.log("kill command: " + killcmd);
     // spawn process
-    const cwd = window.dirname + "/tools/RockSniffer/"
-    window.process.chdir(cwd);
-    this.rssniffer = `bash -c "${killcmd}; cd ${cwd}; mono RockSniffer.exe"`
-    const options = { name: 'RockSniffer', cwd };
-    window.sudo.exec(
-      this.rssniffer,
-      options,
-      (error, stdout, stderr) => {
-        if (error) { console.log("start-track-stderr: " + error) }
-        if (stdout) { console.log('start-track-stdout: ' + stdout); }
-      },
-    );
+    let cwd = ""
+    if (window.os.platform() === "win32") {
+      cwd = window.dirname + "\\tools\\RockSniffer\\";
+      this.rssniffer = `${killcmd} && cd ${cwd} && RockSniffer.exe`;
+      window.process.chdir(cwd);
+      console.log(this.rssniffer);
+      const options = { name: 'RockSniffer', cwd };
+      window.exec(
+        this.rssniffer,
+        options,
+        (error, stdout, stderr) => {
+          if (error) { console.log("start-track-stderr: " + error) }
+          if (stdout) { console.log('start-track-stdout: ' + stdout); }
+        },
+      );
+    }
+    else {
+      cwd = window.dirname + "/tools/RockSniffer/"
+      this.rssniffer = `bash -c "${killcmd}; cd ${cwd}; mono RockSniffer.exe"`
+      window.process.chdir(cwd);
+      console.log(this.rssniffer);
+      const options = { name: 'RockSniffer', cwd };
+      window.sudo.exec(
+        this.rssniffer,
+        options,
+        (error, stdout, stderr) => {
+          if (error) { console.log("start-track-stderr: " + error) }
+          if (stdout) { console.log('start-track-stdout: ' + stdout); }
+        },
+      );
+    }
     this.setState({ tracking: true });
     this.props.updateHeader(
       this.tabname,
       `Tracking: Active`,
     );
+    this.fetchRSSniffer();
+  }
+  fetchRSSniffer = async () => {
+    this.fetchrstimer = setInterval(async () => {
+      try
+      {
+        const songData = await window.fetch("http://127.0.0.1:9938");
+        if (!songData) return;
+        if (typeof songData === 'undefined') { return; }
+        const jsonObj = await songData.json();
+        await this.parseSongResults(jsonObj);
+      }
+      catch (e) {
+        console.log(e);
+      }
+    }, 1000);
   }
   findPID = async () => {
     const pids = await window.findProcess("name", "RockSniffer.exe");
+    console.log(pids);
     return pids;
   }
   killPIDs = async (pids) => {
@@ -337,11 +411,20 @@ export default class RSLiveView extends React.Component {
       pidarr.push(pids[i].pid);
     }
     if (pidarr.length > 0) {
+      if (window.os.platform() === "win32") {
+        let taskcmd = "taskkill /f ";
+        for (let i = 0; i < pidarr.length; i += 1) {
+          taskcmd += "/pid " + pidarr[i];
+        }
+        return taskcmd;
+      }
       return "kill -9 " + pidarr.join(" ");
     }
     return "echo 'no pids'"
   }
   stopTracking = async (reset = true) => {
+    this.setState({ startTrack: false, stopTrack: true })
+    if (this.fetchrstimer) clearInterval(this.fetchrstimer);
     console.log("stop tracking");
     const killcmd = await this.killPIDs(await this.findPID());
     console.log("kill command: " + killcmd);
@@ -350,7 +433,8 @@ export default class RSLiveView extends React.Component {
     }
     this.rskiller = killcmd;
     const options = { name: 'Kill RockSniffer' };
-    window.sudo.exec(
+    const exec = window.os.platform() === "win32" ? window.exec : window.sudo.exec;
+    exec(
       this.rskiller,
       options,
       (error, stdout, stderr) => {
@@ -368,8 +452,26 @@ export default class RSLiveView extends React.Component {
       const timeTotal = 0;
       const timeCurrent = 0;
       this.setState({
-        tracking: false, song, artist, album, albumArt: aart, timeCurrent, timeTotal, songKey: '',
+        tracking: false,
+        song,
+        artist,
+        album,
+        albumArt: aart,
+        timeCurrent,
+        timeTotal,
+        songKey: '',
+        accuracy: 0,
+        currentStreak: 0,
+        highestStreak: 0,
+        totalNotes: 0,
+        notesHit: 0,
+        notesMissed: 0,
       });
+      this.lastalbumname = "";
+      this.lastsongkey = "";
+      this.lastsongdetail = null;
+      this.songkeyresults = null;
+      this.albumarturl = "";
       this.refreshTable();
     }
     this.props.resetHeader(this.tabname);
@@ -542,7 +644,11 @@ export default class RSLiveView extends React.Component {
           </div>
         </div>
         <div id="chart">
-          <ChartView timeTotal={this.state.timeTotal} />
+          <ChartView
+            timeTotal={this.state.timeTotal}
+            starTrack={this.state.startTrack}
+            stopTrack={this.state.stopTrack}
+          />
         </div>
         <div>
           <RemoteAll
