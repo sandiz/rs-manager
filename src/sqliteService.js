@@ -39,6 +39,11 @@ export async function initSongsOwnedDB() {
   altersql2 += "alter table songs_owned add centoffset float default 0;"
   altersql2 += "alter table songs_owned add tuning blob;"
 
+  let altersql3 = "";
+  altersql3 += "alter table songs_owned add songLength float;"
+  altersql3 += "alter table songs_owned add maxNotes int;"
+  altersql3 += "alter table songs_owned add tempo int;"
+
   switch (version) {
     case 0: {
       // add score attack stats
@@ -66,6 +71,12 @@ export async function initSongsOwnedDB() {
     case 2:
       // add arrangement info
       await db.exec(altersql2);
+      version += 1
+      await setUserVersion(version);
+      break;
+    case 3:
+      // add songLength/tempo/notes info
+      await db.exec(altersql3);
       version += 1
       await setUserVersion(version);
       break;
@@ -238,6 +249,9 @@ export default async function updateSongsOwned(psarcResult) {
   const capo = psarcResult.capofret;
   const cent = psarcResult.centoffset;
   const tuning = escape(psarcResult.tuning);
+  const notes = psarcResult.maxNotes;
+  const tmpo = psarcResult.tempo;
+  const length = psarcResult.songLength;
   let mastery = 0
   let count = 0
   sqlstr = `select mastery, count from songs_owned where song='${song}' AND
@@ -250,17 +264,21 @@ export default async function updateSongsOwned(psarcResult) {
   }
 
   sqlstr = `REPLACE INTO songs_owned (album, artist, song, arrangement, json, psarc, dlc, sku, difficulty, dlckey, songkey,\
-                                       id,uniqkey, lastConversionTime, mastery, count, arrangementProperties, capofret, centoffset,tuning)\
-                                       VALUES ('${album}','${artist}',
+  id,uniqkey, lastConversionTime, mastery, \
+  count, arrangementProperties, capofret, centoffset, tuning,\
+  songLength, maxNotes, tempo)\
+  VALUES ('${album}','${artist}',
       '${song}','${arrangement}','${json}','${psarc}',
       '${dlc}','${sku}',${difficulty},'${dlckey}',
-      '${songkey}','${id}', '${uniqkey}', '${lct}', '${mastery}','${count}', '${ap}', '${capo}','${cent}','${tuning}');`
+      '${songkey}','${id}', '${uniqkey}', '${lct}', '${mastery}','${count}', '${ap}', '${capo}','${cent}','${tuning}', '${length}', '${notes}', '${tmpo}');`
   //});
   try {
     await db.run(sqlstr); // Run the query without returning anything
   }
   catch (error) {
     console.log(error);
+    console.log(sqlstr);
+    console.log(psarcResult);
   }
 }
 export async function getSongsOwned(start = 0, count = 10, sortField = "mastery", sortOrder = "desc", search = "", searchField = "") {
@@ -340,7 +358,8 @@ export async function getSongBySongKey(key, start = 0, count = 10, sortField = "
           sa_playcount, sa_ts, 
           sa_hs_easy, sa_hs_medium, sa_hs_hard, sa_hs_master, 
           sa_badge_easy, sa_badge_medium,sa_badge_hard, sa_badge_master, sa_highest_badge,
-          arrangementProperties, capofret, centoffset, tuning
+          arrangementProperties, capofret, centoffset, tuning,
+          songLength, maxNotes, tempo
           from songs_owned, (
           SELECT count(*) as acount, count(distinct songkey) as songcount
             FROM songs_owned

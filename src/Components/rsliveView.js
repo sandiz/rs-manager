@@ -16,7 +16,7 @@ export function pad2(number) {
 }
 export function getMinutesSecs(time) {
   const minutes = Math.floor(time / 60);
-  const seconds = pad2(time - (minutes * 60));
+  const seconds = pad2(Math.round(time - (minutes * 60)));
   return ({ minutes, seconds });
 }
 export default class RSLiveView extends React.Component {
@@ -318,7 +318,7 @@ export default class RSLiveView extends React.Component {
       song: this.songkeyresults ? unescape(this.songkeyresults.song) : "",
       artist: this.songkeyresults ? unescape(this.songkeyresults.artist) : "",
       album: this.songkeyresults ? unescape(this.songkeyresults.album) : "",
-      timeTotal: this.lastsongdetail ? songDetails.songLength : 0,
+      timeTotal: this.songkeyresults ? this.songkeyresults.songLength : 0,
       timeCurrent: memoryReadout ? memoryReadout.songTimer : 0,
       songKey: memoryReadout ? memoryReadout.songID : "",
       currentStreak: memoryReadout ? memoryReadout.currentHitStreak : 0,
@@ -504,9 +504,9 @@ export default class RSLiveView extends React.Component {
   }
   render = () => {
     let { minutes, seconds } = getMinutesSecs(this.state.timeCurrent);
-    const timeCurrent = `${minutes}:${Math.round(seconds)}`;
+    const timeCurrent = `${minutes}:${seconds}`;
     ({ minutes, seconds } = getMinutesSecs(this.state.timeTotal));
-    const timeTotal = `${minutes}:${Math.round(seconds)}`;
+    const timeTotal = `${minutes}:${seconds}`;
     let progress = (this.state.timeCurrent / this.state.timeTotal) * 100;
     //eslint-disable-next-line
     if (isNaN(progress)) {
