@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types';
+import AnimatedNumber from 'react-animated-number';
 import {
   RemoteAll,
   unescapeFormatter, difficultyFormatter, difficultyClass, round100Formatter,
@@ -278,6 +279,21 @@ export default class RSLiveView extends React.Component {
   componentWillUnmount = async () => {
     this.stopTracking(false);
   }
+  animatedNumber = (number) => {
+    return (
+      <AnimatedNumber
+        component="span"
+        value={number}
+        style={{
+              transition: '1s ease-out',
+              transitionProperty:
+                  'background-color, color, opacity',
+          }}
+        duration={300}
+        stepPrecision={0}
+        />
+    );
+  }
   parseSongResults = async (songData) => {
     const { songDetails, memoryReadout } = songData;
     const tnh = memoryReadout ? memoryReadout.totalNotesHit : 0;
@@ -293,6 +309,9 @@ export default class RSLiveView extends React.Component {
     if (songDetails) {
       this.lastsongdetail = songDetails;
     }
+    const notesHit = memoryReadout ? memoryReadout.totalNotesHit : 0;
+    const notesMissed = memoryReadout ? memoryReadout.totalNotesMissed : 0;
+    const highestStreak = memoryReadout ? memoryReadout.highestHitStreak : 0;
     if (memoryReadout &&
       memoryReadout.songID.length > 0 &&
       memoryReadout.songID !== this.state.songKey) {
@@ -319,13 +338,13 @@ export default class RSLiveView extends React.Component {
       artist: this.songkeyresults ? unescape(this.songkeyresults.artist) : "",
       album: this.songkeyresults ? unescape(this.songkeyresults.album) : "",
       timeTotal: this.songkeyresults ? this.songkeyresults.songLength : 0,
+      totalNotes: memoryReadout && this.songkeyresults ? this.songkeyresults.maxNotes : 0,
       timeCurrent: memoryReadout ? memoryReadout.songTimer : 0,
       songKey: memoryReadout ? memoryReadout.songID : "",
       currentStreak: memoryReadout ? memoryReadout.currentHitStreak : 0,
-      highestStreak: memoryReadout ? memoryReadout.highestHitStreak : 0,
-      totalNotes: memoryReadout ? memoryReadout.TotalNotes : 0,
-      notesHit: memoryReadout ? memoryReadout.totalNotesHit : 0,
-      notesMissed: memoryReadout ? memoryReadout.totalNotesMissed : 0,
+      highestStreak,
+      notesHit,
+      notesMissed,
       albumArt: this.albumarturl,
     }, () => {
       if (memoryReadout && this.lastsongkey !== memoryReadout.songID) {
@@ -516,17 +535,24 @@ export default class RSLiveView extends React.Component {
     return (
       <div className="container-fluid">
         <div className="ta-center">
+          <a
+            onClick={() => {
+                  window.shell.openExternal("steam://run/221680");
+            }}
+            className="extraPadding download smallbutton">
+            steam://run/rocksmith
+          </a>
           {
             this.state.tracking ?
               <a
                 onClick={this.stopTracking}
-                className="extraPadding download">
+                className="extraPadding download smallbutton">
                 Stop Tracking
               </a>
               :
               <a
                 onClick={this.startTracking}
-                className="extraPadding download">
+                className="extraPadding download smallbutton">
                 Start Tracking
               </a>
           }
@@ -545,7 +571,18 @@ export default class RSLiveView extends React.Component {
                     Accuracy
                     <hr style={{ width: 65 + '%' }} />
                     <div style={{ fontSize: 35 + 'px', marginTop: -10 + 'px' }}>
-                      {this.state.accuracy}%
+                      <AnimatedNumber
+                        component="span"
+                        value={this.state.accuracy}
+                        style={{
+                          transition: '1s ease-out',
+                          transitionProperty:
+                            'background-color, color, opacity',
+                        }}
+                        duration={300}
+                        stepPrecision={2}
+                        formatValue={n => n.toFixed(2)}
+                      />%
                     </div>
                   </div>
                 </div>
@@ -554,7 +591,7 @@ export default class RSLiveView extends React.Component {
                     Current Streak
                     <hr style={{ width: 65 + '%' }} />
                     <div style={{ fontSize: 35 + 'px', marginTop: -10 + 'px' }}>
-                      {this.state.currentStreak}
+                      {this.animatedNumber(this.state.currentStreak)}
                     </div>
                   </div>
                 </div>
@@ -571,22 +608,21 @@ export default class RSLiveView extends React.Component {
                   Notes Hit
                   <hr />
                   <div style={{ marginTop: -10 + 'px' }}>
-                    {this.state.notesHit}
+                    {this.animatedNumber(this.state.notesHit)}
                   </div>
                 </div>
                 <div className="flex-div">
                   Notes Missed
                   <hr />
                   <div style={{ marginTop: -10 + 'px' }}>
-                    {this.state.notesMissed}
+                    {this.animatedNumber(this.state.notesMissed)}
                   </div>
                 </div>
                 <div className="flex-div">
                   Highest Streak
-
                   <hr />
                   <div style={{ marginTop: -10 + 'px' }}>
-                    {this.state.highestStreak}
+                    {this.animatedNumber(this.state.highestStreak)}
                   </div>
                 </div>
               </div>
