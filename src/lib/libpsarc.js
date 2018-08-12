@@ -241,9 +241,12 @@ async function processPSARC(psarcFile) {
         songDict.lastConversionTime = Object.prototype.hasOwnProperty.call(attr, "LastConversionDateTime") ? attr.LastConversionDateTime : "";
         songDict.id = Object.prototype.hasOwnProperty.call(attr, "PersistentID") ? attr.PersistentID : "";
         songDict.arrangementProperties = Object.prototype.hasOwnProperty.call(attr, "ArrangementProperties") ? JSON.stringify(attr.ArrangementProperties) : "";
-        songDict.capofret = Object.prototype.hasOwnProperty.call(attr, "CapoFret") ? attr.CapoFret : "";
-        songDict.centoffset = Object.prototype.hasOwnProperty.call(attr, "CentOffset") ? attr.CentOffset : "";
+        songDict.capofret = Object.prototype.hasOwnProperty.call(attr, "CapoFret") ? attr.CapoFret : 0;
+        songDict.centoffset = Object.prototype.hasOwnProperty.call(attr, "CentOffset") ? attr.CentOffset : 0;
         songDict.tuning = Object.prototype.hasOwnProperty.call(attr, "Tuning") ? JSON.stringify(attr.Tuning) : "";
+        songDict.tempo = Object.prototype.hasOwnProperty.call(attr, "SongAverageTempo") ? Math.round(attr.SongAverageTempo) : 0;
+        songDict.maxNotes = Object.prototype.hasOwnProperty.call(attr, "Score_MaxNotes") ? Math.round(attr.Score_MaxNotes) : 0;
+        songDict.songLength = Object.prototype.hasOwnProperty.call(attr, "SongLength") ? Math.round(attr.SongLength) : 0;
         arrangements.push(songDict)
       }
     }
@@ -271,7 +274,7 @@ async function extractFile(psarcFile, fileToExtract) {
       const key = keys[i];
       const value = entries[keys[i]];
       if (key === fileToExtract) {
-        filename = "/tmp/" + Date.now() + "_" + path.basename(fileToExtract)
+        filename = os.tmpdir() + Date.now() + "_" + path.basename(fileToExtract)
         await writeFile(filename, value)
       }
     }
