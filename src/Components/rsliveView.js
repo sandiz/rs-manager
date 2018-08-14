@@ -8,7 +8,9 @@ import {
 } from './songlistView';
 import SongDetailView from './songdetailView';
 import ChartView from './chartView';
-import { getSongBySongKey } from '../sqliteService'
+import { getSongBySongKey, initSongsOwnedDB, updateMasteryandPlayed } from '../sqliteService'
+import readProfile from '../steamprofileService';
+import getProfileConfig from '../configService';
 
 const albumArt = require('album-art');
 
@@ -495,6 +497,103 @@ export default class RSLiveView extends React.Component {
     }
     this.props.resetHeader(this.tabname);
   }
+  updateMastery = async () => {
+    const prfldb = await getProfileConfig();
+    if (prfldb === '' || prfldb === null) {
+      this.props.updateHeader(
+        this.tabname,
+        `No Profile found, please update it in Settings!`,
+      );
+      return;
+    }
+    if (this.state.songKey.length <= 0) { return }
+
+    if (prfldb.length > 0) {
+      this.props.updateHeader(
+        this.tabname,
+        `Decrypting ${window.path.basename(prfldb)}`,
+      );
+      const steamProfile = await readProfile(prfldb);
+      const stats = steamProfile.Stats.Songs;
+      const sastats = steamProfile.SongsSA;
+      await initSongsOwnedDB();
+      const output = await getSongBySongKey(this.state.songKey);
+      if (output.length === 0) { return; }
+      let keys = Object.keys(stats);
+      let updatedRows = 0;
+      const ids = []
+      output.forEach((element) => {
+        ids.push(element.id);
+      });
+      //find mastery stats
+      for (let i = 0; i < keys.length; i += 1) {
+        if (!ids.includes(keys[i])) { continue; }
+        const stat = stats[keys[i]];
+        const mastery = stat.MasteryPeak;
+        const played = stat.PlayedCount;
+        this.props.updateHeader(
+          this.tabname,
+          `Updating Stat for SongID:  ${keys[i]} (${i}/${keys.length})`,
+        );
+        // eslint-disable-next-line
+        const rows = await updateMasteryandPlayed(keys[i], mastery, played);
+        if (rows === 0) {
+          console.log("Missing ID: " + keys[i]);
+        }
+        updatedRows += rows;
+      }
+      //find score attack stats
+      keys = Object.keys(sastats);
+      for (let i = 0; i < keys.length; i += 1) {
+        if (!ids.includes(keys[i])) { continue; }
+        const stat = sastats[keys[i]];
+        let highestBadge = 0;
+        if (stat.Badges.Easy > 0) {
+          stat.Badges.Easy += 10;
+          highestBadge = stat.Badges.Easy;
+        }
+        if (stat.Badges.Medium > 0) {
+          stat.Badges.Medium += 20;
+          highestBadge = stat.Badges.Medium;
+        }
+        if (stat.Badges.Hard > 0) {
+          stat.Badges.Hard += 30;
+          highestBadge = stat.Badges.Hard;
+        }
+        if (stat.Badges.Master > 0) {
+          stat.Badges.Master += 40;
+          highestBadge = stat.Badges.Master;
+        }
+        this.props.updateHeader(
+          this.tabname,
+          `Updating Stat for SongID:  ${keys[i]} (${i}/${keys.length})`,
+        );
+        // eslint-disable-next-line
+        const rows = await updateScoreAttackStats(stat, highestBadge, keys[i]);
+        if (rows === 0) {
+          console.log("Missing ID: " + keys[i]);
+        }
+        updatedRows += rows;
+      }
+
+      this.props.updateHeader(
+        this.tabname,
+        `Stats maching songkey (${this.state.songKey}): ` + updatedRows,
+      );
+      if (this.state.tracking)
+      {
+        setTimeout(() => {
+          this.props.updateHeader(
+            this.tabname,
+            "Tracking: Active",
+          );
+        }, 5000);
+      }
+
+      // refresh view
+      this.refreshTable();
+    }
+  }
   handleTableChange = async (type, {
     page,
     sizePerPage,
@@ -532,6 +631,21 @@ export default class RSLiveView extends React.Component {
       progress = 0;
     }
     const albumartstyle = this.state.albumArt.length > 0 ? "" : "hidden";
+    //eslint-disable-next-line
+    const song = this.state.song.length > 0 ?
+      (this.state.song.length > 35 ?
+        this.state.song.substring(0, 35) + "..." : this.state.song)
+      : "N/A";
+    //eslint-disable-next-line
+    const artist = this.state.artist.length > 0 ?
+      (this.state.artist.length > 35 ?
+        this.state.artist.substring(0, 35) + "..." : this.state.artist)
+      : "N/A";
+    //eslint-disable-next-line
+    const album = this.state.album.length > 0 ?
+      (this.state.album.length > 35 ?
+        this.state.album.substring(0, 35) + "..." : this.state.album)
+      : "N/A";
     return (
       <div className="container-fluid">
         <div className="ta-center">
@@ -556,6 +670,11 @@ export default class RSLiveView extends React.Component {
                 Start Tracking
               </a>
           }
+          <a
+            onClick={this.updateMastery}
+            className="extraPadding download smallbutton">
+            Update Mastery
+          </a>
         </div>
         <br />
         <div className="row justify-content-md-center" style={{ marginTop: -30 + 'px' }}>
@@ -641,16 +760,16 @@ export default class RSLiveView extends React.Component {
             </span>
             <div style={{ marginTop: -6 + 'px', textAlign: 'left', marginLeft: 2 + 'px' }}>
               <span style={{ fontSize: 26 + 'px' }}>
-                {this.state.song.length > 0 ? this.state.song : "N/A"}
+                {song}
               </span>
               <br />
               <div style={{ marginTop: 19 + 'px' }}>
                 <span style={{ fontSize: 22 + 'px' }}>
-                  {this.state.artist.length > 0 ? this.state.artist : "N/A"}
+                  {artist}
                 </span>
                 <br />
                 <span style={{ fontSize: 22 + 'px' }}>
-                  {this.state.album.length > 0 ? this.state.album : "N/A"}
+                  {album}
                 </span>
               </div>
               <br />
