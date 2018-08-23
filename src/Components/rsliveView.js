@@ -12,7 +12,7 @@ import { getSongBySongKey, initSongsOwnedDB, updateMasteryandPlayed } from '../s
 import readProfile from '../steamprofileService';
 import getProfileConfig from '../configService';
 
-const albumArt = require('album-art');
+const albumArt = require('./../lib/album-art');
 
 export function pad2(number) {
   return (number < 10 ? '0' : '') + number
