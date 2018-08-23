@@ -2,7 +2,6 @@
 const aesjs = require('aes-js');
 const zlib = require('zlib')
 
-//eslint-disable-next-line
 const readFile = filePath => new Promise((resolve, reject) => {
   window.electronFS.readFile(filePath, (err, data) => {
     if (err) reject(err);
@@ -25,7 +24,6 @@ const keya = [
 export default async function readProfile(prfldb) {
   const data = await readFile(prfldb);
   //const unk1 = jspack.jspack.Unpack('<L', data.slice(16, 20));
-  //eslint-disable-next-line
   const aesEcb = new aesjs.ModeOfOperation.ecb(keya);
   const decrypted = aesEcb.decrypt(data.slice(20, data.length))
   //console.log(Buffer.from(keya).toString('hex'));
@@ -56,8 +54,9 @@ export async function getOwnedHistory(cookie) {
     'https://store.steampowered.com',
   );
 
-  //eslint-disable-next-line
-  const re1 = /<td class="wht_date">(.*)<\/td>.*<td data-tooltip-text="Click to get help with this purchase.*both">(.*)<\/div>.*<\/td>.*<td class="wht_type ">/gm
+  //const re1 = /<td class="wht_date">(.*)<\/td>.*
+  //<td data-tooltip-text="Click to get help with this purchase.*both">(.*)<\/div>.*<\/td>.*
+  //<td class="wht_type ">/gm
   try {
     const d = JSON.parse(c);
     const e = d.html.replace(/(\r\n\t|\n|\r\t)/gm, "").replace(/ +(?= )/g, '').replace(/\t/g, '');

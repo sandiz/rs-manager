@@ -309,31 +309,41 @@ export function tuningFormatter(cell, row) {
   }
   return <span>Custom</span>
 }
-//eslint-disable-next-line
-export const RemoteAll = ({ keyField, columns, data, page, sizePerPage, onTableChange, totalSize, rowEvents, paginate = true }) => (
-  <div>
-    <BootstrapTable
-      remote={{ pagination: true }}
-      keyField={keyField}
-      data={data}
-      columns={columns}
-      filter={filterFactory()}
-      pagination={!paginate ? null : paginationFactory({
-        page,
-        sizePerPage,
-        totalSize,
-        paginationSize: 10,
-        sizePerPageList: [],
-      })}
-      onTableChange={onTableChange}
-      classes="psarcTable"
-      hover
-      bordered={false}
-      rowEvents={rowEvents}
-      noDataIndication="No Songs"
-    />
-  </div>
-);
+export const RemoteAll = ({
+  keyField,
+  columns,
+  data,
+  page,
+  sizePerPage,
+  onTableChange,
+  totalSize,
+  rowEvents,
+  paginate = true,
+}) =>
+  (
+    <div>
+      <BootstrapTable
+        remote={{ pagination: true }}
+        keyField={keyField}
+        data={data}
+        columns={columns}
+        filter={filterFactory()}
+        pagination={!paginate ? null : paginationFactory({
+          page,
+          sizePerPage,
+          totalSize,
+          paginationSize: 10,
+          sizePerPageList: [],
+        })}
+        onTableChange={onTableChange}
+        classes="psarcTable"
+        hover
+        bordered={false}
+        rowEvents={rowEvents}
+        noDataIndication="No Songs"
+      />
+    </div>
+  );
 
 RemoteAll.propTypes = {
   data: PropTypes.array.isRequired,
@@ -341,6 +351,10 @@ RemoteAll.propTypes = {
   totalSize: PropTypes.number.isRequired,
   sizePerPage: PropTypes.number.isRequired,
   onTableChange: PropTypes.func.isRequired,
+  keyField: PropTypes.string.isRequired,
+  columns: PropTypes.array.isRequired,
+  rowEvents: PropTypes.func.isRequired,
+  paginate: PropTypes.bool.isRequired,
 };
 export default class SonglistView extends React.Component {
   constructor(props) {
@@ -619,7 +633,7 @@ export default class SonglistView extends React.Component {
           this.childtabname,
           `Updating Stat for SongID:  ${keys[i]} (${i}/${keys.length})`,
         );
-        // eslint-disable-next-line
+        /* loop await */ // eslint-disable-next-line
         const rows = await updateMasteryandPlayed(keys[i], mastery, played);
         if (rows === 0) {
           console.log("Missing ID: " + keys[i]);
@@ -652,7 +666,7 @@ export default class SonglistView extends React.Component {
           this.childtabname,
           `Updating Stat for SongID:  ${keys[i]} (${i}/${keys.length})`,
         );
-        // eslint-disable-next-line
+        /* loop await */ // eslint-disable-next-line
         const rows = await updateScoreAttackStats(stat, highestBadge, keys[i]);
         if (rows === 0) {
           console.log("Missing ID: " + keys[i]);
@@ -713,7 +727,7 @@ export default class SonglistView extends React.Component {
           this.childtabname,
           `Updating Favorite for SongKey:  ${stat} (${i}/${stats.length})`,
         );
-        // eslint-disable-next-line
+        /* loop await */ // eslint-disable-next-line
         const rows = await addToFavorites(stat);
         if (rows === 0) {
           console.log("Missing ID: " + stat);
@@ -839,10 +853,8 @@ export default class SonglistView extends React.Component {
   }
 }
 SonglistView.propTypes = {
-  // eslint-disable-next-line
   updateHeader: PropTypes.func,
-  // eslint-disable-next-line
-  resetHeader: PropTypes.func,
+  //resetHeader: PropTypes.func,
   handleChange: PropTypes.func,
 }
 SonglistView.defaultProps = {

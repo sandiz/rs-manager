@@ -1,11 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types';
 
-//eslint-disable-next-line
 export default class StatsTableView extends React.Component {
-  //eslint-disable-next-line
-  constructor(props) {
-    super(props);
+  testFunction = () => {
+    console.log("test");
   }
   render = () => {
     return (

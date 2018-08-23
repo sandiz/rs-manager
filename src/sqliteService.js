@@ -96,8 +96,7 @@ export async function addToSteamDLCCatalog(dlc, name, releaseDate) {
   // console.log("__db_call__: addToSteamDLCCatalog");
   let sqlstr = ";";
   let date = Date.parse(releaseDate);
-  //eslint-disable-next-line
-  if (isNaN(date)) { date = 0; }
+  if (Number.isNaN(date)) { date = 0; }
   const owned = false;
   sqlstr += `REPLACE INTO songs_available (appid, name, release_date, owned) VALUES ('${dlc}',"${name}", ${date}, '${owned}');`
   //});
@@ -258,7 +257,6 @@ export default async function updateSongsOwned(psarcResult) {
   album='${album}' AND artist='${artist}' AND arrangement='${arrangement}'`;
   const op = await db.all(sqlstr);
   if (op.length > 0) {
-    //eslint-disable-next-line
     mastery = op[0].mastery === null ? 0 : op[0].mastery;
     count = op[0].count === null ? 0 : op[0].count;
   }
@@ -559,7 +557,7 @@ export async function removeSongFromSetlist(dbname, song, artist, album) {
   for (let i = 0; i < op.length; i += 1) {
     const uniq = op[i].uniqkey;
     sql = `DELETE FROM '${dbname}' where uniqkey='${uniq}';`
-    //eslint-disable-next-line
+    /* loop await */ //eslint-disable-next-line
     await db.all(sql);
   }
 }
@@ -570,7 +568,7 @@ export async function saveSongToSetlist(setlist, song, artist) {
   for (let i = 0; i < op.length; i += 1) {
     const uniq = op[i].uniqkey;
     sql = `replace into '${setlist}' values ('${uniq}')`;
-    //eslint-disable-next-line
+    /* loop await */ //eslint-disable-next-line
     await db.run(sql)
   }
 }

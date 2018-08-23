@@ -286,7 +286,7 @@ export default class SetlistView extends React.Component {
           this.lastChildID,
           `Updating Stat for SongID:  ${keys[i]} (${i}/${keys.length})`,
         );
-        // eslint-disable-next-line
+        /* loop await */ // eslint-disable-next-line
         const rows = await updateMasteryandPlayed(keys[i], mastery, played);
         if (rows === 0) {
           console.log("Missing ID: " + keys[i]);
@@ -392,7 +392,7 @@ export default class SetlistView extends React.Component {
           this.lastChildID,
           `Updating Favorite for SongKey:  ${stat} (${i}/${stats.length})`,
         );
-        // eslint-disable-next-line
+        /* loop await */ // eslint-disable-next-line
         const rows = await addToFavorites(stat);
         if (rows === 0) {
           console.log("Missing ID: " + stat);
@@ -497,20 +497,16 @@ export default class SetlistView extends React.Component {
   }
 }
 SetlistView.propTypes = {
-  // eslint-disable-next-line
-  currentTab: PropTypes.object,
-  // eslint-disable-next-line
+  //currentTab: PropTypes.object,
   currentChildTab: PropTypes.object,
-  // eslint-disable-next-line
   updateHeader: PropTypes.func,
-  // eslint-disable-next-line
-  resetHeader: PropTypes.func,
+  //resetHeader: PropTypes.func,
   handleChange: PropTypes.func,
 }
 SetlistView.defaultProps = {
-  currentTab: null,
+  //currentTab: null,
   currentChildTab: null,
   updateHeader: () => { },
-  resetHeader: () => { },
+  //resetHeader: () => { },
   handleChange: () => { },
 }

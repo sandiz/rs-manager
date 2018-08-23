@@ -74,8 +74,7 @@ export default class ChartView extends React.Component {
       const jsonObj = await songData.json();
       console.log(jsonObj)
 
-      if (jsonObj.memoryReadout && jsonObj.memoryReadout.songTimer > 0)
-      {
+      if (jsonObj.memoryReadout && jsonObj.memoryReadout.songTimer > 0) {
         const { memoryReadout } = jsonObj;
         if (typeof memoryReadout === 'undefined') { return; }
         if (this.lastsongid !== memoryReadout.songID) {
@@ -93,8 +92,7 @@ export default class ChartView extends React.Component {
           (tnh + tnm);
         accuracy *= 100;
 
-        //eslint-disable-next-line
-        if (isNaN(accuracy)) {
+        if (Number.isNaN(accuracy)) {
           accuracy = 0;
         }
         const notesRandom = jsonObj.memoryReadout.totalNotesMissed;
@@ -163,15 +161,12 @@ export default class ChartView extends React.Component {
   }
 }
 ChartView.propTypes = {
-  //eslint-disable-next-line
   timeTotal: PropTypes.number,
-  //eslint-disable-next-line
-  startTrack: PropTypes.bool,
-  //eslint-disable-next-line
-  stopTrack: PropTypes.bool,
+  //startTrack: PropTypes.bool,
+  //stopTrack: PropTypes.bool,
 }
 ChartView.defaultProps = {
   timeTotal: 0,
-  startTrack: false,
-  stopTrack: false,
+  //startTrack: false,
+  //stopTrack: false,
 }

@@ -209,9 +209,9 @@ export default class PSARCView extends React.Component {
       files: [],
     });
     this.processedFiles = [];
-    // eslint-disable-next-line
-    for (const prObj of results) {
-      // eslint-disable-next-line
+    for (let i = 0; i < results.length; i += 1) {
+      const prObj = results[i];
+      /* loop await */ // eslint-disable-next-line
       const currentResults = await readPSARC(prObj[0], prObj[1], (500 + (index * 100)))
       if (currentResults === null || currentResults === 'undefined' || currentResults.length === 0) {
         this.props.updateHeader(this.tabname, "Failed to read " + path.basename(prObj[0]));
@@ -277,7 +277,7 @@ export default class PSARCView extends React.Component {
         continue;
       }
       count += 1
-      // eslint-disable-next-line
+      /* loop await */ // eslint-disable-next-line
       await updateSongsOwned(this.state.files[i]);
     }
     await saveSongsOwnedDB();
@@ -497,13 +497,12 @@ export default class PSARCView extends React.Component {
   }
 }
 PSARCView.propTypes = {
-  //eslint-disable-next-line
-  currentTab: PropTypes.object,
+  //currentTab: PropTypes.object,
   updateHeader: PropTypes.func,
   //resetHeader: PropTypes.func,
 }
 PSARCView.defaultProps = {
-  currentTab: null,
+  //currentTab: null,
   updateHeader: () => { },
   //resetHeader: () => { },
 }

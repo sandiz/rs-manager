@@ -193,7 +193,6 @@ export default class SongDetailView extends React.Component {
               Playthrough Video
             </a>
             {
-              //eslint-disable-next-line
               this.props.isWeekly ? "" :
                 this.props.isSongpack ?
                   <a
