@@ -36,7 +36,6 @@ const unzip = data => new Promise((resolve, reject) => {
     }
   });
 });
-//eslint-disable-next-line
 const mod = (x, n) => (x % n + n) % n
 
 function pad(buffer, blocksize = 16) {
@@ -47,7 +46,6 @@ function pad(buffer, blocksize = 16) {
 function aesBomDecrypt(buffer) {
   const key = aesjs.utils.hex.toBytes(ARC_KEY)
   const iv = aesjs.utils.hex.toBytes(ARC_IV)
-  //eslint-disable-next-line
   const aescfb = new aesjs.ModeOfOperation.cfb(key, iv, 16);
   return aescfb.decrypt(buffer)
 }
@@ -56,7 +54,6 @@ async function aesPsarcDecrypt(data, key) {
   key = aesjs.utils.hex.toBytes(key)
   const quanta = data.slice(24, data.length - 56)
 
-  //eslint-disable-next-line
   const aesCtr = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(iv));
   const decrypted = aesCtr.decrypt(pad(quanta));
   //const length = new Uint32Array(decrypted.slice(0, 4))
@@ -139,13 +136,10 @@ async function readEntry(fd, idx, bomentries) {
     const z = zlength[i]
     if (length === entrylength) { break; }
 
-    //eslint-disable-next-line
     let buf = Buffer.alloc(z === 0 ? BLOCK_SIZE : z)
-    //eslint-disable-next-line
     let { bytesRead, buffer } = await readFD(fd, buf, 0, z === 0 ? BLOCK_SIZE : z, entryoffset)
     entryoffset += (z === 0 ? BLOCK_SIZE : z)
     try {
-      //eslint-disable-next-line
       buffer = await unzip(buffer)
     }
     catch (E) {
@@ -174,7 +168,6 @@ async function readPsarc(psarcFile, fastRead = true) {
     for (let i = 1; i < bomentries.entries.length; i += 1) {
       if (fastRead) {
         if (listing[i - 1].includes("json")) {
-          //eslint-disable-next-line
           const c = await readEntry(fd, i, bomentries)
           contents.push(c)
         }
@@ -183,7 +176,6 @@ async function readPsarc(psarcFile, fastRead = true) {
         }
       }
       else {
-        //eslint-disable-next-line
         const c = await readEntry(fd, i, bomentries)
         contents.push(c)
       }
@@ -196,7 +188,6 @@ async function readPsarc(psarcFile, fastRead = true) {
           continue;
         }
       }
-      //eslint-disable-next-line
       const decrypted = await decryptPsarc(listing[i], contents[i])
       entries[listing[i]] = decrypted;
     }

@@ -69,7 +69,6 @@ export default class SettingsView extends React.Component {
             textAlign: 'right',
           }}>
             {
-              //eslint-disable-next-line
               this.state.processingSetlist ? "Processing..." :
                 (
                   this.state.setlistImported[i] ?
@@ -137,7 +136,7 @@ export default class SettingsView extends React.Component {
       for (let i = 0; i < currentSetlist.length; i += 1) {
         const songkey = currentSetlist[i];
         this.props.updateHeader(this.tabname, `Importing Song List ${setlistnum + 1}: ${i}/${currentSetlist.length}`);
-        //eslint-disable-next-line
+        /* loop await */ // eslint-disable-next-line
         await addtoRSSongList(tablename, songkey);
       }
       //set header with success + stats
@@ -162,7 +161,7 @@ export default class SettingsView extends React.Component {
     const setliststatus = []
     for (let i = 0; i <= 5; i += 1) {
       const tablename = "rs_song_list_" + (i + 1);
-      //eslint-disable-next-line
+      /* loop await */ // eslint-disable-next-line
       setliststatus[i] = await isTablePresent(tablename);
     }
     this.setState({
@@ -205,10 +204,8 @@ export default class SettingsView extends React.Component {
     this.props.updateHeader(this.tabname, "Songs Owned collection is now reset!");
   }
   enterCookie = async () => {
-    //eslint-disable-next-line
-    //const d = prompt("Please enter value of steamLoginSecure cookie");
-    //eslint-disable-next-line
-    const d = await window.prompt({
+    const prompt = window.prompt;
+    const d = await prompt({
       title: 'Please enter value of steamLoginSecure cookie',
       label: 'steamLoginSecure:',
       value: '',
@@ -433,16 +430,14 @@ export default class SettingsView extends React.Component {
 SettingsView.propTypes = {
   currentTab: PropTypes.object,
   handleChange: PropTypes.func,
-  // eslint-disable-next-line
   updateHeader: PropTypes.func,
-  // eslint-disable-next-line
-  resetHeader: PropTypes.func,
+  //resetHeader: PropTypes.func,
   refreshTabs: PropTypes.func,
 }
 SettingsView.defaultProps = {
   currentTab: null,
   handleChange: () => { },
   updateHeader: () => { },
-  resetHeader: () => { },
+  //resetHeader: () => { },
   refreshTabs: () => { },
 }

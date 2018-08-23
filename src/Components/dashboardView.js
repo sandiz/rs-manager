@@ -85,20 +85,16 @@ export default class DashboardView extends React.Component {
   }
   getStatsWidth = (input, min, max) => {
     const w = ((input - min) * 100) / (max - min);
-    //eslint-disable-next-line
-    if (isNaN(w)) { return 0; }
+    if (Number.isNaN(w)) { return 0; }
     return w;
   }
   convertMS = (ms) => {
-    //eslint-disable-next-line
-    let d, h, m, s;
-    s = Math.floor(ms / 1000);
-    m = Math.floor(s / 60);
+    let s = Math.floor(ms / 1000);
+    let m = Math.floor(s / 60);
     s %= 60;
-    h = Math.floor(m / 60);
+    let h = Math.floor(m / 60);
     m %= 60;
-    //eslint-disable-next-line
-    d = Math.floor(h / 24);
+    const d = Math.floor(h / 24);
     h %= 24;
     return {
       d, h, m, s,
@@ -256,8 +252,8 @@ export default class DashboardView extends React.Component {
     for (let i = 0; i < posts.length; i += 1) {
       const post = posts[i].data;
       if (post.stickied && post.title.includes("Weekly Song Spotlight")) {
-        //eslint-disable-next-line
-        weekly.title = post.title.split(":")[1];
+        const [keyIgnored, value] = post.title.split(":");
+        weekly.title = value;
         weekly.url = post.url;
       }
     }
@@ -298,7 +294,7 @@ export default class DashboardView extends React.Component {
           this.tabname,
           `Updating Stat for SongID:  ${keys[i]} (${i}/${keys.length})`,
         );
-        // eslint-disable-next-line
+        /* loop await */ // eslint-disable-next-line
         const rows = await updateMasteryandPlayed(keys[i], mastery, played);
         if (rows === 0) {
           console.log("Missing ID: " + keys[i]);
@@ -331,7 +327,7 @@ export default class DashboardView extends React.Component {
           this.childtabname,
           `Updating Stat for SongID:  ${keys[i]} (${i}/${keys.length})`,
         );
-        // eslint-disable-next-line
+        /* loop await */ // eslint-disable-next-line
         const rows = await updateScoreAttackStats(stat, highestBadge, keys[i]);
         if (rows === 0) {
           console.log("Missing ID: " + keys[i]);
@@ -620,17 +616,14 @@ export default class DashboardView extends React.Component {
   }
 }
 DashboardView.propTypes = {
-  // eslint-disable-next-line
-  currentTab: PropTypes.object,
-  // eslint-disable-next-line
+  //currentTab: PropTypes.object,
   updateHeader: PropTypes.func,
-  // eslint-disable-next-line
-  resetHeader: PropTypes.func,
+  //resetHeader: PropTypes.func,
   handleChange: PropTypes.func,
 }
 DashboardView.defaultProps = {
-  currentTab: null,
+  //currentTab: null,
   updateHeader: () => { },
-  resetHeader: () => { },
+  //resetHeader: () => { },
   handleChange: () => { },
 }

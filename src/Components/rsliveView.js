@@ -287,13 +287,13 @@ export default class RSLiveView extends React.Component {
         component="span"
         value={number}
         style={{
-              transition: '1s ease-out',
-              transitionProperty:
-                  'background-color, color, opacity',
-          }}
+          transition: '1s ease-out',
+          transitionProperty:
+            'background-color, color, opacity',
+        }}
         duration={300}
         stepPrecision={0}
-        />
+      />
     );
   }
   parseSongResults = async (songData) => {
@@ -304,8 +304,7 @@ export default class RSLiveView extends React.Component {
       (tnh + tnm);
     accuracy *= 100;
 
-    //eslint-disable-next-line
-    if (isNaN(accuracy)) {
+    if (Number.isNaN(accuracy)) {
       accuracy = 0;
     }
     if (songDetails) {
@@ -318,12 +317,10 @@ export default class RSLiveView extends React.Component {
       memoryReadout.songID.length > 0 &&
       memoryReadout.songID !== this.state.songKey) {
       const skr = await getSongBySongKey(memoryReadout.songID);
-      //eslint-disable-next-line
       if (skr.length > 0) this.songkeyresults = skr[0];
     }
     if (this.songkeyresults && this.lastalbumname !== unescape(this.songkeyresults.album)) {
-      try
-      {
+      try {
         this.albumarturl = await albumArt(
           unescape(this.songkeyresults.artist),
           { album: unescape(this.songkeyresults.album), size: 'large' },
@@ -408,8 +405,7 @@ export default class RSLiveView extends React.Component {
   }
   fetchRSSniffer = async () => {
     this.fetchrstimer = setInterval(async () => {
-      try
-      {
+      try {
         const songData = await window.fetch("http://127.0.0.1:9938");
         if (!songData) return;
         if (typeof songData === 'undefined') { return; }
@@ -535,7 +531,7 @@ export default class RSLiveView extends React.Component {
           this.tabname,
           `Updating Stat for SongID:  ${keys[i]} (${i}/${keys.length})`,
         );
-        // eslint-disable-next-line
+        /*loop await */ // eslint-disable-next-line
         const rows = await updateMasteryandPlayed(keys[i], mastery, played);
         if (rows === 0) {
           console.log("Missing ID: " + keys[i]);
@@ -568,7 +564,7 @@ export default class RSLiveView extends React.Component {
           this.tabname,
           `Updating Stat for SongID:  ${keys[i]} (${i}/${keys.length})`,
         );
-        // eslint-disable-next-line
+        /* loop await */ // eslint-disable-next-line
         const rows = await updateScoreAttackStats(stat, highestBadge, keys[i]);
         if (rows === 0) {
           console.log("Missing ID: " + keys[i]);
@@ -580,8 +576,7 @@ export default class RSLiveView extends React.Component {
         this.tabname,
         `Stats maching songkey (${this.state.songKey}): ` + updatedRows,
       );
-      if (this.state.tracking)
-      {
+      if (this.state.tracking) {
         setTimeout(() => {
           this.props.updateHeader(
             this.tabname,
@@ -626,22 +621,18 @@ export default class RSLiveView extends React.Component {
     ({ minutes, seconds } = getMinutesSecs(this.state.timeTotal));
     const timeTotal = `${minutes}:${seconds}`;
     let progress = (this.state.timeCurrent / this.state.timeTotal) * 100;
-    //eslint-disable-next-line
-    if (isNaN(progress)) {
+    if (Number.isNaN(progress)) {
       progress = 0;
     }
     const albumartstyle = this.state.albumArt.length > 0 ? "" : "hidden";
-    //eslint-disable-next-line
     const song = this.state.song.length > 0 ?
       (this.state.song.length > 35 ?
         this.state.song.substring(0, 35) + "..." : this.state.song)
       : "N/A";
-    //eslint-disable-next-line
     const artist = this.state.artist.length > 0 ?
       (this.state.artist.length > 35 ?
         this.state.artist.substring(0, 35) + "..." : this.state.artist)
       : "N/A";
-    //eslint-disable-next-line
     const album = this.state.album.length > 0 ?
       (this.state.album.length > 35 ?
         this.state.album.substring(0, 35) + "..." : this.state.album)
@@ -651,7 +642,7 @@ export default class RSLiveView extends React.Component {
         <div className="ta-center">
           <a
             onClick={() => {
-                  window.shell.openExternal("steam://run/221680");
+              window.shell.openExternal("steam://run/221680");
             }}
             className="extraPadding download smallbutton">
             steam://run/rocksmith
@@ -834,13 +825,12 @@ export default class RSLiveView extends React.Component {
   }
 }
 RSLiveView.propTypes = {
-  //eslint-disable-next-line
-  currentTab: PropTypes.object,
+  //currentTab: PropTypes.object,
   updateHeader: PropTypes.func,
   resetHeader: PropTypes.func,
 }
 RSLiveView.defaultProps = {
-  currentTab: null,
+  //currentTab: null,
   updateHeader: () => { },
   resetHeader: () => { },
 }

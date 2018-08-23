@@ -180,10 +180,9 @@ class App extends Component {
   }
   updateChildHeader = (tabname, childname, text) => {
     if (tabname === null || this.state.currentChildTab === null) {
-      //eslint-disable-next-line
       return;
     }
-    else if (tabname === this.state.currentTab.id && childname === this.state.currentChildTab.id) {
+    if (tabname === this.state.currentTab.id && childname === this.state.currentChildTab.id) {
       this.setState({ appTitle: text });
     }
   }

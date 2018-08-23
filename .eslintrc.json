@@ -23,10 +23,15 @@
         "no-continue": "off",
         "no-fallthrough": "off",
         "no-unreachable": "warn",
+        "prefer-destructuring": "off",
+        "no-nested-ternary": "off",
+        "new-cap": "off",
         "no-unused-vars": [
             "error",
             {
-                "args": "none"
+                "args": "none",
+                "argsIgnorePattern": "^_",
+                "varsIgnorePattern": "[iI]gnored"
             }
         ],
         "constructor-super": "warn",

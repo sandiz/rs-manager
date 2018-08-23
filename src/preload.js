@@ -24,15 +24,12 @@ const exp = express()
 window.PROD_YT_PORT = 8000;
 window.DEV_YT_PORT = 9000;
 window.YT_PORT = isDev ? window.DEV_YT_PORT : window.PROD_YT_PORT;
-//eslint-disable-next-line
 window.path = null;
 
 if (window.os.platform() === 'win32') {
-    //eslint-disable-next-line
     window.path = require("path").win32;
 }
 else {
-    //eslint-disable-next-line
     window.path = require("path");
 }
 

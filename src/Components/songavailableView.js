@@ -170,18 +170,17 @@ export default class SongAvailableView extends React.Component {
     let error = false;
     for (let i = 0; i < e.length; i += 1) {
       const dlc = e[i];
-      //eslint-disable-next-line
+      /* loop await */ // eslint-disable-next-line
       if (await isDLCInDB(dlc)) {
         console.log("skipping dlc with appid: " + dlc)
         continue;
       }
       else {
-        //eslint-disable-next-line
         let f = null;
         try {
-          //eslint-disable-next-line
+          /* loop await */ // eslint-disable-next-line
           f = await window.fetch(`https://store.steampowered.com/api/appdetails/?appids=${dlc}&cc=us&l=english&v=1`);
-          //eslint-disable-next-line
+          /* loop await */ // eslint-disable-next-line
           const g = await f.json()
           const h = replaceRocksmithTerms(decodeURIComponent(g[dlc].data.name))
           const r = g[dlc].data.release_date.date
@@ -190,7 +189,7 @@ export default class SongAvailableView extends React.Component {
             this.childtabname,
             `Adding DLC AppID: ${dlc} Name: ${h}`,
           );
-          //eslint-disable-next-line
+          /* loop await */ // eslint-disable-next-line
           await addToSteamDLCCatalog(dlc, h, r);
           newDLC += 1;
         }
@@ -224,7 +223,6 @@ export default class SongAvailableView extends React.Component {
     this.setState({ dlcs: output, page: 1, totalSize: output[0].acount });
   }
   updateAcquiredDates = async (tuples) => {
-    //eslint-disable-next-line
     const songpacks = []
     let songsupdated = 0;
     for (let i = 0; i < tuples.length; i += 1) {
@@ -237,7 +235,7 @@ export default class SongAvailableView extends React.Component {
         `Updating acquired date for ` + itemname,
       )
       //TODO: try artist/song split if not found, potential gotcha: london calling the clash
-      //eslint-disable-next-line
+      /* loop await */ // eslint-disable-next-line
       const res = await updateAcquiredDate(Date.parse(date), itemname);
       songsupdated += res;
       if (res === 0) { console.log("failed to update for", itemname); }
@@ -256,7 +254,7 @@ export default class SongAvailableView extends React.Component {
         this.childtabname,
         `Trying to find songpack items for ` + replaceRocksmithTerms(data[1]),
       )
-      //eslint-disable-next-line
+      /* loop await */ // eslint-disable-next-line
       let appop = await getAppID(itemname);
       if (typeof appop === 'undefined') { console.log("no entry for ", itemname); continue }
       let appid = parseInt(appop.appid, 10)
@@ -272,10 +270,10 @@ export default class SongAvailableView extends React.Component {
           appid += 1
         }
         else { appid -= 1; }
-        //eslint-disable-next-line
+        /* loop await */ // eslint-disable-next-line
         const op = await countAppID(appid, apprd)
         if (op.count > 0 && !op.name.includes("Song Pack") && idx <= max) {
-          //eslint-disable-next-line
+          /* loop await */ // eslint-disable-next-line
           const changes = await updateAcquiredDateByAppID(appid, Date.parse(date))
           //console.log("valid appid", appid, op.name, changes);
         }
@@ -333,7 +331,7 @@ export default class SongAvailableView extends React.Component {
     }
     for (let i = 0; i < totalPackages.length; i += 1) {
       const pid = totalPackages[i];
-      //eslint-disable-next-line
+      /* loop await */ // eslint-disable-next-line
       await updateOwnedInDB(pid);
       this.props.updateHeader(
         this.tabname,
@@ -408,7 +406,6 @@ export default class SongAvailableView extends React.Component {
       sortOrder === null ? "desc" : sortOrder,
       (owned === true || owned === false ||
         this.search.value === "owned" || this.search.value === "available") ? "" : this.search.value,
-      //eslint-disable-next-line
       (this.search.value === "owned") ? 'true' : this.search.value === 'available' ? 'false' : owned,
     )
     if (output.length > 0) {
@@ -486,15 +483,12 @@ export default class SongAvailableView extends React.Component {
 }
 
 SongAvailableView.propTypes = {
-  // eslint-disable-next-line
   updateHeader: PropTypes.func,
-  // eslint-disable-next-line
-  resetHeader: PropTypes.func,
-  // eslint-disable-next-line
-  handleChange: PropTypes.func,
+  //resetHeader: PropTypes.func,
+  //handleChange: PropTypes.func,
 }
 SongAvailableView.defaultProps = {
   updateHeader: () => { },
-  resetHeader: () => { },
-  handleChange: () => { },
+  //resetHeader: () => { },
+  //handleChange: () => { },
 }
