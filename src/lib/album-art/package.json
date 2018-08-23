@@ -1,0 +1,45 @@
+{
+  "name": "album-art",
+  "version": "2.0.1",
+  "description": "Fetch the cover art for an artist or album: The Beatles ➔ http://path/to/beatles.jpg",
+  "license": "MIT",
+  "main": "index.js",
+  "browser": "index.js",
+  "repository": "lacymorrow/album-art",
+  "bin": {
+    "album-art": "cli.js"
+  },
+  "author": {
+    "name": "Lacy Morrow",
+    "email": "me@lacymorrow.com",
+    "url": "http://lacymorrow.com"
+  },
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "scripts": {
+    "test": "ava"
+  },
+  "files": [
+    "cli.js",
+    "index.js"
+  ],
+  "keywords": [
+    "cli",
+    "bin",
+    "app",
+    "album",
+    "art",
+    "image",
+    "url",
+    "uri",
+    "path"
+  ],
+  "devDependencies": {
+    "ava": "^0.25.0"
+  },
+  "dependencies": {
+    "meow": "^4.0.0",
+    "node-fetch": "^2.1.2"
+  }
+}

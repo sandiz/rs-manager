@@ -353,9 +353,13 @@ RemoteAll.propTypes = {
   onTableChange: PropTypes.func.isRequired,
   keyField: PropTypes.string.isRequired,
   columns: PropTypes.array.isRequired,
-  rowEvents: PropTypes.func.isRequired,
-  paginate: PropTypes.bool.isRequired,
+  rowEvents: PropTypes.object,
+  paginate: PropTypes.bool,
 };
+RemoteAll.defaultProps = {
+  paginate: false,
+  rowEvents: null,
+}
 export default class SonglistView extends React.Component {
   constructor(props) {
     super(props);
