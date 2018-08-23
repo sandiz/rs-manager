@@ -92,6 +92,9 @@ a:focus {
   transform-origin: bottom left;
   outline: 0.5px solid black;
   opacity: 0.92;
+  position: sticky;
+  height: 100vh;
+  top: 0;
 }
 
 #sidebar.active {
