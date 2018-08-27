@@ -357,8 +357,8 @@ RemoteAll.propTypes = {
   paginate: PropTypes.bool,
 };
 RemoteAll.defaultProps = {
-  paginate: false,
-  rowEvents: null,
+  paginate: true,
+  rowEvents: {},
 }
 export default class SonglistView extends React.Component {
   constructor(props) {
