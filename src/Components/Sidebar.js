@@ -43,7 +43,7 @@ export default class Sidebar extends React.Component {
     tabsList = this.props.TabsData.map((tab, index) => {
       const { platform } = tab;
       if (typeof platform !== 'undefined' && platform.length > 0 && window.os.platform() !== platform) {
-        //return null;
+        return null;
       }
       let ulclassList = '';
       if (this.state.currentTab === tab.id) {
@@ -64,7 +64,7 @@ export default class Sidebar extends React.Component {
           <a
             onClick={() => this.toggleActive(tab)}
             className={tab.child.length > 0 ? 'dropdown-toggle' : ''}
-            data-toggle={tab.child.length > 0 ? 'collapse' : ''}>{tab.name}</a>
+            data-toggle={tab.child.length > 0 ? 'collapse' : ''}>{tab.name} <sup>{tab.tag}</sup></a>
           <ul
             className={this.state.expandedTabs.indexOf(tab.id) !== -1
               ? this.expandedClass : this.collapseClass}>
@@ -72,7 +72,7 @@ export default class Sidebar extends React.Component {
               tab.child.map((childtab, index2) => {
                 return (
                   <li key={`child-key-${childtab.id}`}>
-                    <a className={this.state.currentTab === tab.id && this.state.currentChildTab === childtab.id ? 'activeChildTab' : 'inactiveChildTab'} onClick={() => this.setChildActive(tab, childtab)}>{childtab.name}</a>
+                    <a className={this.state.currentTab === tab.id && this.state.currentChildTab === childtab.id ? 'activeChildTab' : 'inactiveChildTab'} onClick={() => this.setChildActive(tab, childtab)}>{childtab.name}</a><sup>{childtab.tag}</sup>
                   </li>
                 );
               })

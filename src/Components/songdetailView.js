@@ -12,7 +12,12 @@ export default class SongDetailView extends React.Component {
       mvurl: '',
       setlists: [],
       currentSetlist: '',
+      ptindex: 0,
+      mvindex: 0,
+      ptresults: null,
+      mvresults: null,
     }
+    this.maxResults = 10;
     this.modal_div = null;
     this.ptplayer = null
     this.mvplayer = null
@@ -34,7 +39,6 @@ export default class SongDetailView extends React.Component {
   componentDidUpdate = () => {
     if (this.modal_div) { this.modal_div.scrollTop = 0 }
   }
-
   onKeyUp = (e) => {
     console.log(e.KeyCode);
   }
@@ -44,12 +48,36 @@ export default class SongDetailView extends React.Component {
       part: 'snippet',
       key: 'AIzaSyAQPZZZVEH-lUTRuN4l2XF-zUB25eR45zo',
       q: searchterm,
+      maxResults: this.maxResults,
     };
     const output = await window.request(url, '', '', params);
     const entries = JSON.parse(output);
+    switch (divID) {
+      case "div_playthrough":
+        this.setState({
+          ptresults: entries.items,
+        }, () => {
+          console.log(this.state.ptresults)
+          this.chooseVideo(divID, 0);
+        });
+        break;
+      case "div_musicvideo":
+        this.setState({
+          mvresults: entries.items,
+        }, () => {
+          console.log(this.state.mvresults)
+          this.chooseVideo(divID, 0);
+        });
+        break;
+      default:
+        break;
+    }
+  }
+  chooseVideo = async (divID, index) => {
     let vid = '';
-    if (entries.items.length > 0) {
-      const result = entries.items[0];
+    const results = divID === "div_playthrough" ? this.state.ptresults : this.state.mvresults;
+    if (results.length > 0) {
+      const result = results[index];
       vid = result.id.videoId;
     }
     const yturl = `http://localhost:${window.YT_PORT}/yt/` + vid
@@ -58,12 +86,14 @@ export default class SongDetailView extends React.Component {
       case "div_playthrough":
         this.setState({
           pturl: yturl,
+          ptindex: index,
         });
         if (this.ptplayer) { this.ptplayer.src = yturl; this.mvplayer.src = ""; }
         break;
       case "div_musicvideo":
         this.setState({
           mvurl: yturl,
+          mvindex: index,
         });
         break;
       default:
@@ -83,7 +113,6 @@ export default class SongDetailView extends React.Component {
     this.props.close();
     this.enableScroll();
   }
-
   addToSetlist = async (e) => {
     const { song, artist } = this.props;
     await saveSongToSetlist(this.state.currentSetlist, unescape(song), unescape(artist));
@@ -116,6 +145,21 @@ export default class SongDetailView extends React.Component {
     document.getElementsByTagName("html")[0].style.height = "100%";
     document.getElementsByTagName("html")[0].style.overflow = "inherit";
   }
+  showPrevVideo = (divID) => {
+    const index = divID === "div_playthrough" ? this.state.ptindex : this.state.mvindex;
+    if (index <= 0) {
+      return;
+    }
+    this.chooseVideo(divID, index - 1);
+  }
+  showNextVideo = (divID) => {
+    const results = divID === "div_playthrough" ? this.state.ptresults : this.state.mvresults;
+    const index = divID === "div_playthrough" ? this.state.ptindex : this.state.mvindex;
+    if (index >= results.length - 1) {
+      return;
+    }
+    this.chooseVideo(divID, index + 1);
+  }
   render = () => {
     const setlistyle = "extraPadding download " + (this.props.isSetlist ? "" : "hidden");
     const songlistanddashstyle = "extraPadding download " + (this.props.isSongview ? "" : "hidden");
@@ -124,6 +168,21 @@ export default class SongDetailView extends React.Component {
     const mvstyle = "extraPadding download " + (!this.state.showMusicVideo ? "" : "isDisabled");
     const ptdivstyle = this.state.showPlaythrough ? "dblock" : "hidden";
     const mvdivstyle = this.state.showMusicVideo ? "dblock" : "hidden";
+    let showleftarrow = '';
+    let showrightarrow = '';
+    let yttitle = "";
+    if (this.state.showPlaythrough && this.state.ptresults !== null) {
+      yttitle = this.state.ptindex < this.state.ptresults.length ?
+        this.state.ptresults[this.state.ptindex].snippet.title + " - " + this.state.ptresults[this.state.ptindex].snippet.channelTitle : ""
+      yttitle = "(" + (this.state.ptindex + 1) + "/" + this.state.ptresults.length + ") " + yttitle
+      showleftarrow = this.state.ptindex <= 0 ? "hidden" : "dblock";
+      showrightarrow = this.state.ptindex >= this.state.ptresults.length - 1 ? "hidden" : "dblock";
+    }
+    else if (this.state.showMusicVideo && this.state.mvresults !== null) {
+      yttitle = this.state.mvindex < this.state.mvresults.length ?
+        this.state.mvresults[this.state.mvindex].snippet.title + " - " + this.state.mvresults[this.state.mvindex].snippet.channelTitle : ""
+      yttitle = "(" + (this.state.mvindex + 1) + "/" + this.state.mvresults.length + ") " + yttitle
+    }
     let modalinfostyle = "width-52";
     if (this.props.isSetlist) {
       modalinfostyle = "width-75-2"
@@ -163,6 +222,25 @@ export default class SongDetailView extends React.Component {
                 frameBorder="0"
                 style={{ margin: 'auto', display: 'block' }}
                 allowFullScreen />
+              <a href="#" onClick={() => this.showPrevVideo("div_playthrough")}>
+                <img
+                  style={{ width: 4 + '%', float: 'left' }}
+                  className={showleftarrow}
+                  title="Previous Result"
+                  alt="prev-video"
+                  src="data:image/svg+xml;utf8;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2ZXJzaW9uPSIxLjEiIHZpZXdCb3g9IjAgMCAxMjkgMTI5IiBlbmFibGUtYmFja2dyb3VuZD0ibmV3IDAgMCAxMjkgMTI5IiB3aWR0aD0iNjRweCIgaGVpZ2h0PSI2NHB4Ij4KICA8Zz4KICAgIDxwYXRoIGQ9Im04OC42LDEyMS4zYzAuOCwwLjggMS44LDEuMiAyLjksMS4yczIuMS0wLjQgMi45LTEuMmMxLjYtMS42IDEuNi00LjIgMC01LjhsLTUxLTUxIDUxLTUxYzEuNi0xLjYgMS42LTQuMiAwLTUuOHMtNC4yLTEuNi01LjgsMGwtNTQsNTMuOWMtMS42LDEuNi0xLjYsNC4yIDAsNS44bDU0LDUzLjl6IiBmaWxsPSIjMDAwMDAwIi8+CiAgPC9nPgo8L3N2Zz4K" />
+              </a>
+              <a href="#" onClick={() => this.showNextVideo("div_playthrough")}>
+                <img
+                  style={{ width: 4 + '%', float: 'right' }}
+                  className={showrightarrow}
+                  title="Next Result"
+                  src="data:image/svg+xml;utf8;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2ZXJzaW9uPSIxLjEiIHZpZXdCb3g9IjAgMCAxMjkgMTI5IiBlbmFibGUtYmFja2dyb3VuZD0ibmV3IDAgMCAxMjkgMTI5IiB3aWR0aD0iNTEycHgiIGhlaWdodD0iNTEycHgiPgogIDxnPgogICAgPHBhdGggZD0ibTQwLjQsMTIxLjNjLTAuOCwwLjgtMS44LDEuMi0yLjksMS4ycy0yLjEtMC40LTIuOS0xLjJjLTEuNi0xLjYtMS42LTQuMiAwLTUuOGw1MS01MS01MS01MWMtMS42LTEuNi0xLjYtNC4yIDAtNS44IDEuNi0xLjYgNC4yLTEuNiA1LjgsMGw1My45LDUzLjljMS42LDEuNiAxLjYsNC4yIDAsNS44bC01My45LDUzLjl6IiBmaWxsPSIjMDAwMDAwIi8+CiAgPC9nPgo8L3N2Zz4K"
+                  alt="next-video" />
+              </a>
+              <div className="ta-center">
+                {yttitle}
+              </div>
             </div>
             <div title="mv" id="div_musicvideo" className={mvdivstyle} style={{ width: 100 + '%', margin: '0 auto' }} >
               <iframe
@@ -229,7 +307,7 @@ export default class SongDetailView extends React.Component {
             }
           </div>
         </div>
-      </div >
+      </div>
     );
   }
 }
