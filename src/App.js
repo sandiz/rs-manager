@@ -56,6 +56,7 @@ class App extends Component {
         {
           id: 'tab-rslive',
           name: 'Rocksmith Live',
+          tag: 'BETA',
           child: [],
           platform: 'win32', //works only in windows for now
         },
