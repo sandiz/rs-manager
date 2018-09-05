@@ -1,5 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types';
+import DatePicker from 'react-datepicker';
+import moment from 'moment';
+import 'react-datepicker/dist/react-datepicker.css';
+
 import { initSongsAvailableDB, isDLCInDB, addToSteamDLCCatalog, getDLCDetails, countSongsAvailable, updateOwnedInDB, updateAcquiredDate, getAppID, countAppID, updateAcquiredDateByAppID } from '../sqliteService';
 import { RemoteAll } from './songlistView';
 import { getOwnedPackages, getOwnedHistory } from '../steamprofileService';
@@ -53,6 +57,9 @@ export default class SongAvailableView extends React.Component {
     this.search = "";
     this.rowEvents = {
       onClick: (e, row, rowIndex) => {
+        if (e.target.className.includes("react-datepicker")) {
+          return;
+        }
         this.setState({
           showsongpackpreview: true,
           randompackappid: unescape(row.appid),
@@ -98,10 +105,14 @@ export default class SongAvailableView extends React.Component {
         },
         sort: true,
         formatter: (cell, row) => {
-          const d = new Date(0);
-          d.setUTCSeconds(cell / 1000);
-          const o = d.toDateString()
-          return <span>{o}</span>
+          const d = moment.unix(cell / 1000);
+          return (<div>
+            <DatePicker
+              customInput={<DateAcquiredInput />}
+              selected={d}
+              readOnly
+              dateFormat="ddd ll" />
+          </div>)
         },
       },
       {
@@ -115,11 +126,44 @@ export default class SongAvailableView extends React.Component {
         },
         sort: true,
         formatter: (cell, row) => {
-          if (typeof cell === 'undefined' || cell === null) { return <span>-</span> }
-          const d = new Date(0);
-          d.setUTCSeconds(cell / 1000);
-          const o = d.toDateString()
-          return <span>{o}</span>
+          if (typeof cell === 'undefined' || cell === null) {
+            return (
+              <div>
+                <DatePicker
+                  //placeholderText="---"
+                  customInput={<DateAcquiredInput />}
+                  onChange={t => this.updateSingleAcquireDate(cell, row, t)}
+                  onChangeRaw={
+                    (event) => {
+                      //this.handleChangeRaw(event.target.value);
+                      event.stopPropagation();
+                    }
+                  }
+                  popperModifiers={{
+                    offset: {
+                      enabled: true,
+                      offset: '5px, 10px',
+                    },
+                    preventOverflow: {
+                      enabled: true,
+                      escapeWithReference: false,
+                      boundariesElement: 'viewport',
+                    },
+                  }}
+                  dateFormat="ddd ll" />
+              </div>);
+          }
+          const d = moment.unix(cell / 1000);
+          //d.setUTCSeconds(cell / 1000);
+          //const o = d.toDateString()
+          return (
+            <div>
+              <DatePicker
+                customInput={<DateAcquiredInput />}
+                selected={d}
+                onChange={t => this.updateSingleAcquireDate(cell, row, t)}
+                dateFormat="ddd ll" />
+            </div>);
         },
       },
       {
@@ -149,6 +193,46 @@ export default class SongAvailableView extends React.Component {
       sizePerPage: this.state.sizePerPage,
       filters: {},
     })
+  }
+  updateSingleAcquireDate = async (cell, row, selectedMoment) => {
+    console.log(cell, row, selectedMoment.format("ddd ll"));
+    const d = selectedMoment.toDate();
+    await updateAcquiredDateByAppID(row.appid, Date.parse(d))
+    //update appid with date
+    //refresh view
+    if (this.search.value === "owned") {
+      await this.handleTableChange('filter', {
+        page: 1,
+        sizePerPage: this.state.sizePerPage,
+        sortField: null,
+        sortOrder: null,
+        owned: true,
+      })
+    }
+    else if (this.search.value === "available") {
+      await this.handleTableChange('filter', {
+        page: 1,
+        sizePerPage: this.state.sizePerPage,
+        sortField: null,
+        sortOrder: null,
+        owned: false,
+      })
+    }
+    else {
+      await this.handleTableChange('filter', {
+        page: 1,
+        sizePerPage: this.state.sizePerPage,
+        filters: { search: this.search.value },
+        sortField: null,
+        sortOrder: null,
+        owned: "",
+      })
+    }
+    this.props.updateHeader(
+      this.tabname,
+      this.childtabname,
+      `Updated date for ${row.appid}: ${d} `,
+    );
   }
   updateSteamDLCCatalog = async () => {
     this.props.updateHeader(
@@ -492,3 +576,26 @@ SongAvailableView.defaultProps = {
   //resetHeader: () => { },
   //handleChange: () => { },
 }
+
+/* custom input */ //eslint-disable-next-line
+class DateAcquiredInput extends React.Component {
+  render() {
+    const text = (this.props.value === "") ? "--" : this.props.value;
+    return (
+      <a
+        className="react-datepicker-custom-input"
+        onClick={this.props.onClick}>
+        {text}
+      </a>
+    )
+  }
+}
+DateAcquiredInput.defaultProps = {
+  onClick: () => { },
+  value: '',
+}
+
+DateAcquiredInput.propTypes = {
+  onClick: PropTypes.func,
+  value: PropTypes.string,
+};

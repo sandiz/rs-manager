@@ -844,3 +844,10 @@ hr {
 .smallbutton {
   width: 15%;
 }
+.react-datepicker__input-container input {
+  background: none;
+  border: none;
+  text-align: center;
+  color: inherit;
+  cursor: pointer;
+}
