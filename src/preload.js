@@ -53,8 +53,8 @@ window.request = async function (uri, cookie, cookieurl, qs) {
 
 
 if (isDev) {
-    window.configPath = path.resolve(window.dirname + "/../config.json");
-    window.sqlitePath = path.resolve(window.dirname + "/../rsdb.sqlite");
+    window.configPath = path.resolve(window.dirname + "/../config.dev.json");
+    window.sqlitePath = path.resolve(window.dirname + "/../rsdb.dev.sqlite");
 }
 else {
     window.configPath = path.resolve(window.remote.app.getPath("userData") + "/config.json");
