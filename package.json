@@ -70,8 +70,8 @@
     "pack": "build --dir",
     "dist": "npm run build && build",
     "postinstall": "electron-rebuild  -f -w  sqlite3 && patch-package",
-    "package-mac": "electron-packager . 'Rocksmith Manager' --overwrite --platform=darwin --arch=x64 --icon=src/assets/icons/mac/mac.icns --prune=true --out=release-builds --ignore=config.dev.json --ignore=rsdb.dev.sqlite",
-    "package-win": "electron-packager . \"Rocksmith Manager\" --overwrite --platform=win32 --arch=x64 --icon=src/assets/icons/win/rs.ico --prune=true --out=release-builds --ignore=config.dev.json --ignore=rsdb.dev.sqlite",
+    "package-mac": "electron-packager . 'Rocksmith Manager' --overwrite --platform=darwin --arch=x64 --icon=src/assets/icons/mac/mac.icns --prune=true --out=release-builds --ignore=config.dev.json --ignore=rsdb.dev.sqlite --ignore=assets/ --ignore=src/tools/RockSniffer",
+    "package-win": "electron-packager . \"Rocksmith Manager\" --overwrite --platform=win32 --arch=x64 --icon=src/assets/icons/win/rs.ico --prune=true --out=release-builds --ignore=config.dev.json --ignore=rsdb.dev.sqlite --ignore=assets/",
     "contributors:add": "all-contributors add",
     "contributors:generate": "all-contributors generate"
   },
