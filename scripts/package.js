@@ -1,7 +1,6 @@
 const spawn = require('cross-spawn');
 
-if(process.argv.length <= 2)
-{
+if (process.argv.length <= 2) {
     console.log("Need platform (win/mac)");
     process.exit(-1);
 }
@@ -26,7 +25,9 @@ else {
 }
 
 
-const child = spawn("yarn run electron-packager", [
+const child = spawn("yarn", [
+    "run",
+    "electron-packager",
     ".",
     "Rocksmith Manager",
     "--out=release-builds",
@@ -39,15 +40,15 @@ const child = spawn("yarn run electron-packager", [
     "--ignore=rsdb.dev.sqlite",
     "--ignore=assets/",
     extra_ignore.length > 0 ? `--ignore=${extra_ignore}` : ""
-  ]);
+]);
 
-  child.stdout.on('data', (data) => {
+child.stdout.on('data', (data) => {
     console.log(`stdout: ${data}`);
-  });
-  
-  child.stderr.on('data', (data) => {
+});
+
+child.stderr.on('data', (data) => {
     console.log(`stderr: ${data}`);
-  });
+});
 child.on('close', (code) => {
     console.log(`child process exited with code ${code}`);
 });
