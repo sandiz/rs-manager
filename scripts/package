@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+if [ $1 = "mac" ]; then
+  echo "Packaging for mac"
+  platform="darwin"
+  icon="src/assets/icons/mac/mac.icns"
+  extra_ignore="src/tools/RockSniffer"
+else
+  echo "Packaging for windows"
+  platform="win32"
+  icon="src/assets/icons/win/rs.ico"
+  extra_ignore="" # Nothing extra to ignore on windows
+fi
+
+electron-packager . \
+  "Rocksmith Manager" \
+  --out=release-builds \
+  --overwrite \
+  --prune=true \
+  --arch=x64 \
+  --platform="$platform" \
+  --icon="$icon" \
+  --ignore=config.dev.json \
+  --ignore=rsdb.dev.sqlite \
+  --ignore="assets/" \
+  --ignore=$extra_ignore
