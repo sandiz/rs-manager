@@ -10,6 +10,9 @@ import { getOwnedPackages, getOwnedHistory } from '../steamprofileService';
 import SongDetailView from './songdetailView';
 import { getSteamLoginSecureCookie } from '../configService'
 
+const parse = require('csv-parse/lib/es5/sync');
+
+
 export function decodeEntity(str) {
   const elem = document.createElement('textarea');
   elem.innerHTML = str;
@@ -181,7 +184,48 @@ export default class SongAvailableView extends React.Component {
   }
   componentDidMount = async () => {
     await initSongsAvailableDB();
-    const so = await countSongsAvailable();
+    let so = await countSongsAvailable();
+    if (so.count === 0) {
+      this.props.updateHeader(
+        this.tabname,
+        this.childtabname,
+        `Initializing Steam DLC List with offline copy, Please Wait...`,
+      );
+      const lr = new window.linereader(window.dirname + "/../songs_available_steam.csv");
+      lr.on('error', (err) => {
+        console.log(err);
+      });
+
+      lr.on('line', async (line) => {
+        // pause emitting of lines...
+        lr.pause();
+
+        const items = parse(line)[0];
+        const appid = items[0]
+        const name = items[1]
+        const rdate = Math.trunc(items[2]);
+        await addToSteamDLCCatalog(appid, replaceRocksmithTerms(name), rdate, true);
+        lr.resume();
+      });
+
+      lr.on('end', async () => {
+        // All lines are read, file is closed now.
+        so = await countSongsAvailable();
+        this.props.updateHeader(
+          this.tabname,
+          this.childtabname,
+          `DLC's: ${so.count} Excluding SongPacks: ${so.count}`,
+        );
+        this.setState({ totalSize: so.count });
+        this.handleTableChange("cdm", {
+          page: this.state.page,
+          sizePerPage: this.state.sizePerPage,
+          filters: {},
+        })
+      });
+
+      return;
+    }
     this.props.updateHeader(
       this.tabname,
       this.childtabname,
@@ -282,7 +326,7 @@ export default class SongAvailableView extends React.Component {
           this.props.updateHeader(
             this.tabname,
             this.childtabname,
-            'Error: ' + f.status + " - " + f.statusText,
+            'Error: ' + f.status + " - " + f.statusText + " (try again in ~15 minutes)",
           );
           error = true;
           break;

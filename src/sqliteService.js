@@ -92,15 +92,23 @@ export async function initSongsAvailableDB() {
   }
   await db.run("CREATE TABLE IF NOT EXISTS songs_available (appid char primary key, name char, release_date float, owned boolean default false, acquired_date float default NULL);");
 }
-export async function addToSteamDLCCatalog(dlc, name, releaseDate) {
+export async function addToSteamDLCCatalog(dlc, name, releaseDate, dontparseDate = false) {
   // console.log("__db_call__: addToSteamDLCCatalog");
   let sqlstr = ";";
-  let date = Date.parse(releaseDate);
+  let date = 0;
+  if (!Number.isNaN(releaseDate)) {
+    if (!dontparseDate) {
+      date = Date.parse(releaseDate);
+    }
+    else {
+      date = releaseDate;
+    }
+  }
   if (Number.isNaN(date)) { date = 0; }
   const owned = false;
   sqlstr += `REPLACE INTO songs_available (appid, name, release_date, owned) VALUES ('${dlc}',"${name}", ${date}, '${owned}');`
   //});
-  console.log(sqlstr);
+  //console.log(sqlstr);
   await db.run(sqlstr); // Run the query without returning anything
 }
 export async function getDLCDetails(start = 0, count = 10, sortField = "release_date", sortOrder = "desc", search = "", owned = "") {
