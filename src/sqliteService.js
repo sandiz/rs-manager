@@ -44,6 +44,13 @@ export async function initSongsOwnedDB() {
   altersql3 += "alter table songs_owned add maxNotes int;"
   altersql3 += "alter table songs_owned add tempo int;"
 
+  let altersql4 = "";
+  altersql4 += "alter table songs_owned add is_cdlc boolean default false;"
+  altersql4 += "alter table songs_owned add sa_fc_easy real default null;"
+  altersql4 += "alter table songs_owned add sa_fc_medium real default null;"
+  altersql4 += "alter table songs_owned add sa_fc_hard real default null;"
+  altersql4 += "alter table songs_owned add sa_fc_master real default null;"
+
   switch (version) {
     case 0: {
       // add score attack stats
@@ -73,13 +80,16 @@ export async function initSongsOwnedDB() {
       await db.exec(altersql2);
       version += 1
       await setUserVersion(version);
-      break;
     case 3:
       // add songLength/tempo/notes info
       await db.exec(altersql3);
       version += 1
       await setUserVersion(version);
-      break;
+    case 4:
+      // add is_cdlc, sa_easy_fc, sa_medium_fc, sa_hard_fc, sa_expert_fc
+      await db.exec(altersql4);
+      version += 1
+      await setUserVersion(version);
     default:
       break;
   }
@@ -385,7 +395,7 @@ export async function getSongByID(ID) {
     const dbfilename = window.sqlitePath;
     db = await window.sqlite.open(dbfilename);
   }
-  const sql = `select distinct song, artist from songs_owned where id='${ID}'`;
+  const sql = `select distinct song, artist, * from songs_owned where id='${ID}'`;
   const output = await db.get(sql);
   if (typeof output === 'undefined') { return '' }
   return output;
@@ -600,6 +610,14 @@ export async function getRandomSongAvailable() {
   const sql = "select * from songs_available where name not like '%Song%20Pack%' and owned='false' order by random() limit 1;"
   const op = await db.get(sql);
   return op;
+}
+export async function updateCDLCStat(songID, status) {
+  const sql = `update songs_owned set is_cdlc='${status}' where id='${songID}'`;
+  await db.exec(sql);
+}
+export async function updateSAFCStat(key, value, songID) {
+  const sql = `update songs_owned set ${key}='${value}' where id='${songID}'`;
+  await db.exec(sql);
 }
 window.remote.app.on('window-all-closed', async () => {
   await saveSongsOwnedDB();

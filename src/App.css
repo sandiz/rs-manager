@@ -851,3 +851,27 @@ hr {
   color: inherit;
   cursor: pointer;
 }
+
+.song-detail-option {
+  border-bottom: 1px dashed gray;
+}
+.song-detail-option-disabled {
+  border-bottom: 1px dashed gray;
+  color: lightgray;
+}
+
+.options-flex {
+  display: flex;
+  align-items: left;
+  justify-content: left;
+}
+.options-flex-right {
+  display: flex;
+  align-items: right;
+  justify-content: right;
+}
+
+.options-flex-div {
+  flex-basis: 25%;
+}
+   
