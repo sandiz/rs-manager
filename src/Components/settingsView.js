@@ -7,6 +7,54 @@ import readProfile from '../steamprofileService';
 
 const { path } = window;
 const { remote } = window.require('electron')
+
+const getHeader = (text, size) => {
+  let header = null;
+  switch (size) {
+    case 3:
+      header = (<h3><a>{text}</a></h3>)
+      break;
+    case 6:
+      header = (<h6><a>{text}</a></h6>)
+      break;
+    default:
+      header = (<h1><a>{text}</a></h1>)
+      break;
+  }
+  return header;
+}
+export const expandButton = (text, size = 3) => {
+  return (
+    <div>
+      {getHeader(text, size)}
+      <hr />
+      <button
+        type="button"
+        id="settingsExpand"
+        className="navbar-btn"
+        style={{ float: 'right', marginTop: -62 + 'px' }}
+      >
+        <span /><span /><span />
+      </button>
+    </div>
+  );
+}
+export const collapseButton = (text, size = 3) => {
+  return (
+    <div>
+      {getHeader(text, size)}
+      <hr />
+      <button
+        type="button"
+        id="settingsCollapse"
+        className="navbar-btn"
+        style={{ float: 'right', marginTop: -62 + 'px' }}
+      >
+        <span /><span /><span />
+      </button>
+    </div>
+  );
+}
 export default class SettingsView extends React.Component {
   constructor(props) {
     super(props);
@@ -20,38 +68,6 @@ export default class SettingsView extends React.Component {
     };
     this.readConfigs();
     this.refreshSetlist();
-  }
-  expandButton = (text) => {
-    return (
-      <div>
-        <h3><a>{text}</a></h3>
-        <hr />
-        <button
-          type="button"
-          id="settingsExpand"
-          className="navbar-btn"
-          style={{ float: 'right', marginTop: -62 + 'px' }}
-        >
-          <span /><span /><span />
-        </button>
-      </div>
-    );
-  }
-  collapseButton = (text) => {
-    return (
-      <div>
-        <h3><a>{text}</a></h3>
-        <hr />
-        <button
-          type="button"
-          id="settingsCollapse"
-          className="navbar-btn"
-          style={{ float: 'right', marginTop: -62 + 'px' }}
-        >
-          <span /><span /><span />
-        </button>
-      </div>
-    );
   }
   generateSetlistOptions = () => {
     const setlistOptions = []
@@ -232,8 +248,8 @@ export default class SettingsView extends React.Component {
               <br /> <br />
               <div style={{ marginTop: -30 + 'px', paddingLeft: 30 + 'px', paddingRight: 30 + 'px' }}>
                 <Collapsible
-                  trigger={this.expandButton('General')}
-                  triggerWhenOpen={this.collapseButton('General')}
+                  trigger={expandButton('General')}
+                  triggerWhenOpen={collapseButton('General')}
                   transitionTime={200}
                   easing="ease-in"
                   open
@@ -344,8 +360,8 @@ export default class SettingsView extends React.Component {
               <div style={{ marginTop: -6 + 'px', paddingLeft: 30 + 'px', paddingRight: 30 + 'px' }}>
                 <br />
                 <Collapsible
-                  trigger={this.expandButton("Score Attack")}
-                  triggerWhenOpen={this.collapseButton("Score Attack")}
+                  trigger={expandButton("Score Attack")}
+                  triggerWhenOpen={collapseButton("Score Attack")}
                   transitionTime={200}
                   easing="ease-in"
                 >
@@ -375,8 +391,8 @@ export default class SettingsView extends React.Component {
                 </Collapsible>
                 <br />
                 <Collapsible
-                  trigger={this.expandButton("Setlist")}
-                  triggerWhenOpen={this.collapseButton("Setlist")}
+                  trigger={expandButton("Setlist")}
+                  triggerWhenOpen={collapseButton("Setlist")}
                   transitionTime={200}
                   easing="ease-in"
                 >
@@ -384,8 +400,8 @@ export default class SettingsView extends React.Component {
                 </Collapsible>
                 <br />
                 <Collapsible
-                  trigger={this.expandButton("Song Collection")}
-                  triggerWhenOpen={this.collapseButton("Song Collection")}
+                  trigger={expandButton("Song Collection")}
+                  triggerWhenOpen={collapseButton("Song Collection")}
                   transitionTime={200}
                   easing="ease-in"
                 >

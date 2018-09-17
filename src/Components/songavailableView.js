@@ -622,7 +622,7 @@ SongAvailableView.defaultProps = {
 }
 
 /* custom input */ //eslint-disable-next-line
-class DateAcquiredInput extends React.Component {
+export class DateAcquiredInput extends React.Component {
   render() {
     const text = (this.props.value === "") ? "--" : this.props.value;
     return (

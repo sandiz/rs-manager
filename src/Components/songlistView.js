@@ -850,6 +850,7 @@ export default class SonglistView extends React.Component {
             removeFromDB={this.removeFromDB}
             isSongview
             isSetlist={false}
+            songID={this.state.showSongID}
           />
         </div>
       </div>
