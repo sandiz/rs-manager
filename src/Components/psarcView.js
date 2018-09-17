@@ -141,6 +141,7 @@ export default class PSARCView extends React.Component {
       pageStartIndex: 1,
       sizePerPageList: [],
     }
+    this.markAsCDLC = null;
   }
   openDirDialog = async () => {
     const dirs = remote.dialog.showOpenDialog({
@@ -278,7 +279,7 @@ export default class PSARCView extends React.Component {
       }
       count += 1
       /* loop await */ // eslint-disable-next-line
-      await updateSongsOwned(this.state.files[i]);
+      await updateSongsOwned(this.state.files[i], this.markAsCDLC.checked);
     }
     await saveSongsOwnedDB();
     if (fcount > 0) {
@@ -322,6 +323,17 @@ export default class PSARCView extends React.Component {
             style={{ display: `${hasdatastyle}` }}>
             Update Songs &gt; Owned
             </a>
+          <span style={{ display: `${hasdatastyle}` }}>
+            <label htmlFor="cdlc">Mark All as CDLC</label>
+            <input
+              ref={(node) => { this.markAsCDLC = node }}
+              style={{ margin: 7 + 'px' }}
+              type="checkbox"
+              id="cdlc"
+              name="cdlc"
+              value="cdlc"
+            />
+          </span>
         </div>
         <div>
           <BootstrapTable

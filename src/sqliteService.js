@@ -244,7 +244,7 @@ export async function removeFromSongsOwned(songid) {
   const sql = `delete from songs_owned where id = '${songid}'`;
   await db.run(sql);
 }
-export default async function updateSongsOwned(psarcResult) {
+export default async function updateSongsOwned(psarcResult, isCDLC = false) {
   // console.log("__db_call__: updateSongsOwned");
   let sqlstr = "";
   //psarcResults.forEach((psarcResult) => {
@@ -271,22 +271,24 @@ export default async function updateSongsOwned(psarcResult) {
   const length = psarcResult.songLength;
   let mastery = 0
   let count = 0
-  sqlstr = `select mastery, count from songs_owned where song='${song}' AND
+  let cdlc = false;
+  sqlstr = `select mastery, count, is_cdlc from songs_owned where song='${song}' AND
   album='${album}' AND artist='${artist}' AND arrangement='${arrangement}'`;
   const op = await db.all(sqlstr);
   if (op.length > 0) {
     mastery = op[0].mastery === null ? 0 : op[0].mastery;
     count = op[0].count === null ? 0 : op[0].count;
+    cdlc = op[0].is_cdlc === "true" ? true : isCDLC;
   }
 
   sqlstr = `REPLACE INTO songs_owned (album, artist, song, arrangement, json, psarc, dlc, sku, difficulty, dlckey, songkey,\
   id,uniqkey, lastConversionTime, mastery, \
   count, arrangementProperties, capofret, centoffset, tuning,\
-  songLength, maxNotes, tempo)\
+  songLength, maxNotes, tempo, is_cdlc)\
   VALUES ('${album}','${artist}',
       '${song}','${arrangement}','${json}','${psarc}',
       '${dlc}','${sku}',${difficulty},'${dlckey}',
-      '${songkey}','${id}', '${uniqkey}', '${lct}', '${mastery}','${count}', '${ap}', '${capo}','${cent}','${tuning}', '${length}', '${notes}', '${tmpo}');`
+      '${songkey}','${id}', '${uniqkey}', '${lct}', '${mastery}','${count}', '${ap}', '${capo}','${cent}','${tuning}', '${length}', '${notes}', '${tmpo}', '${cdlc}');`
   //});
   try {
     await db.run(sqlstr); // Run the query without returning anything
@@ -304,9 +306,9 @@ export async function getSongsOwned(start = 0, count = 10, sortField = "mastery"
     db = await window.sqlite.open(dbfilename);
   }
   let sql;
-  let searchSql = `song like '%${escape(search)}%' or 
+  let searchSql = `( song like '%${escape(search)}%' or 
             artist like '%${escape(search)}%' or 
-            album like '%${escape(search)}%'`
+            album like '%${escape(search)}%' )`
   switch (searchField) {
     case "song":
       searchSql = `song like '%${escape(search)}%'`
@@ -317,15 +319,13 @@ export async function getSongsOwned(start = 0, count = 10, sortField = "mastery"
     case "artist":
       searchSql = `artist like '%${escape(search)}%'`
       break;
+    case "cdlc":
+      searchSql += ` and is_cdlc = 'true'`
+      break;
     default: break;
   }
-  if (search === "") {
-    sql = `select c.acount as acount, c.songcount as songcount, song, album, artist, arrangement, mastery,
-          count, difficulty, uniqkey, id, lastConversionTime, json,
-          sa_playcount, sa_ts, 
-          sa_hs_easy, sa_hs_medium, sa_hs_hard, sa_hs_master, 
-          sa_badge_easy, sa_badge_medium,sa_badge_hard, sa_badge_master, sa_highest_badge,
-          arrangementProperties, capofret, centoffset, tuning
+  if (search === "" && searchField !== "cdlc") {
+    sql = `select c.acount as acount, c.songcount as songcount, *
           from songs_owned,  (
           SELECT count(*) as acount, count(distinct songkey) as songcount
             FROM songs_owned
@@ -333,12 +333,7 @@ export async function getSongsOwned(start = 0, count = 10, sortField = "mastery"
           ORDER BY ${sortField} ${sortOrder} LIMIT ${start},${count}`;
   }
   else {
-    sql = `select c.acount as acount, c.songcount as songcount, song, album, artist, arrangement, mastery,
-          count, difficulty, uniqkey, id, lastConversionTime, json, 
-          sa_playcount, sa_ts, 
-          sa_hs_easy, sa_hs_medium, sa_hs_hard, sa_hs_master, 
-          sa_badge_easy, sa_badge_medium,sa_badge_hard, sa_badge_master, sa_highest_badge,
-          arrangementProperties, capofret, centoffset, tuning
+    sql = `select c.acount as acount, c.songcount as songcount, *
           from songs_owned, (
           SELECT count(*) as acount, count(distinct songkey) as songcount
             FROM songs_owned
