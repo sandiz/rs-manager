@@ -364,13 +364,7 @@ export async function getSongBySongKey(key, start = 0, count = 10, sortField = "
     const dbfilename = window.sqlitePath;
     db = await window.sqlite.open(dbfilename);
   }
-  const sql = `select c.acount as acount, c.songcount as songcount, song, album, artist, arrangement, mastery,
-          count, difficulty, uniqkey, id, lastConversionTime, json, 
-          sa_playcount, sa_ts, 
-          sa_hs_easy, sa_hs_medium, sa_hs_hard, sa_hs_master, 
-          sa_badge_easy, sa_badge_medium,sa_badge_hard, sa_badge_master, sa_highest_badge,
-          arrangementProperties, capofret, centoffset, tuning,
-          songLength, maxNotes, tempo
+  const sql = `select c.acount as acount, c.songcount as songcount, *
           from songs_owned, (
           SELECT count(*) as acount, count(distinct songkey) as songcount
             FROM songs_owned
@@ -409,34 +403,57 @@ export async function resetDB(table = 'songs_owned') {
   const sql = `delete from ${table};`
   await db.exec(sql);
 }
-export async function getSAStats(type = "sa_badge_hard") {
+export async function getSAStats(type = "sa_badge_hard", useCDLC = false) {
+  const cdlcSql = useCDLC ? "" : "is_cdlc = 'false' AND";
   // console.log("__db_call__: getLeadStats");
   const badgeHard = (type === "sa_badge_hard");
   const sqlstr = `select sa.count as satotal, saplat.count as saplat, sagold.count as sagold, sasilver.count as sasilver,sabronze.count as sabronze, safailed.count as safailed from \
-  (select count(*) as count from songs_owned where sa_playcount > 0 AND ${type} > ${badgeHard ? 30 : 40}) sa, \
-  (select count(*) as count from songs_owned where sa_playcount > 0 AND (${type} == ${badgeHard ? 35 : 45})) saplat, \
-  (select count(*) as count from songs_owned where sa_playcount > 0 AND (${type} == ${badgeHard ? 34 : 44})) sagold, \
-  (select count(*) as count from songs_owned where sa_playcount > 0 AND (${type} == ${badgeHard ? 33 : 43})) sasilver, \
-  (select count(*) as count from songs_owned where sa_playcount > 0 AND (${type} == ${badgeHard ? 32 : 42})) sabronze, \
-  (select count(*) as count from songs_owned where sa_playcount > 0 AND (${type} == ${badgeHard ? 31 : 41})) safailed; `
+  (select count(*) as count from songs_owned where ${cdlcSql} sa_playcount > 0 AND ${type} > ${badgeHard ? 30 : 40}) sa, \
+  (select count(*) as count from songs_owned where ${cdlcSql} sa_playcount > 0 AND (${type} == ${badgeHard ? 35 : 45})) saplat, \
+  (select count(*) as count from songs_owned where ${cdlcSql} sa_playcount > 0 AND (${type} == ${badgeHard ? 34 : 44})) sagold, \
+  (select count(*) as count from songs_owned where ${cdlcSql} sa_playcount > 0 AND (${type} == ${badgeHard ? 33 : 43})) sasilver, \
+  (select count(*) as count from songs_owned where ${cdlcSql} sa_playcount > 0 AND (${type} == ${badgeHard ? 32 : 42})) sabronze, \
+  (select count(*) as count from songs_owned where ${cdlcSql} sa_playcount > 0 AND (${type} == ${badgeHard ? 31 : 41})) safailed; `
   const output = await db.get(sqlstr);
   return output;
 }
-export async function getLeadStats() {
+export async function getLeadStats(useCDLC = false) {
+  const cdlcSql = useCDLC ? "" : "is_cdlc = 'false' AND";
   // console.log("__db_call__: getLeadStats");
-  const sqlstr = "select l.count as l,lh.count as lh,lm.count as lm,ll.count as ll,up.count as lup from (select count(*) as count from songs_owned where arrangement like '%lead%')l, (select count(*) as count from songs_owned where mastery > .95 AND arrangement like '%lead%') lh, (select count(*) as count from songs_owned where mastery > .90 AND mastery <= .95 AND arrangement like '%lead%') lm, (select count(*) as count from songs_owned where mastery >= .1 AND mastery <= .90 AND arrangement like '%lead%') ll, (select count(*) as count from songs_owned where mastery < .1 AND arrangement like '%lead%') up;"
+  //eslint-disable-next-line
+  const sqlstr = `select l.count as l,lh.count as lh,lm.count as lm,ll.count as ll,up.count as lup from \
+  (select count(*) as count from songs_owned where ${cdlcSql} arrangement like '%lead%')l, \
+  (select count(*) as count from songs_owned where ${cdlcSql} mastery > .95 AND arrangement like '%lead%') lh, \
+  (select count(*) as count from songs_owned where ${cdlcSql} mastery > .90 AND mastery <= .95 AND arrangement like '%lead%') lm, \
+  (select count(*) as count from songs_owned where ${cdlcSql} mastery >= .1 AND mastery <= .90 AND arrangement like '%lead%') ll, \
+  (select count(*) as count from songs_owned where ${cdlcSql} mastery < .1 AND arrangement like '%lead%') up;`
   const output = await db.get(sqlstr);
+  console.log(sqlstr);
   return output;
 }
-export async function getRhythmStats() {
+export async function getRhythmStats(useCDLC = false) {
+  const cdlcSql = useCDLC ? "" : "is_cdlc = 'false' AND";
   //console.log("__db_call__: getRhythmStats");
-  const sqlstr = "select l.count as r,lh.count as rh,lm.count as rm,ll.count as rl,up.count as rup from (select count(*) as count from songs_owned where arrangement like '%rhythm%')l, (select count(*) as count from songs_owned where mastery > .95 AND arrangement like '%rhythm%') lh, (select count(*) as count from songs_owned where mastery > .90 AND mastery <= .95 AND arrangement like '%rhythm%') lm, (select count(*) as count from songs_owned where mastery >= .1 AND mastery <= .90 AND arrangement like '%rhythm%') ll, (select count(*) as count from songs_owned where mastery < .1 AND arrangement like '%rhythm%') up;"
+  //eslint-disable-next-line
+  const sqlstr = `select l.count as r,lh.count as rh,lm.count as rm,ll.count as rl,up.count as rup from \
+  (select count(*) as count from songs_owned where ${cdlcSql} arrangement like '%rhythm%')l, \
+  (select count(*) as count from songs_owned where ${cdlcSql} mastery > .95 AND arrangement like '%rhythm%') lh, \
+  (select count(*) as count from songs_owned where ${cdlcSql} mastery > .90 AND mastery <= .95 AND arrangement like '%rhythm%') lm, \
+  (select count(*) as count from songs_owned where ${cdlcSql} mastery >= .1 AND mastery <= .90 AND arrangement like '%rhythm%') ll, \
+  (select count(*) as count from songs_owned where ${cdlcSql} mastery < .1 AND arrangement like '%rhythm%') up;`
   const output = await db.get(sqlstr);
   return output;
 }
-export async function getBassStats() {
+export async function getBassStats(useCDLC = false) {
+  const cdlcSql = useCDLC ? "" : "is_cdlc = 'false' AND";
   // console.log("__db_call__: getBassStats");
-  const sqlstr = "select l.count as b,lh.count as bh,lm.count as bm,ll.count as bl,up.count as bup from (select count(*) as count from songs_owned where arrangement like '%bass%')l, (select count(*) as count from songs_owned where mastery > .95 AND arrangement like '%bass%') lh, (select count(*) as count from songs_owned where mastery > .90 AND mastery <= .95 AND arrangement like '%bass%') lm, (select count(*) as count from songs_owned where mastery >= .1 AND mastery <= .90 AND arrangement like '%bass%') ll, (select count(*) as count from songs_owned where mastery < .1 AND arrangement like '%bass%') up;"
+  //eslint-disable-next-line
+  const sqlstr = `select l.count as b,lh.count as bh,lm.count as bm,ll.count as bl,up.count as bup from \
+  (select count(*) as count from songs_owned where ${cdlcSql} arrangement like '%bass%')l, \
+  (select count(*) as count from songs_owned where ${cdlcSql} mastery > .95 AND arrangement like '%bass%') lh, \
+  (select count(*) as count from songs_owned where ${cdlcSql} mastery > .90 AND mastery <= .95 AND arrangement like '%bass%') lm, \
+  (select count(*) as count from songs_owned where ${cdlcSql} mastery >= .1 AND mastery <= .90 AND arrangement like '%bass%') ll, \
+  (select count(*) as count from songs_owned where ${cdlcSql} mastery < .1 AND arrangement like '%bass%') up;`
   const output = await db.get(sqlstr);
   return output;
 }
@@ -523,12 +540,7 @@ export async function getSongsFromPlaylistDB(dbname, start = 0, count = 10, sort
     default: break;
   }
   if (search === "") {
-    sql = `select c.acount as acount, c.songcount as songcount, song, artist, album, arrangement, mastery,
-          count, difficulty, id, lastConversionTime, json,
-          sa_playcount, sa_ts, 
-          sa_hs_easy, sa_hs_medium, sa_hs_hard, sa_hs_master, 
-          sa_badge_easy, sa_badge_medium,sa_badge_hard, sa_badge_master, sa_highest_badge,
-          arrangementProperties, capofret, centoffset, tuning
+    sql = `select c.acount as acount, c.songcount as songcount, *
           from songs_owned,  (
           SELECT count(*) as acount, count(distinct songkey) as songcount
             FROM songs_owned
@@ -539,12 +551,7 @@ export async function getSongsFromPlaylistDB(dbname, start = 0, count = 10, sort
           `;
   }
   else {
-    sql = `select c.acount as acount, c.songcount as songcount, song, artist, album, arrangement, mastery,
-          count, difficulty, id, lastConversionTime, json,
-          sa_playcount, sa_ts, 
-          sa_hs_easy, sa_hs_medium, sa_hs_hard, sa_hs_master, 
-          sa_badge_easy, sa_badge_medium,sa_badge_hard, sa_badge_master, sa_highest_badge,
-          arrangementProperties, capofret, centoffset, tuning
+    sql = `select c.acount as acount, c.songcount as songcount, *
           from songs_owned, (
           SELECT count(*) as acount, count(distinct songkey) as songcount
             FROM songs_owned
