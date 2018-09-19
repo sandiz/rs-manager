@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types';
 import StatsTableView from './statsTableView';
-import getProfileConfig, { updateProfileConfig, getScoreAttackConfig } from '../configService';
+import getProfileConfig, { updateProfileConfig, getScoreAttackConfig, getUseCDLCConfig } from '../configService';
 import readProfile from '../steamprofileService';
 import { updateMasteryandPlayed, initSongsOwnedDB, getSongByID, countSongsOwned, getArrangmentsMastered, getLeadStats, getRhythmStats, getBassStats, getRandomSongOwned, getRandomSongAvailable, getSAStats, updateScoreAttackStats } from '../sqliteService';
 import { replaceRocksmithTerms } from './songavailableView';
@@ -147,11 +147,12 @@ export default class DashboardView extends React.Component {
         arrMaster: arrmaster.count + "/" + songscount.count,
         mostPlayed,
       });
-      const leadStats = await getLeadStats();
+      const useCDLCforStats = await getUseCDLCConfig();
+      const leadStats = await getLeadStats(useCDLCforStats);
       const lup = leadStats.l - (leadStats.lh + leadStats.lm + leadStats.ll)
-      const rhythmStats = await getRhythmStats();
+      const rhythmStats = await getRhythmStats(useCDLCforStats);
       const rup = rhythmStats.r - (rhythmStats.rh + rhythmStats.rm + rhythmStats.rl)
-      const bassStats = await getBassStats();
+      const bassStats = await getBassStats(useCDLCforStats);
       const bup = bassStats.b - (bassStats.bh + bassStats.bm + bassStats.bl)
       const saStats = await getSAStats("sa_badge_hard");
       const samStats = await getSAStats("sa_badge_master")

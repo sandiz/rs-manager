@@ -220,6 +220,8 @@ export function arrangmentFormatter(cell, row) {
   else if (arrinfo.equals([0, 1, 0, 0, 1])) { arrobj = <span>Bonus Bass</span> }
   else if (arrinfo.equals([0, 0, 0, 0, 1])) { arrobj = <span>Alternate Bass</span> }
 
+  const isCDLC = row.is_cdlc === "true";
+  if (isCDLC) { arrobj = [arrobj, <span> (C)</span>] }
   return (
     <div>
       <ReactTooltip
@@ -252,6 +254,14 @@ export function arrangmentFormatter(cell, row) {
                 }
                 return null;
               })
+            }
+            {
+              isCDLC ?
+                <tr className="row" key={"cdlc" + row.id}>
+                  <td style={{ width: 100 + '%', textAlign: 'center' }}>
+                    Custom DLC
+                </td>
+                </tr> : null
             }
           </tbody>
         </table>
@@ -518,6 +528,11 @@ export default class SonglistView extends React.Component {
       {
         dataField: "sa_badge_master",
         text: 'Badge (Master)',
+        hidden: true,
+      },
+      {
+        dataField: "is_cdlc",
+        text: 'IS CDLC',
         hidden: true,
       },
       {

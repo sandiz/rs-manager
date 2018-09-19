@@ -1,7 +1,7 @@
 import React from 'react'
 import Collapsible from 'react-collapsible';
 import PropTypes from 'prop-types';
-import getProfileConfig, { updateSteamLoginSecureCookie, getSteamLoginSecureCookie, updateProfileConfig, getScoreAttackConfig, updateScoreAttackConfig } from '../configService';
+import getProfileConfig, { updateSteamLoginSecureCookie, getSteamLoginSecureCookie, updateProfileConfig, getScoreAttackConfig, updateScoreAttackConfig, updateUseCDLCConfig, getUseCDLCConfig } from '../configService';
 import { resetDB, createRSSongList, addtoRSSongList, isTablePresent, deleteRSSongList } from '../sqliteService';
 import readProfile from '../steamprofileService';
 
@@ -65,6 +65,7 @@ export default class SettingsView extends React.Component {
       showScoreAttack: true,
       setlistImported: [false, false, false, false, false, false],
       processingSetlist: false,
+      useCDLCinStats: true,
     };
     this.readConfigs();
     this.refreshSetlist();
@@ -173,6 +174,14 @@ export default class SettingsView extends React.Component {
       showScoreAttack: value,
     });
   }
+  handleCDLCStats = (event) => {
+    const t = event.target;
+    const value = t.type === 'checkbox' ? t.checked : t.value;
+    this.setState({
+      useCDLCinStats: value,
+    });
+  }
+
   refreshSetlist = async () => {
     const setliststatus = []
     for (let i = 0; i <= 5; i += 1) {
@@ -188,10 +197,12 @@ export default class SettingsView extends React.Component {
     const d = await getProfileConfig();
     const e = await getSteamLoginSecureCookie();
     const f = await getScoreAttackConfig();
+    const g = await getUseCDLCConfig();
     this.setState({
       prfldb: d,
       steamLoginSecure: e,
       showScoreAttack: f,
+      useCDLCinStats: g,
     });
   }
   saveSettings = async () => {
@@ -202,6 +213,7 @@ export default class SettingsView extends React.Component {
       await updateProfileConfig(this.state.prfldb);
     }
     await updateScoreAttackConfig(this.state.showScoreAttack);
+    await updateUseCDLCConfig(this.state.useCDLCinStats);
     this.props.handleChange();
     this.props.updateHeader(this.tabname, "Settings Saved!");
   }
@@ -360,8 +372,8 @@ export default class SettingsView extends React.Component {
               <div style={{ marginTop: -6 + 'px', paddingLeft: 30 + 'px', paddingRight: 30 + 'px' }}>
                 <br />
                 <Collapsible
-                  trigger={expandButton("Score Attack")}
-                  triggerWhenOpen={collapseButton("Score Attack")}
+                  trigger={expandButton("Advanced ")}
+                  triggerWhenOpen={collapseButton("Advanced")}
                   transitionTime={200}
                   easing="ease-in"
                 >
@@ -388,11 +400,35 @@ export default class SettingsView extends React.Component {
                       Show/Hides score attack stats from Dashboard and Songs view.
                   </span>
                   </div>
+                  <br />
+                  <span style={{ float: 'left' }}>
+                    <a onClick={this.enterCookie}>
+                      Include CDLC in Stats
+                  </a>
+                  </span>
+                  <span style={{
+                    float: 'right',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    width: 400 + 'px',
+                    textAlign: 'right',
+                  }}>
+                    <input
+                      type="checkbox"
+                      checked={this.state.useCDLCinStats}
+                      onChange={this.handleCDLCStats} />
+                  </span>
+                  <br />
+                  <div className="">
+                    <span style={{ color: '#ccc' }}>
+                      Includes cdlc when calculating stats in Dashboard view
+                  </span>
+                  </div>
                 </Collapsible>
                 <br />
                 <Collapsible
-                  trigger={expandButton("Setlist")}
-                  triggerWhenOpen={collapseButton("Setlist")}
+                  trigger={expandButton("Import Setlists")}
+                  triggerWhenOpen={collapseButton("Import Setlists")}
                   transitionTime={200}
                   easing="ease-in"
                 >
