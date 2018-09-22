@@ -17,6 +17,27 @@ export default class StatsTableView extends React.Component {
               </span>
             </td>
           </tr>
+          {
+            this.props.scoreattack ?
+              <tr>
+                <td
+                  className="iconPreview gp_fcs badgeText dashboardGP"
+                  title="Total Full Combos">
+                  FCs
+                </td>
+                <td className="ta-left skinny">
+                  <span>
+                    <svg id="fcs_tier_1_svg" height="100%" width="100%" className="dashboardsvg">
+                      <rect width={(this.props.tierWidths[6]) + "%"} height="100%" style={{ fill: 'lightgreen', strokeWidth: 2, stroke: 'rgb(0,0,0)' }} />
+                    </svg>
+                  </span>
+                  <span className="ta-right right-align">
+                    {this.props.tierTotals[6]}
+                  </span>
+                </td>
+              </tr>
+              : null
+          }
           <tr>
             <td
               className={this.props.scoreattack ? "iconPreview gp_platinum badgeText dashboardGP" : ""}
@@ -26,11 +47,11 @@ export default class StatsTableView extends React.Component {
             <td className="ta-left skinny">
               <span>
                 <svg id="lead_tier_1_svg" height="100%" width="100%" className="dashboardsvg">
-                  <rect width={(this.props.scoreattack ? this.props.platwidth : this.props.highscorewidth) + "%"} height="100%" style={{ fill: 'lightgreen', strokeWidth: 2, stroke: 'rgb(0,0,0)' }} />
+                  <rect width={(this.props.scoreattack ? this.props.tierWidths[0] : this.props.masteryWidths[0]) + "%"} height="100%" style={{ fill: 'lightgreen', strokeWidth: 2, stroke: 'rgb(0,0,0)' }} />
                 </svg>
               </span>
               <span className="ta-right right-align">
-                {this.props.scoreattack ? this.props.plattotal : this.props.highscoretotal}
+                {this.props.scoreattack ? this.props.tierTotals[0] : this.props.masteryTotals[0]}
               </span>
             </td>
           </tr>
@@ -44,10 +65,10 @@ export default class StatsTableView extends React.Component {
             <td className="ta-left skinny">
               <span>
                 <svg id="lead_tier_1_svg" height="100%" width="100%" className="dashboardsvg">
-                  <rect width={(this.props.scoreattack ? this.props.goldwidth : this.props.mediumscorewidth) + "%"} height="100%" style={{ fill: '#C8F749', strokeWidth: 2, stroke: 'rgb(0,0,0)' }} />
+                  <rect width={(this.props.scoreattack ? this.props.tierWidths[1] : this.props.masteryWidths[1]) + "%"} height="100%" style={{ fill: '#C8F749', strokeWidth: 2, stroke: 'rgb(0,0,0)' }} />
                 </svg>
                 <span className="ta-right right-align">
-                  {this.props.scoreattack ? this.props.goldtotal : this.props.mediumscoretotal}
+                  {this.props.scoreattack ? this.props.tierTotals[1] : this.props.masteryTotals[1]}
                 </span>
               </span>
             </td>
@@ -62,50 +83,54 @@ export default class StatsTableView extends React.Component {
             <td className="ta-left skinny">
               <span>
                 <svg id="lead_tier_1_svg" height="100%" width="100%" className="dashboardsvg">
-                  <rect width={(this.props.scoreattack ? this.props.silverwidth : this.props.lowscorewidth) + "%"} height="100%" style={{ fill: 'yellow', strokeWidth: 2, stroke: 'rgb(0,0,0)' }} />
+                  <rect width={(this.props.scoreattack ? this.props.tierWidths[2] : this.props.masteryWidths[2]) + "%"} height="100%" style={{ fill: 'yellow', strokeWidth: 2, stroke: 'rgb(0,0,0)' }} />
                 </svg>
               </span>
               <span className="ta-right right-align">
-                {this.props.scoreattack ? this.props.silvertotal : this.props.lowscoretotal}
+                {this.props.scoreattack ? this.props.tierTotals[2] : this.props.masteryTotals[2]}
               </span>
             </td>
           </tr>
-          <tr className={this.props.scoreattack ? "" : "hidden"}>
-            <td
-              className={this.props.scoreattack ? "iconPreview gp_bronze badgeText  GP" : "hidden"}
-              title={this.props.scoreattack ? "Total Bronze Badges" : ""}
-            >
-              Brnz
-            </td>
-            <td className="ta-left skinny">
-              <span>
-                <svg id="lead_tier_1_svg" height="100%" width="100%" className="dashboardsvg">
-                  <rect width={(this.props.scoreattack ? this.props.bronzewidth : this.props.lowscorewidth) + "%"} height="100%" style={{ fill: 'yellow', strokeWidth: 2, stroke: 'rgb(0,0,0)' }} />
-                </svg>
-              </span>
-              <span className="ta-right right-align">
-                {this.props.scoreattack ? this.props.bronzetotal : this.props.lowscoretotal}
-              </span>
-            </td>
-          </tr>
-          <tr className={this.props.scoreattack ? "" : "hidden"}>
-            <td
-              className={this.props.scoreattack ? "iconPreview gp_failed badgeText dashboardGP" : "hidden"}
-              title={this.props.scoreattack ? "Total Failed" : ""}
-            >
-              Fail
-            </td>
-            <td className="ta-left skinny">
-              <span>
-                <svg id="lead_tier_1_svg" height="100%" width="100%" className="dashboardsvg">
-                  <rect width={(this.props.scoreattack ? this.props.failedwidth : this.props.lowscorewidth) + "%"} height="100%" style={{ fill: 'yellow', strokeWidth: 2, stroke: 'rgb(0,0,0)' }} />
-                </svg>
-              </span>
-              <span className="ta-right right-align">
-                {this.props.scoreattack ? this.props.failedtotal : this.props.lowscoretotal}
-              </span>
-            </td>
-          </tr>
+          {
+            this.props.scoreattack ?
+              <tr>
+                <td
+                  className={this.props.scoreattack ? "iconPreview gp_bronze badgeText  GP" : "hidden"}
+                  title={this.props.scoreattack ? "Total Bronze Badges" : ""}>
+                  Brnz
+                </td>
+                <td className="ta-left skinny">
+                  <span>
+                    <svg id="lead_tier_1_svg" height="100%" width="100%" className="dashboardsvg">
+                      <rect width={(this.props.tierWidths[3]) + "%"} height="100%" style={{ fill: 'yellow', strokeWidth: 2, stroke: 'rgb(0,0,0)' }} />
+                    </svg>
+                  </span>
+                  <span className="ta-right right-align">
+                    {this.props.tierTotals[3]}
+                  </span>
+                </td>
+              </tr> : null
+          }
+          {
+            this.props.scoreattack ?
+              <tr>
+                <td
+                  className={this.props.scoreattack ? "iconPreview gp_failed badgeText dashboardGP" : "hidden"}
+                  title={this.props.scoreattack ? "Total Failed" : ""}>
+                  Fail
+                </td>
+                <td className="ta-left skinny">
+                  <span>
+                    <svg id="lead_tier_1_svg" height="100%" width="100%" className="dashboardsvg">
+                      <rect width={(this.props.tierWidths[4]) + "%"} height="100%" style={{ fill: 'yellow', strokeWidth: 2, stroke: 'rgb(0,0,0)' }} />
+                    </svg>
+                  </span>
+                  <span className="ta-right right-align">
+                    {this.props.tierTotals[4]}
+                  </span>
+                </td>
+              </tr> : null
+          }
           <tr>
             <td
               title="Unplayed Arrangments">
@@ -114,11 +139,11 @@ export default class StatsTableView extends React.Component {
             <td className="ta-left skinny">
               <span>
                 <svg id="lead_tier_1_svg" height="100%" width="100%" className="dashboardsvg">
-                  <rect width={(this.props.unplayedwidth) + "%"} height="100%" style={{ fill: 'lightgray', strokeWidth: 2, stroke: 'rgb(0,0,0)' }} />
+                  <rect width={(this.props.scoreattack ? this.props.tierWidths[5] : this.props.masteryWidths[3]) + "%"} height="100%" style={{ fill: 'lightgray', strokeWidth: 2, stroke: 'rgb(0,0,0)' }} />
                 </svg>
               </span>
               <span className="ta-right right-align">
-                {this.props.unplayedtotal}
+                {this.props.scoreattack ? this.props.tierTotals[5] : this.props.masteryTotals[3]}
               </span>
             </td>
           </tr>
@@ -129,45 +154,17 @@ export default class StatsTableView extends React.Component {
 }
 StatsTableView.propTypes = {
   total: PropTypes.number,
-  highscoretotal: PropTypes.number,
-  highscorewidth: PropTypes.number,
-  mediumscoretotal: PropTypes.number,
-  mediumscorewidth: PropTypes.number,
-  lowscoretotal: PropTypes.number,
-  lowscorewidth: PropTypes.number,
-  unplayedtotal: PropTypes.number,
-  unplayedwidth: PropTypes.number,
   scoreattack: PropTypes.bool,
-  plattotal: PropTypes.number,
-  platwidth: PropTypes.number,
-  goldtotal: PropTypes.number,
-  goldwidth: PropTypes.number,
-  silvertotal: PropTypes.number,
-  silverwidth: PropTypes.number,
-  bronzetotal: PropTypes.number,
-  bronzewidth: PropTypes.number,
-  failedtotal: PropTypes.number,
-  failedwidth: PropTypes.number,
+  tierTotals: PropTypes.array,
+  tierWidths: PropTypes.array,
+  masteryTotals: PropTypes.array,
+  masteryWidths: PropTypes.array,
 }
 StatsTableView.defaultProps = {
   total: 0,
-  highscoretotal: 0,
-  highscorewidth: 0,
-  mediumscoretotal: 0,
-  mediumscorewidth: 0,
-  lowscoretotal: 0,
-  lowscorewidth: 0,
-  unplayedtotal: 0,
-  unplayedwidth: 0,
   scoreattack: false,
-  plattotal: 0,
-  platwidth: 0,
-  goldtotal: 0,
-  goldwidth: 0,
-  silvertotal: 0,
-  silverwidth: 0,
-  bronzetotal: 0,
-  bronzewidth: 0,
-  failedtotal: 0,
-  failedwidth: 0,
+  tierTotals: [0, 0, 0, 0, 0, 0, 0],
+  tierWidths: [0, 0, 0, 0, 0, 0, 0],
+  masteryTotals: [0, 0, 0, 0],
+  masteryWidths: [0, 0, 0, 0],
 }
