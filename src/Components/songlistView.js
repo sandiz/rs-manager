@@ -57,6 +57,7 @@ export const techniqueNames = {
 }
 export function getBadgeName(num, retClass = false) {
   switch (num) {
+    case 6: return retClass ? "gp_fcs" : "FC";
     case 5: return retClass ? "gp_platinum" : "Platinum";
     case 4: return retClass ? "gp_gold" : "Gold";
     case 3: return retClass ? "gp_silver" : "Silver";
@@ -125,16 +126,32 @@ export function badgeFormatter(cell, row) {
   const badgeClassDefault = "col col-md-3 col-md-34 ta-center iconPreview ";
   const badgeClasses = [];
   if (row.sa_badge_easy > 10) {
-    badgeClasses.push([row.sa_badge_easy, row.sa_hs_easy, "Easy", getBadgeName(row.sa_badge_easy - 10, true), getBadgeName(row.sa_badge_easy - 10, false)]);
+    if (row.sa_fc_easy) {
+      badgeClasses.push([row.sa_badge_easy, row.sa_hs_easy, "Easy", getBadgeName(6, true), getBadgeName(6, false)]);
+    } else {
+      badgeClasses.push([row.sa_badge_easy, row.sa_hs_easy, "Easy", getBadgeName(row.sa_badge_easy - 10, true), getBadgeName(row.sa_badge_easy - 10, false)]);
+    }
   }
   if (row.sa_badge_medium > 20) {
-    badgeClasses.push([row.sa_badge_medium, row.sa_hs_medium, "Medium", getBadgeName(row.sa_badge_medium - 20, true), getBadgeName(row.sa_badge_medium - 20, false)]);
+    if (row.sa_fc_medium) {
+      badgeClasses.push([row.sa_badge_medium, row.sa_hs_medium, "Medium", getBadgeName(6, true), getBadgeName(6, false)]);
+    } else {
+      badgeClasses.push([row.sa_badge_medium, row.sa_hs_medium, "Medium", getBadgeName(row.sa_badge_medium - 20, true), getBadgeName(row.sa_badge_medium - 20, false)]);
+    }
   }
   if (row.sa_badge_hard > 30) {
-    badgeClasses.push([row.sa_badge_hard, row.sa_hs_hard, "Hard", getBadgeName(row.sa_badge_hard - 30, true), getBadgeName(row.sa_badge_hard - 30, false)]);
+    if (row.sa_fc_hard) {
+      badgeClasses.push([row.sa_badge_hard, row.sa_hs_hard, "Hard", getBadgeName(6, true), getBadgeName(6, false)]);
+    } else {
+      badgeClasses.push([row.sa_badge_hard, row.sa_hs_hard, "Hard", getBadgeName(row.sa_badge_hard - 30, true), getBadgeName(row.sa_badge_hard - 30, false)]);
+    }
   }
   if (row.sa_badge_master > 40) {
-    badgeClasses.push([row.sa_badge_master, row.sa_hs_master, "Master", getBadgeName(row.sa_badge_master - 40, true), getBadgeName(row.sa_badge_master - 40, false)]);
+    if (row.sa_fc_master) {
+      badgeClasses.push([row.sa_badge_master, row.sa_hs_master, "Master", getBadgeName(6, true), getBadgeName(6, false)]);
+    } else {
+      badgeClasses.push([row.sa_badge_master, row.sa_hs_master, "Master", getBadgeName(row.sa_badge_master - 40, true), getBadgeName(row.sa_badge_master - 40, false)]);
+    }
   }
   if (badgeClasses.length > 0) {
     return (
