@@ -347,13 +347,14 @@ export async function getSongsOwned(start = 0, count = 10, sortField = "mastery"
   const output = await db.all(sql);
   return output
 }
-export async function countSongsOwned() {
+export async function countSongsOwned(useCDLC = false) {
   // console.log("__db_call__: countSongsOwned");
+  const cdlcSql = useCDLC ? "" : "where is_cdlc = 'false'";
   if (db == null) {
     const dbfilename = window.sqlitePath;
     db = await window.sqlite.open(dbfilename);
   }
-  const sql = `select count(*) as count, count(distinct songkey) as songcount from songs_owned`;
+  const sql = `select count(*) as count, count(distinct songkey) as songcount from songs_owned ${cdlcSql};`;
   // console.log(sql);
   const output = await db.get(sql);
   return output
@@ -389,13 +390,14 @@ export async function getSongByID(ID) {
   if (typeof output === 'undefined') { return '' }
   return output;
 }
-export async function getArrangmentsMastered() {
+export async function getArrangmentsMastered(useCDLC = false) {
   //console.log("__db_call__: getArrangmentsMastered");
+  const cdlcSql = useCDLC ? "" : " AND is_cdlc = 'false'";
   if (db == null) {
     const dbfilename = window.sqlitePath;
     db = await window.sqlite.open(dbfilename);
   }
-  const sql = `select count(mastery) as count from songs_owned where mastery > 0.95`;
+  const sql = `select count(mastery) as count from songs_owned where mastery > 0.95 ${cdlcSql};`;
   const output = await db.get(sql);
   return output;
 }
