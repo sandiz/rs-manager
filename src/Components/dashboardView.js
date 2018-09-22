@@ -114,8 +114,9 @@ export default class DashboardView extends React.Component {
       else {
         playingText = `${dateObj.h} Hours ${dateObj.m} Minutes`
       }
-      const songscount = await countSongsOwned();
-      const arrmaster = await getArrangmentsMastered();
+      const useCDLCforStats = await getUseCDLCConfig();
+      const songscount = await countSongsOwned(useCDLCforStats);
+      const arrmaster = await getArrangmentsMastered(useCDLCforStats);
       this.setState({
         totalPlayingTime: playingText,
         maxConsecutiveDays: stats.MaxConsecutiveDays,
@@ -126,17 +127,16 @@ export default class DashboardView extends React.Component {
         arrMaster: arrmaster.count + "/" + songscount.count,
         mostPlayed,
       });
-      const useCDLCforStats = await getUseCDLCConfig();
       const leadStats = await getLeadStats(useCDLCforStats);
       const lup = leadStats.l - (leadStats.lh + leadStats.lm + leadStats.ll)
       const rhythmStats = await getRhythmStats(useCDLCforStats);
       const rup = rhythmStats.r - (rhythmStats.rh + rhythmStats.rm + rhythmStats.rl)
       const bassStats = await getBassStats(useCDLCforStats);
       const bup = bassStats.b - (bassStats.bh + bassStats.bm + bassStats.bl)
-      const saStats = await getSAStats("sa_badge_hard", "sa_fc_hard");
-      const samStats = await getSAStats("sa_badge_master", "sa_fc_master")
-      const sameStats = await getSAStats("sa_badge_medium", "sa_fc_medium");
-      const saeStats = await getSAStats("sa_badge_easy", "sa_fc_easy");
+      const saStats = await getSAStats("sa_badge_hard", "sa_fc_hard", useCDLCforStats);
+      const samStats = await getSAStats("sa_badge_master", "sa_fc_master", useCDLCforStats)
+      const sameStats = await getSAStats("sa_badge_medium", "sa_fc_medium", useCDLCforStats);
+      const saeStats = await getSAStats("sa_badge_easy", "sa_fc_easy", useCDLCforStats);
       /*
       saStats.saplat = 240;
       saStats.sagold = 540;
