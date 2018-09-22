@@ -403,17 +403,25 @@ export async function resetDB(table = 'songs_owned') {
   const sql = `delete from ${table};`
   await db.exec(sql);
 }
-export async function getSAStats(type = "sa_badge_hard", useCDLC = false) {
+export async function getSAStats(type = "sa_badge_hard", fctype = "sa_fc_hard", useCDLC = false) {
   const cdlcSql = useCDLC ? "" : "is_cdlc = 'false' AND";
   // console.log("__db_call__: getLeadStats");
-  const badgeHard = (type === "sa_badge_hard");
-  const sqlstr = `select sa.count as satotal, saplat.count as saplat, sagold.count as sagold, sasilver.count as sasilver,sabronze.count as sabronze, safailed.count as safailed from \
-  (select count(*) as count from songs_owned where ${cdlcSql} sa_playcount > 0 AND ${type} > ${badgeHard ? 30 : 40}) sa, \
-  (select count(*) as count from songs_owned where ${cdlcSql} sa_playcount > 0 AND (${type} == ${badgeHard ? 35 : 45})) saplat, \
-  (select count(*) as count from songs_owned where ${cdlcSql} sa_playcount > 0 AND (${type} == ${badgeHard ? 34 : 44})) sagold, \
-  (select count(*) as count from songs_owned where ${cdlcSql} sa_playcount > 0 AND (${type} == ${badgeHard ? 33 : 43})) sasilver, \
-  (select count(*) as count from songs_owned where ${cdlcSql} sa_playcount > 0 AND (${type} == ${badgeHard ? 32 : 42})) sabronze, \
-  (select count(*) as count from songs_owned where ${cdlcSql} sa_playcount > 0 AND (${type} == ${badgeHard ? 31 : 41})) safailed; `
+  let badgeRating = 0;
+  if (type === "sa_badge_master") badgeRating = 40;
+  else if (type === "sa_badge_hard") badgeRating = 30;
+  else if (type === "sa_badge_medium") badgeRating = 20;
+  else if (type === "sa_badge_easy") badgeRating = 10;
+
+  const sqlstr = `select sa.count as satotal, \
+  saplat.count as saplat, sagold.count as sagold, sasilver.count as sasilver,\
+  sabronze.count as sabronze, safailed.count as safailed, safcs.count as safcs from \
+  (select count(*) as count from songs_owned where ${cdlcSql} ${fctype} is not null) safcs, \
+  (select count(*) as count from songs_owned where ${cdlcSql} sa_playcount > 0 AND ${type} > ${badgeRating}) sa, \
+  (select count(*) as count from songs_owned where ${cdlcSql} sa_playcount > 0 AND (${type} == ${badgeRating + 1})) safailed,
+  (select count(*) as count from songs_owned where ${cdlcSql} sa_playcount > 0 AND (${type} == ${badgeRating + 2})) sabronze, \
+  (select count(*) as count from songs_owned where ${cdlcSql} sa_playcount > 0 AND (${type} == ${badgeRating + 3})) sasilver, \
+  (select count(*) as count from songs_owned where ${cdlcSql} sa_playcount > 0 AND (${type} == ${badgeRating + 4})) sagold, \
+  (select count(*) as count from songs_owned where ${cdlcSql} sa_playcount > 0 AND (${type} == ${badgeRating + 5})) saplat;`
   const output = await db.get(sqlstr);
   return output;
 }
@@ -428,7 +436,6 @@ export async function getLeadStats(useCDLC = false) {
   (select count(*) as count from songs_owned where ${cdlcSql} mastery >= .1 AND mastery <= .90 AND arrangement like '%lead%') ll, \
   (select count(*) as count from songs_owned where ${cdlcSql} mastery < .1 AND arrangement like '%lead%') up;`
   const output = await db.get(sqlstr);
-  console.log(sqlstr);
   return output;
 }
 export async function getRhythmStats(useCDLC = false) {

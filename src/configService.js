@@ -20,6 +20,7 @@ export async function getConfig(type) {
       obj.steamLoginSecure = ""
       obj.showScoreAttack = true
       obj.useCDLCinStats = true
+      obj.scoreAttackDashboard = [true, true, true, true]; //easy, medium, hard, master
       await writeFile(window.configPath, JSON.stringify(obj));
     }
     const data = await readFile(window.configPath);
@@ -57,6 +58,9 @@ export async function updateUseCDLCConfig(value) {
 export async function updateSteamLoginSecureCookie(value) {
   await updateConfig("steamLoginSecure", value);
 }
+export async function updateScoreAttackDashboard(current) {
+  await updateConfig("scoreAttackDashboard", current);
+}
 
 export default async function getProfileConfig() {
   const d = await getConfig("prfldb");
@@ -74,5 +78,10 @@ export async function getScoreAttackConfig() {
 export async function getUseCDLCConfig() {
   const d = await getConfig("useCDLCinStats");
   if (d === '') return true; //default value
+  return d;
+}
+export async function getScoreAttackDashboardConfig() {
+  const d = await getConfig("scoreAttackDashboard");
+  if (d === '') return [true, true, true, true];
   return d;
 }

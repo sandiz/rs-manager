@@ -1,7 +1,7 @@
 import React from 'react'
 import Collapsible from 'react-collapsible';
 import PropTypes from 'prop-types';
-import getProfileConfig, { updateSteamLoginSecureCookie, getSteamLoginSecureCookie, updateProfileConfig, getScoreAttackConfig, updateScoreAttackConfig, updateUseCDLCConfig, getUseCDLCConfig } from '../configService';
+import getProfileConfig, { updateSteamLoginSecureCookie, getSteamLoginSecureCookie, updateProfileConfig, getScoreAttackConfig, updateScoreAttackConfig, updateUseCDLCConfig, getUseCDLCConfig, getScoreAttackDashboardConfig, updateScoreAttackDashboard } from '../configService';
 import { resetDB, createRSSongList, addtoRSSongList, isTablePresent, deleteRSSongList } from '../sqliteService';
 import readProfile from '../steamprofileService';
 
@@ -66,6 +66,7 @@ export default class SettingsView extends React.Component {
       setlistImported: [false, false, false, false, false, false],
       processingSetlist: false,
       useCDLCinStats: true,
+      scoreAttackDashboard: [true, true, true, true],
     };
     this.readConfigs();
     this.refreshSetlist();
@@ -174,6 +175,30 @@ export default class SettingsView extends React.Component {
       showScoreAttack: value,
     });
   }
+  handleScoreAttackDashboard = async (event, type) => {
+    const t = event.target;
+    const value = t.type === 'checkbox' ? t.checked : t.value;
+    const cur = this.state.scoreAttackDashboard;
+    switch (type) {
+      case 'easy':
+        cur[0] = value;
+        break;
+      case 'medium':
+        cur[1] = value;
+        break;
+      case 'hard':
+        cur[2] = value;
+        break;
+      case 'master':
+        cur[3] = value;
+        break;
+      default:
+        break;
+    }
+    this.setState({
+      scoreAttackDashboard: cur,
+    });
+  }
   handleCDLCStats = (event) => {
     const t = event.target;
     const value = t.type === 'checkbox' ? t.checked : t.value;
@@ -198,11 +223,13 @@ export default class SettingsView extends React.Component {
     const e = await getSteamLoginSecureCookie();
     const f = await getScoreAttackConfig();
     const g = await getUseCDLCConfig();
+    const h = await getScoreAttackDashboardConfig();
     this.setState({
       prfldb: d,
       steamLoginSecure: e,
       showScoreAttack: f,
       useCDLCinStats: g,
+      scoreAttackDashboard: h,
     });
   }
   saveSettings = async () => {
@@ -214,6 +241,7 @@ export default class SettingsView extends React.Component {
     }
     await updateScoreAttackConfig(this.state.showScoreAttack);
     await updateUseCDLCConfig(this.state.useCDLCinStats);
+    await updateScoreAttackDashboard(this.state.scoreAttackDashboard);
     this.props.handleChange();
     this.props.updateHeader(this.tabname, "Settings Saved!");
   }
@@ -398,6 +426,46 @@ export default class SettingsView extends React.Component {
                   <div className="">
                     <span style={{ color: '#ccc' }}>
                       Show/Hides score attack stats from Dashboard and Songs view.
+                  </span>
+                  </div>
+                  <br />
+                  <span style={{ float: 'left' }}>
+                    <a onClick={this.enterCookie}>
+                      Score Attack Panes
+                  </a>
+                  </span>
+                  <span style={{
+                    float: 'right',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    width: 400 + 'px',
+                    textAlign: 'right',
+                  }}>
+                    <span>Easy &nbsp;&nbsp;</span>
+                    <input
+                      type="checkbox"
+                      checked={this.state.scoreAttackDashboard[0] === true}
+                      onChange={event => this.handleScoreAttackDashboard(event, 'easy')} />
+                    <span>&nbsp;&nbsp;Medium &nbsp;&nbsp;</span>
+                    <input
+                      type="checkbox"
+                      checked={this.state.scoreAttackDashboard[1] === true}
+                      onChange={event => this.handleScoreAttackDashboard(event, 'medium')} />
+                    <span>&nbsp;&nbsp;Hard &nbsp;&nbsp;</span>
+                    <input
+                      type="checkbox"
+                      checked={this.state.scoreAttackDashboard[2] === true}
+                      onChange={event => this.handleScoreAttackDashboard(event, 'hard')} />
+                    <span>&nbsp;&nbsp;Master &nbsp;&nbsp;</span>
+                    <input
+                      type="checkbox"
+                      checked={this.state.scoreAttackDashboard[3] === true}
+                      onChange={event => this.handleScoreAttackDashboard(event, 'master')} />
+                  </span>
+                  <br />
+                  <div className="">
+                    <span style={{ color: '#ccc' }}>
+                      Show selected score attack panes in Dashboard.
                   </span>
                   </div>
                   <br />

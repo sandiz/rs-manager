@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types';
 import StatsTableView from './statsTableView';
-import getProfileConfig, { updateProfileConfig, getScoreAttackConfig, getUseCDLCConfig } from '../configService';
+import getProfileConfig, { updateProfileConfig, getScoreAttackConfig, getUseCDLCConfig, getScoreAttackDashboardConfig } from '../configService';
 import readProfile from '../steamprofileService';
 import { updateMasteryandPlayed, initSongsOwnedDB, getSongByID, countSongsOwned, getArrangmentsMastered, getLeadStats, getRhythmStats, getBassStats, getRandomSongOwned, getRandomSongAvailable, getSAStats, updateScoreAttackStats } from '../sqliteService';
 import { replaceRocksmithTerms } from './songavailableView';
@@ -14,6 +14,8 @@ export default class DashboardView extends React.Component {
     super(props);
     this.tabname = 'tab-dashboard';
     this.state = {
+      scoreAttackDashboard: [false, false, false, false],
+      scdTrueLength: 0,
       showweekly: false,
       weeklysongspotlight: { title: '', url: '' },
       randompackappid: '',
@@ -33,48 +35,23 @@ export default class DashboardView extends React.Component {
       songPlays: 0,
       mostPlayed: '-',
       arrMaster: 0,
-      l: 0,
-      lh: 0,
-      lm: 0,
-      ll: 0,
-      lup: 0,
-      lhw: 0,
-      lmw: 0,
-      llw: 0,
-      luw: 0,
-      r: 0,
-      rh: 0,
-      rm: 0,
-      rl: 0,
-      rup: 0,
-      rhw: 0,
-      rmw: 0,
-      rlw: 0,
-      ruw: 0,
-      b: 0,
-      bh: 0,
-      bm: 0,
-      bl: 0,
-      bup: 0,
-      bhw: 0,
-      bmw: 0,
-      blw: 0,
-      buw: 0,
-      saplat: 0,
-      saplatw: 0,
-      sagold: 0,
-      sagoldw: 0,
-      sasilver: 0,
-      sasilverw: 0,
-      sabronze: 0,
-      sabronzew: 0,
-      safailed: 0,
-      safailedw: 0,
-      saunplayed: 0,
-      saunplayedw: 0,
-      samunplayed: 0,
-      samunplayedw: 0,
       showsastats: true,
+
+      lead: [0, 0, 0, 0, 0],
+      leadwidth: [0, 0, 0, 0, 0],
+      rhythm: [0, 0, 0, 0, 0],
+      rhythmwidth: [0, 0, 0, 0, 0],
+      bass: [0, 0, 0, 0, 0],
+      basswidth: [0, 0, 0, 0, 0],
+
+      sahard: [0, 0, 0, 0, 0, 0, 0],
+      sahardwidth: [0, 0, 0, 0, 0, 0, 0],
+      samaster: [0, 0, 0, 0, 0, 0, 0],
+      samasterwidth: [0, 0, 0, 0, 0, 0, 0],
+      samedium: [0, 0, 0, 0, 0, 0, 0],
+      samediumwidth: [0, 0, 0, 0, 0, 0, 0],
+      saeasy: [0, 0, 0, 0, 0, 0, 0],
+      saeasywidth: [0, 0, 0, 0, 0, 0, 0],
     }
   }
   componentWillMount = async () => {
@@ -103,7 +80,9 @@ export default class DashboardView extends React.Component {
   fetchStats = async (disbleDialog) => {
     const prfldb = await getProfileConfig();
     const showsastats = await getScoreAttackConfig();
-    this.setState({ showsastats });
+    const scoreAttackDashboard = await getScoreAttackDashboardConfig();
+    const scdTrueLength = scoreAttackDashboard.filter(x => x).length;
+    this.setState({ showsastats, scoreAttackDashboard, scdTrueLength });
     if (prfldb === "" || prfldb === null) {
       return;
     }
@@ -154,8 +133,10 @@ export default class DashboardView extends React.Component {
       const rup = rhythmStats.r - (rhythmStats.rh + rhythmStats.rm + rhythmStats.rl)
       const bassStats = await getBassStats(useCDLCforStats);
       const bup = bassStats.b - (bassStats.bh + bassStats.bm + bassStats.bl)
-      const saStats = await getSAStats("sa_badge_hard");
-      const samStats = await getSAStats("sa_badge_master")
+      const saStats = await getSAStats("sa_badge_hard", "sa_fc_hard");
+      const samStats = await getSAStats("sa_badge_master", "sa_fc_master")
+      const sameStats = await getSAStats("sa_badge_medium", "sa_fc_medium");
+      const saeStats = await getSAStats("sa_badge_easy", "sa_fc_easy");
       /*
       saStats.saplat = 240;
       saStats.sagold = 540;
@@ -165,59 +146,100 @@ export default class DashboardView extends React.Component {
       samStats.sasilver = 440;
       */
       this.setState({
-        l: leadStats.l,
-        lh: leadStats.lh,
-        lm: leadStats.lm,
-        ll: leadStats.ll,
-        lup,
-        lhw: this.getStatsWidth(leadStats.lh, 0, leadStats.l),
-        lmw: this.getStatsWidth(leadStats.lm, 0, leadStats.l),
-        llw: this.getStatsWidth(leadStats.ll, 0, leadStats.l),
-        luw: this.getStatsWidth(lup, 0, leadStats.l),
-        r: rhythmStats.r,
-        rh: rhythmStats.rh,
-        rm: rhythmStats.rm,
-        rl: rhythmStats.rl,
-        rup,
-        rhw: this.getStatsWidth(rhythmStats.rh, 0, rhythmStats.r),
-        rmw: this.getStatsWidth(rhythmStats.rm, 0, rhythmStats.r),
-        rlw: this.getStatsWidth(rhythmStats.rl, 0, rhythmStats.r),
-        ruw: this.getStatsWidth(rup, 0, rhythmStats.r),
-        b: bassStats.b,
-        bh: bassStats.bh,
-        bm: bassStats.bm,
-        bl: bassStats.bl,
-        bup,
-        bhw: this.getStatsWidth(bassStats.bh, 0, bassStats.b),
-        bmw: this.getStatsWidth(bassStats.bm, 0, bassStats.b),
-        blw: this.getStatsWidth(bassStats.bl, 0, bassStats.b),
-        buw: this.getStatsWidth(bup, 0, bassStats.b),
-        satotal: songscount.count,
-        saplat: saStats.saplat,
-        saplatw: this.getStatsWidth(saStats.saplat, 0, songscount.count),
-        sagold: saStats.sagold,
-        sagoldw: this.getStatsWidth(saStats.sagold, 0, songscount.count),
-        sasilver: saStats.sasilver,
-        sasilverw: this.getStatsWidth(saStats.sasilver, 0, songscount.count),
-        sabronze: saStats.sabronze,
-        sabronzew: this.getStatsWidth(saStats.sabronze, 0, songscount.count),
-        safailed: saStats.safailed,
-        safailedw: this.getStatsWidth(saStats.safailed, 0, songscount.count),
-        saunplayed: songscount.count - saStats.satotal,
-        saunplayedw: this.getStatsWidth(songscount.count - saStats.satotal, 0, songscount.count),
+        lead: [
+          leadStats.l, leadStats.lh, leadStats.lm, leadStats.ll, lup,
+        ],
+        leadwidth: [
+          0,
+          this.getStatsWidth(leadStats.lh, 0, leadStats.l),
+          this.getStatsWidth(leadStats.lm, 0, leadStats.l),
+          this.getStatsWidth(leadStats.ll, 0, leadStats.l),
+          this.getStatsWidth(lup, 0, leadStats.l),
+        ],
 
-        samplat: samStats.saplat,
-        samplatw: this.getStatsWidth(samStats.saplat, 0, songscount.count),
-        samgold: samStats.sagold,
-        samgoldw: this.getStatsWidth(samStats.sagold, 0, songscount.count),
-        samsilver: samStats.sasilver,
-        samsilverw: this.getStatsWidth(samStats.sasilver, 0, songscount.count),
-        sambronze: samStats.sabronze,
-        sambronzew: this.getStatsWidth(samStats.sabronze, 0, songscount.count),
-        samfailed: samStats.safailed,
-        samfailedw: this.getStatsWidth(samStats.safailed, 0, songscount.count),
-        samunplayed: songscount.count - samStats.satotal,
-        samunplayedw: this.getStatsWidth(songscount.count - samStats.satotal, 0, songscount.count),
+        rhythm: [
+          rhythmStats.r, rhythmStats.rh, rhythmStats.rm, rhythmStats.rl, rup,
+        ],
+        rhythmwidth: [
+          0,
+          this.getStatsWidth(rhythmStats.rh, 0, rhythmStats.r),
+          this.getStatsWidth(rhythmStats.rm, 0, rhythmStats.r),
+          this.getStatsWidth(rhythmStats.rl, 0, rhythmStats.r),
+          this.getStatsWidth(rup, 0, rhythmStats.r),
+        ],
+
+        bass: [
+          bassStats.b, bassStats.bh, bassStats.bm, bassStats.bl, bup,
+        ],
+        basswidth: [
+          0,
+          this.getStatsWidth(bassStats.bh, 0, bassStats.b),
+          this.getStatsWidth(bassStats.bm, 0, bassStats.b),
+          this.getStatsWidth(bassStats.bl, 0, bassStats.b),
+          this.getStatsWidth(bup, 0, bassStats.b),
+        ],
+        satotal: songscount.count,
+
+        /* hard */
+        sahard: [
+          saStats.saplat, saStats.sagold, saStats.sasilver,
+          saStats.sabronze, saStats.safailed, songscount.count - saStats.satotal,
+          saStats.safcs,
+        ],
+        sahardwidth: [
+          this.getStatsWidth(saStats.saplat, 0, songscount.count),
+          this.getStatsWidth(saStats.sagold, 0, songscount.count),
+          this.getStatsWidth(saStats.sasilver, 0, songscount.count),
+          this.getStatsWidth(saStats.sabronze, 0, songscount.count),
+          this.getStatsWidth(saStats.safailed, 0, songscount.count),
+          this.getStatsWidth(songscount.count - saStats.satotal, 0, songscount.count),
+          this.getStatsWidth(saStats.safcs, 0, songscount.count),
+        ],
+        /* master */
+        samaster: [
+          samStats.saplat, samStats.sagold, samStats.sasilver,
+          samStats.sabronze, samStats.safailed, songscount.count - samStats.satotal,
+          samStats.safcs,
+        ],
+        samasterwidth: [
+          this.getStatsWidth(samStats.saplat, 0, songscount.count),
+          this.getStatsWidth(samStats.sagold, 0, songscount.count),
+          this.getStatsWidth(samStats.sasilver, 0, songscount.count),
+          this.getStatsWidth(samStats.sabronze, 0, songscount.count),
+          this.getStatsWidth(samStats.safailed, 0, songscount.count),
+          this.getStatsWidth(songscount.count - samStats.satotal, 0, songscount.count),
+          this.getStatsWidth(samStats.safcs, 0, songscount.count),
+        ],
+        /* medium */
+        samedium: [
+          sameStats.saplat, sameStats.sagold, sameStats.sasilver,
+          sameStats.sabronze, sameStats.safailed, songscount.count - sameStats.satotal,
+          sameStats.safcs,
+        ],
+        samediumwidth: [
+          this.getStatsWidth(sameStats.saplat, 0, songscount.count),
+          this.getStatsWidth(sameStats.sagold, 0, songscount.count),
+          this.getStatsWidth(sameStats.sasilver, 0, songscount.count),
+          this.getStatsWidth(sameStats.sabronze, 0, songscount.count),
+          this.getStatsWidth(sameStats.safailed, 0, songscount.count),
+          this.getStatsWidth(songscount.count - sameStats.satotal, 0, songscount.count),
+          this.getStatsWidth(sameStats.safcs, 0, songscount.count),
+        ],
+        /* easy */
+        saeasy: [
+          saeStats.saplat, saeStats.sagold, saeStats.sasilver,
+          saeStats.sabronze, saeStats.safailed, songscount.count - saeStats.satotal,
+          saeStats.safcs,
+        ],
+        saeasywidth: [
+          this.getStatsWidth(saeStats.saplat, 0, songscount.count),
+          this.getStatsWidth(saeStats.sagold, 0, songscount.count),
+          this.getStatsWidth(saeStats.sasilver, 0, songscount.count),
+          this.getStatsWidth(saeStats.sabronze, 0, songscount.count),
+          this.getStatsWidth(saeStats.safailed, 0, songscount.count),
+          this.getStatsWidth(songscount.count - saeStats.satotal, 0, songscount.count),
+          this.getStatsWidth(saeStats.safcs, 0, songscount.count),
+        ],
       })
       this.props.updateHeader(this.tabname, "Rocksmith 2014 Dashboard");
     }
@@ -348,7 +370,9 @@ export default class DashboardView extends React.Component {
     await this.fetchStats();
   }
   render = () => {
-    const scoreattackstyle = "col ta-center dashboard-bottom " + (this.state.showsastats ? "col-md-3" : "hidden");
+    let sacolwidth = "col-sm-3";
+    if (this.state.scdTrueLength > 2) sacolwidth = "col-sm-2-2"
+    const scoreattackstyle = "col ta-center dashboard-bottom " + (this.state.showsastats ? sacolwidth : "hidden");
     const arrstyle = "col ta-center dashboard-middle col-md-3";
     return (
       <div className="container-fluid">
@@ -508,85 +532,77 @@ export default class DashboardView extends React.Component {
           <div className={arrstyle}>
             <span style={{ fontSize: 17 + 'px' }}>Lead </span>
             <StatsTableView
-              total={this.state.l}
-              highscoretotal={this.state.lh}
-              mediumscoretotal={this.state.lm}
-              lowscoretotal={this.state.ll}
-              unplayedtotal={this.state.lup}
-              highscorewidth={this.state.lhw}
-              mediumscorewidth={this.state.lmw}
-              lowscorewidth={this.state.llw}
-              unplayedwidth={this.state.luw}
+              total={this.state.lead[0]}
+              masteryTotals={this.state.lead.slice(1)}
+              masteryWidths={this.state.leadwidth.slice(1)}
             />
           </div>
           <div className={arrstyle}>
             <span style={{ fontSize: 17 + 'px' }}>Rhythm </span>
             <StatsTableView
-              total={this.state.r}
-              highscoretotal={this.state.rh}
-              mediumscoretotal={this.state.rm}
-              lowscoretotal={this.state.rl}
-              unplayedtotal={this.state.rup}
-              highscorewidth={this.state.rhw}
-              mediumscorewidth={this.state.rmw}
-              lowscorewidth={this.state.rlw}
-              unplayedwidth={this.state.ruw}
+              total={this.state.rhythm[0]}
+              masteryTotals={this.state.rhythm.slice(1)}
+              masteryWidths={this.state.rhythmwidth.slice(1)}
             />
           </div>
           <div className={arrstyle}>
             <span style={{ fontSize: 17 + 'px' }}>Bass </span>
             <StatsTableView
-              total={this.state.b}
-              highscoretotal={this.state.bh}
-              mediumscoretotal={this.state.bm}
-              lowscoretotal={this.state.bl}
-              unplayedtotal={this.state.bup}
-              highscorewidth={this.state.bhw}
-              mediumscorewidth={this.state.bmw}
-              lowscorewidth={this.state.blw}
-              unplayedwidth={this.state.buw}
+              total={this.state.bass[0]}
+              masteryTotals={this.state.bass.slice(1)}
+              masteryWidths={this.state.basswidth.slice(1)}
             />
           </div>
         </div>
-        <div className="row justify-content-md-center dashboard-scoreattack" >
-          <div className={scoreattackstyle}>
-            <span style={{ fontSize: 17 + 'px' }}>Score Attack - Hard</span>
-            <StatsTableView
-              scoreattack
-              total={this.state.satotal}
-              plattotal={this.state.saplat}
-              platwidth={this.state.saplatw}
-              goldtotal={this.state.sagold}
-              goldwidth={this.state.sagoldw}
-              silvertotal={this.state.sasilver}
-              silverwidth={this.state.sasilverw}
-              bronzetotal={this.state.sabronze}
-              bronzewidth={this.state.sabronzew}
-              failedtotal={this.state.safailed}
-              failedwidth={this.state.safailedw}
-              unplayedtotal={this.state.saunplayed}
-              unplayedwidth={this.state.saunplayedw}
-            />
-          </div>
-          <div className={scoreattackstyle}>
-            <span style={{ fontSize: 17 + 'px' }}>Score Attack - Master</span>
-            <StatsTableView
-              scoreattack
-              total={this.state.satotal}
-              plattotal={this.state.samplat}
-              platwidth={this.state.samplatw}
-              goldtotal={this.state.samgold}
-              goldwidth={this.state.samgoldw}
-              silvertotal={this.state.samsilver}
-              silverwidth={this.state.samsilverw}
-              bronzetotal={this.state.sambronze}
-              bronzewidth={this.state.sambronzew}
-              failedtotal={this.state.samfailed}
-              failedwidth={this.state.samfailedw}
-              unplayedtotal={this.state.samunplayed}
-              unplayedwidth={this.state.samunplayedw}
-            />
-          </div>
+        <div className="row justify-content-md-center dashboard-scoreattack">
+          {
+            this.state.scoreAttackDashboard[0] === true ?
+              <div className={scoreattackstyle}>
+                <span style={{ fontSize: 17 + 'px' }}>Score Attack - Easy</span>
+                <StatsTableView
+                  scoreattack
+                  total={this.state.satotal}
+                  tierTotals={this.state.saeasy}
+                  tierWidths={this.state.saeasywidth}
+                />
+              </div> : null
+          }
+          {
+            this.state.scoreAttackDashboard[1] === true ?
+              <div className={scoreattackstyle}>
+                <span style={{ fontSize: 17 + 'px' }}>Score Attack - Medium</span>
+                <StatsTableView
+                  scoreattack
+                  total={this.state.satotal}
+                  tierTotals={this.state.samedium}
+                  tierWidths={this.state.samediumwidth}
+                />
+              </div> : null
+          }
+          {
+            this.state.scoreAttackDashboard[2] === true ?
+              <div className={scoreattackstyle}>
+                <span style={{ fontSize: 17 + 'px' }}>Score Attack - Hard</span>
+                <StatsTableView
+                  scoreattack
+                  total={this.state.satotal}
+                  tierTotals={this.state.sahard}
+                  tierWidths={this.state.sahardwidth}
+                />
+              </div> : null
+          }
+          {
+            this.state.scoreAttackDashboard[3] === true ?
+              <div className={scoreattackstyle}>
+                <span style={{ fontSize: 17 + 'px' }}>Score Attack - Master</span>
+                <StatsTableView
+                  scoreattack
+                  total={this.state.satotal}
+                  tierTotals={this.state.samaster}
+                  tierWidths={this.state.samasterwidth}
+                />
+              </div> : null
+          }
         </div>
         <div>
           <SongDetailView
@@ -625,6 +641,6 @@ DashboardView.propTypes = {
 DashboardView.defaultProps = {
   //currentTab: null,
   updateHeader: () => { },
-  //resetHeader: () => { },
+  //resetHeader: () => {},
   handleChange: () => { },
 }
