@@ -271,7 +271,7 @@ export default async function updateSongsOwned(psarcResult, isCDLC = false) {
   const length = psarcResult.songLength;
   let mastery = 0
   let count = 0
-  let cdlc = false;
+  let cdlc = isCDLC;
   sqlstr = `select mastery, count, is_cdlc from songs_owned where song='${song}' AND
   album='${album}' AND artist='${artist}' AND arrangement='${arrangement}'`;
   const op = await db.all(sqlstr);
@@ -322,9 +322,12 @@ export async function getSongsOwned(start = 0, count = 10, sortField = "mastery"
     case "cdlc":
       searchSql += ` and is_cdlc = 'true'`
       break;
+    case "odlc":
+      searchSql += ` and is_cdlc = 'false'`
+      break;
     default: break;
   }
-  if (search === "" && searchField !== "cdlc") {
+  if (search === "" && searchField !== "cdlc" && searchField !== "odlc") {
     sql = `select c.acount as acount, c.songcount as songcount, *
           from songs_owned,  (
           SELECT count(*) as acount, count(distinct songkey) as songcount

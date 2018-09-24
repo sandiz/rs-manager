@@ -264,6 +264,7 @@ export default class PSARCView extends React.Component {
   updateSongList = async () => {
     await initSongsOwnedDB();
     console.log("arrangments: " + this.state.files.length);
+    console.log("mark as cdlc: " + this.markAsCDLC.checked);
     let count = 0;
     let fcount = 0;
     let filtered = "";
