@@ -22,6 +22,7 @@ const rp = require('request-promise');
 const isDev = require('electron-is-dev');
 const express = require('express')
 
+
 const exp = express()
 window.PROD_YT_PORT = 8000;
 window.DEV_YT_PORT = 9000;
@@ -36,19 +37,26 @@ else {
 }
 
 
-window.request = async function (uri, cookie, cookieurl, qs) {
+window.request = async function (uri, cookies, cookieurl, qs, form, method = "GET") {
 
     let cookiejar = rp.jar();
     //cookiejar.setCookie('steamLoginSecure=76561197985613182%7C%7C4B2D9C3BFDDB12750CD0BB9086C188AAD7051295', 'https://store.steampowered.com');
-    if (cookie != "") {
-        cookiejar.setCookie(cookie, cookieurl);
+    if (Array.isArray(cookies)) {
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i];
+            console.log("adding cookie: ", cookie);
+            cookiejar.setCookie(cookie, cookieurl);
+        }
     }
     const options = {
+        method,
         //uri: 'https://store.steampowered.com/dynamicstore/userdata/',
         uri,
         jar: cookiejar, // Tells rp to include cookies in jar that match uri,
         qs,
+        form,
     };
+    console.log(options);
     const d = await rp(options);
     return d;
 }

@@ -37,21 +37,28 @@ export default async function readProfile(prfldb) {
   }
   return null;
 }
-export async function getOwnedPackages(cookie) {
+export async function getOwnedPackages(cookie, cookieSess) {
   const c = await window.request(
     "https://store.steampowered.com/dynamicstore/userdata/",
-    `steamLoginSecure=${cookie}`,
+    [`steamLoginSecure=${cookie}`, `sessionid=${cookieSess}`],
     'https://store.steampowered.com',
   );
-
   return JSON.parse(c);
 }
 
-export async function getOwnedHistory(cookie) {
+export async function getOwnedHistory(cookie, cookieSess) {
+  //const body = "sessionid=819d356d55af59e5ce4efd38";
+  const form = {
+    sessionid: cookieSess,
+    //"cursor[timestamp_newest]": Math.round((new Date()).getTime() / 1000),
+  }
   const c = await window.request(
     "https://store.steampowered.com/account/AjaxLoadMoreHistory/",
-    `steamLoginSecure=${cookie}`,
+    [`steamLoginSecure=${cookie}`, `sessionid=${cookieSess}`],
     'https://store.steampowered.com',
+    null,
+    form,
+    "POST",
   );
 
   //const re1 = /<td class="wht_date">(.*)<\/td>.*
