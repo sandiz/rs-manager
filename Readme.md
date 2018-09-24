@@ -17,6 +17,8 @@ Rocksmith's UI leaves a lot to be desired especially when you have a lot of song
     - This section should already be populated with all the dlc's released so far. You can use the options in this view to keep the list up to date as well as retreive metadata from steam about ownership/acquire date. (requires steam profile to be linked in Settings)
 
 ## Screenshots
+### Stats
+![Stats](https://github.com/sandiz/rs-manager/raw/master/assets/images/dashboard.stats.png)
 ### Songs Owned
 ![Songs Owned](https://github.com/sandiz/rs-manager/raw/master/assets/images/songs.owned.png)
 ### Songs Available
