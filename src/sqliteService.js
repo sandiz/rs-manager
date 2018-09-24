@@ -426,7 +426,7 @@ export async function getSAStats(type = "sa_badge_hard", fctype = "sa_fc_hard", 
   (select count(*) as count from songs_owned where ${cdlcSql} sa_playcount > 0 AND (${type} == ${badgeRating + 2})) sabronze, \
   (select count(*) as count from songs_owned where ${cdlcSql} sa_playcount > 0 AND (${type} == ${badgeRating + 3})) sasilver, \
   (select count(*) as count from songs_owned where ${cdlcSql} sa_playcount > 0 AND (${type} == ${badgeRating + 4})) sagold, \
-  (select count(*) as count from songs_owned where ${cdlcSql} sa_playcount > 0 AND (${type} == ${badgeRating + 5})) saplat;`
+  (select count(*) as count from songs_owned where ${cdlcSql} ${fctype} is null AND sa_playcount > 0 AND (${type} == ${badgeRating + 5})) saplat;`
   const output = await db.get(sqlstr);
   return output;
 }
