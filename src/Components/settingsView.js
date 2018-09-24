@@ -1,7 +1,7 @@
 import React from 'react'
 import Collapsible from 'react-collapsible';
 import PropTypes from 'prop-types';
-import getProfileConfig, { updateSteamLoginSecureCookie, getSteamLoginSecureCookie, updateProfileConfig, getScoreAttackConfig, updateScoreAttackConfig, updateUseCDLCConfig, getUseCDLCConfig, getScoreAttackDashboardConfig, updateScoreAttackDashboard } from '../configService';
+import getProfileConfig, { updateSteamLoginSecureCookie, getSteamLoginSecureCookie, updateProfileConfig, getScoreAttackConfig, updateScoreAttackConfig, updateUseCDLCConfig, getUseCDLCConfig, getScoreAttackDashboardConfig, updateScoreAttackDashboard, getSessionIDConfig, updateSessionIDConfig } from '../configService';
 import { resetDB, createRSSongList, addtoRSSongList, isTablePresent, deleteRSSongList } from '../sqliteService';
 import readProfile from '../steamprofileService';
 
@@ -62,6 +62,7 @@ export default class SettingsView extends React.Component {
     this.state = {
       prfldb: '',
       steamLoginSecure: '',
+      sessionID: '',
       showScoreAttack: true,
       setlistImported: [false, false, false, false, false, false],
       processingSetlist: false,
@@ -224,17 +225,20 @@ export default class SettingsView extends React.Component {
     const f = await getScoreAttackConfig();
     const g = await getUseCDLCConfig();
     const h = await getScoreAttackDashboardConfig();
+    const i = await getSessionIDConfig();
     this.setState({
       prfldb: d,
       steamLoginSecure: e,
       showScoreAttack: f,
       useCDLCinStats: g,
       scoreAttackDashboard: h,
+      sessionID: i,
     });
   }
   saveSettings = async () => {
     if (this.state.steamLoginSecure !== "" && this.state.steamLoginSecure != null) {
       await updateSteamLoginSecureCookie(this.state.steamLoginSecure);
+      await updateSessionIDConfig(this.state.sessionID);
     }
     if (this.state.prfldb !== "" && this.state.prfldb != null) {
       await updateProfileConfig(this.state.prfldb);
@@ -261,7 +265,7 @@ export default class SettingsView extends React.Component {
   }
   enterCookie = async () => {
     const prompt = window.prompt;
-    const d = await prompt({
+    let d = await prompt({
       title: 'Please enter value of steamLoginSecure cookie',
       label: 'steamLoginSecure:',
       value: '',
@@ -273,9 +277,21 @@ export default class SettingsView extends React.Component {
     console.log(d);
     if (d !== "" && d != null) {
       this.setState({ steamLoginSecure: d });
-
-      this.props.handleChange();
     }
+    d = await prompt({
+      title: 'Please enter value of sessionID cookie',
+      label: 'sessionID:',
+      value: '',
+      inputAttrs: {
+        type: 'text',
+      },
+      type: 'input',
+    })
+    console.log(d);
+    if (d !== "" && d != null) {
+      this.setState({ sessionID: d });
+    }
+    this.props.handleChange();
   }
   render = () => {
     if (this.props.currentTab === null) {
@@ -354,14 +370,14 @@ export default class SettingsView extends React.Component {
                   <br />
                   <span style={{ float: 'left' }}>
                     <a onClick={this.enterCookie}>
-                      Steam Login Cookie (steamLoginSecure):
+                      Steam Login Cookie (steamLoginSecure) / SessionID (sessionId):
                   </a>
                   </span>
                   <span style={{
                     float: 'right',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
-                    width: 400 + 'px',
+                    width: 500 + 'px',
                     textAlign: 'right',
                     paddingRight: 1 + 'px',
                   }}>
@@ -372,6 +388,9 @@ export default class SettingsView extends React.Component {
                         <i>
                           <a onClick={this.enterCookie}>
                             {(this.state.steamLoginSecure).toLowerCase()}
+                          </a><br />
+                          <a onClick={this.enterCookie}>
+                            {(this.state.sessionID).toLowerCase()}
                           </a>
                         </i>
                     }
@@ -379,7 +398,7 @@ export default class SettingsView extends React.Component {
                   <br />
                   <div className="">
                     <span style={{ color: '#ccc' }}>
-                      Steam Login Cookie is used to update owned/acquired date in
+                      Steam Login Cookie and SessionID is used to update owned/acquired date in
                       Songs &gt; RS DLC Catalog.
                       The login cookie is valid as long the browser session is valid.
                       The app queries your

@@ -8,7 +8,7 @@ import { initSongsAvailableDB, isDLCInDB, addToSteamDLCCatalog, getDLCDetails, c
 import { RemoteAll } from './songlistView';
 import { getOwnedPackages, getOwnedHistory } from '../steamprofileService';
 import SongDetailView from './songdetailView';
-import { getSteamLoginSecureCookie } from '../configService'
+import { getSteamLoginSecureCookie, getSessionIDConfig } from '../configService'
 
 const parse = require('csv-parse/lib/es5/sync');
 
@@ -423,6 +423,7 @@ export default class SongAvailableView extends React.Component {
   }
   updateOwnedStatus = async () => {
     const cookie = await getSteamLoginSecureCookie();
+    const cookieSess = await getSessionIDConfig();
     if (cookie.length < 10 || cookie === '' || cookie == null) {
       this.props.updateHeader(
         this.tabname,
@@ -436,7 +437,7 @@ export default class SongAvailableView extends React.Component {
       this.childtabname,
       `Fetching acquired dates`,
     );
-    const history = await getOwnedHistory(cookie);
+    const history = await getOwnedHistory(cookie, cookieSess);
     if (history == null || history.length === 0) {
       this.props.updateHeader(
         this.tabname,
@@ -446,7 +447,7 @@ export default class SongAvailableView extends React.Component {
       return;
     }
     await this.updateAcquiredDates(history);
-    const pack = await getOwnedPackages(cookie);
+    const pack = await getOwnedPackages(cookie, cookieSess);
     let totalPackages = pack.rgOwnedApps;
     totalPackages = totalPackages.concat(pack.rgOwnedPackages);
     if (totalPackages.length === 0) {
