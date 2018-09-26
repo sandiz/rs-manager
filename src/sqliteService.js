@@ -51,6 +51,11 @@ export async function initSongsOwnedDB() {
   altersql4 += "alter table songs_owned add sa_fc_hard real default null;"
   altersql4 += "alter table songs_owned add sa_fc_master real default null;"
 
+  let altersql5 = "";
+  altersql5 += "alter table setlist_meta add is_manual boolean default null;"
+  altersql5 += "alter table setlist_meta add is_generated boolean default null;"
+  altersql5 += "alter table setlist_meta add view_sql char default null;"
+
   switch (version) {
     case 0: {
       // add score attack stats
@@ -88,6 +93,11 @@ export async function initSongsOwnedDB() {
     case 4:
       // add is_cdlc, sa_easy_fc, sa_medium_fc, sa_hard_fc, sa_expert_fc
       await db.exec(altersql4);
+      version += 1
+      await setUserVersion(version);
+    case 5:
+      // add is_manual, is_generated, view_sql in setlist_meta
+      await db.exec(altersql5);
       version += 1
       await setUserVersion(version);
     default:
@@ -484,20 +494,25 @@ export async function initSetlistDB() {
     db = await window.sqlite.open(dbfilename);
   }
   await db.run("CREATE TABLE IF NOT EXISTS setlist_meta (key char primary key, name char);");
-  await db.run("REPLACE INTO setlist_meta VALUES('setlist_practice','Practice List');")
+  await db.run("REPLACE INTO setlist_meta VALUES('setlist_practice','Practice List', 'true', 'false', '');")
   await initSetlistPlaylistDB("setlist_practice");
-  await db.run("REPLACE INTO setlist_meta VALUES('setlist_favorites','RS Favorites');")
+  await db.run("REPLACE INTO setlist_meta VALUES('setlist_favorites','RS Favorites', 'true', 'false', '');")
   await initSetlistPlaylistDB("setlist_favorites");
+}
+export async function getSetlistMetaInfo(key) {
+  const sql = `select * from setlist_meta where key='${key}'`;
+  const op = await db.get(sql);
+  return op;
 }
 export async function getAllSetlist(filter = false) {
   // console.log("__db_call__: getAllSetlist");
   await initSetlistDB();
   let sql = ''
   if (filter) {
-    sql = "SELECT * FROM setlist_meta where key not like '%setlist_favorites%' and key not like '%rs_song_list%' order by name collate nocase";
+    sql = "SELECT * FROM setlist_meta where key not like '%setlist_favorites%' and key not like '%rs_song_list%' and is_manual='true' order by rowid asc;"
   }
   else {
-    sql = "SELECT * FROM setlist_meta  order by name collate nocase;"
+    sql = "SELECT * FROM setlist_meta  order by rowid asc;"
   }
   const all = await db.all(sql);
   return all;
@@ -510,9 +525,18 @@ export async function isTablePresent(tablename) {
   }
   return true;
 }
-export async function createRSSongList(tablename, displayname) {
+export async function createRSSongList(
+  tablename, displayname,
+  isgenerated = null, ismanual = null, viewsql = null,
+) {
   await initSetlistPlaylistDB(tablename);
-  await db.run(`REPLACE INTO setlist_meta VALUES('${tablename}','${displayname}');`)
+  await db.run(`
+    REPLACE INTO setlist_meta VALUES(
+    '${tablename}',
+    '${displayname}', 
+    '${ismanual}', 
+    '${isgenerated}',
+    '${viewsql}');`)
 }
 export async function addtoRSSongList(tablename, songkey) {
   const sql = `replace into '${tablename}' (uniqkey) select uniqkey from songs_owned where songkey like '%${songkey}%'`
@@ -577,7 +601,6 @@ export async function getSongsFromPlaylistDB(dbname, start = 0, count = 10, sort
           ORDER BY ${sortField} ${sortOrder} LIMIT ${start},${count}
           `;
   }
-  //console.log(sql);
   const output = await db.all(sql);
   return output
 }

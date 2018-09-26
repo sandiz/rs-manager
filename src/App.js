@@ -38,7 +38,7 @@ class App extends Component {
               id: 'songs-owned',
             },
             {
-              name: 'RS DLC Catalog',
+              name: 'DLC Catalog',
               id: 'songs-available',
             },
           ],
@@ -72,15 +72,7 @@ class App extends Component {
     this.selectedTab = null;
   }
   componentWillMount = async () => {
-    await initSetlistDB();
-    const setlists = await getAllSetlist();
-    const t = this.state.TabsData;
-    for (let i = 0; i < setlists.length; i += 1) {
-      const setlist = setlists[i];
-      const setlistObj = { name: setlist.name, id: setlist.key }
-      t[2].child.push(setlistObj);
-    }
-    this.setState({ TabsData: t });
+    this.refreshTabs();
   }
   componentDidMount = async () => {
     await this.updateProfile();
@@ -134,6 +126,7 @@ class App extends Component {
           updateHeader={this.updateChildHeader}
           resetHeader={this.resetHeader}
           handleChange={this.updateProfile}
+          refreshTabs={this.refreshTabs}
         />)
         break;
       case "tab-songs":
@@ -201,11 +194,16 @@ class App extends Component {
     console.log("Refresh tabs");
     const t = this.state.TabsData;
     t[2].child = []
+    const tempChilds = []
     for (let i = 0; i < setlists.length; i += 1) {
       const setlist = setlists[i];
       const setlistObj = { name: setlist.name, id: setlist.key }
-      t[2].child.push(setlistObj);
+      if (setlist.key === "setlist_practice") tempChilds.splice(0, 0, setlistObj)
+      else if (setlist.key === "setlist_favorites") tempChilds.splice(1, 0, setlistObj)
+      else tempChilds.push(setlistObj);
     }
+    t[2].child = tempChilds;
+    t[2].child.push({ name: 'Create New Setlist...', id: 'add-setlist' });
     this.setState({ TabsData: t });
   }
   render = () => {
@@ -224,6 +222,7 @@ class App extends Component {
             steamConnected={cookie}
             ytConnected={false}
             TabsData={this.state.TabsData}
+            RefreshTabs={this.refreshTabs}
           />
           <div id="content">
             <nav className="navbar navbar-expand-lg navbar-light bg-light">

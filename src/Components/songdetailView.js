@@ -8,6 +8,21 @@ import { getScoreAttackConfig } from '../configService';
 import { expandButton, collapseButton } from "./settingsView";
 import { DateAcquiredInput } from './songavailableView';
 
+export function forceNoScroll() {
+  document.getElementsByTagName("body")[0].scrollTop = 0;
+  document.getElementsByTagName("html")[0].scrollTop = 0;
+
+  document.getElementsByTagName("body")[0].style.height = "100%";
+  document.getElementsByTagName("body")[0].style.overflow = "hidden";
+  document.getElementsByTagName("html")[0].style.height = "100%";
+  document.getElementsByTagName("html")[0].style.overflow = "hidden";
+}
+export function enableScroll() {
+  document.getElementsByTagName("body")[0].style.height = "100%";
+  document.getElementsByTagName("body")[0].style.overflow = "inherit";
+  document.getElementsByTagName("html")[0].style.height = "100%";
+  document.getElementsByTagName("html")[0].style.overflow = "inherit";
+}
 export default class SongDetailView extends React.Component {
   constructor(props) {
     super(props)
@@ -123,7 +138,7 @@ export default class SongDetailView extends React.Component {
   handleHide = () => {
     this.choosePlay();
     this.props.close();
-    this.enableScroll();
+    enableScroll();
   }
   addToSetlist = async (e) => {
     const { song, artist } = this.props;
@@ -151,21 +166,6 @@ export default class SongDetailView extends React.Component {
       sa_fc_hard: songDetails.sa_fc_hard == null ? null : moment(songDetails.sa_fc_hard),
       sa_fc_master: songDetails.sa_fc_master == null ? null : moment(songDetails.sa_fc_master),
     })
-  }
-  forceNoScroll = () => {
-    document.getElementsByTagName("body")[0].scrollTop = 0;
-    document.getElementsByTagName("html")[0].scrollTop = 0;
-
-    document.getElementsByTagName("body")[0].style.height = "100%";
-    document.getElementsByTagName("body")[0].style.overflow = "hidden";
-    document.getElementsByTagName("html")[0].style.height = "100%";
-    document.getElementsByTagName("html")[0].style.overflow = "hidden";
-  }
-  enableScroll = () => {
-    document.getElementsByTagName("body")[0].style.height = "100%";
-    document.getElementsByTagName("body")[0].style.overflow = "inherit";
-    document.getElementsByTagName("html")[0].style.height = "100%";
-    document.getElementsByTagName("html")[0].style.overflow = "inherit";
   }
   showPrevVideo = (divID) => {
     const index = divID === "div_playthrough" ? this.state.ptindex : this.state.mvindex;
@@ -255,7 +255,7 @@ export default class SongDetailView extends React.Component {
       modalinfostyle = "width-52";
     }
     if (this.props.showDetail === false) { return null; }
-    this.forceNoScroll();
+    forceNoScroll();
     return (
       <div ref={(ref) => { this.modal_div = ref }} id="open-modal" className="modal-window" style={{ opacity: 1, pointerEvents: "auto" }}>
         <div id="modal-info" className={modalinfostyle}>
@@ -365,7 +365,7 @@ export default class SongDetailView extends React.Component {
                       className={songlistanddashstyle}>
                       Add to Setlist
                     </a>
-                    <select onChange={this.saveSetlist} style={{ margin: 12 + 'px' }}>
+                    <select onChange={this.saveSetlist} style={{ width: 12 + '%', margin: 12 + 'px' }}>
                       {this.state.setlists}
                     </select>
                   </span>
