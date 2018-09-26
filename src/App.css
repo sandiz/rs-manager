@@ -393,7 +393,7 @@ tbody tr:hover {
   width: 54% !important;
 }
 .width-52 {
-  width: 54% !important;
+  width: 58% !important;
 }
 
 .modal-window header {
@@ -885,4 +885,30 @@ hr {
 .col-sm-2-2 {
   flex: 0 0 20%;
   max-width: 20%
+}
+
+.filterTable {
+  border: 1pt solid black;
+  border-radius: 5px;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+.filterTable tbody tr {
+
+}
+.filterTable tbody td {
+  
+}
+.filterTable tbody tr:nth-child(even) {
+  background-color: rgba(112, 128, 144,.5);
+  color: black;
+}
+
+.filterTable tbody tr:nth-child(odd) {
+    background-color: rgba(255, 255, 255,.4);
+    color: black;
+}
+.filterTable tbody tr:hover {
+  background-color: lightgray !important;
+  color:black;
 }

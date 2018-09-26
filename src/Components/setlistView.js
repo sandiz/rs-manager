@@ -7,8 +7,9 @@ import {
 } from './songlistView';
 import SongDetailView from './songdetailView';
 import readProfile from '../steamprofileService';
-import { addToFavorites, initSetlistPlaylistDB, getSongsFromPlaylistDB, removeSongFromSetlist, updateMasteryandPlayed, initSongsOwnedDB } from '../sqliteService';
+import { addToFavorites, initSetlistPlaylistDB, getSongsFromPlaylistDB, removeSongFromSetlist, updateMasteryandPlayed, initSongsOwnedDB, getSetlistMetaInfo } from '../sqliteService';
 import getProfileConfig, { updateProfileConfig, getScoreAttackConfig } from '../configService';
+import SetlistOptions from './setlistOptions';
 
 const { path } = window;
 
@@ -25,6 +26,8 @@ export default class SetlistView extends React.Component {
       showSong: '',
       showArtist: '',
       showSAStats: true,
+      showOptions: false,
+      setlistMeta: {},
     };
     this.search = null;
     this.columns = [
@@ -226,12 +229,14 @@ export default class SetlistView extends React.Component {
       sizePerPage: this.state.sizePerPage,
       filters: {},
     })
+    this.fetchMeta();
   }
   shouldComponentUpdate = async (nextprops, nextstate) => {
     if (nextprops.currentChildTab === null) { return false; }
     if (this.lastChildID === nextprops.currentChildTab.id) { return false; }
     this.lastChildID = nextprops.currentChildTab.id;
     const showSAStats = await getScoreAttackConfig();
+    this.fetchMeta();
     this.setState({ showSAStats });
     this.handleTableChange("cdm", {
       page: this.state.page,
@@ -239,6 +244,12 @@ export default class SetlistView extends React.Component {
       filters: {},
     })
     return true;
+  }
+  fetchMeta = async () => {
+    const metaInfo = await getSetlistMetaInfo(this.lastChildID);
+    const showOptions = metaInfo.is_manual == null && metaInfo.is_generated == null;
+    console.log(metaInfo);
+    this.setState({ showOptions, setlistMeta: metaInfo });
   }
   handleSearchChange = (e) => {
     this.handleTableChange('filter', {
@@ -427,6 +438,8 @@ export default class SetlistView extends React.Component {
   render = () => {
     const { songs, sizePerPage, page } = this.state;
     const choosepsarchstyle = "extraPadding download " + (this.state.totalSize <= 0 ? "isDisabled" : "");
+    const choosesettingsstyle = (this.lastChildID !== "setlist_favorites" && this.lastChildID !== "setlist_practice") ? "extraPadding download" : "hidden"
+    const setlistinitclass = this.state.showOptions ? "" : "hidden";
     return (
       <div>
         <div
@@ -467,6 +480,12 @@ export default class SetlistView extends React.Component {
             className={choosepsarchstyle}>
             Update Mastery from RS Profile
           </a>
+          <a
+            style={{ width: 150 + 'px' }}
+            className={choosesettingsstyle}
+            onClick={() => this.setState({ showOptions: true })}>
+            Settings
+           </a>
           <br />
         </div>
         <div>
@@ -492,6 +511,16 @@ export default class SetlistView extends React.Component {
             removeFromSetlist={this.removeFromSetlist}
           />
         </div>
+        <div className={setlistinitclass}>
+          <SetlistOptions
+            table={this.lastChildID}
+            info={this.state.setlistMeta}
+            close={() => this.setState({ showOptions: false })}
+            showOptions={this.state.showOptions}
+            refreshTabs={this.props.refreshTabs}
+            fetchMeta={this.fetchMeta}
+          />
+        </div>
       </div>
     );
   }
@@ -502,6 +531,7 @@ SetlistView.propTypes = {
   updateHeader: PropTypes.func,
   //resetHeader: PropTypes.func,
   handleChange: PropTypes.func,
+  refreshTabs: PropTypes.func,
 }
 SetlistView.defaultProps = {
   //currentTab: null,
@@ -509,4 +539,5 @@ SetlistView.defaultProps = {
   updateHeader: () => { },
   //resetHeader: () => { },
   handleChange: () => { },
+  refreshTabs: () => { },
 }

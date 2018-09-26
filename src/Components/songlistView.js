@@ -225,20 +225,20 @@ export function arrangmentFormatter(cell, row) {
   ];
   let arrobj = null;
   const arrinfo = [represent, bonusArr, pathLead, pathRhythm, pathBass]
-  if (arrinfo.equals([1, 0, 1, 0, 0])) { arrobj = <span>Lead</span> }
-  else if (arrinfo.equals([0, 1, 1, 0, 0])) { arrobj = <span>Bonus Lead</span> }
-  else if (arrinfo.equals([0, 0, 1, 0, 0])) { arrobj = <span>Alternate Lead</span> }
+  if (arrinfo.equals([1, 0, 1, 0, 0])) { arrobj = <span key={row.id + "_ai"}>Lead</span> }
+  else if (arrinfo.equals([0, 1, 1, 0, 0])) { arrobj = <span key={row.id + "_ai"}>Bonus Lead</span> }
+  else if (arrinfo.equals([0, 0, 1, 0, 0])) { arrobj = <span key={row.id + "_ai"}>Alternate Lead</span> }
 
-  else if (arrinfo.equals([1, 0, 0, 1, 0])) { arrobj = <span>Rhythm</span> }
-  else if (arrinfo.equals([0, 1, 0, 1, 0])) { arrobj = <span>Bonus Rhythm</span> }
-  else if (arrinfo.equals([0, 0, 0, 1, 0])) { arrobj = <span>Alternate Rhythm</span> }
+  else if (arrinfo.equals([1, 0, 0, 1, 0])) { arrobj = <span key={row.id + "_ai"}>Rhythm</span> }
+  else if (arrinfo.equals([0, 1, 0, 1, 0])) { arrobj = <span key={row.id + "_ai"}>Bonus Rhythm</span> }
+  else if (arrinfo.equals([0, 0, 0, 1, 0])) { arrobj = <span key={row.id + "_ai"}>Alternate Rhythm</span> }
 
-  else if (arrinfo.equals([1, 0, 0, 0, 1])) { arrobj = <span>Bass</span> }
-  else if (arrinfo.equals([0, 1, 0, 0, 1])) { arrobj = <span>Bonus Bass</span> }
-  else if (arrinfo.equals([0, 0, 0, 0, 1])) { arrobj = <span>Alternate Bass</span> }
+  else if (arrinfo.equals([1, 0, 0, 0, 1])) { arrobj = <span key={row.id + "_ai"}>Bass</span> }
+  else if (arrinfo.equals([0, 1, 0, 0, 1])) { arrobj = <span key={row.id + "_ai"}>Bonus Bass</span> }
+  else if (arrinfo.equals([0, 0, 0, 0, 1])) { arrobj = <span key={row.id + "_ai"}>Alternate Bass</span> }
 
   const isCDLC = row.is_cdlc === "true";
-  if (isCDLC) { arrobj = [arrobj, <span> (C)</span>] }
+  if (isCDLC) { arrobj = [arrobj, <span key={row.id + "_custom"}> (C)</span>] }
   return (
     <div>
       <ReactTooltip

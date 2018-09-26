@@ -17,6 +17,8 @@ window.extractFile = require("./lib/libpsarc").extractFile
 window.sudo = require('sudo-prompt');
 window.exec = require('child_process').exec;
 window.linereader = require('line-by-line');
+window.shortid = require('shortid');
+
 
 const rp = require('request-promise');
 const isDev = require('electron-is-dev');

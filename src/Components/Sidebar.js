@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types';
+import { createRSSongList } from '../sqliteService';
 
 export default class Sidebar extends React.Component {
   constructor(props) {
@@ -23,6 +24,14 @@ export default class Sidebar extends React.Component {
   setChildActive(val, cid) {
     this.setState({ currentTab: val.id, currentChildTab: cid.id })
     this.props.handleChange(val, cid)
+  }
+  createNewSetlist = async () => {
+    const ts = Math.round((new Date()).getTime() / 1000);
+    const tablename = "setlist_custom_" + ts;
+    const displayname = "New Setlist #" + ts;
+    await createRSSongList(tablename, displayname);
+    this.props.RefreshTabs();
+    console.log("Created new setlist ", tablename, displayname);
   }
   toggleActive(val) {
     const index = this.state.expandedTabs.indexOf(val.id)
@@ -70,6 +79,13 @@ export default class Sidebar extends React.Component {
               ? this.expandedClass : this.collapseClass}>
             {
               tab.child.map((childtab, index2) => {
+                if (childtab.id === "add-setlist") {
+                  return (
+                    <li key={`child-key-${childtab.id}`}>
+                      <a className={this.state.currentTab === tab.id && this.state.currentChildTab === childtab.id ? 'activeChildTab' : 'inactiveChildTab'} onClick={() => this.createNewSetlist()}>{childtab.name}</a><sup>{childtab.tag}</sup>
+                    </li>
+                  );
+                }
                 return (
                   <li key={`child-key-${childtab.id}`}>
                     <a className={this.state.currentTab === tab.id && this.state.currentChildTab === childtab.id ? 'activeChildTab' : 'inactiveChildTab'} onClick={() => this.setChildActive(tab, childtab)}>{childtab.name}</a><sup>{childtab.tag}</sup>
@@ -109,10 +125,12 @@ Sidebar.propTypes = {
   steamConnected: PropTypes.string,
   ytConnected: PropTypes.bool,
   TabsData: PropTypes.array,
+  RefreshTabs: PropTypes.func,
 }
 Sidebar.defaultProps = {
   currentProfile: 'sandi',
   steamConnected: false,
   ytConnected: false,
   TabsData: [],
+  RefreshTabs: () => { },
 }

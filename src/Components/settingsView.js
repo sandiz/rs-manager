@@ -399,7 +399,7 @@ export default class SettingsView extends React.Component {
                   <div className="">
                     <span style={{ color: '#ccc' }}>
                       Steam Login Cookie and SessionID is used to update owned/acquired date in
-                      Songs &gt; RS DLC Catalog.
+                      Songs &gt; DLC Catalog.
                       The login cookie is valid as long the browser session is valid.
                       The app queries your
                       <a style={{ color: 'blue' }} onClick={() => window.shell.openExternal("http://store.steampowered.com/dynamicstore/userdata/")}>
