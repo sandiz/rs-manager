@@ -912,3 +912,6 @@ hr {
   background-color: lightgray !important;
   color:black;
 }
+.filterTable thead {
+  font-size: 18px;
+}

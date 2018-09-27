@@ -7,7 +7,7 @@ import {
 } from './songlistView';
 import SongDetailView from './songdetailView';
 import readProfile from '../steamprofileService';
-import { addToFavorites, initSetlistPlaylistDB, getSongsFromPlaylistDB, removeSongFromSetlist, updateMasteryandPlayed, initSongsOwnedDB, getSetlistMetaInfo } from '../sqliteService';
+import { addToFavorites, initSetlistPlaylistDB, getSongsFromPlaylistDB, removeSongFromSetlist, updateMasteryandPlayed, initSongsOwnedDB, getSetlistMetaInfo, getSongsFromGeneratedPlaylist } from '../sqliteService';
 import getProfileConfig, { updateProfileConfig, getScoreAttackConfig } from '../configService';
 import SetlistOptions from './setlistOptions';
 
@@ -21,13 +21,14 @@ export default class SetlistView extends React.Component {
       songs: [],
       page: 1,
       totalSize: 0,
-      sizePerPage: 100,
+      sizePerPage: 50,
       showDetail: false,
       showSong: '',
       showArtist: '',
       showSAStats: true,
       showOptions: false,
       setlistMeta: {},
+      isDeleted: false,
     };
     this.search = null;
     this.columns = [
@@ -224,12 +225,12 @@ export default class SetlistView extends React.Component {
     this.lastsortfield = "mastery"
     this.lastsortorder = "desc"
     this.lastChildID = props.currentChildTab.id;
+    this.fetchMeta();
     this.handleTableChange("cdm", {
       page: this.state.page,
       sizePerPage: this.state.sizePerPage,
       filters: {},
     })
-    this.fetchMeta();
   }
   shouldComponentUpdate = async (nextprops, nextstate) => {
     if (nextprops.currentChildTab === null) { return false; }
@@ -237,19 +238,22 @@ export default class SetlistView extends React.Component {
     this.lastChildID = nextprops.currentChildTab.id;
     const showSAStats = await getScoreAttackConfig();
     this.fetchMeta();
-    this.setState({ showSAStats });
-    this.handleTableChange("cdm", {
-      page: this.state.page,
-      sizePerPage: this.state.sizePerPage,
-      filters: {},
-    })
+    this.setState({ showSAStats }, () => {
+
+    });
     return true;
   }
   fetchMeta = async () => {
     const metaInfo = await getSetlistMetaInfo(this.lastChildID);
     const showOptions = metaInfo.is_manual == null && metaInfo.is_generated == null;
-    console.log(metaInfo);
-    this.setState({ showOptions, setlistMeta: metaInfo });
+    //console.log("fetchMeta: ", metaInfo);
+    this.setState({ showOptions, setlistMeta: metaInfo }, () => {
+      this.handleTableChange("cdm", {
+        page: this.state.page,
+        sizePerPage: this.state.sizePerPage,
+        filters: {},
+      })
+    });
   }
   handleSearchChange = (e) => {
     this.handleTableChange('filter', {
@@ -338,18 +342,33 @@ export default class SetlistView extends React.Component {
     data,
   }) => {
     if (this.lastChildID === null) { return; }
+    const isgen = this.state.setlistMeta.is_generated === "true";
     const zeroIndexPage = page - 1
     const start = zeroIndexPage * sizePerPage;
-    const output = await getSongsFromPlaylistDB(
-      this.lastChildID,
-      start,
-      sizePerPage,
-      sortField === null ? this.lastsortfield : sortField,
-      sortOrder === null ? this.lastsortorder : sortOrder,
-      this.search ? this.search.value : "",
-      document.getElementById("search_field") ?
-        document.getElementById("search_field").value : "",
-    )
+    let output = []
+    if (isgen) {
+      const joinedoutput = await getSongsFromGeneratedPlaylist(
+        this.state.setlistMeta,
+        start,
+        sizePerPage,
+        sortField === null ? this.lastsortfield : sortField,
+        sortOrder === null ? this.lastsortorder : sortOrder,
+      )
+      output = joinedoutput[0]
+      output[0].acount = joinedoutput[1].acount
+      output[0].songcount = joinedoutput[1].songcount
+    } else {
+      output = await getSongsFromPlaylistDB(
+        this.lastChildID,
+        start,
+        sizePerPage,
+        sortField === null ? this.lastsortfield : sortField,
+        sortOrder === null ? this.lastsortorder : sortOrder,
+        this.search ? this.search.value : "",
+        document.getElementById("search_field") ?
+          document.getElementById("search_field").value : "",
+      )
+    }
     if (sortField !== null) { this.lastsortfield = sortField; }
     if (sortOrder !== null) { this.lastsortorder = sortOrder; }
     if (output.length > 0) {
@@ -438,7 +457,10 @@ export default class SetlistView extends React.Component {
   render = () => {
     const { songs, sizePerPage, page } = this.state;
     const choosepsarchstyle = "extraPadding download " + (this.state.totalSize <= 0 ? "isDisabled" : "");
-    const choosesettingsstyle = (this.lastChildID !== "setlist_favorites" && this.lastChildID !== "setlist_practice") ? "extraPadding download" : "hidden"
+    const choosesettingsstyle =
+      (this.lastChildID !== "setlist_favorites" && this.lastChildID !== "setlist_practice"
+        && this.state.isDeleted === false)
+        ? "extraPadding download" : "hidden"
     const setlistinitclass = this.state.showOptions ? "" : "hidden";
     return (
       <div>
@@ -449,22 +471,27 @@ export default class SetlistView extends React.Component {
             margin: "auto",
             textAlign: "center",
           }}>
-          <input
-            ref={(node) => { this.search = node }}
-            style={{ width: 50 + '%', border: "1px solid black", padding: 5 + "px" }}
-            name="search"
-            onChange={this.handleSearchChange}
-            placeholder="Search..."
-            type="search"
-          />
-          &nbsp;&nbsp;
+          {
+            this.state.setlistMeta.is_manual === "true" ?
+              <div>
+                <input
+                  ref={(node) => { this.search = node }}
+                  style={{ width: 50 + '%', border: "1px solid black", padding: 5 + "px" }}
+                  name="search"
+                  onChange={this.handleSearchChange}
+                  placeholder="Search..."
+                  type="search"
+                />
+                &nbsp; &nbsp;
           <select id="search_field" onChange={this.refreshView}>
-            <option value="anything">Anything</option>
-            <option value="song">Song</option>
-            <option value="artist">Artist</option>
-            <option value="album">Album</option>
-          </select>
-          <br /><br />
+                  <option value="anything">Anything</option>
+                  <option value="song">Song</option>
+                  <option value="artist">Artist</option>
+                  <option value="album">Album</option>
+                </select>
+                <br /><br />
+              </div> : null
+          }
           {
             this.lastChildID === "setlist_favorites" ?
               <a
@@ -519,6 +546,19 @@ export default class SetlistView extends React.Component {
             showOptions={this.state.showOptions}
             refreshTabs={this.props.refreshTabs}
             fetchMeta={this.fetchMeta}
+            clearPage={() => {
+              this.props.updateHeader(
+                this.tabname,
+                this.lastChildID,
+                `Setlist deleted`,
+              );
+              this.setState({
+                isDeleted: true,
+                songs: [],
+                page: 1,
+                totalSize: 0,
+              });
+            }}
           />
         </div>
       </div>
