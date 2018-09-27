@@ -1,8 +1,41 @@
 import React from 'react'
 import PropTypes from 'prop-types';
-import { enableScroll, forceNoScroll } from './songdetailView';
-import { deleteRSSongList, createRSSongList } from '../sqliteService';
+import { enableScroll } from './songdetailView';
+import { deleteRSSongList, createRSSongList, executeRawSql } from '../sqliteService';
 
+export function generateSql(filters, count = false) {
+  const countsql = count ? "count(*) as acount, count(distinct songkey) as songcount" : "*"
+  let sql = `select ${countsql} from songs_owned `;
+  for (let i = 0; i < filters.length; i += 1) {
+    const filter = filters[i];
+    if (i === 0) {
+      sql += " where "
+    }
+    switch (filter.type) {
+      case "artist":
+      case "album":
+      case "song":
+      case "arrangement":
+        sql += `${filter.type} ${filter.cmp} '%${escape(filter.value)}%' `;
+        break;
+      case "mastery":
+        sql += `coalesce(${filter.type},0) ${filter.cmp} ${filter.value / 100} `;
+        break;
+      case "difficulty":
+      case "count":
+      case "tempo":
+        sql += `coalesce(${filter.type},0) ${filter.cmp} ${filter.value} `;
+        break;
+      default:
+        break;
+    }
+    if (i < filters.length - 1) {
+      sql += `${filter.gate} `;
+    }
+  }
+  //console.log(sql);
+  return sql;
+}
 export default class SetlistOptions extends React.Component {
   constructor(props) {
     super(props)
@@ -13,18 +46,53 @@ export default class SetlistOptions extends React.Component {
       filters: [],
       numResults: 0,
     }
+    //arrangement
+    //difficulty
+    //playcount
+    //tempo
+    //cdlc
+    //tuning
+    this.gates = ["and", "or"]
     this.fields = [
       {
         type: "artist",
-        cmp: ["like", "notlike"],
+        display: "Artist",
+        cmp: ["like", "not like"],
       },
       {
         type: "song",
-        cmp: ["like", "notlike"],
+        display: "Song",
+        cmp: ["like", "not like"],
       },
       {
         type: "album",
-        cmp: ["like", "notlike"],
+        display: "Album",
+        cmp: ["like", "not like"],
+      },
+      {
+        type: "arrangement",
+        display: "Arrangement",
+        cmp: ["like", "not like"],
+      },
+      {
+        type: "mastery",
+        display: "Mastery",
+        cmp: [">=", "<=", "==", "<", ">"],
+      },
+      {
+        type: "difficulty",
+        display: "Difficulty",
+        cmp: [">=", "<=", "==", "<", ">"],
+      },
+      {
+        type: "count",
+        display: "Playcount",
+        cmp: [">=", "<=", "==", "<", ">"],
+      },
+      {
+        type: "tempo",
+        display: "Tempo",
+        cmp: [">=", "<=", "==", "<", ">"],
       },
     ];
   }
@@ -53,7 +121,7 @@ export default class SetlistOptions extends React.Component {
         this.setState({
           numResults: 0,
           filters: jsonObj,
-        })
+        }, () => this.runQuery())
         // run viewsql and find results
       }
     }
@@ -78,6 +146,80 @@ export default class SetlistOptions extends React.Component {
       isGenerated: false,
     });
   }
+  generateFilterTypeOptions = (filter, index) => {
+    return (
+      <select defaultValue={filter.type} onChange={event => this.handleSelectChange(event, "type", index)}>
+        {
+          this.fields.map((field, idx) => {
+            return (
+              <option value={field.type} key={"type_" + filter.id + field.type}>{field.display}</option>
+            );
+          })
+        }
+      </select>
+    );
+  }
+  generateFilterComparatorOptions = (filter, index) => {
+    let selectedField = null;
+    for (let i = 0; i < this.fields.length; i += 1) {
+      if (this.fields[i].type === filter.type) {
+        selectedField = this.fields[i];
+      }
+    }
+    return selectedField ? (
+      <select defaultValue={filter.cmp} onChange={event => this.handleSelectChange(event, "comparator", index)}>
+        {
+          selectedField.cmp.map((field, idx) => {
+            return (
+              <option value={field} key={"cmp_" + filter.id + field}>{field}</option>
+            );
+          })
+        }
+      </select>
+    ) : null;
+  }
+  generateFilterChainOptions = (filter, index) => {
+    return (
+      <select defaultValue={filter.gate} onChange={event => this.handleSelectChange(event, "chain", index)}>
+        {
+          this.gates.map((field, idx) => {
+            return (
+              <option value={field} key={"chain_" + filter.id + field}>{field}</option>
+            );
+          })
+        }
+      </select>
+    );
+  }
+  handleSelectChange = (event, type, index) => {
+    const filters = this.state.filters;
+    switch (type) {
+      case "chain":
+        filters[index].gate = event.target.value;
+        break;
+      case "comparator":
+        filters[index].cmp = event.target.value;
+        break;
+      case "type": {
+        filters[index].type = event.target.value;
+        let selected = null;
+        for (let i = 0; i < this.fields.length; i += 1) {
+          const field = this.fields[i];
+          if (field.type === event.target.value) selected = field;
+        }
+        if (selected) filters[index].cmp = selected.cmp[0];
+        break;
+      }
+      default:
+        break;
+    }
+    this.setState({ filters });
+  }
+  handleValueChange = (event, index) => {
+    const filters = this.state.filters;
+    filters[index].value = event.target.value;
+    this.setState({ filters });
+  }
   saveOptions = async () => {
     console.log("save setlist: " + this.props.info.key);
     await createRSSongList(
@@ -90,15 +232,21 @@ export default class SetlistOptions extends React.Component {
   }
   deleteSetlist = async () => {
     console.log("delete setlist: " + this.props.info.key);
-    this.handleHide();
     await deleteRSSongList(this.props.info.key)
     this.props.refreshTabs();
+    this.props.clearPage();
+    this.handleHide();
     //delete setlist db
     //delete meta info from setlist_meta
   }
   addFilter = async () => {
+    const ts = Math.round((new Date()).getTime() / 1000);
     const defaultFilter = {
-      type: "artist", cmp: "like", value: "", gate: "and",
+      type: "artist",
+      cmp: "like",
+      value: "",
+      gate: "and",
+      id: ts.toString(),
     }
     const filters = this.state.filters;
     filters.push(defaultFilter);
@@ -109,11 +257,24 @@ export default class SetlistOptions extends React.Component {
     filters.splice(index, 1);
     this.setState({ filters })
   }
+
+  runQuery = async () => {
+    if (this.state.filters != null && this.state.filters.length > 0) {
+      const sql = await generateSql(this.state.filters, true);
+      try {
+        const op = await executeRawSql(sql);
+        this.setState({ numResults: op.acount });
+      }
+      catch (e) {
+        console.log(e);
+        this.setState({ numResults: -1 });
+      }
+    }
+  }
   render = () => {
     const modalinfostyle = "width-75-2"
     const buttonstyle = "extraPadding download"
     if (this.props.showOptions === false) { return null; }
-    const rwIgnored = this.state.filters.length < 5 ? forceNoScroll() : enableScroll();
     return (
       <div ref={(ref) => { this.modal_div = ref }} id="open-modal" className="modal-window" style={{ opacity: 1, pointerEvents: "auto" }}>
         <div id="modal-info" className={modalinfostyle}>
@@ -187,22 +348,46 @@ export default class SetlistOptions extends React.Component {
                                 marginTop: 30 + 'px',
                                 marginBottom: 12 + 'px',
                               }}>
+                              <thead>
+                                <tr>
+                                  <td>Filter Type</td>
+                                  <td>Comparator</td>
+                                  <td>Value</td>
+                                  <td>Logic Chain</td>
+                                  <td>Delete</td>
+                                </tr>
+                              </thead>
                               <tbody>
                                 {
                                   this.state.filters.map((filter, index) => {
                                     return (
-                                      <tr key={window.shortid.generate()}>
-                                        <td style={{ width: 20 + '%' }}>{filter.type}</td>
-                                        <td style={{ width: 20 + '%' }}>{filter.cmp}</td>
-                                        <td style={{ width: 40 + '%' }}>{filter.value}</td>
-                                        <td style={{ width: 15 + '%' }}>{filter.gate}</td>
+                                      <tr key={"row_" + filter.id}>
+                                        <td style={{ width: 20 + '%' }}>
+                                          {this.generateFilterTypeOptions(filter, index)}
+                                        </td>
+                                        <td style={{ width: 20 + '%' }}>
+                                          {this.generateFilterComparatorOptions(filter, index)}
+                                        </td>
+                                        <td style={{ width: 40 + '%' }}>
+                                          <input
+                                            key={"input_" + filter.id}
+                                            type="text"
+                                            defaultValue={filter.value}
+                                            onChange={event => this.handleValueChange(event, index)}
+                                            style={{ paddingLeft: 10 + 'px', width: 80 + '%' }} />
+                                        </td>
+                                        {
+                                          (index < this.state.filters.length - 1) ?
+                                            <td style={{ width: 15 + '%' }}>
+                                              {this.generateFilterChainOptions(filter, index)}
+                                            </td> : <td />
+                                        }
                                         <td style={{ width: 5 + '%' }}>
                                           <button
                                             type="button"
                                             id="settingsCollapse"
                                             className="navbar-btn"
                                             onClick={() => this.removeFilter(index)}
-                                            style={{ float: 'right' }}
                                           >
                                             <span /><span /><span />
                                           </button>
@@ -213,7 +398,14 @@ export default class SetlistOptions extends React.Component {
                                 }
                               </tbody>
                             </table>
-                            <span>Query returned {this.state.numResults} results </span>
+                            <span>
+                              <a
+                                href="#"
+                                onClick={this.runQuery}
+                                style={{ borderBottom: "1px solid gray" }}>
+                                Run Query
+                              </a>: {this.state.numResults} arrangements.
+                             </span>
                           </div>
                           : null
                       }
@@ -222,8 +414,8 @@ export default class SetlistOptions extends React.Component {
                   : null
               }
             </div>
-            <br />
             <div>
+              <br />
               <hr />
               <a
                 onClick={this.saveOptions}
@@ -249,6 +441,7 @@ SetlistOptions.propTypes = {
   showOptions: PropTypes.bool,
   refreshTabs: PropTypes.func,
   fetchMeta: PropTypes.func,
+  clearPage: PropTypes.func,
 }
 SetlistOptions.defaultProps = {
   info: {
@@ -257,4 +450,5 @@ SetlistOptions.defaultProps = {
   showOptions: false,
   refreshTabs: () => { },
   fetchMeta: () => { },
+  clearPage: () => { },
 }

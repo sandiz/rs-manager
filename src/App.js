@@ -191,7 +191,6 @@ class App extends Component {
   refreshTabs = async () => {
     await initSetlistDB();
     const setlists = await getAllSetlist();
-    console.log("Refresh tabs");
     const t = this.state.TabsData;
     t[2].child = []
     const tempChilds = []

@@ -1,3 +1,5 @@
+import { generateSql } from "./Components/setlistOptions";
+
 let db = null;
 export async function getUserVersion() {
   const sql = "pragma user_version;";
@@ -553,6 +555,27 @@ export async function getSongCountFromPlaylistDB(dbname) {
   const all = await db.get(sql);
   return all;
 }
+export async function getSongsFromGeneratedPlaylist(
+  meta,
+  start = 0, count = 10,
+  sortField = "mastery", sortOrder = "desc",
+) {
+  if (meta.view_sql.length > 0) {
+    try {
+      const jsonObj = JSON.parse(meta.view_sql)
+      let sql = generateSql(jsonObj);
+      const countsql = generateSql(jsonObj, true)
+      sql += ` ORDER BY ${sortField} ${sortOrder} LIMIT ${start},${count};`
+      const output = await db.all(sql);
+      const output2 = await db.get(countsql)
+      return [output, output2];
+    }
+    catch (e) {
+      return [];
+    }
+  }
+  return [];
+}
 export async function getSongsFromPlaylistDB(dbname, start = 0, count = 10, sortField = "mastery", sortOrder = "desc", search = "", searchField = "") {
   // console.log("__db_call__: getSongsFromPlaylistDB");
   if (db == null) {
@@ -655,6 +678,10 @@ export async function updateCDLCStat(songID, status) {
 export async function updateSAFCStat(key, value, songID) {
   const sql = `update songs_owned set ${key}='${value}' where id='${songID}'`;
   await db.exec(sql);
+}
+export async function executeRawSql(sql) {
+  const op = await db.get(sql);
+  return op;
 }
 window.remote.app.on('window-all-closed', async () => {
   await saveSongsOwnedDB();
