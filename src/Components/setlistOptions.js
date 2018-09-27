@@ -49,7 +49,6 @@ export default class SetlistOptions extends React.Component {
       filters: [],
       numResults: 0,
     }
-    //cdlc
     //tuning
     this.gates = ["and", "or"]
     this.fields = [
