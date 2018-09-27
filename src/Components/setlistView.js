@@ -238,7 +238,7 @@ export default class SetlistView extends React.Component {
     this.lastChildID = nextprops.currentChildTab.id;
     const showSAStats = await getScoreAttackConfig();
     this.fetchMeta();
-    this.setState({ showSAStats }, () => {
+    this.setState({ showSAStats, isDeleted: false }, () => {
 
     });
     return true;

@@ -26,6 +26,9 @@ export function generateSql(filters, count = false) {
       case "tempo":
         sql += `coalesce(${filter.type},0) ${filter.cmp} ${filter.value} `;
         break;
+      case "is_cdlc":
+        sql += `${filter.type} ${filter.cmp} '${filter.value}' `;
+        break;
       default:
         break;
     }
@@ -46,10 +49,6 @@ export default class SetlistOptions extends React.Component {
       filters: [],
       numResults: 0,
     }
-    //arrangement
-    //difficulty
-    //playcount
-    //tempo
     //cdlc
     //tuning
     this.gates = ["and", "or"]
@@ -93,6 +92,11 @@ export default class SetlistOptions extends React.Component {
         type: "tempo",
         display: "Tempo",
         cmp: [">=", "<=", "==", "<", ">"],
+      },
+      {
+        type: "is_cdlc",
+        display: "CDLC",
+        cmp: ["is"],
       },
     ];
   }
@@ -138,12 +142,14 @@ export default class SetlistOptions extends React.Component {
     this.setState({
       isGenerated: e.currentTarget.value === "on",
       isManual: false,
+      filters: [],
     });
   }
   handleManual = (e) => {
     this.setState({
       isManual: e.currentTarget.value === "on",
       isGenerated: false,
+      filters: [],
     });
   }
   generateFilterTypeOptions = (filter, index) => {
@@ -339,7 +345,7 @@ export default class SetlistOptions extends React.Component {
                         <span /><span /><span />
                       </button>
                       {
-                        this.state.filters.length > 0 ?
+                        this.state.filters != null && this.state.filters.length > 0 ?
                           <div>
                             <table
                               className="filterTable"
