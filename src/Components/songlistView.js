@@ -74,7 +74,16 @@ export function unescapeFormatter(cell, row) {
   return <span>{cell}</span>;
 }
 export function difficultyFormatter(cell, row) {
-  return <span />
+  return (
+    <span
+      style={{
+        fontSize: 20 + 'px',
+        marginTop: 4 + 'px',
+      }}
+      title={cell.toFixed(2)}>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    </span>
+  )
 }
 export function round100Formatter(cell, row) {
   if (cell == null) { cell = 0; }
