@@ -88,13 +88,12 @@ export function difficultyFormatter(cell, row) {
 export function round100Formatter(cell, row) {
   if (cell == null) { cell = 0; }
   cell = (cell * 100).toFixed(2);
-  if (cell >= 100) { cell = 100; }
   let color = "lightgreen";
   if (cell > 95) { color = "lightgreen" }
   else if (cell < 95 && cell > 90) { color = "#C8F749" }
   else color = "yellow";
 
-  const width = cell + "%";
+  const width = (cell > 100 ? 100 : cell) + "%";
   return (<span>
     <span className="mastery">{cell}%</span>
     <span>
