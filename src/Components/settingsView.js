@@ -1,7 +1,7 @@
 import React from 'react'
 import Collapsible from 'react-collapsible';
 import PropTypes from 'prop-types';
-import getProfileConfig, { updateSteamLoginSecureCookie, getSteamLoginSecureCookie, updateProfileConfig, getScoreAttackConfig, updateScoreAttackConfig, updateUseCDLCConfig, getUseCDLCConfig, getScoreAttackDashboardConfig, updateScoreAttackDashboard, getSessionIDConfig, updateSessionIDConfig } from '../configService';
+import getProfileConfig, { updateSteamLoginSecureCookie, getSteamLoginSecureCookie, updateProfileConfig, getScoreAttackConfig, updateScoreAttackConfig, updateUseCDLCConfig, getUseCDLCConfig, getScoreAttackDashboardConfig, updateScoreAttackDashboard, getSessionIDConfig, updateSessionIDConfig, getMasteryThresholdConfig, updateMasteryThreshold } from '../configService';
 import { resetDB, createRSSongList, addtoRSSongList, isTablePresent, deleteRSSongList } from '../sqliteService';
 import readProfile from '../steamprofileService';
 
@@ -68,6 +68,7 @@ export default class SettingsView extends React.Component {
       processingSetlist: false,
       useCDLCinStats: true,
       scoreAttackDashboard: [true, true, true, true],
+      masteryThreshold: 0.95,
     };
     this.readConfigs();
     this.refreshSetlist();
@@ -207,6 +208,11 @@ export default class SettingsView extends React.Component {
       useCDLCinStats: value,
     });
   }
+  handleMasteryThreshold = (event) => {
+    this.setState({
+      masteryThreshold: event.target.value / 100,
+    });
+  }
 
   refreshSetlist = async () => {
     const setliststatus = []
@@ -226,6 +232,7 @@ export default class SettingsView extends React.Component {
     const g = await getUseCDLCConfig();
     const h = await getScoreAttackDashboardConfig();
     const i = await getSessionIDConfig();
+    const j = await getMasteryThresholdConfig();
     this.setState({
       prfldb: d,
       steamLoginSecure: e,
@@ -233,6 +240,7 @@ export default class SettingsView extends React.Component {
       useCDLCinStats: g,
       scoreAttackDashboard: h,
       sessionID: i,
+      masteryThreshold: j,
     });
   }
   saveSettings = async () => {
@@ -246,6 +254,7 @@ export default class SettingsView extends React.Component {
     await updateScoreAttackConfig(this.state.showScoreAttack);
     await updateUseCDLCConfig(this.state.useCDLCinStats);
     await updateScoreAttackDashboard(this.state.scoreAttackDashboard);
+    await updateMasteryThreshold(this.state.masteryThreshold);
     this.props.handleChange();
     this.props.updateHeader(this.tabname, "Settings Saved!");
   }
@@ -509,6 +518,33 @@ export default class SettingsView extends React.Component {
                   <div className="">
                     <span style={{ color: '#ccc' }}>
                       Includes cdlc when calculating stats in Dashboard view
+                  </span>
+                  </div>
+                  <br />
+                  <span style={{ float: 'left' }}>
+                    <a onClick={this.enterCookie}>
+                      Mastery Threshold
+                  </a>
+                  </span>
+                  <span style={{
+                    float: 'right',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    width: 400 + 'px',
+                    textAlign: 'right',
+                  }}>
+                    <input
+                      type="number"
+                      value={this.state.masteryThreshold * 100}
+                      min={0}
+                      max={100}
+                      onChange={this.handleMasteryThreshold} />
+                  </span>
+                  <br />
+                  <div className="">
+                    <span style={{ color: '#ccc' }}>
+                      Songs needs to have mastery &gt;=
+                      this threshold to be considered &quot;mastered&quot;.
                   </span>
                   </div>
                 </Collapsible>
