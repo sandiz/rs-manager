@@ -313,16 +313,31 @@ export default class SetlistView extends React.Component {
         this.lastChildID,
         "Stats Found: " + updatedRows + ", Total Stats: " + keys.length,
       );
-      const output = await getSongsFromPlaylistDB(
-        this.lastChildID,
-        0,
-        this.state.sizePerPage,
-        this.lastsortfield,
-        this.lastsortorder,
-        this.search.value,
-        document.getElementById("search_field") ?
-          document.getElementById("search_field").value : "",
-      )
+      let output = []
+      const isgen = this.state.setlistMeta.is_generated === "true";
+      if (isgen) {
+        const joinedoutput = await getSongsFromGeneratedPlaylist(
+          this.state.setlistMeta,
+          0,
+          this.state.sizePerPage,
+          this.lastsortfield,
+          this.lastsortorder,
+        )
+        output = joinedoutput[0]
+        output[0].acount = joinedoutput[1].acount
+        output[0].songcount = joinedoutput[1].songcount
+      } else {
+        output = await getSongsFromPlaylistDB(
+          this.lastChildID,
+          0,
+          this.state.sizePerPage,
+          this.lastsortfield,
+          this.lastsortorder,
+          this.search.value,
+          document.getElementById("search_field") ?
+            document.getElementById("search_field").value : "",
+        )
+      }
       this.setState({ songs: output, page: 1, totalSize: output[0].acount });
     }
   }
@@ -459,7 +474,7 @@ export default class SetlistView extends React.Component {
     const choosepsarchstyle = "extraPadding download " + (this.state.totalSize <= 0 ? "isDisabled" : "");
     const choosesettingsstyle =
       (this.lastChildID !== "setlist_favorites" && this.lastChildID !== "setlist_practice"
-        && this.state.isDeleted === false)
+        && this.state.isDeleted === false && this.state.setlistMeta.is_rssetlist !== "true")
         ? "extraPadding download" : "hidden"
     const setlistinitclass = this.state.showOptions ? "" : "hidden";
     return (
@@ -472,7 +487,7 @@ export default class SetlistView extends React.Component {
             textAlign: "center",
           }}>
           {
-            this.state.setlistMeta.is_manual === "true" ?
+            this.state.setlistMeta.is_manual === "true" || this.state.setlistMeta.is_rssetlist === "true" ?
               <div>
                 <input
                   ref={(node) => { this.search = node }}
@@ -536,6 +551,8 @@ export default class SetlistView extends React.Component {
             close={() => this.setState({ showDetail: false })}
             isSetlist
             removeFromSetlist={this.removeFromSetlist}
+            isGenerated={this.state.setlistMeta.is_generated === "true"}
+            isRSSetlist={this.state.setlistMeta.is_rssetlist === "true"}
           />
         </div>
         <div className={setlistinitclass}>

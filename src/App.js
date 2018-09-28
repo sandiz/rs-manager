@@ -196,7 +196,7 @@ class App extends Component {
     const tempChilds = []
     for (let i = 0; i < setlists.length; i += 1) {
       const setlist = setlists[i];
-      const setlistObj = { name: setlist.name, id: setlist.key }
+      const setlistObj = { name: unescape(setlist.name), id: setlist.key }
       if (setlist.key === "setlist_practice") tempChilds.splice(0, 0, setlistObj)
       else if (setlist.key === "setlist_favorites") tempChilds.splice(1, 0, setlistObj)
       else tempChilds.push(setlistObj);

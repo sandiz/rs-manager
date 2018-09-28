@@ -1,7 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types';
-import { enableScroll } from './songdetailView';
+import { enableScroll, forceNoScroll } from './songdetailView';
 import { deleteRSSongList, createRSSongList, executeRawSql } from '../sqliteService';
+import { allTunings } from './songlistView';
 
 export function generateSql(filters, count = false) {
   const countsql = count ? "count(*) as acount, count(distinct songkey) as songcount" : "*"
@@ -29,6 +30,9 @@ export function generateSql(filters, count = false) {
       case "is_cdlc":
         sql += `${filter.type} ${filter.cmp} '${filter.value}' `;
         break;
+      case "tuning":
+        sql += `${filter.type} like '${filter.value}' `;
+        break;
       default:
         break;
     }
@@ -36,8 +40,18 @@ export function generateSql(filters, count = false) {
       sql += `${filter.gate} `;
     }
   }
-  //console.log(sql);
   return sql;
+}
+export function generateTunings() {
+  const tunings = {}
+  const tuningkeys = Object.keys(allTunings);
+  for (let i = 0; i < tuningkeys.length; i += 1) {
+    const t = allTunings[tuningkeys[i]];
+    const tuningsJSON = `{"string0":${t[0]},"string1":${t[0]},"string2":${t[0]},"string3":${t[0]},"string4":${t[0]},"string5":${t[0]}}`;
+    const escaped = escape(tuningsJSON);
+    tunings[tuningkeys[i]] = escaped;
+  }
+  return tunings;
 }
 export default class SetlistOptions extends React.Component {
   constructor(props) {
@@ -46,6 +60,7 @@ export default class SetlistOptions extends React.Component {
       setlistName: '',
       isGenerated: null,
       isManual: null,
+      isRSSetlist: null,
       filters: [],
       numResults: 0,
     }
@@ -97,14 +112,20 @@ export default class SetlistOptions extends React.Component {
         display: "CDLC",
         cmp: ["is"],
       },
+      {
+        type: "tuning",
+        display: "Tunings",
+        cmp: ["is"],
+      },
     ];
   }
   shouldComponentUpdate = async (nextprops, nextstate) => {
     if (nextprops !== this.props) {
       this.setState({
-        setlistName: nextprops.info.name,
+        setlistName: unescape(nextprops.info.name),
         isGenerated: nextprops.info.is_generated === "true",
         isManual: nextprops.info.is_manual === "true",
+        isRSSetlist: nextprops.info.is_rssetlist === "true",
       })
       if (nextprops.info.is_manual === "true") {
         this.setState({
@@ -196,6 +217,40 @@ export default class SetlistOptions extends React.Component {
       </select>
     );
   }
+  generateFilterValueOptions = (filter, index) => {
+    if (filter.type === "tuning") {
+      const tunings = generateTunings();
+      const filtervalU = unescape(filter.value)
+      let defValue = filter.value;
+      try {
+        JSON.parse(filtervalU);
+      }
+      catch (e) {
+        defValue = tunings["E Standard"];
+        filter.value = defValue;
+      }
+      return (
+        <select defaultValue={defValue} onChange={event => this.handleValueChange(event, index)}>
+          {
+            Object.keys(tunings).map((tuningkey, idx) => {
+              const tuningescaped = tunings[tuningkey];
+              return (
+                <option value={tuningescaped} key={"tuning_" + filter.id + tuningkey}>{tuningkey}</option>
+              );
+            })
+          }
+        </select>
+      )
+    }
+    return (
+      <input
+        key={"input_" + filter.id}
+        type="text"
+        defaultValue={filter.value}
+        onChange={event => this.handleValueChange(event, index)}
+        style={{ paddingLeft: 10 + 'px', width: 80 + '%' }} />
+    )
+  }
   handleSelectChange = (event, type, index) => {
     const filters = this.state.filters;
     switch (type) {
@@ -213,6 +268,16 @@ export default class SetlistOptions extends React.Component {
           if (field.type === event.target.value) selected = field;
         }
         if (selected) filters[index].cmp = selected.cmp[0];
+        switch (filters[index].type) {
+          case "tuning": {
+            const tunings = generateTunings();
+            filters[index].value = tunings["E Standard"];
+          }
+            break;
+          default:
+            filters[index].value = "";
+            break;
+        }
         break;
       }
       default:
@@ -229,7 +294,7 @@ export default class SetlistOptions extends React.Component {
     console.log("save setlist: " + this.props.info.key);
     await createRSSongList(
       this.props.info.key, this.state.setlistName, this.state.isGenerated,
-      this.state.isManual, JSON.stringify(this.state.filters),
+      this.state.isManual, JSON.stringify(this.state.filters), this.state.isRSSetlist,
     );
     this.props.refreshTabs();
     this.props.fetchMeta();
@@ -245,7 +310,7 @@ export default class SetlistOptions extends React.Component {
     //delete meta info from setlist_meta
   }
   addFilter = async () => {
-    const ts = Math.round((new Date()).getTime() / 1000);
+    const ts = Math.round((new Date()).getTime());
     const defaultFilter = {
       type: "artist",
       cmp: "like",
@@ -280,6 +345,7 @@ export default class SetlistOptions extends React.Component {
     const modalinfostyle = "width-75-2"
     const buttonstyle = "extraPadding download"
     if (this.props.showOptions === false) { return null; }
+    forceNoScroll()
     return (
       <div ref={(ref) => { this.modal_div = ref }} id="open-modal" className="modal-window" style={{ opacity: 1, pointerEvents: "auto" }}>
         <div id="modal-info" className={modalinfostyle}>
@@ -374,12 +440,7 @@ export default class SetlistOptions extends React.Component {
                                           {this.generateFilterComparatorOptions(filter, index)}
                                         </td>
                                         <td style={{ width: 40 + '%' }}>
-                                          <input
-                                            key={"input_" + filter.id}
-                                            type="text"
-                                            defaultValue={filter.value}
-                                            onChange={event => this.handleValueChange(event, index)}
-                                            style={{ paddingLeft: 10 + 'px', width: 80 + '%' }} />
+                                          {this.generateFilterValueOptions(filter, index)}
                                         </td>
                                         {
                                           (index < this.state.filters.length - 1) ?
