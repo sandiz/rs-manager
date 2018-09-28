@@ -11,17 +11,22 @@ const readFile = filePath => new Promise((resolve, reject) => {
   });
 });
 let JsonObj = null;
+function getDefaultSettings() {
+  const obj = {};
+  obj.prfldb = ""
+  obj.steamLoginSecure = ""
+  obj.showScoreAttack = true
+  obj.useCDLCinStats = true
+  obj.scoreAttackDashboard = [true, true, true, true]; //easy, medium, hard, master
+  obj.sessionID = ""
+  obj.masteryThreshold = 0.95
+  return obj;
+}
 export async function getConfig(type) {
   try {
     if (!window.electronFS.existsSync(window.configPath)) {
       console.log("creating empty config file")
-      const obj = {}
-      obj.prfldb = ""
-      obj.steamLoginSecure = ""
-      obj.showScoreAttack = true
-      obj.useCDLCinStats = true
-      obj.scoreAttackDashboard = [true, true, true, true]; //easy, medium, hard, master
-      obj.sessionID = ""
+      const obj = getDefaultSettings();
       await writeFile(window.configPath, JSON.stringify(obj));
     }
     const data = await readFile(window.configPath);
@@ -65,6 +70,9 @@ export async function updateSessionIDConfig(value) {
 export async function updateScoreAttackDashboard(current) {
   await updateConfig("scoreAttackDashboard", current);
 }
+export async function updateMasteryThreshold(current) {
+  await updateConfig("masteryThreshold", current);
+}
 
 export default async function getProfileConfig() {
   const d = await getConfig("prfldb");
@@ -86,6 +94,11 @@ export async function getScoreAttackConfig() {
 export async function getUseCDLCConfig() {
   const d = await getConfig("useCDLCinStats");
   if (d === '') return true; //default value
+  return d;
+}
+export async function getMasteryThresholdConfig() {
+  const d = await getConfig("masteryThreshold");
+  if (d === '') return 0.95; //default value
   return d;
 }
 export async function getScoreAttackDashboardConfig() {

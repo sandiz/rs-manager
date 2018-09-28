@@ -1,4 +1,5 @@
 import { generateSql } from "./Components/setlistOptions";
+import { getMasteryThresholdConfig } from "./configService";
 
 let db = null;
 export async function getUserVersion() {
@@ -448,7 +449,8 @@ export async function getArrangmentsMastered(useCDLC = false) {
     const dbfilename = window.sqlitePath;
     db = await window.sqlite.open(dbfilename);
   }
-  const sql = `select count(mastery) as count from songs_owned where mastery > 0.95 ${cdlcSql};`;
+  const masteryT = await getMasteryThresholdConfig();
+  const sql = `select count(mastery) as count from songs_owned where mastery > '${masteryT}' ${cdlcSql};`;
   const output = await db.get(sql);
   return output;
 }

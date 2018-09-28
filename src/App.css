@@ -683,6 +683,7 @@ hr {
   padding: 10px;
   margin: auto;
   width: 100%;
+  font-size: 15px;
 }
 .react-bootstrap-table-pagination {
   float: left;
