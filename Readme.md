@@ -15,6 +15,8 @@ Rocksmith's UI leaves a lot to be desired especially when you have a lot of song
     - Songs->Owned section should now list songs that you own. You can use basic operations like search, sort, filter as well as view YouTube vidoes of your songs or add them to setlists. If you linked your Rocksmith profile in [Settings](#settings) you can Update RS Favorites/Mastery by clicking the appropriate button
 - [RS Catalog](#songs-available)
     - This section should already be populated with all the dlc's released so far. You can use the options in this view to keep the list up to date as well as retreive metadata from steam about ownership/acquire date. (requires steam profile to be linked in Settings)
+- [Setlist](#setlist)
+    - This section is used to create custom setlists from your songs library. There are two types of setlists, [Manual](#setlist-custom) setlist where you add songs manually from the library and [Generated](#generated-setlist) setlist where you use filters to select songs from the library.
 
 ## Screenshots
 ### Stats
@@ -25,7 +27,12 @@ Rocksmith's UI leaves a lot to be desired especially when you have a lot of song
 ![Songs Available](https://github.com/sandiz/rs-manager/raw/master/assets/images/songs.available.png)
 ### Song Preview
 ![Songs Available](https://github.com/sandiz/rs-manager/raw/master/assets/images/songPreview.png)
-### Setlist favorites
+### Setlist
+### Generated Setlist
+![Filter One](https://raw.githubusercontent.com/sandiz/rs-manager/master/assets/images/custom.setlist.filterone.jpg)
+
+![Filter Two](https://raw.githubusercontent.com/sandiz/rs-manager/master/assets/images/custom.setlist.filtertwo.jpg)
+### RS favorites
 ![Setlist favorites](https://github.com/sandiz/rs-manager/raw/master/assets/images/setlist.favorites.png)
 ### Setlist Custom
 ![Setlist Custom](https://github.com/sandiz/rs-manager/raw/master/assets/images/setlist.practicelist.png)
