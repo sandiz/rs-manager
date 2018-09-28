@@ -892,6 +892,9 @@ hr {
   border-radius: 5px;
   border-collapse: separate;
   border-spacing: 0;
+  height: 430px;
+  display: block;
+  overflow: auto;
 }
 .filterTable tbody tr {
 

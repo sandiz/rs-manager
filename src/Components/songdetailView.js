@@ -224,7 +224,7 @@ export default class SongDetailView extends React.Component {
   render = () => {
     const cdlcyesstyle = this.state.is_cdlc ? "song-detail-option" : "song-detail-option-disabled";
     const cdlcnostyle = this.state.is_cdlc ? "song-detail-option-disabled" : "song-detail-option";
-    const setlistyle = "extraPadding download " + (this.props.isSetlist ? "" : "hidden");
+    const setlistyle = "extraPadding download " + (this.props.isSetlist && !this.props.isGenerated && !this.props.isRSSetlist ? "" : "hidden");
     const songlistanddashstyle = "extraPadding download " + (this.props.isSongview ? "" : "hidden");
     const songliststyle = "extraPadding download " + (this.props.isSongview && !this.props.isDashboard ? "" : "hidden");
     const songliststylegeneric = (this.props.isSongview && !this.props.isDashboard ? "" : "hidden");
@@ -232,6 +232,7 @@ export default class SongDetailView extends React.Component {
     const mvstyle = "extraPadding download " + (!this.state.showMusicVideo ? "" : "isDisabled");
     const ptdivstyle = this.state.showPlaythrough ? "dblock" : "hidden";
     const mvdivstyle = this.state.showMusicVideo ? "dblock" : "hidden";
+    const selectsetliststyle = this.props.isGenerated || this.props.isRSSetlist ? "hidden" : "";
     let showleftarrow = '';
     let showrightarrow = '';
     let yttitle = "";
@@ -365,7 +366,7 @@ export default class SongDetailView extends React.Component {
                       className={songlistanddashstyle}>
                       Add to Setlist
                     </a>
-                    <select onChange={this.saveSetlist} style={{ width: 12 + '%', margin: 12 + 'px' }}>
+                    <select className={selectsetliststyle} onChange={this.saveSetlist} style={{ width: 12 + '%', margin: 12 + 'px' }}>
                       {this.state.setlists}
                     </select>
                   </span>
@@ -552,6 +553,8 @@ SongDetailView.propTypes = {
   removeFromSetlist: PropTypes.func,
   removeFromDB: PropTypes.func,
   songID: PropTypes.string,
+  isGenerated: PropTypes.bool,
+  isRSSetlist: PropTypes.bool,
 }
 SongDetailView.defaultProps = {
   showDetail: false,
@@ -568,4 +571,6 @@ SongDetailView.defaultProps = {
   removeFromSetlist: () => { },
   removeFromDB: () => { },
   songID: '',
+  isGenerated: false,
+  isRSSetlist: false,
 }
