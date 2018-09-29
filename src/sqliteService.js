@@ -450,7 +450,7 @@ export async function getArrangmentsMastered(useCDLC = false) {
     db = await window.sqlite.open(dbfilename);
   }
   const masteryT = await getMasteryThresholdConfig();
-  const sql = `select count(mastery) as count from songs_owned where mastery > '${masteryT}' ${cdlcSql};`;
+  const sql = `select count(mastery) as count from songs_owned where mastery >= '${masteryT}' ${cdlcSql};`;
   const output = await db.get(sql);
   return output;
 }
@@ -484,11 +484,21 @@ export async function getLeadStats(useCDLC = false) {
   const cdlcSql = useCDLC ? "" : "is_cdlc = 'false' AND";
   // console.log("__db_call__: getLeadStats");
   //eslint-disable-next-line
-  const sqlstr = `select l.count as l,lh.count as lh,lm.count as lm,ll.count as ll,up.count as lup from \
+  const sqlstr = `select l.count as l,\
+  l1.count as l1, \
+  l2.count as l2, \
+  l3.count as l3, \
+  l4.count as l4, \
+  l5.count as l5, \
+  l6.count as l6, \
+  up.count as lup from \
   (select count(*) as count from songs_owned where ${cdlcSql} arrangement like '%lead%')l, \
-  (select count(*) as count from songs_owned where ${cdlcSql} mastery > .95 AND arrangement like '%lead%') lh, \
-  (select count(*) as count from songs_owned where ${cdlcSql} mastery > .90 AND mastery <= .95 AND arrangement like '%lead%') lm, \
-  (select count(*) as count from songs_owned where ${cdlcSql} mastery >= .1 AND mastery <= .90 AND arrangement like '%lead%') ll, \
+  (select count(*) as count from songs_owned where ${cdlcSql} mastery >= 1 AND arrangement like '%lead%') l1, \
+  (select count(*) as count from songs_owned where ${cdlcSql} mastery >= .95 AND mastery < 1 AND arrangement like '%lead%') l2, \
+  (select count(*) as count from songs_owned where ${cdlcSql} mastery >= .90 AND mastery < .95 AND arrangement like '%lead%') l3, \
+  (select count(*) as count from songs_owned where ${cdlcSql} mastery >= .80 AND mastery < .90 AND arrangement like '%lead%') l4, \
+  (select count(*) as count from songs_owned where ${cdlcSql} mastery >= .70 AND mastery < .80 AND arrangement like '%lead%') l5, \
+  (select count(*) as count from songs_owned where ${cdlcSql} mastery >= .1 AND mastery < .70 AND arrangement like '%lead%') l6, \
   (select count(*) as count from songs_owned where ${cdlcSql} mastery < .1 AND arrangement like '%lead%') up;`
   const output = await db.get(sqlstr);
   return output;
@@ -497,11 +507,21 @@ export async function getRhythmStats(useCDLC = false) {
   const cdlcSql = useCDLC ? "" : "is_cdlc = 'false' AND";
   //console.log("__db_call__: getRhythmStats");
   //eslint-disable-next-line
-  const sqlstr = `select l.count as r,lh.count as rh,lm.count as rm,ll.count as rl,up.count as rup from \
+  const sqlstr = `select l.count as r,\
+  l1.count as r1, \
+  l2.count as r2, \
+  l3.count as r3, \
+  l4.count as r4, \
+  l5.count as r5, \
+  l6.count as r6, \
+  up.count as rup from \
   (select count(*) as count from songs_owned where ${cdlcSql} arrangement like '%rhythm%')l, \
-  (select count(*) as count from songs_owned where ${cdlcSql} mastery > .95 AND arrangement like '%rhythm%') lh, \
-  (select count(*) as count from songs_owned where ${cdlcSql} mastery > .90 AND mastery <= .95 AND arrangement like '%rhythm%') lm, \
-  (select count(*) as count from songs_owned where ${cdlcSql} mastery >= .1 AND mastery <= .90 AND arrangement like '%rhythm%') ll, \
+  (select count(*) as count from songs_owned where ${cdlcSql} mastery >= 1 AND arrangement like '%rhythm%') l1, \
+  (select count(*) as count from songs_owned where ${cdlcSql} mastery >= .95 AND mastery < 1 AND arrangement like '%rhythm%') l2, \
+  (select count(*) as count from songs_owned where ${cdlcSql} mastery >= .90 AND mastery < .95 AND arrangement like '%rhythm%') l3, \
+  (select count(*) as count from songs_owned where ${cdlcSql} mastery >= .80 AND mastery < .90 AND arrangement like '%rhythm%') l4, \
+  (select count(*) as count from songs_owned where ${cdlcSql} mastery >= .70 AND mastery < .80 AND arrangement like '%rhythm%') l5, \
+  (select count(*) as count from songs_owned where ${cdlcSql} mastery >= .1 AND mastery < .70 AND arrangement like '%rhythm%') l6, \
   (select count(*) as count from songs_owned where ${cdlcSql} mastery < .1 AND arrangement like '%rhythm%') up;`
   const output = await db.get(sqlstr);
   return output;
@@ -510,11 +530,21 @@ export async function getBassStats(useCDLC = false) {
   const cdlcSql = useCDLC ? "" : "is_cdlc = 'false' AND";
   // console.log("__db_call__: getBassStats");
   //eslint-disable-next-line
-  const sqlstr = `select l.count as b,lh.count as bh,lm.count as bm,ll.count as bl,up.count as bup from \
+  const sqlstr = `select l.count as b,\
+  l1.count as b1, \
+  l2.count as b2, \
+  l3.count as b3, \
+  l4.count as b4, \
+  l5.count as b5, \
+  l6.count as b6, \
+  up.count as bup from \
   (select count(*) as count from songs_owned where ${cdlcSql} arrangement like '%bass%')l, \
-  (select count(*) as count from songs_owned where ${cdlcSql} mastery > .95 AND arrangement like '%bass%') lh, \
-  (select count(*) as count from songs_owned where ${cdlcSql} mastery > .90 AND mastery <= .95 AND arrangement like '%bass%') lm, \
-  (select count(*) as count from songs_owned where ${cdlcSql} mastery >= .1 AND mastery <= .90 AND arrangement like '%bass%') ll, \
+  (select count(*) as count from songs_owned where ${cdlcSql} mastery >= 1 AND arrangement like '%bass%') l1, \
+  (select count(*) as count from songs_owned where ${cdlcSql} mastery >= .95 AND mastery < 1 AND arrangement like '%bass%') l2, \
+  (select count(*) as count from songs_owned where ${cdlcSql} mastery >= .90 AND mastery < .95 AND arrangement like '%bass%') l3, \
+  (select count(*) as count from songs_owned where ${cdlcSql} mastery >= .80 AND mastery < .90 AND arrangement like '%bass%') l4, \
+  (select count(*) as count from songs_owned where ${cdlcSql} mastery >= .70 AND mastery < .80 AND arrangement like '%bass%') l5, \
+  (select count(*) as count from songs_owned where ${cdlcSql} mastery >= .1 AND mastery < .70 AND arrangement like '%bass%') l6, \
   (select count(*) as count from songs_owned where ${cdlcSql} mastery < .1 AND arrangement like '%bass%') up;`
   const output = await db.get(sqlstr);
   return output;

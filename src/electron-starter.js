@@ -11,7 +11,7 @@ function createWindow() {
     // Load the previous state with fallback to defaults
     let mainWindowState = windowStateKeeper({
       defaultWidth: 1750,
-      defaultHeight: 1036
+      defaultHeight: 1064
     });
 
     // Create the window using the state information
@@ -20,6 +20,7 @@ function createWindow() {
         y: mainWindowState.y,
         width: mainWindowState.width,
         height: mainWindowState.height,
+
         icon: path.join(__dirname, "./icons/png/icon-1024x1024.png"),
         webPreferences: {
             preload: path.join(__dirname, "./preload.js"),
