@@ -37,12 +37,12 @@ export default class DashboardView extends React.Component {
       arrMaster: 0,
       showsastats: true,
 
-      lead: [0, 0, 0, 0, 0],
-      leadwidth: [0, 0, 0, 0, 0],
-      rhythm: [0, 0, 0, 0, 0],
-      rhythmwidth: [0, 0, 0, 0, 0],
-      bass: [0, 0, 0, 0, 0],
-      basswidth: [0, 0, 0, 0, 0],
+      lead: [0, 0, 0, 0, 0, 0, 0, 0],
+      leadwidth: [0, 0, 0, 0, 0, 0, 0, 0],
+      rhythm: [0, 0, 0, 0, 0, 0, 0, 0],
+      rhythmwidth: [0, 0, 0, 0, 0, 0, 0, 0],
+      bass: [0, 0, 0, 0, 0, 0, 0, 0],
+      basswidth: [0, 0, 0, 0, 0, 0, 0, 0],
 
       sahard: [0, 0, 0, 0, 0, 0, 0],
       sahardwidth: [0, 0, 0, 0, 0, 0, 0],
@@ -128,11 +128,14 @@ export default class DashboardView extends React.Component {
         mostPlayed,
       });
       const leadStats = await getLeadStats(useCDLCforStats);
-      const lup = leadStats.l - (leadStats.lh + leadStats.lm + leadStats.ll)
+      const lup = leadStats.l - (leadStats.l1 + leadStats.l2 + leadStats.l3 +
+        leadStats.l4 + leadStats.l5 + leadStats.l6)
       const rhythmStats = await getRhythmStats(useCDLCforStats);
-      const rup = rhythmStats.r - (rhythmStats.rh + rhythmStats.rm + rhythmStats.rl)
+      const rup = rhythmStats.r - (rhythmStats.r1 + rhythmStats.r2 + rhythmStats.r3 +
+        rhythmStats.r4 + rhythmStats.r5 + rhythmStats.r6)
       const bassStats = await getBassStats(useCDLCforStats);
-      const bup = bassStats.b - (bassStats.bh + bassStats.bm + bassStats.bl)
+      const bup = bassStats.b - (bassStats.b1 + bassStats.b2 + bassStats.b3 +
+        bassStats.b4 + bassStats.b5 + bassStats.b6)
       const saStats = await getSAStats("sa_badge_hard", "sa_fc_hard", useCDLCforStats);
       const samStats = await getSAStats("sa_badge_master", "sa_fc_master", useCDLCforStats)
       const sameStats = await getSAStats("sa_badge_medium", "sa_fc_medium", useCDLCforStats);
@@ -147,35 +150,53 @@ export default class DashboardView extends React.Component {
       */
       this.setState({
         lead: [
-          leadStats.l, leadStats.lh, leadStats.lm, leadStats.ll, lup,
+          leadStats.l,
+          leadStats.l1, leadStats.l2, leadStats.l3,
+          leadStats.l4, leadStats.l5, leadStats.l6,
+          lup,
         ],
         leadwidth: [
           0,
-          this.getStatsWidth(leadStats.lh, 0, leadStats.l),
-          this.getStatsWidth(leadStats.lm, 0, leadStats.l),
-          this.getStatsWidth(leadStats.ll, 0, leadStats.l),
+          this.getStatsWidth(leadStats.l1, 0, leadStats.l),
+          this.getStatsWidth(leadStats.l2, 0, leadStats.l),
+          this.getStatsWidth(leadStats.l3, 0, leadStats.l),
+          this.getStatsWidth(leadStats.l4, 0, leadStats.l),
+          this.getStatsWidth(leadStats.l5, 0, leadStats.l),
+          this.getStatsWidth(leadStats.l6, 0, leadStats.l),
           this.getStatsWidth(lup, 0, leadStats.l),
         ],
 
         rhythm: [
-          rhythmStats.r, rhythmStats.rh, rhythmStats.rm, rhythmStats.rl, rup,
+          rhythmStats.r,
+          rhythmStats.r1, rhythmStats.r2, rhythmStats.r3,
+          rhythmStats.r4, rhythmStats.r5, rhythmStats.r6,
+          rup,
         ],
         rhythmwidth: [
           0,
-          this.getStatsWidth(rhythmStats.rh, 0, rhythmStats.r),
-          this.getStatsWidth(rhythmStats.rm, 0, rhythmStats.r),
-          this.getStatsWidth(rhythmStats.rl, 0, rhythmStats.r),
+          this.getStatsWidth(rhythmStats.r1, 0, rhythmStats.r),
+          this.getStatsWidth(rhythmStats.r2, 0, rhythmStats.r),
+          this.getStatsWidth(rhythmStats.r3, 0, rhythmStats.r),
+          this.getStatsWidth(rhythmStats.r4, 0, rhythmStats.r),
+          this.getStatsWidth(rhythmStats.r5, 0, rhythmStats.r),
+          this.getStatsWidth(rhythmStats.r6, 0, rhythmStats.r),
           this.getStatsWidth(rup, 0, rhythmStats.r),
         ],
 
         bass: [
-          bassStats.b, bassStats.bh, bassStats.bm, bassStats.bl, bup,
+          bassStats.b,
+          bassStats.b1, bassStats.b2, bassStats.b3,
+          bassStats.b4, bassStats.b5, bassStats.b6,
+          bup,
         ],
         basswidth: [
           0,
-          this.getStatsWidth(bassStats.bh, 0, bassStats.b),
-          this.getStatsWidth(bassStats.bm, 0, bassStats.b),
-          this.getStatsWidth(bassStats.bl, 0, bassStats.b),
+          this.getStatsWidth(bassStats.b1, 0, bassStats.b),
+          this.getStatsWidth(bassStats.b2, 0, bassStats.b),
+          this.getStatsWidth(bassStats.b3, 0, bassStats.b),
+          this.getStatsWidth(bassStats.b4, 0, bassStats.b),
+          this.getStatsWidth(bassStats.b5, 0, bassStats.b),
+          this.getStatsWidth(bassStats.b6, 0, bassStats.b),
           this.getStatsWidth(bup, 0, bassStats.b),
         ],
         satotal: songscount.count,
@@ -373,7 +394,7 @@ export default class DashboardView extends React.Component {
     let sacolwidth = "col-sm-3";
     if (this.state.scdTrueLength > 2) sacolwidth = "col-sm-2-2"
     const scoreattackstyle = "col ta-center dashboard-bottom " + (this.state.showsastats ? sacolwidth : "hidden");
-    const arrstyle = "col ta-center dashboard-middle col-md-3";
+    const arrstyle = "col ta-center dashboard-bottom col-md-3";
     return (
       <div className="container-fluid">
         <div className="centerButton list-unstyled">
