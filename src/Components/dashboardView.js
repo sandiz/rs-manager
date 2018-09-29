@@ -396,7 +396,7 @@ export default class DashboardView extends React.Component {
     const scoreattackstyle = "col ta-center dashboard-bottom " + (this.state.showsastats ? sacolwidth : "hidden");
     const arrstyle = "col ta-center dashboard-bottom col-md-3";
     return (
-      <div className="container-fluid">
+      <div className="container-fluid" style={{ marginTop: -20 + 'px' }}>
         <div className="centerButton list-unstyled">
           <a
             onClick={this.refreshStats}
@@ -405,7 +405,7 @@ export default class DashboardView extends React.Component {
           </a>
         </div>
         <br />
-        <div className="row justify-content-md-center" style={{ marginTop: -30 + 'px' }}>
+        <div className="row justify-content-md-center" style={{ marginTop: -38 + 'px' }}>
           <div className="col col-md-3 ta-center dashboard-top dashboard-header">
             <div>
               <a onClick={() => this.fetchRandomStats(false, true)}>Random Purchasable DLC</a>
@@ -469,7 +469,7 @@ export default class DashboardView extends React.Component {
             </div>
           </div>
         </div>
-        <div className="row justify-content-md-center">
+        <div className="row justify-content-md-center" style={{ marginTop: 10 + 'px' }}>
           <div className="col col-lg-5 ta-center dashboard-top">
             <div>
               General
@@ -549,7 +549,7 @@ export default class DashboardView extends React.Component {
           </div>
         </div>
         <br /> <br />
-        <div className="row justify-content-md-center">
+        <div className="row justify-content-md-center" style={{ marginTop: -10 + 'px' }}>
           <div className={arrstyle}>
             <span style={{ fontSize: 17 + 'px' }}>Lead </span>
             <StatsTableView
@@ -575,7 +575,7 @@ export default class DashboardView extends React.Component {
             />
           </div>
         </div>
-        <div className="row justify-content-md-center dashboard-scoreattack">
+        <div className="row justify-content-md-center dashboard-scoreattack" style={{ marginTop: -10 + 'px' }}>
           {
             this.state.scoreAttackDashboard[0] === true ?
               <div className={scoreattackstyle}>
