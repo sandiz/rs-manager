@@ -450,7 +450,7 @@ export async function getArrangmentsMastered(useCDLC = false) {
     db = await window.sqlite.open(dbfilename);
   }
   const masteryT = await getMasteryThresholdConfig();
-  const sql = `select count(mastery) as count from songs_owned where mastery > '${masteryT}' ${cdlcSql};`;
+  const sql = `select count(mastery) as count from songs_owned where mastery >= '${masteryT}' ${cdlcSql};`;
   const output = await db.get(sql);
   return output;
 }
