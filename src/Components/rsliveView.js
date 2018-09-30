@@ -52,6 +52,7 @@ export default class RSLiveView extends React.Component {
       /* end table */
       startTrack: false,
       stopTrack: false,
+      win32: window.os.platform() === "win32",
     }
     this.tabname = 'tab-rslive';
     this.columns = [
@@ -277,6 +278,12 @@ export default class RSLiveView extends React.Component {
         numArrangements: 4,
       },
     };*/
+    if (!this.state.win32) {
+      this.props.updateHeader(
+        this.tabname,
+        "Rocksmith live is only available in Windows",
+      );
+    }
   }
   componentWillUnmount = async () => {
     this.stopTracking(false);
@@ -637,6 +644,7 @@ export default class RSLiveView extends React.Component {
       (this.state.album.length > 35 ?
         this.state.album.substring(0, 35) + "..." : this.state.album)
       : "N/A";
+    const buttonclass = "extraPadding download smallbutton " + (this.state.win32 ? "" : "isDisabled");
     return (
       <div className="container-fluid">
         <div className="ta-center">
@@ -651,19 +659,19 @@ export default class RSLiveView extends React.Component {
             this.state.tracking ?
               <a
                 onClick={this.stopTracking}
-                className="extraPadding download smallbutton">
+                className={buttonclass}>
                 Stop Tracking
               </a>
               :
               <a
                 onClick={this.startTracking}
-                className="extraPadding download smallbutton">
+                className={buttonclass}>
                 Start Tracking
               </a>
           }
           <a
             onClick={this.updateMastery}
-            className="extraPadding download smallbutton">
+            className={buttonclass}>
             Update Mastery
           </a>
         </div>
