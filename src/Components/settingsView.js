@@ -19,12 +19,15 @@ const getHeader = (text, size) => {
   let header = null;
   switch (size) {
     case 3:
+      //eslint-disable-next-line
       header = (<h3><a>{text}</a></h3>)
       break;
     case 6:
+      //eslint-disable-next-line
       header = (<h6><a>{text}</a></h6>)
       break;
     default:
+      //eslint-disable-next-line
       header = (<h1><a>{text}</a></h1>)
       break;
   }
