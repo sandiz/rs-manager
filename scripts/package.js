@@ -38,7 +38,7 @@ const child = spawn("yarn", [
     `--icon=${icon}`,
     "--ignore=config.dev.json",
     "--ignore=rsdb.dev.sqlite",
-    "--ignore=assets/",
+    "--ignore=screenshots/",
     extra_ignore.length > 0 ? `--ignore=${extra_ignore}` : ""
 ]);
 
