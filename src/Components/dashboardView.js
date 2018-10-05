@@ -1,9 +1,16 @@
 import React from 'react'
 import PropTypes from 'prop-types';
 import StatsTableView from './statsTableView';
-import getProfileConfig, { updateProfileConfig, getScoreAttackConfig, getUseCDLCConfig, getScoreAttackDashboardConfig } from '../configService';
+import getProfileConfig, {
+  updateProfileConfig, getScoreAttackConfig, getUseCDLCConfig, getScoreAttackDashboardConfig,
+} from '../configService';
 import readProfile from '../steamprofileService';
-import { updateMasteryandPlayed, initSongsOwnedDB, getSongByID, countSongsOwned, getArrangmentsMastered, getLeadStats, getRhythmStats, getBassStats, getRandomSongOwned, getRandomSongAvailable, getSAStats, updateScoreAttackStats } from '../sqliteService';
+import {
+  updateMasteryandPlayed, initSongsOwnedDB, getSongByID,
+  countSongsOwned, getArrangmentsMastered, getLeadStats,
+  getRhythmStats, getBassStats, getRandomSongOwned,
+  getRandomSongAvailable, getSAStats, updateScoreAttackStats,
+} from '../sqliteService';
 import { replaceRocksmithTerms } from './songavailableView';
 import SongDetailView from './songdetailView';
 
@@ -54,17 +61,20 @@ export default class DashboardView extends React.Component {
       saeasywidth: [0, 0, 0, 0, 0, 0, 0],
     }
   }
+
   componentWillMount = async () => {
     await initSongsOwnedDB();
     this.fetchStats();
     this.fetchRandomStats();
     this.fetchWeeklySpotlight();
   }
+
   getStatsWidth = (input, min, max) => {
     const w = ((input - min) * 100) / (max - min);
     if (Number.isNaN(w)) { return 0; }
     return w;
   }
+
   convertMS = (ms) => {
     let s = Math.floor(ms / 1000);
     let m = Math.floor(s / 60);
@@ -76,7 +86,8 @@ export default class DashboardView extends React.Component {
     return {
       d, h, m, s,
     };
-  };
+  }
+
   fetchStats = async (disbleDialog) => {
     const prfldb = await getProfileConfig();
     const showsastats = await getScoreAttackConfig();
@@ -128,14 +139,14 @@ export default class DashboardView extends React.Component {
         mostPlayed,
       });
       const leadStats = await getLeadStats(useCDLCforStats);
-      const lup = leadStats.l - (leadStats.l1 + leadStats.l2 + leadStats.l3 +
-        leadStats.l4 + leadStats.l5 + leadStats.l6)
+      const lup = leadStats.l - (leadStats.l1 + leadStats.l2 + leadStats.l3
+        + leadStats.l4 + leadStats.l5 + leadStats.l6)
       const rhythmStats = await getRhythmStats(useCDLCforStats);
-      const rup = rhythmStats.r - (rhythmStats.r1 + rhythmStats.r2 + rhythmStats.r3 +
-        rhythmStats.r4 + rhythmStats.r5 + rhythmStats.r6)
+      const rup = rhythmStats.r - (rhythmStats.r1 + rhythmStats.r2 + rhythmStats.r3
+        + rhythmStats.r4 + rhythmStats.r5 + rhythmStats.r6)
       const bassStats = await getBassStats(useCDLCforStats);
-      const bup = bassStats.b - (bassStats.b1 + bassStats.b2 + bassStats.b3 +
-        bassStats.b4 + bassStats.b5 + bassStats.b6)
+      const bup = bassStats.b - (bassStats.b1 + bassStats.b2 + bassStats.b3
+        + bassStats.b4 + bassStats.b5 + bassStats.b6)
       const saStats = await getSAStats("sa_badge_hard", "sa_fc_hard", useCDLCforStats);
       const samStats = await getSAStats("sa_badge_master", "sa_fc_master", useCDLCforStats)
       const sameStats = await getSAStats("sa_badge_medium", "sa_fc_medium", useCDLCforStats);
@@ -265,6 +276,7 @@ export default class DashboardView extends React.Component {
       this.props.updateHeader(this.tabname, "Rocksmith 2014 Dashboard");
     }
   }
+
   fetchRandomStats = async (changesong = true, changepack = true) => {
     if (changesong) {
       const rsong = await getRandomSongOwned();
@@ -288,6 +300,7 @@ export default class DashboardView extends React.Component {
       });
     }
   }
+
   fetchWeeklySpotlight = async () => {
     const c = await window.fetch("https://www.reddit.com/r/rocksmith.json");
     const d = await c.json();
@@ -303,6 +316,7 @@ export default class DashboardView extends React.Component {
     }
     this.setState({ weeklysongspotlight: weekly });
   }
+
   updateMastery = async () => {
     const prfldb = await getProfileConfig();
     if (prfldb === '' || prfldb === null) {
@@ -386,10 +400,12 @@ export default class DashboardView extends React.Component {
       );
     }
   }
+
   refreshStats = async () => {
     await this.updateMastery();
     await this.fetchStats();
   }
+
   render = () => {
     let sacolwidth = "col-sm-3";
     if (this.state.scdTrueLength > 2) sacolwidth = "col-sm-2-2"
@@ -577,52 +593,60 @@ export default class DashboardView extends React.Component {
         </div>
         <div className="row justify-content-md-center dashboard-scoreattack" style={{ marginTop: -10 + 'px' }}>
           {
-            this.state.scoreAttackDashboard[0] === true ?
-              <div className={scoreattackstyle}>
-                <span style={{ fontSize: 17 + 'px' }}>Score Attack - Easy</span>
-                <StatsTableView
-                  scoreattack
-                  total={this.state.satotal}
-                  tierTotals={this.state.saeasy}
-                  tierWidths={this.state.saeasywidth}
-                />
-              </div> : null
+            this.state.scoreAttackDashboard[0] === true
+              ? (
+                <div className={scoreattackstyle}>
+                  <span style={{ fontSize: 17 + 'px' }}>Score Attack - Easy</span>
+                  <StatsTableView
+                    scoreattack
+                    total={this.state.satotal}
+                    tierTotals={this.state.saeasy}
+                    tierWidths={this.state.saeasywidth}
+                  />
+                </div>
+              ) : null
           }
           {
-            this.state.scoreAttackDashboard[1] === true ?
-              <div className={scoreattackstyle}>
-                <span style={{ fontSize: 17 + 'px' }}>Score Attack - Medium</span>
-                <StatsTableView
-                  scoreattack
-                  total={this.state.satotal}
-                  tierTotals={this.state.samedium}
-                  tierWidths={this.state.samediumwidth}
-                />
-              </div> : null
+            this.state.scoreAttackDashboard[1] === true
+              ? (
+                <div className={scoreattackstyle}>
+                  <span style={{ fontSize: 17 + 'px' }}>Score Attack - Medium</span>
+                  <StatsTableView
+                    scoreattack
+                    total={this.state.satotal}
+                    tierTotals={this.state.samedium}
+                    tierWidths={this.state.samediumwidth}
+                  />
+                </div>
+              ) : null
           }
           {
-            this.state.scoreAttackDashboard[2] === true ?
-              <div className={scoreattackstyle}>
-                <span style={{ fontSize: 17 + 'px' }}>Score Attack - Hard</span>
-                <StatsTableView
-                  scoreattack
-                  total={this.state.satotal}
-                  tierTotals={this.state.sahard}
-                  tierWidths={this.state.sahardwidth}
-                />
-              </div> : null
+            this.state.scoreAttackDashboard[2] === true
+              ? (
+                <div className={scoreattackstyle}>
+                  <span style={{ fontSize: 17 + 'px' }}>Score Attack - Hard</span>
+                  <StatsTableView
+                    scoreattack
+                    total={this.state.satotal}
+                    tierTotals={this.state.sahard}
+                    tierWidths={this.state.sahardwidth}
+                  />
+                </div>
+              ) : null
           }
           {
-            this.state.scoreAttackDashboard[3] === true ?
-              <div className={scoreattackstyle}>
-                <span style={{ fontSize: 17 + 'px' }}>Score Attack - Master</span>
-                <StatsTableView
-                  scoreattack
-                  total={this.state.satotal}
-                  tierTotals={this.state.samaster}
-                  tierWidths={this.state.samasterwidth}
-                />
-              </div> : null
+            this.state.scoreAttackDashboard[3] === true
+              ? (
+                <div className={scoreattackstyle}>
+                  <span style={{ fontSize: 17 + 'px' }}>Score Attack - Master</span>
+                  <StatsTableView
+                    scoreattack
+                    total={this.state.satotal}
+                    tierTotals={this.state.samaster}
+                    tierWidths={this.state.samasterwidth}
+                  />
+                </div>
+              ) : null
           }
         </div>
         <div>
@@ -637,8 +661,8 @@ export default class DashboardView extends React.Component {
             isSetlist={false}
           />
           <SongDetailView
-            song={this.state.showweekly ?
-              this.state.weeklysongspotlight.title : this.state.randompack}
+            song={this.state.showweekly
+              ? this.state.weeklysongspotlight.title : this.state.randompack}
             artist=""
             album=""
             showDetail={this.state.showsongpackpreview}

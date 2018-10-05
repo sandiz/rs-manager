@@ -14,6 +14,7 @@ export default class Sidebar extends React.Component {
       currentChildTab: '',
     }
   }
+
   componentWillMount = async () => {
     // default tabs on startup
     this.props.handleChange(this.props.TabsData[0]);
@@ -21,10 +22,12 @@ export default class Sidebar extends React.Component {
     //this.props.handleChange(TabsData[2], TabsData[2].child[0])
     //this.toggleActive(TabsData[2]);
   }
+
   setChildActive(val, cid) {
     this.setState({ currentTab: val.id, currentChildTab: cid.id })
     this.props.handleChange(val, cid)
   }
+
   createNewSetlist = async () => {
     const ts = Math.round((new Date()).getTime() / 1000);
     const tablename = "setlist_custom_" + ts;
@@ -33,6 +36,7 @@ export default class Sidebar extends React.Component {
     this.props.RefreshTabs();
     console.log("Created new setlist ", tablename, displayname);
   }
+
   toggleActive(val) {
     const index = this.state.expandedTabs.indexOf(val.id)
     const tabs = this.state.expandedTabs
@@ -47,6 +51,7 @@ export default class Sidebar extends React.Component {
       this.props.handleChange(val, null)
     }
   }
+
   render() {
     let tabsList = {};
     tabsList = this.props.TabsData.map((tab, index) => {

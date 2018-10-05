@@ -119,6 +119,7 @@ export default class SetlistOptions extends React.Component {
       },
     ];
   }
+
   shouldComponentUpdate = async (nextprops, nextstate) => {
     if (nextprops !== this.props) {
       this.setState({
@@ -151,13 +152,16 @@ export default class SetlistOptions extends React.Component {
     }
     return nextprops.showOptions;
   }
+
   handleChange = (event) => {
     this.setState({ setlistName: event.target.value });
   }
+
   handleHide = () => {
     this.props.close();
     enableScroll();
   }
+
   handleGenerated = (e) => {
     this.setState({
       isGenerated: e.currentTarget.value === "on",
@@ -165,6 +169,7 @@ export default class SetlistOptions extends React.Component {
       filters: [],
     });
   }
+
   handleManual = (e) => {
     this.setState({
       isManual: e.currentTarget.value === "on",
@@ -172,6 +177,7 @@ export default class SetlistOptions extends React.Component {
       filters: [],
     });
   }
+
   generateFilterTypeOptions = (filter, index) => {
     return (
       <select defaultValue={filter.type} onChange={event => this.handleSelectChange(event, "type", index)}>
@@ -185,6 +191,7 @@ export default class SetlistOptions extends React.Component {
       </select>
     );
   }
+
   generateFilterComparatorOptions = (filter, index) => {
     let selectedField = null;
     for (let i = 0; i < this.fields.length; i += 1) {
@@ -204,6 +211,7 @@ export default class SetlistOptions extends React.Component {
       </select>
     ) : null;
   }
+
   generateFilterChainOptions = (filter, index) => {
     return (
       <select defaultValue={filter.gate} onChange={event => this.handleSelectChange(event, "chain", index)}>
@@ -217,6 +225,7 @@ export default class SetlistOptions extends React.Component {
       </select>
     );
   }
+
   generateFilterValueOptions = (filter, index) => {
     if (filter.type === "tuning") {
       const tunings = generateTunings();
@@ -251,8 +260,9 @@ export default class SetlistOptions extends React.Component {
         style={{ paddingLeft: 10 + 'px', width: 80 + '%' }} />
     )
   }
+
   handleSelectChange = (event, type, index) => {
-    const filters = this.state.filters;
+    const { filters } = this.state;
     switch (type) {
       case "chain":
         filters[index].gate = event.target.value;
@@ -285,11 +295,13 @@ export default class SetlistOptions extends React.Component {
     }
     this.setState({ filters });
   }
+
   handleValueChange = (event, index) => {
-    const filters = this.state.filters;
+    const { filters } = this.state;
     filters[index].value = event.target.value;
     this.setState({ filters });
   }
+
   saveOptions = async () => {
     console.log("save setlist: " + this.props.info.key);
     await createRSSongList(
@@ -300,6 +312,7 @@ export default class SetlistOptions extends React.Component {
     this.props.fetchMeta();
     this.handleHide();
   }
+
   deleteSetlist = async () => {
     console.log("delete setlist: " + this.props.info.key);
     await deleteRSSongList(this.props.info.key)
@@ -309,6 +322,7 @@ export default class SetlistOptions extends React.Component {
     //delete setlist db
     //delete meta info from setlist_meta
   }
+
   addFilter = async () => {
     const ts = Math.round((new Date()).getTime());
     const defaultFilter = {
@@ -318,12 +332,13 @@ export default class SetlistOptions extends React.Component {
       gate: "and",
       id: ts.toString(),
     }
-    const filters = this.state.filters;
+    const { filters } = this.state;
     filters.push(defaultFilter);
     this.setState({ filters })
   }
+
   removeFilter = async (index) => {
-    const filters = this.state.filters;
+    const { filters } = this.state;
     filters.splice(index, 1);
     this.setState({ filters })
   }
@@ -341,6 +356,7 @@ export default class SetlistOptions extends React.Component {
       }
     }
   }
+
   render = () => {
     const modalinfostyle = "width-75-2"
     const buttonstyle = "extraPadding download"
@@ -395,8 +411,8 @@ export default class SetlistOptions extends React.Component {
                 </tbody>
               </table>
               {
-                this.state.isGenerated ?
-                  (
+                this.state.isGenerated
+                  ? (
                     <div>
                       <h4>Filters</h4>
                       <hr />
@@ -407,72 +423,80 @@ export default class SetlistOptions extends React.Component {
                         onClick={this.addFilter}
                         style={{ float: 'right', marginTop: -62 + 'px' }}
                       >
-                        <span /><span /><span />
+                        <span />
+                        <span />
+                        <span />
                       </button>
                       {
-                        this.state.filters != null && this.state.filters.length > 0 ?
-                          <div>
-                            <table
-                              className="filterTable"
-                              style={{
-                                width: 100 + '%',
-                                marginTop: 30 + 'px',
-                                marginBottom: 12 + 'px',
-                              }}>
-                              <thead>
-                                <tr>
-                                  <td>Filter Type</td>
-                                  <td>Comparator</td>
-                                  <td>Value</td>
-                                  <td>Logic Chain</td>
-                                  <td>Delete</td>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {
-                                  this.state.filters.map((filter, index) => {
-                                    return (
-                                      <tr key={"row_" + filter.id}>
-                                        <td style={{ width: 20 + '%' }}>
-                                          {this.generateFilterTypeOptions(filter, index)}
-                                        </td>
-                                        <td style={{ width: 20 + '%' }}>
-                                          {this.generateFilterComparatorOptions(filter, index)}
-                                        </td>
-                                        <td style={{ width: 40 + '%' }}>
-                                          {this.generateFilterValueOptions(filter, index)}
-                                        </td>
-                                        {
-                                          (index < this.state.filters.length - 1) ?
-                                            <td style={{ width: 15 + '%' }}>
-                                              {this.generateFilterChainOptions(filter, index)}
-                                            </td> : <td />
-                                        }
-                                        <td style={{ width: 5 + '%' }}>
-                                          <button
-                                            type="button"
-                                            id="settingsCollapse"
-                                            className="navbar-btn"
-                                            onClick={() => this.removeFilter(index)}
-                                          >
-                                            <span /><span /><span />
-                                          </button>
-                                        </td>
-                                      </tr>
-                                    )
-                                  })
-                                }
-                              </tbody>
-                            </table>
-                            <span>
-                              <a
-                                href="#"
-                                onClick={this.runQuery}
-                                style={{ borderBottom: "1px solid gray" }}>
-                                Run Query
+                        this.state.filters != null && this.state.filters.length > 0
+                          ? (
+                            <div>
+                              <table
+                                className="filterTable"
+                                style={{
+                                  width: 100 + '%',
+                                  marginTop: 30 + 'px',
+                                  marginBottom: 12 + 'px',
+                                }}>
+                                <thead>
+                                  <tr>
+                                    <td>Filter Type</td>
+                                    <td>Comparator</td>
+                                    <td>Value</td>
+                                    <td>Logic Chain</td>
+                                    <td>Delete</td>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {
+                                    this.state.filters.map((filter, index) => {
+                                      return (
+                                        <tr key={"row_" + filter.id}>
+                                          <td style={{ width: 20 + '%' }}>
+                                            {this.generateFilterTypeOptions(filter, index)}
+                                          </td>
+                                          <td style={{ width: 20 + '%' }}>
+                                            {this.generateFilterComparatorOptions(filter, index)}
+                                          </td>
+                                          <td style={{ width: 40 + '%' }}>
+                                            {this.generateFilterValueOptions(filter, index)}
+                                          </td>
+                                          {
+                                            (index < this.state.filters.length - 1)
+                                              ? (
+                                                <td style={{ width: 15 + '%' }}>
+                                                  {this.generateFilterChainOptions(filter, index)}
+                                                </td>
+                                              ) : <td />
+                                          }
+                                          <td style={{ width: 5 + '%' }}>
+                                            <button
+                                              type="button"
+                                              id="settingsCollapse"
+                                              className="navbar-btn"
+                                              onClick={() => this.removeFilter(index)}
+                                            >
+                                              <span />
+                                              <span />
+                                              <span />
+                                            </button>
+                                          </td>
+                                        </tr>
+                                      )
+                                    })
+                                  }
+                                </tbody>
+                              </table>
+                              <span>
+                                <a
+                                  href="#"
+                                  onClick={this.runQuery}
+                                  style={{ borderBottom: "1px solid gray" }}>
+                                  Run Query
                               </a>: {this.state.numResults} arrangements.
                              </span>
-                          </div>
+                            </div>
+                          )
                           : null
                       }
                     </div>

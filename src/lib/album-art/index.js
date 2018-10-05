@@ -30,12 +30,13 @@
     const apiKey = '4cb074e4b8ec4ee9ad3eb37d6f7eb240'
     const sizes = ['small', 'medium', 'large', 'extralarge', 'mega']
     const method = (opts.album === null) ? 'artist' : 'album'
-    const url = 'https://ws.audioscrobbler.com' +
-      encodeURI('/2.0/?format=json&api_key=' +
-        apiKey +
-        '&method=' + method +
-        '.getinfo&artist=' + artist +
-        (opts.album !== null ? '&album=' + opts.album : ''))
+    const url = 'https://ws.audioscrobbler.com'
+      + encodeURI('/2.0/?format=json&api_key='
+        + apiKey
+        + '&method=' + method
+        + '.getinfo&artist='
+        + artist
+        + (opts.album !== null ? '&album=' + opts.album : ''))
     const response = fetch(url, {
       method: 'GET',
     })
