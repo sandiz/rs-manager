@@ -4,6 +4,8 @@ const path = require("path");
 const url = require("url");
 const isDev = require('electron-is-dev');
 const windowStateKeeper = require('electron-window-state');
+const openAboutWindow = require('about-window').default;
+
 let mainWindow;
 
 function createWindow() {
@@ -55,7 +57,16 @@ function createWindow() {
     var template = [{
         label: "About",
         submenu: [
-            { label: "About Application", selector: "orderFrontStandardAboutPanel:" },
+            {
+                label: "About Application", click: () => {
+                    openAboutWindow({
+                        icon_path: path.join(__dirname, "./assets/icons/icon-1024x1024.png"),
+                        package_json_dir: path.join(__dirname, "../"),
+                        copyright: 'Copyright (c) 2015 sandic',
+                        homepage: 'https://github.com/sandiz/rs-manager',
+                    });
+                }
+            },
             { type: "separator" },
             { label: "Quit", accelerator: "Command+Q", click: function () { app.quit(); } }
         ]
