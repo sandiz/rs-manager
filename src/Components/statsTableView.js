@@ -5,12 +5,13 @@ export default class StatsTableView extends React.Component {
   testFunction = () => {
     console.log("test");
   }
+
   render = () => {
     return (
-      <table style={{ width: 100 + '%', marginTop: 7 + 'px' }} >
+      <table style={{ width: 100 + '%', marginTop: 7 + 'px' }}>
         {
-          this.props.scoreattack ?
-            (
+          this.props.scoreattack
+            ? (
               <tbody>
                 <tr>
                   <td>Total</td>
@@ -142,8 +143,7 @@ export default class StatsTableView extends React.Component {
                 </tr>
               </tbody>
             )
-            :
-            (
+            : (
               <tbody>
                 <tr>
                   <td>Total</td>

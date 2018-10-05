@@ -4,7 +4,11 @@ import DatePicker from 'react-datepicker';
 import moment from 'moment';
 import 'react-datepicker/dist/react-datepicker.css';
 
-import { initSongsAvailableDB, isDLCInDB, addToSteamDLCCatalog, getDLCDetails, countSongsAvailable, updateOwnedInDB, updateAcquiredDate, getAppID, countAppID, updateAcquiredDateByAppID } from '../sqliteService';
+import {
+  initSongsAvailableDB, isDLCInDB, addToSteamDLCCatalog, getDLCDetails,
+  countSongsAvailable, updateOwnedInDB, updateAcquiredDate,
+  getAppID, countAppID, updateAcquiredDateByAppID,
+} from '../sqliteService';
 import { RemoteAll } from './songlistView';
 import { getOwnedPackages, getOwnedHistory } from '../steamprofileService';
 import SongDetailView from './songdetailView';
@@ -109,13 +113,15 @@ export default class SongAvailableView extends React.Component {
         sort: true,
         formatter: (cell, row) => {
           const d = moment.unix(cell / 1000);
-          return (<div>
-            <DatePicker
-              customInput={<DateAcquiredInput />}
-              selected={d}
-              readOnly
-              dateFormat="ddd ll" />
-          </div>)
+          return (
+            <div>
+              <DatePicker
+                customInput={<DateAcquiredInput />}
+                selected={d}
+                readOnly
+                dateFormat="ddd ll" />
+            </div>
+          )
         },
       },
       {
@@ -182,6 +188,7 @@ export default class SongAvailableView extends React.Component {
       },
     ]
   }
+
   componentDidMount = async () => {
     await initSongsAvailableDB();
     let so = await countSongsAvailable();
@@ -238,6 +245,7 @@ export default class SongAvailableView extends React.Component {
       filters: {},
     })
   }
+
   updateSingleAcquireDate = async (cell, row, selectedMoment) => {
     console.log(cell, row, selectedMoment.format("ddd ll"));
     const d = selectedMoment.toDate();
@@ -278,6 +286,7 @@ export default class SongAvailableView extends React.Component {
       `Updated date for ${row.appid}: ${d} `,
     );
   }
+
   updateSteamDLCCatalog = async () => {
     this.props.updateHeader(
       this.tabname,
@@ -350,6 +359,7 @@ export default class SongAvailableView extends React.Component {
     )
     this.setState({ dlcs: output, page: 1, totalSize: output[0].acount });
   }
+
   updateAcquiredDates = async (tuples) => {
     const songpacks = []
     let songsupdated = 0;
@@ -421,6 +431,7 @@ export default class SongAvailableView extends React.Component {
       sortOrder: "desc",
     })
   }
+
   updateOwnedStatus = async () => {
     const cookie = await getSteamLoginSecureCookie();
     const cookieSess = await getSessionIDConfig();
@@ -484,6 +495,7 @@ export default class SongAvailableView extends React.Component {
       sortOrder: "desc",
     })
   }
+
   handleSearchChange = (e) => {
     if (e.target.value === "owned") {
       this.handleTableChange('filter', {
@@ -514,9 +526,11 @@ export default class SongAvailableView extends React.Component {
       })
     }
   }
+
   generateYouTube = () => {
 
   }
+
   handleTableChange = async (type, {
     page,
     sizePerPage,
@@ -533,8 +547,8 @@ export default class SongAvailableView extends React.Component {
       sizePerPage,
       sortField === null ? "release_date" : sortField,
       sortOrder === null ? "desc" : sortOrder,
-      (owned === true || owned === false ||
-        this.search.value === "owned" || this.search.value === "available") ? "" : this.search.value,
+      (owned === true || owned === false
+        || this.search.value === "owned" || this.search.value === "available") ? "" : this.search.value,
       (this.search.value === "owned") ? 'true' : this.search.value === 'available' ? 'false' : owned,
     )
     if (output.length > 0) {
@@ -554,6 +568,7 @@ export default class SongAvailableView extends React.Component {
       this.setState({ dlcs: output, page, totalSize: 0 });
     }
   }
+
   render = () => {
     const ownedstyle = "extraPadding download " + (this.state.dlcs.length > 0 ? " " : "hidden");
     const { dlcs, sizePerPage, page } = this.state;

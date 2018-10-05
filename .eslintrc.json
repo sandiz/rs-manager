@@ -48,7 +48,15 @@
         "no-lonely-if": "off",
         "react/forbid-prop-types": "off",
         "no-console": "off",
-        "spaced-comment": "off"
+        "spaced-comment": "off",
+        "react/destructuring-assignment": "off",
+        "jsx-a11y/label-has-associated-control": "off",
+        "jsx-a11y/label-has-for": "off",
+        "react/no-access-state-in-setstate": "off",
+        "react/jsx-one-expression-per-line": "off",
+        "indent": "off",
+        "react/jsx-indent-props": "off",
+        "no-else-return": "off"
     },
     "parser": "babel-eslint",
     "extends": "airbnb",

@@ -71,20 +71,24 @@ class App extends Component {
     //this.handleChange = this.handleChange.bind(this);
     this.selectedTab = null;
   }
+
   componentWillMount = async () => {
     this.refreshTabs();
   }
+
   componentDidMount = async () => {
     await this.updateProfile();
   }
+
   updateProfile = async () => {
     const prfldb = await getProfileConfig();
     const steamcookie = await getSteamLoginSecureCookie();
     this.setState({ currentProfile: prfldb, currentCookie: steamcookie });
   }
+
   handleChange = async (tab, child) => {
-    const text = (tab == null) ? "" : tab.name +
-      (child == null ? "" : ` >  ${child.name}`);
+    const text = (tab == null) ? "" : tab.name
+      + (child == null ? "" : ` >  ${child.name}`);
 
     this.setState({
       currentTab: tab,
@@ -95,39 +99,46 @@ class App extends Component {
     switch (tab.id) {
       default:
       case "tab-dashboard":
-        this.selectedTab =
-          (<DashboardView
+        this.selectedTab = (
+          <DashboardView
             currentTab={tab}
             updateHeader={this.updateHeader}
             resetHeader={this.resetHeader}
             handleChange={this.updateProfile}
-          />)
+          />
+        )
         break;
       case "tab-psarc":
-        this.selectedTab = (<PSARCView
-          currentTab={tab}
-          updateHeader={this.updateHeader}
-          resetHeader={this.resetHeader}
-        />)
+        this.selectedTab = (
+          <PSARCView
+            currentTab={tab}
+            updateHeader={this.updateHeader}
+            resetHeader={this.resetHeader}
+          />
+        )
         break;
       case "tab-settings":
-        this.selectedTab = (<SettingsView
-          currentTab={tab}
-          updateHeader={this.updateHeader}
-          resetHeader={this.resetHeader}
-          handleChange={this.updateProfile}
-          refreshTabs={this.refreshTabs}
-        />)
+        this.selectedTab = (
+          <SettingsView
+            currentTab={tab}
+            updateHeader={this.updateHeader}
+            resetHeader={this.resetHeader}
+            handleChange={this.updateProfile}
+            refreshTabs={this.refreshTabs}
+          />
+        )
         break;
       case "tab-setlist":
-        this.selectedTab = (<SetlistView
-          currentTab={tab}
-          currentChildTab={child}
-          updateHeader={this.updateChildHeader}
-          resetHeader={this.resetHeader}
-          handleChange={this.updateProfile}
-          refreshTabs={this.refreshTabs}
-        />)
+        this.selectedTab = (
+          <SetlistView
+            currentTab={tab}
+            currentChildTab={child}
+            updateHeader={this.updateChildHeader}
+            resetHeader={this.resetHeader}
+            handleChange={this.updateProfile}
+            refreshTabs={this.refreshTabs}
+          />
+        )
         break;
       case "tab-songs":
         switch (child.id) {
@@ -156,14 +167,17 @@ class App extends Component {
         }
         break;
       case "tab-rslive":
-        this.selectedTab = (<RSLiveView
-          currentTab={tab}
-          updateHeader={this.updateHeader}
-          resetHeader={this.resetHeader}
-        />)
+        this.selectedTab = (
+          <RSLiveView
+            currentTab={tab}
+            updateHeader={this.updateHeader}
+            resetHeader={this.resetHeader}
+          />
+        )
         break;
     }
   }
+
   updateHeader = (tabname, text) => {
     if (this.state.currentTab === null) {
       return;
@@ -172,6 +186,7 @@ class App extends Component {
       this.setState({ appTitle: text });
     }
   }
+
   updateChildHeader = (tabname, childname, text) => {
     if (tabname === null || this.state.currentChildTab === null) {
       return;
@@ -180,14 +195,17 @@ class App extends Component {
       this.setState({ appTitle: text });
     }
   }
+
   resetHeader = (tabname) => {
     if (this.state.currentTab != null && tabname === this.state.currentTab.id) {
       this.handleChange(this.state.currentTab, this.state.currentChildTab);
     }
   }
+
   collapseSidebar = () => {
     this.setState({ showSidebar: !this.state.showSidebar });
   }
+
   refreshTabs = async () => {
     await initSetlistDB();
     const setlists = await getAllSetlist();
@@ -205,10 +223,11 @@ class App extends Component {
     t[2].child.push({ name: 'Create New Setlist...', id: 'add-setlist' });
     this.setState({ TabsData: t });
   }
+
   render = () => {
     const len = this.state.currentProfile.length;
-    let profile = len > 0 ?
-      path.basename(this.state.currentProfile).slice(0, 6) + "..." + this.state.currentProfile.slice(len - 6, len) : "-";
+    let profile = len > 0
+      ? path.basename(this.state.currentProfile).slice(0, 6) + "..." + this.state.currentProfile.slice(len - 6, len) : "-";
     profile = profile.toLowerCase();
     const cookie = this.state.currentCookie.length > 0 ? this.state.currentCookie.slice(0, 16) + "..." : "-";
     return (

@@ -16,6 +16,7 @@ export default class ChartView extends React.Component {
     this.lastsongid = "";
     console.log(zoom);
   }
+
   shouldComponentUpdate = (nextstate, nextprops) => {
     if (nextprops.startTrack) {
       this.startCollecting()
@@ -40,14 +41,17 @@ export default class ChartView extends React.Component {
     }
     return true;
   }
+
   componentWillUnmount = () => {
     if (this.timer) clearInterval(this.timer);
   }
+
   getRandomInt = (min, max) => {
     min = Math.ceil(min);
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min)) + min;
   }
+
   startCollecting = async () => {
     const chartData = [
       {
@@ -66,6 +70,7 @@ export default class ChartView extends React.Component {
     this.setState({ chartData })
     await this.DataTimer(chartData);
   }
+
   DataTimer = async (chartData) => {
     this.timer = setInterval(async () => {
       const songData = await window.fetch("http://127.0.0.1:9938");
@@ -88,8 +93,7 @@ export default class ChartView extends React.Component {
         const timeKey = `${minutes}:${seconds}`
         const tnh = memoryReadout ? memoryReadout.totalNotesHit : 0;
         const tnm = memoryReadout ? memoryReadout.totalNotesMissed : 0;
-        let accuracy = tnh /
-          (tnh + tnm);
+        let accuracy = tnh / (tnh + tnm);
         accuracy *= 100;
 
         if (Number.isNaN(accuracy)) {
@@ -103,6 +107,7 @@ export default class ChartView extends React.Component {
       }
     }, 1000);
   }
+
   render = () => {
     return (
       <LineChart

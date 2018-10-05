@@ -1,8 +1,15 @@
 import React from 'react'
 import Collapsible from 'react-collapsible';
 import PropTypes from 'prop-types';
-import getProfileConfig, { updateSteamLoginSecureCookie, getSteamLoginSecureCookie, updateProfileConfig, getScoreAttackConfig, updateScoreAttackConfig, updateUseCDLCConfig, getUseCDLCConfig, getScoreAttackDashboardConfig, updateScoreAttackDashboard, getSessionIDConfig, updateSessionIDConfig, getMasteryThresholdConfig, updateMasteryThreshold } from '../configService';
-import { resetDB, createRSSongList, addtoRSSongList, isTablePresent, deleteRSSongList } from '../sqliteService';
+import getProfileConfig, {
+  updateSteamLoginSecureCookie, getSteamLoginSecureCookie, updateProfileConfig,
+  getScoreAttackConfig, updateScoreAttackConfig, updateUseCDLCConfig,
+  getUseCDLCConfig, getScoreAttackDashboardConfig, updateScoreAttackDashboard,
+  getSessionIDConfig, updateSessionIDConfig, getMasteryThresholdConfig, updateMasteryThreshold,
+} from '../configService';
+import {
+  resetDB, createRSSongList, addtoRSSongList, isTablePresent, deleteRSSongList,
+} from '../sqliteService';
 import readProfile from '../steamprofileService';
 
 const { path } = window;
@@ -73,6 +80,7 @@ export default class SettingsView extends React.Component {
     this.readConfigs();
     this.refreshSetlist();
   }
+
   generateSetlistOptions = () => {
     const setlistOptions = []
     for (let i = 0; i <= 5; i += 1) {
@@ -89,13 +97,17 @@ export default class SettingsView extends React.Component {
             textAlign: 'right',
           }}>
             {
-              this.state.processingSetlist ? "Processing..." :
-                (
-                  this.state.setlistImported[i] ?
-                    <span> <a style={{ color: 'red' }} onClick={() => this.importDeleteSetlist(i, "delete")}>Delete Setlist</a> &nbsp;| &nbsp;
-                    <a onClick={() => this.importDeleteSetlist(i, "import")}>Reimport Setlist</a> </span>
-                    :
-                    <a onClick={() => this.importDeleteSetlist(i, "import")}>Click to Import</a>
+              this.state.processingSetlist ? "Processing..."
+                : (
+                  this.state.setlistImported[i]
+                    ? (
+                      <span>
+                        <a style={{ color: 'red' }} onClick={() => this.importDeleteSetlist(i, "delete")}>Delete Setlist</a>
+                        &nbsp;| &nbsp;
+                        <a onClick={() => this.importDeleteSetlist(i, "import")}>Reimport Setlist</a>
+                      </span>
+                    )
+                    : <a onClick={() => this.importDeleteSetlist(i, "import")}>Click to Import</a>
                 )
             }
           </span>
@@ -105,6 +117,7 @@ export default class SettingsView extends React.Component {
     }
     return setlistOptions;
   }
+
   importDeleteSetlist = async (setlistnum, method) => {
     if (this.state.prfldb === '' || this.state.prfldb === null) {
       this.props.updateHeader(
@@ -170,6 +183,7 @@ export default class SettingsView extends React.Component {
     this.refreshSetlist();
     this.props.refreshTabs();
   }
+
   handleScoreAttack = (event) => {
     const t = event.target;
     const value = t.type === 'checkbox' ? t.checked : t.value;
@@ -177,6 +191,7 @@ export default class SettingsView extends React.Component {
       showScoreAttack: value,
     });
   }
+
   handleScoreAttackDashboard = async (event, type) => {
     const t = event.target;
     const value = t.type === 'checkbox' ? t.checked : t.value;
@@ -201,6 +216,7 @@ export default class SettingsView extends React.Component {
       scoreAttackDashboard: cur,
     });
   }
+
   handleCDLCStats = (event) => {
     const t = event.target;
     const value = t.type === 'checkbox' ? t.checked : t.value;
@@ -208,6 +224,7 @@ export default class SettingsView extends React.Component {
       useCDLCinStats: value,
     });
   }
+
   handleMasteryThreshold = (event) => {
     this.setState({
       masteryThreshold: event.target.value / 100,
@@ -225,6 +242,7 @@ export default class SettingsView extends React.Component {
       setlistImported: setliststatus,
     });
   }
+
   readConfigs = async () => {
     const d = await getProfileConfig();
     const e = await getSteamLoginSecureCookie();
@@ -243,6 +261,7 @@ export default class SettingsView extends React.Component {
       masteryThreshold: j,
     });
   }
+
   saveSettings = async () => {
     if (this.state.steamLoginSecure !== "" && this.state.steamLoginSecure != null) {
       await updateSteamLoginSecureCookie(this.state.steamLoginSecure);
@@ -258,6 +277,7 @@ export default class SettingsView extends React.Component {
     this.props.handleChange();
     this.props.updateHeader(this.tabname, "Settings Saved!");
   }
+
   enterPrfldb = async () => {
     const prfldbs = remote.dialog.showOpenDialog({
       properties: ["openFile"],
@@ -268,10 +288,12 @@ export default class SettingsView extends React.Component {
       this.props.handleChange();
     }
   }
+
   resetdb = async () => {
     await resetDB('songs_owned');
     this.props.updateHeader(this.tabname, "Songs Owned collection is now reset!");
   }
+
   enterCookie = async () => {
     const prompt = window.prompt;
     let d = await prompt({
@@ -302,10 +324,12 @@ export default class SettingsView extends React.Component {
     }
     this.props.handleChange();
   }
+
   render = () => {
     if (this.props.currentTab === null) {
       return null;
-    } else if (this.props.currentTab.id === this.tabname) {
+    }
+    else if (this.props.currentTab.id === this.tabname) {
       return (
         <div className="container-fluid">
           <div className="row justify-content-lg-center">
@@ -359,12 +383,13 @@ export default class SettingsView extends React.Component {
                     paddingRight: 1 + 'px',
                   }}>
                     {
-                      this.state.prfldb === '' ?
-                        <a onClick={this.enterPrfldb}>Click to Change </a>
-                        :
-                        <a onClick={this.enterPrfldb}>
-                          <i>{path.basename(this.state.prfldb).toLowerCase()}</i>
-                        </a>
+                      this.state.prfldb === ''
+                        ? <a onClick={this.enterPrfldb}>Click to Change </a>
+                        : (
+                          <a onClick={this.enterPrfldb}>
+                            <i>{path.basename(this.state.prfldb).toLowerCase()}</i>
+                          </a>
+                        )
                     }
                   </span>
                   <br />
@@ -391,17 +416,18 @@ export default class SettingsView extends React.Component {
                     paddingRight: 1 + 'px',
                   }}>
                     {
-                      this.state.steamLoginSecure === '' ?
-                        <a onClick={this.enterCookie}>Click to Change </a>
-                        :
-                        <i>
-                          <a onClick={this.enterCookie}>
-                            {(this.state.steamLoginSecure).toLowerCase()}
-                          </a><br />
-                          <a onClick={this.enterCookie}>
-                            {(this.state.sessionID).toLowerCase()}
-                          </a>
-                        </i>
+                      this.state.steamLoginSecure === ''
+                        ? <a onClick={this.enterCookie}>Click to Change </a>
+                        : (
+                          <i>
+                            <a onClick={this.enterCookie}>
+                              {(this.state.steamLoginSecure).toLowerCase()}
+                            </a><br />
+                            <a onClick={this.enterCookie}>
+                              {(this.state.sessionID).toLowerCase()}
+                            </a>
+                          </i>
+                        )
                     }
                   </span>
                   <br />
@@ -595,7 +621,7 @@ export default class SettingsView extends React.Component {
               Save Settings
             </a>
           </div>
-        </div >
+        </div>
       )
     }
     return null;

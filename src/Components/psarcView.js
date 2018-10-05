@@ -9,7 +9,12 @@ import updateSongsOwned, { initSongsOwnedDB, saveSongsOwnedDB } from '../sqliteS
 const { path } = window;
 const { remote } = window.require('electron')
 function sizeFormatter(cell, row) {
-  return <span>{Math.round(cell / 1024 / 1024)} MB</span>;
+  return (
+    <span>
+      {Math.round(cell / 1024 / 1024)}
+      MB
+  </span>
+  );
 }
 function dateFormatter(cell, row) {
   return <span>{new Date(cell).toLocaleDateString()}</span>;
@@ -143,6 +148,7 @@ export default class PSARCView extends React.Component {
     }
     this.markAsCDLC = null;
   }
+
   openDirDialog = async () => {
     const dirs = remote.dialog.showOpenDialog({
       properties: ["openDirectory"],
@@ -157,6 +163,7 @@ export default class PSARCView extends React.Component {
       this.psarcRead(results);
     }
   }
+
   openFileDialog = async () => {
     const files = remote.dialog.showOpenDialog({
       properties: ["openFile"],
@@ -177,6 +184,7 @@ export default class PSARCView extends React.Component {
       this.psarcRead(results);
     }
   }
+
   walkSync = (dir, results) => {
     const fs = remote.require("fs");
     const files = fs.readdirSync(dir);
@@ -203,6 +211,7 @@ export default class PSARCView extends React.Component {
     }
     return results;
   }
+
   psarcRead = async (results) => {
     const count = results.length;
     let index = 1;
@@ -233,23 +242,28 @@ export default class PSARCView extends React.Component {
       index += 1
     }
   }
+
   noData = () => {
     if (this.state.processing) {
       return "Processing...";
     }
     return "No Data"
   }
+
   forceViewUpdate = () => {
     this.setState({ files: this.processedFiles });
   }
+
   stopProcessing = async () => {
     this.setState({ abortprocessing: true });
   }
+
   extract = async (file, psarc) => {
     const res = await extractFile(psarc, file)
     console.log(res)
     window.shell.showItemInFolder(res.filename)
   }
+
   handleShow = async (row) => {
     const psarcdata = await psarcToJSON(row.filename);
     this.setState({
@@ -258,9 +272,11 @@ export default class PSARCView extends React.Component {
       showpsarcDetail: true,
     });
   }
+
   handleHide = () => {
     this.setState({ showpsarcDetail: false });
   }
+
   updateSongList = async () => {
     await initSongsOwnedDB();
     console.log("arrangments: " + this.state.files.length);
@@ -272,8 +288,8 @@ export default class PSARCView extends React.Component {
       this.props.updateHeader(this.tabname, `Updating Songlist with PSARC:  ${this.state.files[i].psarc} (${i}/${this.state.files.length})`);
       const { song } = this.state.files[i];
 
-      if (song.startsWith("RS2 Test") ||
-        song.startsWith("RS2 Chord")) {
+      if (song.startsWith("RS2 Test")
+        || song.startsWith("RS2 Chord")) {
         console.log("Skipped song: " + song);
         fcount += 1;
         continue;
@@ -288,6 +304,7 @@ export default class PSARCView extends React.Component {
     }
     this.props.updateHeader(this.tabname, "Updated Songlist with " + count + " Arrangements. " + filtered);
   }
+
   render = () => {
     const stopprocessingstyle = this.state.processing ? "" : "none";
     const hasdatastyle = this.state.processing === false && this.state.files.length > 0 ? "" : "none";
@@ -469,7 +486,7 @@ export default class PSARCView extends React.Component {
                   tableData.push(cell);
                 }
                 return (
-                  <div >
+                  <div>
                     <h1> PSARC: {this.state.selectedpsarcData.key + ".psarc"} </h1>
                     <h1> Files: {this.state.selectedpsarcData.files.length}</h1>
                     <div className="psarcFiles">

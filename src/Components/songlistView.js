@@ -5,7 +5,10 @@ import filterFactory from 'react-bootstrap-table2-filter';
 import ReactTooltip from 'react-tooltip'
 import PropTypes from 'prop-types';
 import readProfile from '../steamprofileService';
-import { initSetlistPlaylistDB, getSongsOwned, countSongsOwned, updateMasteryandPlayed, initSongsOwnedDB, addToFavorites, updateScoreAttackStats, removeFromSongsOwned } from '../sqliteService';
+import {
+  initSetlistPlaylistDB, getSongsOwned, countSongsOwned, updateMasteryandPlayed,
+  initSongsOwnedDB, addToFavorites, updateScoreAttackStats, removeFromSongsOwned,
+} from '../sqliteService';
 import getProfileConfig, { updateProfileConfig, getScoreAttackConfig } from '../configService';
 import SongDetailView from './songdetailView';
 
@@ -94,15 +97,17 @@ export function round100Formatter(cell, row) {
   else color = "yellow";
 
   const width = (cell > 100 ? 100 : cell) + "%";
-  return (<span>
-    <span className="mastery">{cell}%</span>
+  return (
     <span>
-      <svg height="100%">
-        <rect width={width} height="100%" style={{ fill: color, strokeWidth: 2, stroke: 'rgb(0, 0, 0)' }} />
-        <text x="40%" y="18" fontSize="15px">{cell} %</text>
-      </svg>
+      <span className="mastery">{cell}%</span>
+      <span>
+        <svg height="100%">
+          <rect width={width} height="100%" style={{ fill: color, strokeWidth: 2, stroke: 'rgb(0, 0, 0)' }} />
+          <text x="40%" y="18" fontSize="15px">{cell} %</text>
+        </svg>
+      </span>
     </span>
-  </span>);
+  );
 }
 export function countFormmatter(cell, row) {
   if (cell == null) {
@@ -197,7 +202,7 @@ export function badgeFormatter(cell, row) {
           </table>
         </ReactTooltip>
         <div data-tip data-for={row.id + "_badge"} data-class="tooltip-badge tooltipClass">
-          <div id={row.id + "_col"} className="row justify-content-md-center pointer" >
+          <div id={row.id + "_col"} className="row justify-content-md-center pointer">
             {
               badgeClasses.map(([badgeCount, highScore, badgeType, badgeClass], index) => {
                 const divclass = badgeClassDefault + badgeClass;
@@ -281,12 +286,14 @@ export function arrangmentFormatter(cell, row) {
               })
             }
             {
-              isCDLC ?
-                <tr className="row" key={"cdlc" + row.id}>
-                  <td style={{ width: 100 + '%', textAlign: 'center' }}>
-                    Custom DLC
-                </td>
-                </tr> : null
+              isCDLC
+                ? (
+                  <tr className="row" key={"cdlc" + row.id}>
+                    <td style={{ width: 100 + '%', textAlign: 'center' }}>
+                      Custom DLC
+                    </td>
+                  </tr>
+                ) : null
             }
           </tbody>
         </table>
@@ -354,8 +361,7 @@ export const RemoteAll = ({
   totalSize,
   rowEvents,
   paginate = true,
-}) =>
-  (
+}) => (
     <div>
       <BootstrapTable
         remote={{ pagination: true }}
@@ -611,6 +617,7 @@ export default class SonglistView extends React.Component {
       },
     };
   }
+
   componentDidMount = async () => {
     await initSongsOwnedDB();
     const so = await countSongsOwned();
@@ -627,6 +634,7 @@ export default class SonglistView extends React.Component {
       filters: {},
     })
   }
+
   handleSearchChange = (e) => {
     this.handleTableChange('filter', {
       page: 1,
@@ -636,6 +644,7 @@ export default class SonglistView extends React.Component {
       sortOrder: null,
     })
   }
+
   updateMastery = async () => {
     const prfldb = await getProfileConfig();
     if (prfldb === '' || prfldb === null) {
@@ -731,12 +740,12 @@ export default class SonglistView extends React.Component {
         this.lastsortfield,
         this.lastsortorder,
         this.search.value,
-        document.getElementById("search_field") ?
-          document.getElementById("search_field").value : "",
+        document.getElementById("search_field") ? document.getElementById("search_field").value : "",
       )
       this.setState({ songs: output, page: 1, totalSize: output[0].acount });
     }
   }
+
   updateFavs = async () => {
     const prfldb = await getProfileConfig();
     if (prfldb === '' || prfldb === null) {
@@ -785,6 +794,7 @@ export default class SonglistView extends React.Component {
       );
     }
   }
+
   refreshView = async () => {
     this.handleTableChange("cdm", {
       page: this.state.page,
@@ -792,10 +802,12 @@ export default class SonglistView extends React.Component {
       filters: {},
     })
   }
+
   removeFromDB = async () => {
     await removeFromSongsOwned(this.state.showSongID);
     await this.refreshView();
   }
+
   handleTableChange = async (type, {
     page,
     sizePerPage,
@@ -812,8 +824,7 @@ export default class SonglistView extends React.Component {
       sortField === null ? this.lastsortfield : sortField,
       sortOrder === null ? this.lastsortorder : sortOrder,
       this.search.value,
-      document.getElementById("search_field") ?
-        document.getElementById("search_field").value : "",
+      document.getElementById("search_field") ? document.getElementById("search_field").value : "",
     )
     if (sortField !== null) { this.lastsortfield = sortField; }
     if (sortOrder !== null) { this.lastsortorder = sortOrder; }
@@ -834,6 +845,7 @@ export default class SonglistView extends React.Component {
       this.setState({ songs: output, page, totalSize: 0 });
     }
   }
+
   render = () => {
     const { songs, sizePerPage, page } = this.state;
     const choosepsarchstyle = "extraPadding download " + (this.state.totalSize <= 0 ? "isDisabled" : "");

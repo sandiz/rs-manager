@@ -253,6 +253,7 @@ export default class RSLiveView extends React.Component {
     this.songkeyresults = null;
     this.albumarturl = "";
   }
+
   componentDidMount = async () => {
     /*const songData = {
       success: true,
@@ -285,9 +286,11 @@ export default class RSLiveView extends React.Component {
       );
     }
   }
+
   componentWillUnmount = async () => {
     this.stopTracking(false);
   }
+
   animatedNumber = (number) => {
     return (
       <AnimatedNumber
@@ -303,12 +306,12 @@ export default class RSLiveView extends React.Component {
       />
     );
   }
+
   parseSongResults = async (songData) => {
     const { songDetails, memoryReadout } = songData;
     const tnh = memoryReadout ? memoryReadout.totalNotesHit : 0;
     const tnm = memoryReadout ? memoryReadout.totalNotesMissed : 0;
-    let accuracy = tnh /
-      (tnh + tnm);
+    let accuracy = tnh / (tnh + tnm);
     accuracy *= 100;
 
     if (Number.isNaN(accuracy)) {
@@ -320,9 +323,9 @@ export default class RSLiveView extends React.Component {
     const notesHit = memoryReadout ? memoryReadout.totalNotesHit : 0;
     const notesMissed = memoryReadout ? memoryReadout.totalNotesMissed : 0;
     const highestStreak = memoryReadout ? memoryReadout.highestHitStreak : 0;
-    if (memoryReadout &&
-      memoryReadout.songID.length > 0 &&
-      memoryReadout.songID !== this.state.songKey) {
+    if (memoryReadout
+      && memoryReadout.songID.length > 0
+      && memoryReadout.songID !== this.state.songKey) {
       const skr = await getSongBySongKey(memoryReadout.songID);
       if (skr.length > 0) this.songkeyresults = skr[0];
     }
@@ -359,6 +362,7 @@ export default class RSLiveView extends React.Component {
       }
     });
   }
+
   refreshTable = async () => {
     this.handleTableChange("cdm", {
       page: this.state.page,
@@ -366,6 +370,7 @@ export default class RSLiveView extends React.Component {
       filters: {},
     })
   }
+
   startTracking = async () => {
     this.setState({ startTrack: true, stopTrack: false })
     console.log("start tracking");
@@ -410,6 +415,7 @@ export default class RSLiveView extends React.Component {
     );
     this.fetchRSSniffer();
   }
+
   fetchRSSniffer = async () => {
     this.fetchrstimer = setInterval(async () => {
       try {
@@ -424,11 +430,13 @@ export default class RSLiveView extends React.Component {
       }
     }, 1000);
   }
+
   findPID = async () => {
     const pids = await window.findProcess("name", "RockSniffer.exe");
     console.log(pids);
     return pids;
   }
+
   killPIDs = async (pids) => {
     const pidarr = []
     for (let i = 0; i < pids.length; i += 1) {
@@ -446,6 +454,7 @@ export default class RSLiveView extends React.Component {
     }
     return "echo 'no pids'"
   }
+
   stopTracking = async (reset = true) => {
     this.setState({ startTrack: false, stopTrack: true })
     if (this.fetchrstimer) clearInterval(this.fetchrstimer);
@@ -500,6 +509,7 @@ export default class RSLiveView extends React.Component {
     }
     this.props.resetHeader(this.tabname);
   }
+
   updateMastery = async () => {
     const prfldb = await getProfileConfig();
     if (prfldb === '' || prfldb === null) {
@@ -596,6 +606,7 @@ export default class RSLiveView extends React.Component {
       this.refreshTable();
     }
   }
+
   handleTableChange = async (type, {
     page,
     sizePerPage,
@@ -622,6 +633,7 @@ export default class RSLiveView extends React.Component {
       this.setState({ songs: output, page, totalSize: 0 });
     }
   }
+
   render = () => {
     let { minutes, seconds } = getMinutesSecs(this.state.timeCurrent);
     const timeCurrent = `${minutes}:${seconds}`;
@@ -632,17 +644,17 @@ export default class RSLiveView extends React.Component {
       progress = 0;
     }
     const albumartstyle = this.state.albumArt.length > 0 ? "" : "hidden";
-    const song = this.state.song.length > 0 ?
-      (this.state.song.length > 35 ?
-        this.state.song.substring(0, 35) + "..." : this.state.song)
+    const song = this.state.song.length > 0
+      ? (this.state.song.length > 35
+        ? this.state.song.substring(0, 35) + "..." : this.state.song)
       : "N/A";
-    const artist = this.state.artist.length > 0 ?
-      (this.state.artist.length > 35 ?
-        this.state.artist.substring(0, 35) + "..." : this.state.artist)
+    const artist = this.state.artist.length > 0
+      ? (this.state.artist.length > 35
+        ? this.state.artist.substring(0, 35) + "..." : this.state.artist)
       : "N/A";
-    const album = this.state.album.length > 0 ?
-      (this.state.album.length > 35 ?
-        this.state.album.substring(0, 35) + "..." : this.state.album)
+    const album = this.state.album.length > 0
+      ? (this.state.album.length > 35
+        ? this.state.album.substring(0, 35) + "..." : this.state.album)
       : "N/A";
     const buttonclass = "extraPadding download smallbutton " + (this.state.win32 ? "" : "isDisabled");
     return (
@@ -656,18 +668,21 @@ export default class RSLiveView extends React.Component {
             steam://run/rocksmith
           </a>
           {
-            this.state.tracking ?
-              <a
-                onClick={this.stopTracking}
-                className={buttonclass}>
-                Stop Tracking
-              </a>
-              :
-              <a
-                onClick={this.startTracking}
-                className={buttonclass}>
-                Start Tracking
-              </a>
+            this.state.tracking
+              ? (
+                <a
+                  onClick={this.stopTracking}
+                  className={buttonclass}>
+                  Stop Tracking
+                </a>
+              )
+              : (
+                <a
+                  onClick={this.startTracking}
+                  className={buttonclass}>
+                  Start Tracking
+                </a>
+              )
           }
           <a
             onClick={this.updateMastery}

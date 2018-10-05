@@ -3,7 +3,9 @@ import PropTypes from 'prop-types';
 import Collapsible from 'react-collapsible';
 import DatePicker from 'react-datepicker';
 import moment from 'moment';
-import { getAllSetlist, saveSongToSetlist, getSongByID, updateCDLCStat, updateSAFCStat } from '../sqliteService';
+import {
+  getAllSetlist, saveSongToSetlist, getSongByID, updateCDLCStat, updateSAFCStat,
+} from '../sqliteService';
 import { getScoreAttackConfig } from '../configService';
 import { expandButton, collapseButton } from "./settingsView";
 import { DateAcquiredInput } from './songavailableView';
@@ -49,6 +51,7 @@ export default class SongDetailView extends React.Component {
     this.ptplayer = null
     this.mvplayer = null
   }
+
   shouldComponentUpdate = async (nextprops, nextstate) => {
     if (nextprops.showDetail && nextprops !== this.props) {
       //search youtube
@@ -63,12 +66,15 @@ export default class SongDetailView extends React.Component {
     }
     return nextprops.showDetail;
   }
+
   componentDidUpdate = () => {
     if (this.modal_div) { this.modal_div.scrollTop = 0 }
   }
+
   onKeyUp = (e) => {
     console.log(e.KeyCode);
   }
+
   getYoutubeResult = async (searchterm, divID) => {
     const url = 'https://www.googleapis.com/youtube/v3/search';
     const params = {
@@ -100,6 +106,7 @@ export default class SongDetailView extends React.Component {
         break;
     }
   }
+
   chooseVideo = async (divID, index) => {
     let vid = '';
     const results = divID === "div_playthrough" ? this.state.ptresults : this.state.mvresults;
@@ -127,26 +134,32 @@ export default class SongDetailView extends React.Component {
         break;
     }
   }
+
   choosePlay = () => {
     if (this.ptplayer) { this.ptplayer.src = this.state.pturl; this.mvplayer.src = ""; }
     this.setState({ showPlaythrough: true, showMusicVideo: false });
   }
+
   chooseMV = () => {
     if (this.mvplayer) { this.mvplayer.src = this.state.mvurl; this.ptplayer.src = ""; }
     this.setState({ showPlaythrough: false, showMusicVideo: true });
   }
+
   handleHide = () => {
     this.choosePlay();
     this.props.close();
     enableScroll();
   }
+
   addToSetlist = async (e) => {
     const { song, artist } = this.props;
     await saveSongToSetlist(this.state.currentSetlist, unescape(song), unescape(artist));
   }
+
   saveSetlist = (e) => {
     this.setState({ currentSetlist: e.target.value });
   }
+
   generateSetlistOptions = async () => {
     const items = []
     const output = await getAllSetlist(true);
@@ -167,6 +180,7 @@ export default class SongDetailView extends React.Component {
       sa_fc_master: songDetails.sa_fc_master == null ? null : moment(songDetails.sa_fc_master),
     })
   }
+
   showPrevVideo = (divID) => {
     const index = divID === "div_playthrough" ? this.state.ptindex : this.state.mvindex;
     if (index <= 0) {
@@ -174,6 +188,7 @@ export default class SongDetailView extends React.Component {
     }
     this.chooseVideo(divID, index - 1);
   }
+
   showNextVideo = (divID) => {
     const results = divID === "div_playthrough" ? this.state.ptresults : this.state.mvresults;
     const index = divID === "div_playthrough" ? this.state.ptindex : this.state.mvindex;
@@ -182,6 +197,7 @@ export default class SongDetailView extends React.Component {
     }
     this.chooseVideo(divID, index + 1);
   }
+
   updateCDLCStatus = async (status) => {
     //console.log(status);
     //this.setState({ is_cdlc: status });
@@ -192,6 +208,7 @@ export default class SongDetailView extends React.Component {
       is_cdlc: isTrueSet,
     });
   }
+
   updateSAStat = async (saType, date) => {
     //console.log(saType, date.unix());
     //save to db with unix ts
@@ -221,6 +238,7 @@ export default class SongDetailView extends React.Component {
       sa_fc_master: songDetails.sa_fc_master == null ? null : moment(songDetails.sa_fc_master),
     })
   }
+
   render = () => {
     const cdlcyesstyle = this.state.is_cdlc ? "song-detail-option" : "song-detail-option-disabled";
     const cdlcnostyle = this.state.is_cdlc ? "song-detail-option-disabled" : "song-detail-option";
@@ -237,15 +255,15 @@ export default class SongDetailView extends React.Component {
     let showrightarrow = '';
     let yttitle = "";
     if (this.state.showPlaythrough && this.state.ptresults !== null) {
-      yttitle = this.state.ptindex < this.state.ptresults.length ?
-        this.state.ptresults[this.state.ptindex].snippet.title + " - " + this.state.ptresults[this.state.ptindex].snippet.channelTitle : ""
+      yttitle = this.state.ptindex < this.state.ptresults.length
+        ? this.state.ptresults[this.state.ptindex].snippet.title + " - " + this.state.ptresults[this.state.ptindex].snippet.channelTitle : ""
       yttitle = "(" + (this.state.ptindex + 1) + "/" + this.state.ptresults.length + ") " + yttitle
       showleftarrow = this.state.ptindex <= 0 ? "hidden" : "dblock";
       showrightarrow = this.state.ptindex >= this.state.ptresults.length - 1 ? "hidden" : "dblock";
     }
     else if (this.state.showMusicVideo && this.state.mvresults !== null) {
-      yttitle = this.state.mvindex < this.state.mvresults.length ?
-        this.state.mvresults[this.state.mvindex].snippet.title + " - " + this.state.mvresults[this.state.mvindex].snippet.channelTitle : ""
+      yttitle = this.state.mvindex < this.state.mvresults.length
+        ? this.state.mvresults[this.state.mvindex].snippet.title + " - " + this.state.mvresults[this.state.mvindex].snippet.channelTitle : ""
       yttitle = "(" + (this.state.mvindex + 1) + "/" + this.state.mvresults.length + ") " + yttitle
     }
     let modalinfostyle = "width-52";
@@ -265,13 +283,15 @@ export default class SongDetailView extends React.Component {
           <div style={{ textAlign: 'center' }}>
             <h4 style={{ fontSize: 150 + "%", fontWeight: 'bold' }}>{unescape(this.props.song)}
               {
-                this.props.isSongpack ? "" :
-                  (<span>
-                    <span style={{ fontSize: 70 + '%', fontWeight: 'normal' }}> by </span>
-                    {unescape(this.props.artist)}
-                    <span style={{ fontSize: 70 + '%', fontWeight: 'normal' }}> from </span>
-                    {unescape(this.props.album)}
-                  </span>)
+                this.props.isSongpack ? ""
+                  : (
+                    <span>
+                      <span style={{ fontSize: 70 + '%', fontWeight: 'normal' }}> by </span>
+                      {unescape(this.props.artist)}
+                      <span style={{ fontSize: 70 + '%', fontWeight: 'normal' }}> from </span>
+                      {unescape(this.props.album)}
+                    </span>
+                  )
               }
             </h4>
           </div>
@@ -307,7 +327,7 @@ export default class SongDetailView extends React.Component {
                 {yttitle}
               </div>
             </div>
-            <div title="mv" id="div_musicvideo" className={mvdivstyle} style={{ width: 100 + '%', margin: '0 auto' }} >
+            <div title="mv" id="div_musicvideo" className={mvdivstyle} style={{ width: 100 + '%', margin: '0 auto' }}>
               <iframe
                 ref={(node) => { this.mvplayer = node }}
                 title="mv"
@@ -328,7 +348,7 @@ export default class SongDetailView extends React.Component {
                 await this.props.removeFromDB();
                 this.handleHide();
               }}>
-              <span >Delete Song from DB</span>
+              <span>Delete Song from DB</span>
             </a>
             <a
               onClick={this.choosePlay}
@@ -336,40 +356,43 @@ export default class SongDetailView extends React.Component {
               Playthrough Video
             </a>
             {
-              this.props.isWeekly ? "" :
-                this.props.isSongpack ?
-                  <a
-                    onClick={() => {
-                      console.log(this.props.dlcappid);
-                      window.shell.openExternal("steam://openurl/https://store.steampowered.com/app/" + this.props.dlcappid);
-                    }}
-                    className={mvstyle}>
-                    Buy From Steam
-                  </a>
-                  :
-                  <span>
+              this.props.isWeekly ? ""
+                : this.props.isSongpack
+                  ? (
                     <a
-                      onClick={this.chooseMV}
-                      className={mvstyle}>
-                      Music Video
-                    </a>
-                    <a
-                      onClick={async () => {
-                        await this.props.removeFromSetlist();
-                        this.handleHide();
+                      onClick={() => {
+                        console.log(this.props.dlcappid);
+                        window.shell.openExternal("steam://openurl/https://store.steampowered.com/app/" + this.props.dlcappid);
                       }}
-                      className={setlistyle}>
-                      Remove from Setlist
+                      className={mvstyle}>
+                      Buy From Steam
+                  </a>
+                  )
+                  : (
+                    <span>
+                      <a
+                        onClick={this.chooseMV}
+                        className={mvstyle}>
+                        Music Video
                     </a>
-                    <a
-                      onClick={async () => { this.addToSetlist(); this.handleHide(); }}
-                      className={songlistanddashstyle}>
-                      Add to Setlist
+                      <a
+                        onClick={async () => {
+                          await this.props.removeFromSetlist();
+                          this.handleHide();
+                        }}
+                        className={setlistyle}>
+                        Remove from Setlist
                     </a>
-                    <select className={selectsetliststyle} onChange={this.saveSetlist} style={{ width: 12 + '%', margin: 12 + 'px' }}>
-                      {this.state.setlists}
-                    </select>
-                  </span>
+                      <a
+                        onClick={async () => { this.addToSetlist(); this.handleHide(); }}
+                        className={songlistanddashstyle}>
+                        Add to Setlist
+                    </a>
+                      <select className={selectsetliststyle} onChange={this.saveSetlist} style={{ width: 12 + '%', margin: 12 + 'px' }}>
+                        {this.state.setlists}
+                      </select>
+                    </span>
+                  )
             }
           </div>
           <div className={songliststylegeneric}>
@@ -407,125 +430,133 @@ export default class SongDetailView extends React.Component {
               </div>
               <div style={{ marginTop: 6 + 'px' }}>
                 {
-                  this.state.showsastats ?
-                    <div style={{ float: 'left' }}>Score Attack FCs</div>
+                  this.state.showsastats
+                    ? <div style={{ float: 'left' }}>Score Attack FCs</div>
                     : ""
                 }
                 <div className="options-flex-right" style={{ textAlign: 'right' }}>
                   {
-                    this.state.showsastats ?
-                      <div className="options-flex-div">
-                        <span>Master</span>
-                        <span>&nbsp;&nbsp;&nbsp;</span>
-                        <div
-                          className="song-detail-option"
-                          style={{ float: 'right', marginRight: (this.state.sa_fc_master ? 0 : 20) + 'px' }}>
-                          <DatePicker
-                            //placeholderText="---"
-                            selected={this.state.sa_fc_master}
-                            customInput={<DateAcquiredInput />}
-                            onChange={t => this.updateSAStat('master', t)}
-                            popperModifiers={{
-                              offset: {
-                                enabled: true,
-                                offset: '-50px, 0px',
-                              },
-                              preventOverflow: {
-                                enabled: true,
-                                escapeWithReference: false,
-                                boundariesElement: 'viewport',
-                              },
-                            }}
-                            dateFormat="ll" />
+                    this.state.showsastats
+                      ? (
+                        <div className="options-flex-div">
+                          <span>Master</span>
+                          <span>&nbsp;&nbsp;&nbsp;</span>
+                          <div
+                            className="song-detail-option"
+                            style={{ float: 'right', marginRight: (this.state.sa_fc_master ? 0 : 20) + 'px' }}>
+                            <DatePicker
+                              //placeholderText="---"
+                              selected={this.state.sa_fc_master}
+                              customInput={<DateAcquiredInput />}
+                              onChange={t => this.updateSAStat('master', t)}
+                              popperModifiers={{
+                                offset: {
+                                  enabled: true,
+                                  offset: '-50px, 0px',
+                                },
+                                preventOverflow: {
+                                  enabled: true,
+                                  escapeWithReference: false,
+                                  boundariesElement: 'viewport',
+                                },
+                              }}
+                              dateFormat="ll" />
+                          </div>
                         </div>
-                      </div>
+                      )
                       : ""
                   }
                   {
-                    this.state.showsastats ?
-                      <div className="options-flex-div">
-                        <span>Hard</span>
-                        <span>&nbsp;&nbsp;&nbsp;</span>
-                        <div
-                          className="song-detail-option"
-                          style={{ float: 'right', marginRight: (this.state.sa_fc_hard ? 0 : 20) + 'px' }}>
-                          <DatePicker
-                            //placeholderText="---"
-                            selected={this.state.sa_fc_hard}
-                            customInput={<DateAcquiredInput />}
-                            onChange={t => this.updateSAStat('hard', t)}
-                            popperModifiers={{
-                              offset: {
-                                enabled: true,
-                                offset: '-50px, 0px',
-                              },
-                              preventOverflow: {
-                                enabled: true,
-                                escapeWithReference: false,
-                                boundariesElement: 'viewport',
-                              },
-                            }}
-                            dateFormat="ll" />
+                    this.state.showsastats
+                      ? (
+                        <div className="options-flex-div">
+                          <span>Hard</span>
+                          <span>&nbsp;&nbsp;&nbsp;</span>
+                          <div
+                            className="song-detail-option"
+                            style={{ float: 'right', marginRight: (this.state.sa_fc_hard ? 0 : 20) + 'px' }}>
+                            <DatePicker
+                              //placeholderText="---"
+                              selected={this.state.sa_fc_hard}
+                              customInput={<DateAcquiredInput />}
+                              onChange={t => this.updateSAStat('hard', t)}
+                              popperModifiers={{
+                                offset: {
+                                  enabled: true,
+                                  offset: '-50px, 0px',
+                                },
+                                preventOverflow: {
+                                  enabled: true,
+                                  escapeWithReference: false,
+                                  boundariesElement: 'viewport',
+                                },
+                              }}
+                              dateFormat="ll" />
+                          </div>
                         </div>
-                      </div>
+                      )
                       : ""
                   }
                   {
-                    this.state.showsastats ?
-                      <div className="options-flex-div">
-                        <span>Medium</span>
-                        <span>&nbsp;&nbsp;&nbsp;</span>
-                        <div
-                          className="song-detail-option"
-                          style={{ float: 'right', marginRight: (this.state.sa_fc_medium ? 0 : 20) + 'px' }}>
-                          <DatePicker
-                            //placeholderText="---"
-                            selected={this.state.sa_fc_medium}
-                            customInput={<DateAcquiredInput />}
-                            onChange={t => this.updateSAStat('medium', t)}
-                            popperModifiers={{
-                              offset: {
-                                enabled: true,
-                                offset: '-50px, 0px',
-                              },
-                              preventOverflow: {
-                                enabled: true,
-                                escapeWithReference: false,
-                                boundariesElement: 'viewport',
-                              },
-                            }}
-                            dateFormat="ll" />
+                    this.state.showsastats
+                      ? (
+                        <div className="options-flex-div">
+                          <span>Medium</span>
+                          <span>&nbsp;&nbsp;&nbsp;</span>
+                          <div
+                            className="song-detail-option"
+                            style={{ float: 'right', marginRight: (this.state.sa_fc_medium ? 0 : 20) + 'px' }}>
+                            <DatePicker
+                              //placeholderText="---"
+                              selected={this.state.sa_fc_medium}
+                              customInput={<DateAcquiredInput />}
+                              onChange={t => this.updateSAStat('medium', t)}
+                              popperModifiers={{
+                                offset: {
+                                  enabled: true,
+                                  offset: '-50px, 0px',
+                                },
+                                preventOverflow: {
+                                  enabled: true,
+                                  escapeWithReference: false,
+                                  boundariesElement: 'viewport',
+                                },
+                              }}
+                              dateFormat="ll" />
+                          </div>
                         </div>
-                      </div>
+                      )
                       : ""
                   }
                   {
-                    this.state.showsastats ?
-                      <div className="options-flex-div">
-                        <span>Easy</span>
-                        <span>&nbsp;&nbsp;&nbsp;</span>
-                        <div
-                          className="song-detail-option"
-                          style={{ float: 'right', marginRight: (this.state.sa_fc_easy ? 0 : 20) + 'px' }}>
-                          <DatePicker
-                            //placeholderText="---"
-                            selected={this.state.sa_fc_easy}
-                            customInput={<DateAcquiredInput />}
-                            onChange={t => this.updateSAStat('easy', t)}
-                            popperModifiers={{
-                              offset: {
-                                enabled: true,
-                                offset: '-50px, 0px',
-                              },
-                              preventOverflow: {
-                                enabled: true,
-                                escapeWithReference: false,
-                                boundariesElement: 'viewport',
-                              },
-                            }}
-                            dateFormat="ll" />
+                    this.state.showsastats
+                      ? (
+                        <div className="options-flex-div">
+                          <span>Easy</span>
+                          <span>&nbsp;&nbsp;&nbsp;</span>
+                          <div
+                            className="song-detail-option"
+                            style={{ float: 'right', marginRight: (this.state.sa_fc_easy ? 0 : 20) + 'px' }}>
+                            <DatePicker
+                              //placeholderText="---"
+                              selected={this.state.sa_fc_easy}
+                              customInput={<DateAcquiredInput />}
+                              onChange={t => this.updateSAStat('easy', t)}
+                              popperModifiers={{
+                                offset: {
+                                  enabled: true,
+                                  offset: '-50px, 0px',
+                                },
+                                preventOverflow: {
+                                  enabled: true,
+                                  escapeWithReference: false,
+                                  boundariesElement: 'viewport',
+                                },
+                              }}
+                              dateFormat="ll" />
+                          </div>
                         </div>
-                      </div>
+                      )
                       : ""
                   }
                 </div>
