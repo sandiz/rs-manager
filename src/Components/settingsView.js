@@ -560,6 +560,7 @@ export default class SettingsView extends React.Component {
                     textAlign: 'right',
                   }}>
                     <input
+                      style={{ textAlign: 'right' }}
                       type="number"
                       value={this.state.masteryThreshold * 100}
                       min={0}
