@@ -37,7 +37,6 @@
         "constructor-super": "warn",
         "valid-typeof": "warn",
         "quotes": "off",
-        "jsx-a11y/anchor-is-valid": "off",
         "jsx-a11y/click-events-have-key-events": "off",
         "jsx-a11y/no-static-element-interactions": "off",
         "react/jsx-closing-bracket-location": "off",
@@ -56,6 +55,7 @@
         "react/jsx-one-expression-per-line": "off",
         "indent": "off",
         "react/jsx-indent-props": "off",
+        "jsx-a11y/anchor-is-valid": "off",
         "no-else-return": "off"
     },
     "parser": "babel-eslint",
