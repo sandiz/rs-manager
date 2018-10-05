@@ -1,7 +1,7 @@
 # Rocksmith Manager
 Rocksmith's UI leaves a lot to be desired especially when you have a lot of songs in your collection.  Rocksmith Manager uses Rocksmith + Steam data to consolidate stats/mastery/dlc/setlists under one roof. 
 
-![Dashboard](https://github.com/sandiz/rs-manager/raw/master/assets/images/dashboard.png)
+![Dashboard](https://github.com/sandiz/rs-manager/raw/master/screenshots/images/dashboard.png)
 ## Latest Release (Mac/Windows)
 [![GitHub release](https://img.shields.io/github/release/sandiz/rs-manager.svg)](https://github.com/sandiz/rs-manager/releases/latest)
 
@@ -20,28 +20,28 @@ Rocksmith's UI leaves a lot to be desired especially when you have a lot of song
 
 ## Screenshots
 ### Stats
-![Stats](https://github.com/sandiz/rs-manager/raw/master/assets/images/dashboard.stats.png)
+![Stats](https://github.com/sandiz/rs-manager/raw/master/screenshots/images/dashboard.stats.png)
 ### Songs Owned
-![Songs Owned](https://github.com/sandiz/rs-manager/raw/master/assets/images/songs.owned.png)
+![Songs Owned](https://github.com/sandiz/rs-manager/raw/master/screenshots/images/songs.owned.png)
 ### Songs Available
-![Songs Available](https://github.com/sandiz/rs-manager/raw/master/assets/images/songs.available.png)
+![Songs Available](https://github.com/sandiz/rs-manager/raw/master/screenshots/images/songs.available.png)
 ### Song Preview
-![Songs Available](https://github.com/sandiz/rs-manager/raw/master/assets/images/songPreview.png)
+![Songs Available](https://github.com/sandiz/rs-manager/raw/master/screenshots/images/songPreview.png)
 ### Setlist
 ### Generated Setlist
-![Filter One](https://raw.githubusercontent.com/sandiz/rs-manager/master/assets/images/custom.setlist.filterone.jpg)
+![Filter One](https://raw.githubusercontent.com/sandiz/rs-manager/master/screenshots/images/custom.setlist.filterone.jpg)
 
-![Filter Two](https://raw.githubusercontent.com/sandiz/rs-manager/master/assets/images/custom.setlist.filtertwo.jpg)
+![Filter Two](https://raw.githubusercontent.com/sandiz/rs-manager/master/screenshots/images/custom.setlist.filtertwo.jpg)
 ### RS favorites
-![Setlist favorites](https://github.com/sandiz/rs-manager/raw/master/assets/images/setlist.favorites.png)
+![Setlist favorites](https://github.com/sandiz/rs-manager/raw/master/screenshots/images/setlist.favorites.png)
 ### Setlist Custom
-![Setlist Custom](https://github.com/sandiz/rs-manager/raw/master/assets/images/setlist.practicelist.png)
+![Setlist Custom](https://github.com/sandiz/rs-manager/raw/master/screenshots/images/setlist.practicelist.png)
 ### PSARC Explorer
-![PSARC Explorer](https://github.com/sandiz/rs-manager/raw/master/assets/images/psarcExplorer.png)
+![PSARC Explorer](https://github.com/sandiz/rs-manager/raw/master/screenshots/images/psarcExplorer.png)
 ### PSARC Info/Extract
-![PSARC Explorer](https://github.com/sandiz/rs-manager/raw/master/assets/images/extractFromPsarc.png)
+![PSARC Explorer](https://github.com/sandiz/rs-manager/raw/master/screenshots/images/extractFromPsarc.png)
 ### Settings
-![Settings](https://github.com/sandiz/rs-manager/raw/master/assets/images/settings.png)
+![Settings](https://github.com/sandiz/rs-manager/raw/master/screenshots/images/settings.png)
 
 
 ## TODO
