@@ -18,6 +18,7 @@ body {
 }
 .background-image {
   background-image: url(assets/bg.jpg);
+  background-size: 100%;
   /*background-image: url(assets/bg.jpg);*/
   background-color: rgb(0, 0, 0);
   background-repeat: no-repeat;
