@@ -2,7 +2,6 @@ const electron = require("electron");
 var { app, BrowserWindow, Menu } = electron;
 const path = require("path");
 const url = require("url");
-const d = require('debug')('index');
 const isDev = require('electron-is-dev');
 const windowStateKeeper = require('electron-window-state');
 let mainWindow;
@@ -10,8 +9,8 @@ let mainWindow;
 function createWindow() {
     // Load the previous state with fallback to defaults
     let mainWindowState = windowStateKeeper({
-      defaultWidth: 1750,
-      defaultHeight: 1064
+        defaultWidth: 1750,
+        defaultHeight: 1064
     });
 
     // Create the window using the state information
