@@ -66,6 +66,7 @@ class App extends Component {
           child: [],
         },
       ],
+      searchHistory: {},
     };
     this.songlistRef = null;
     //this.handleChange = this.handleChange.bind(this);
@@ -78,6 +79,18 @@ class App extends Component {
 
   componentDidMount = async () => {
     await this.updateProfile();
+  }
+
+  getSearchHistory = (key) => {
+    if (key in this.state.searchHistory) return this.state.searchHistory[key];
+    return null;
+  }
+
+  saveSearchHistory = async (key, search) => {
+    const sh = this.state.searchHistory;
+    sh[key] = search;
+    this.setState({ searchHistory: sh });
+    console.log(sh);
   }
 
   updateProfile = async () => {
@@ -137,6 +150,8 @@ class App extends Component {
             resetHeader={this.resetHeader}
             handleChange={this.updateProfile}
             refreshTabs={this.refreshTabs}
+            saveSearch={this.saveSearchHistory}
+            getSearch={this.getSearchHistory}
           />
         )
         break;
@@ -149,6 +164,8 @@ class App extends Component {
                 updateHeader={this.updateChildHeader}
                 resetHeader={this.resetHeader}
                 handleChange={this.updateProfile}
+                saveSearch={this.saveSearchHistory}
+                getSearch={this.getSearchHistory}
               />
             )
             break;
@@ -161,7 +178,10 @@ class App extends Component {
                 requiredChildTab={child.id}
                 updateHeader={this.updateChildHeader}
                 resetHeader={this.resetHeader}
-                handleChange={this.updateProfile} />
+                handleChange={this.updateProfile}
+                saveSearch={this.saveSearchHistory}
+                getSearch={this.getSearchHistory}
+              />
             )
             break;
         }
