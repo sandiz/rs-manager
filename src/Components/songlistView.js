@@ -628,11 +628,38 @@ export default class SonglistView extends React.Component {
     );
     const showSAStats = await getScoreAttackConfig();
     this.setState({ totalSize: so.count, showSAStats });
-    this.handleTableChange("cdm", {
-      page: this.state.page,
-      sizePerPage: this.state.sizePerPage,
-      filters: {},
-    })
+
+    const key = this.tabname + "-" + this.childtabname;
+    const searchData = this.props.getSearch(key);
+
+    if (searchData === null) {
+      this.handleTableChange("cdm", {
+        page: this.state.page,
+        sizePerPage: this.state.sizePerPage,
+        filters: {},
+      })
+    } else {
+      this.search.value = searchData.search;
+      this.handleTableChange('filter', {
+        page: 1,
+        sizePerPage: this.state.sizePerPage,
+        filters: { search: searchData.search },
+        sortField: searchData.sortfield,
+        sortOrder: searchData.sortorder,
+      })
+    }
+  }
+
+  componentWillUnmount = () => {
+    const searchData = {
+      tabname: this.tabname,
+      childtabname: this.childtabname,
+      search: this.search.value,
+      sortfield: this.lastsortfield,
+      sortorder: this.lastsortorder,
+    }
+    const key = searchData.tabname + "-" + searchData.childtabname;
+    this.props.saveSearch(key, searchData);
   }
 
   handleSearchChange = (e) => {
@@ -826,8 +853,8 @@ export default class SonglistView extends React.Component {
       this.search.value,
       document.getElementById("search_field") ? document.getElementById("search_field").value : "",
     )
-    if (sortField !== null) { this.lastsortfield = sortField; }
-    if (sortOrder !== null) { this.lastsortorder = sortOrder; }
+    if (sortField !== null && typeof sortField !== 'undefined') { this.lastsortfield = sortField; }
+    if (sortOrder !== null && typeof sortField !== 'undefined') { this.lastsortorder = sortOrder; }
     if (output.length > 0) {
       this.props.updateHeader(
         this.tabname,
@@ -915,9 +942,13 @@ SonglistView.propTypes = {
   updateHeader: PropTypes.func,
   //resetHeader: PropTypes.func,
   handleChange: PropTypes.func,
+  saveSearch: PropTypes.func,
+  getSearch: PropTypes.func,
 }
 SonglistView.defaultProps = {
   updateHeader: () => { },
   resetHeader: () => { },
   handleChange: () => { },
+  saveSearch: () => { },
+  getSearch: () => { },
 }

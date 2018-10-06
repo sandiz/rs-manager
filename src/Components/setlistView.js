@@ -240,13 +240,55 @@ export default class SetlistView extends React.Component {
     shouldComponentUpdate = async (nextprops, nextstate) => {
         if (nextprops.currentChildTab === null) { return false; }
         if (this.lastChildID === nextprops.currentChildTab.id) { return false; }
+        this.saveSearch();
         this.lastChildID = nextprops.currentChildTab.id;
         const showSAStats = await getScoreAttackConfig();
         this.fetchMeta();
+
         this.setState({ showSAStats, isDeleted: false }, () => {
 
         });
         return true;
+    }
+
+    getSearch = () => {
+        const isgen = this.state.setlistMeta.is_generated === "true";
+        if (!isgen) {
+            const key = this.tabname + "-" + this.lastChildID;
+            const searchData = this.props.getSearch(key);
+            if (searchData != null) {
+                this.search.value = searchData.search;
+                this.handleTableChange('filter', {
+                    page: 1,
+                    sizePerPage: this.state.sizePerPage,
+                    filters: { search: searchData.search },
+                    sortField: searchData.sortfield,
+                    sortOrder: searchData.sortorder,
+                })
+                return;
+            }
+        }
+        this.handleTableChange("cdm", {
+            page: this.state.page,
+            sizePerPage: this.state.sizePerPage,
+            filters: {},
+        })
+    }
+
+    saveSearch = () => {
+        const isgen = this.state.setlistMeta.is_generated === "true";
+        if (!isgen) {
+            const search = {
+                tabname: this.tabname,
+                childtabname: this.lastChildID,
+                search: this.search.value,
+                sortfield: this.lastsortfield,
+                sortorder: this.lastsortorder,
+            }
+            const key = search.tabname + "-" + search.childtabname;
+            this.props.saveSearch(key, search);
+            this.search.value = "";
+        }
     }
 
     fetchMeta = async () => {
@@ -254,11 +296,7 @@ export default class SetlistView extends React.Component {
         const showOptions = metaInfo.is_manual == null && metaInfo.is_generated == null;
         //console.log("fetchMeta: ", metaInfo);
         this.setState({ showOptions, setlistMeta: metaInfo }, () => {
-            this.handleTableChange("cdm", {
-                page: this.state.page,
-                sizePerPage: this.state.sizePerPage,
-                filters: {},
-            })
+            this.getSearch();
         });
     }
 
@@ -393,8 +431,8 @@ export default class SetlistView extends React.Component {
                 document.getElementById("search_field") ? document.getElementById("search_field").value : "",
             )
         }
-        if (sortField !== null) { this.lastsortfield = sortField; }
-        if (sortOrder !== null) { this.lastsortorder = sortOrder; }
+        if (sortField !== null && typeof sortField !== 'undefined') { this.lastsortfield = sortField; }
+        if (sortOrder !== null && typeof sortField !== 'undefined') { this.lastsortorder = sortOrder; }
         if (output.length > 0) {
             this.props.updateHeader(
                 this.tabname,
@@ -601,6 +639,8 @@ SetlistView.propTypes = {
     //resetHeader: PropTypes.func,
     handleChange: PropTypes.func,
     refreshTabs: PropTypes.func,
+    saveSearch: PropTypes.func,
+    getSearch: PropTypes.func,
 }
 SetlistView.defaultProps = {
     //currentTab: null,
@@ -609,4 +649,6 @@ SetlistView.defaultProps = {
     //resetHeader: () => { },
     handleChange: () => { },
     refreshTabs: () => { },
+    saveSearch: () => { },
+    getSearch: () => { },
 }

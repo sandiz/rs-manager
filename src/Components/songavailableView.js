@@ -239,11 +239,34 @@ export default class SongAvailableView extends React.Component {
       `DLC's: ${so.count} Excluding SongPacks: ${so.count}`,
     );
     this.setState({ totalSize: so.count });
-    this.handleTableChange("cdm", {
-      page: this.state.page,
-      sizePerPage: this.state.sizePerPage,
-      filters: {},
-    })
+
+    const key = this.tabname + "-" + this.childtabname;
+    const searchData = this.props.getSearch(key);
+
+    if (searchData == null) {
+      this.handleTableChange("cdm", {
+        page: this.state.page,
+        sizePerPage: this.state.sizePerPage,
+        filters: {},
+      })
+    } else {
+      this.search.value = searchData.search;
+      this.handleTableChange('filter', {
+        page: 1,
+        sizePerPage: this.state.sizePerPage,
+        filters: { search: searchData.search },
+      })
+    }
+  }
+
+  componentWillUnmount = () => {
+    const search = {
+      tabname: this.tabname,
+      childtabname: this.childtabname,
+      search: this.search.value,
+    }
+    const key = search.tabname + "-" + search.childtabname;
+    this.props.saveSearch(key, search);
   }
 
   updateSingleAcquireDate = async (cell, row, selectedMoment) => {
@@ -630,11 +653,15 @@ SongAvailableView.propTypes = {
   updateHeader: PropTypes.func,
   //resetHeader: PropTypes.func,
   //handleChange: PropTypes.func,
+  saveSearch: PropTypes.func,
+  getSearch: PropTypes.func,
 }
 SongAvailableView.defaultProps = {
   updateHeader: () => { },
   //resetHeader: () => { },
   //handleChange: () => { },
+  saveSearch: () => { },
+  getSearch: () => { },
 }
 
 /* custom input */ //eslint-disable-next-line
