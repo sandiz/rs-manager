@@ -45,7 +45,6 @@ Rocksmith's UI leaves a lot to be desired especially when you have a lot of song
 
 
 ## TODO
-- auto updater
 - rocksmith live stats (windows for now / mac [investigation](https://github.com/sandiz/RockSnifferLib/commits/mac) in progress)
 - generate youtube playlist of current view
 

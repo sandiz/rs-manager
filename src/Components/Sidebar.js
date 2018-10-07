@@ -12,6 +12,7 @@ export default class Sidebar extends React.Component {
       currentTab: 'tab-dashboard',
       expandedTabs: [],
       currentChildTab: '',
+      versionCm: null,
     }
   }
 
@@ -21,11 +22,123 @@ export default class Sidebar extends React.Component {
     this.toggleActive(this.props.TabsData[0]);
     //this.props.handleChange(TabsData[2], TabsData[2].child[0])
     //this.toggleActive(TabsData[2]);
+    this.checkForUpdate();
   }
 
   setChildActive(val, cid) {
     this.setState({ currentTab: val.id, currentChildTab: cid.id })
     this.props.handleChange(val, cid)
+  }
+
+  checkForUpdate = async () => {
+    const updateUrl = "https://api.github.com/repos/sandiz/rs-manager/releases/latest";
+    const updateData = await window.fetch(updateUrl);
+    const json = await updateData.json();
+    const currVersion = window.remote.app.getVersion();
+    const serverVersion = "tag_name" in json ? json.tag_name : "";
+    const downloadUrl = "html_url" in json ? json.html_url : "";
+
+    let updateAvailable = false;
+    if (serverVersion !== "") {
+      const serverVersionnov = serverVersion.replace("v", ""); //replace v prefix
+      if (this.versionCompare(serverVersionnov, currVersion) > 0) {
+        updateAvailable = true;
+      }
+    }
+    let cm = null;
+    if (updateAvailable) {
+      cm = (
+        <div>
+          <div
+            style={{
+              width: 100 + '%',
+              position: 'absolute',
+              bottom: 70 + 'px',
+              fontSize: 13 + 'px',
+            }}
+            className="ta-center"
+          >
+            New Version Available: {serverVersion}
+          </div>
+          <div
+            style={{
+              width: 100 + '%',
+              position: 'absolute',
+              bottom: 17 + 'px',
+              fontSize: 13 + 'px',
+            }}
+            className="ta-center"
+          >
+            <a
+              onClick={() => window.shell.openExternal(downloadUrl)}
+              style={{ width: 50 + '%' }}
+              className="extraPadding download">Download</a>
+          </div>
+        </div>
+      )
+    }
+    else {
+      cm = (
+        <span
+          style={{
+            width: 100 + '%',
+            position: 'absolute',
+            bottom: 17 + 'px',
+            fontSize: 13 + 'px',
+          }}
+          className="ta-center">
+          {"v" + currVersion}
+        </span>
+      );
+    }
+    this.setState({ versionCm: cm });
+  }
+
+  versionCompare = (v1, v2, options) => {
+    const lexicographical = options && options.lexicographical
+    const zeroExtend = true
+    let v1parts = v1.split('.')
+    let v2parts = v2.split('.')
+
+    function isValidPart(x) {
+      return (lexicographical ? /^\d+[A-Za-z]*$/ : /^\d+$/).test(x);
+    }
+
+    if (!v1parts.every(isValidPart) || !v2parts.every(isValidPart)) {
+      return NaN;
+    }
+
+    if (zeroExtend) {
+      while (v1parts.length < v2parts.length) v1parts.push("0");
+      while (v2parts.length < v1parts.length) v2parts.push("0");
+    }
+
+    if (!lexicographical) {
+      v1parts = v1parts.map(Number);
+      v2parts = v2parts.map(Number);
+    }
+
+    for (let i = 0; i < v1parts.length; i += 1) {
+      if (v2parts.length === i) {
+        return 1;
+      }
+
+      if (v1parts[i] === v2parts[i]) {
+        continue;
+      }
+      else if (v1parts[i] > v2parts[i]) {
+        return 1;
+      }
+      else {
+        return -1;
+      }
+    }
+
+    if (v1parts.length !== v2parts.length) {
+      return -1;
+    }
+
+    return 0;
   }
 
   createNewSetlist = async () => {
@@ -118,7 +231,7 @@ export default class Sidebar extends React.Component {
           </div>
           {tabsList}
         </ul>
-
+        {this.state.versionCm}
       </nav>
     );
   }
