@@ -710,7 +710,8 @@ export async function addToFavorites(songkey) {
 export async function getRandomSongOwned() {
   //console.log("__db_call__: getRandomSongOwned");
   await initSongsOwnedDB();
-  const sql = "select * from songs_owned order by random() limit 1;"
+  const masteryT = await getMasteryThresholdConfig();
+  const sql = `select * from songs_owned where mastery < '${masteryT}' order by random() limit 1;`
   const op = await db.get(sql);
   return op;
 }
