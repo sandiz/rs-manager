@@ -136,7 +136,6 @@ export async function initSetlistDB() {
       await db.exec(altersql5);
       version += 1
       await setUserVersion(version);
-      break;
     case 6:
       await db.exec(altersql6);
       version += 1

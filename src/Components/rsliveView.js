@@ -329,24 +329,32 @@ export default class RSLiveView extends React.Component {
       const skr = await getSongBySongKey(memoryReadout.songID);
       if (skr.length > 0) this.songkeyresults = skr[0];
     }
-    if (this.songkeyresults && this.lastalbumname !== unescape(this.songkeyresults.album)) {
+    
+    const song = songDetails ? songDetails.songName : (this.songkeyresults ? unescape(this.songkeyresults.song) : "");
+    const artist = songDetails ? songDetails.artistName : (this.songkeyresults ? unescape(this.songkeyresults.artist) : "");
+    const album = songDetails ? songDetails.albumName : (this.songkeyresults ? unescape(this.songkeyresults.album) : "");
+    
+    const timeTotal = songDetails
+    ? songDetails.songLength : (this.songkeyresults ? this.songkeyresults.songLength : 0);
+    if (song !== "" && artist !== "") {
       try {
         this.albumarturl = await albumArt(
-          unescape(this.songkeyresults.artist),
-          { album: unescape(this.songkeyresults.album), size: 'large' },
+          unescape(artist),
+          { album: unescape(album), size: 'large' },
         );
-        this.lastalbumname = unescape(this.songkeyresults.album)
+        this.lastalbumname = unescape(album)
       }
       catch (e) {
         console.log(e);
       }
     }
+
     this.setState({
       accuracy,
-      song: this.songkeyresults ? unescape(this.songkeyresults.song) : "",
-      artist: this.songkeyresults ? unescape(this.songkeyresults.artist) : "",
-      album: this.songkeyresults ? unescape(this.songkeyresults.album) : "",
-      timeTotal: this.songkeyresults ? this.songkeyresults.songLength : 0,
+      song,
+      artist,
+      album,
+      timeTotal,
       totalNotes: memoryReadout && this.songkeyresults ? this.songkeyresults.maxNotes : 0,
       timeCurrent: memoryReadout ? memoryReadout.songTimer : 0,
       songKey: memoryReadout ? memoryReadout.songID : "",
@@ -446,7 +454,7 @@ export default class RSLiveView extends React.Component {
       if (window.os.platform() === "win32") {
         let taskcmd = "taskkill /f ";
         for (let i = 0; i < pidarr.length; i += 1) {
-          taskcmd += "/pid " + pidarr[i];
+          taskcmd += "/pid " + pidarr[i] + " ";
         }
         return taskcmd;
       }

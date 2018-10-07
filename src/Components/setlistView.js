@@ -497,6 +497,7 @@ export default class SetlistView extends React.Component {
                 this.lastChildID,
                 "Favorites Found: " + updatedRows,
             );
+            this.refreshView();
         }
     }
 
@@ -561,7 +562,7 @@ export default class SetlistView extends React.Component {
                             ? (
                                 <a
                                     onClick={this.updateFavs}
-                                    className={choosepsarchstyle}>
+                                    className="extraPadding download">
                                     Update Favorites from RS Profile
                                 </a>
                             )
