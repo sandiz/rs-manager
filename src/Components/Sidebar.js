@@ -22,12 +22,15 @@ export default class Sidebar extends React.Component {
     this.toggleActive(this.props.TabsData[0]);
     //this.props.handleChange(TabsData[2], TabsData[2].child[0])
     //this.toggleActive(TabsData[2]);
-    this.checkForUpdate();
   }
 
   setChildActive(val, cid) {
     this.setState({ currentTab: val.id, currentChildTab: cid.id })
     this.props.handleChange(val, cid)
+  }
+
+  componentDidMount = () => {
+    this.checkForUpdate();
   }
 
   checkForUpdate = async () => {

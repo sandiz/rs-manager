@@ -282,7 +282,7 @@ export default class RSLiveView extends React.Component {
     if (!this.state.win32) {
       this.props.updateHeader(
         this.tabname,
-        "Rocksmith live is only available in Windows",
+        "Rocksmith live is only available on Windows",
       );
     }
   }
