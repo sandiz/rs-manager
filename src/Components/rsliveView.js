@@ -329,11 +329,9 @@ export default class RSLiveView extends React.Component {
       const skr = await getSongBySongKey(memoryReadout.songID);
       if (skr.length > 0) this.songkeyresults = skr[0];
     }
-    
     const song = songDetails ? songDetails.songName : (this.songkeyresults ? unescape(this.songkeyresults.song) : "");
     const artist = songDetails ? songDetails.artistName : (this.songkeyresults ? unescape(this.songkeyresults.artist) : "");
     const album = songDetails ? songDetails.albumName : (this.songkeyresults ? unescape(this.songkeyresults.album) : "");
-    
     const timeTotal = songDetails
     ? songDetails.songLength : (this.songkeyresults ? this.songkeyresults.songLength : 0);
     if (song !== "" && artist !== "") {
