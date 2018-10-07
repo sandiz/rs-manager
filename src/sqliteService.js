@@ -330,17 +330,20 @@ export default async function updateSongsOwned(psarcResult, isCDLC = false) {
     cdlc = op[0].is_cdlc === "true" ? true : isCDLC;
   }
 
-  sqlstr = `REPLACE INTO songs_owned (album, artist, song, arrangement, json, psarc, dlc, sku, difficulty, dlckey, songkey,\
+  sqlstr = `INSERT OR IGNORE INTO songs_owned (album, artist, song, arrangement, json, psarc, dlc, sku, difficulty, dlckey, songkey,\
   id,uniqkey, lastConversionTime, mastery, \
   count, arrangementProperties, capofret, centoffset, tuning,\
   songLength, maxNotes, tempo, is_cdlc)\
   VALUES ('${album}','${artist}',
       '${song}','${arrangement}','${json}','${psarc}',
       '${dlc}','${sku}',${difficulty},'${dlckey}',
-      '${songkey}','${id}', '${uniqkey}', '${lct}', '${mastery}','${count}', '${ap}', '${capo}','${cent}','${tuning}', '${length}', '${notes}', '${tmpo}', '${cdlc}');`
+      '${songkey}','${id}', '${uniqkey}', '${lct}', '${mastery}','${count}', '${ap}', '${capo}','${cent}','${tuning}', '${length}', '${notes}', '${tmpo}', '${cdlc}')\
+      ;`
+  const sqlstr2 = `update songs_owned set is_cdlc='${cdlc}' where uniqkey='${uniqkey}';`;
   //});
   try {
     await db.run(sqlstr); // Run the query without returning anything
+    await db.run(sqlstr2);
   }
   catch (error) {
     console.log(error);
