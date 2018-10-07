@@ -229,7 +229,7 @@ export default class PSARCView extends React.Component {
         continue;
       }
       this.processedFiles = this.processedFiles.concat(currentResults);
-      this.props.updateHeader(this.tabname, `Processesing PSARC:  ${currentResults[0].psarc} (${index}/${count})`);
+      this.props.updateHeader(this.tabname, `Processing PSARC:  ${currentResults[0].psarc} (${index}/${count})`);
       if (index >= count) {
         this.props.updateHeader(this.tabname, `Processed ${count} PSARC's, ${this.processedFiles.length} arrangements found.`);
         this.setState({ files: this.processedFiles, processing: false });
