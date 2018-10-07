@@ -90,7 +90,6 @@ class App extends Component {
     const sh = this.state.searchHistory;
     sh[key] = search;
     this.setState({ searchHistory: sh });
-    console.log(sh);
   }
 
   updateProfile = async () => {
