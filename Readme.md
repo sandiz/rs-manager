@@ -17,12 +17,17 @@ Rocksmith's UI leaves a lot to be desired especially when you have a lot of song
     - This section should already be populated with all the dlc's released so far. You can use the options in this view to keep the list up to date as well as retreive metadata from steam about ownership/acquire date. (requires steam profile to be linked in Settings)
 - [Setlist](#setlist)
     - This section is used to create custom setlists from your songs library. There are two types of setlists, [Manual](#setlist-custom) setlist where you add songs manually from the library and [Generated](#generated-setlist) setlist where you use filters to select songs from the library.
+- [Rocksmith Live](#rocksmith-live)
+    - Rocksmith Live tracks your current live rocksmith session, showing accuracy, hit/miss streaks
+    and other song info. (Only available on Windows for now)
 
 ## Screenshots
 ### Stats
 ![Stats](https://github.com/sandiz/rs-manager/raw/master/screenshots/images/dashboard.stats.png)
 ### Songs Owned
 ![Songs Owned](https://github.com/sandiz/rs-manager/raw/master/screenshots/images/songs.owned.png)
+### Rocksmith Live
+![Rocksmith Live](https://github.com/sandiz/rs-manager/raw/master/screenshots/images/rs-live.png)
 ### Songs Available
 ![Songs Available](https://github.com/sandiz/rs-manager/raw/master/screenshots/images/songs.available.png)
 ### Song Preview
@@ -45,7 +50,7 @@ Rocksmith's UI leaves a lot to be desired especially when you have a lot of song
 
 
 ## TODO
-- rocksmith live stats (windows for now / mac [investigation](https://github.com/sandiz/RockSnifferLib/commits/mac) in progress)
+- rocksmith live stats (mac [investigation](https://github.com/sandiz/RockSnifferLib/commits/mac) in progress)
 - generate youtube playlist of current view
 
 ## Development
