@@ -338,7 +338,8 @@ export default async function updateSongsOwned(psarcResult, isCDLC = false) {
       '${dlc}','${sku}',${difficulty},'${dlckey}',
       '${songkey}','${id}', '${uniqkey}', '${lct}', '${mastery}','${count}', '${ap}', '${capo}','${cent}','${tuning}', '${length}', '${notes}', '${tmpo}', '${cdlc}')\
       ;`
-  const sqlstr2 = `update songs_owned set is_cdlc='${cdlc}' where uniqkey='${uniqkey}';`;
+  const sqlstr2 = `update songs_owned set is_cdlc='${cdlc}' where id like '${id}';`;
+  console.log(sqlstr2)
   //});
   try {
     await db.run(sqlstr); // Run the query without returning anything
