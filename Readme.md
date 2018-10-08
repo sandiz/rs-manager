@@ -1,10 +1,19 @@
+<p align="center">
+<img width=12.5% src="https://github.com/sandiz/rs-manager/blob/master/src/assets/icons/icon-1024x1024.png">
+</p>
+<p align="center">
+<a href="https://github.com/sandiz/rs-manager/releases/latest"><img src="https://img.shields.io/github/release/sandiz/rs-manager.svg" /></a>
+<a href="https://github.com/sandiz/rs-manager/issues"><img src="https://img.shields.io/github/issues/sandiz/rs-manager.svg" /> </a>
+<img src="https://img.shields.io/badge/contributions-welcome-orange.svg" />
+<img src="https://img.shields.io/github/license/sandiz/rs-manager.svg" />
+</p>
+
+
 # Rocksmith Manager
-Rocksmith's UI leaves a lot to be desired especially when you have a lot of songs in your collection.  Rocksmith Manager uses Rocksmith + Steam data to consolidate stats/mastery/dlc/setlists under one roof. 
+Rocksmith's UI leaves a lot to be desired especially when you have a lot of songs in your collection.  Rocksmith Manager uses Rocksmith + Steam data to consolidate stats/mastery/dlc/setlists under one roof. It also tracks your live session, showing you your accuracy, notes hit/missed in realtime.
 
 ![Dashboard](https://github.com/sandiz/rs-manager/raw/master/screenshots/images/dashboard.png)
-## Latest Release (Mac/Windows)
-[![GitHub release](https://img.shields.io/github/release/sandiz/rs-manager.svg)](https://github.com/sandiz/rs-manager/releases/latest)
-
+![Rocksmith Live](https://github.com/sandiz/rs-manager/raw/master/screenshots/images/rs-live.png)
 
 ## Usage
 - [Settings](#settings)
@@ -61,6 +70,9 @@ Rocksmith's UI leaves a lot to be desired especially when you have a lot of song
     - `yarn run build` to generate build files
     - `yarn run package-mac` for mac builds
     - `yarn run package-win` for win builds
+
+## Thanks
+   - [kokolihapihvi](https://github.com/kokolihapihvi/RockSniffer) for the awesome `RockSniffer` tool.
 
 ## Contributors
 
