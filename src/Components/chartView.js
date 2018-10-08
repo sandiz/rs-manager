@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import ReactChartkick, { LineChart } from 'react-chartkick'
 import Chart from 'chart.js'
 import * as zoom from 'chartjs-plugin-zoom'
-import { getMinutesSecs } from './rsliveView'
 
 export default class ChartView extends React.Component {
   constructor(props) {
@@ -17,11 +16,13 @@ export default class ChartView extends React.Component {
     console.log(zoom);
   }
 
-  shouldComponentUpdate = (nextstate, nextprops) => {
-    if (nextprops.startTrack) {
-      this.startCollecting()
+  componentDidUpdate = (prevProps) => {
+    if (prevProps === this.props) { return }
+    if (this.props.startTrack) {
+      if (this.timer) { return; }
+      //this.startCollecting()
     }
-    if (nextprops.stopTrack) {
+    if (this.props.stopTrack) {
       if (this.timer) clearInterval(this.timer);
       const chartData = [
         {
@@ -39,7 +40,6 @@ export default class ChartView extends React.Component {
       ]
       this.setState({ chartData })
     }
-    return true;
   }
 
   componentWillUnmount = () => {
@@ -72,12 +72,12 @@ export default class ChartView extends React.Component {
   }
 
   DataTimer = async (chartData) => {
+    if (this.timer) clearInterval(this.timer);
     this.timer = setInterval(async () => {
       const songData = await window.fetch("http://127.0.0.1:9938");
       if (!songData) return;
       if (typeof songData === 'undefined') { return; }
       const jsonObj = await songData.json();
-      console.log(jsonObj)
 
       if (jsonObj.memoryReadout && jsonObj.memoryReadout.songTimer > 0) {
         const { memoryReadout } = jsonObj;
@@ -89,8 +89,8 @@ export default class ChartView extends React.Component {
         }
         const newTime = Math.round(memoryReadout.songTimer);
         if (newTime >= this.props.timeTotal && this.timer) clearInterval(this.timer);
-        const { minutes, seconds } = getMinutesSecs(newTime)
-        const timeKey = `${minutes}:${seconds}`
+        //const { minutes, seconds } = getMinutesSecs(newTime)
+        //const timeKey = `${minutes}:${seconds}`
         const tnh = memoryReadout ? memoryReadout.totalNotesHit : 0;
         const tnm = memoryReadout ? memoryReadout.totalNotesMissed : 0;
         let accuracy = tnh / (tnh + tnm);
@@ -100,8 +100,8 @@ export default class ChartView extends React.Component {
           accuracy = 0;
         }
         const notesRandom = jsonObj.memoryReadout.totalNotesMissed;
-        chartData[0].data[timeKey] = accuracy;
-        chartData[1].data[timeKey] = notesRandom;
+        chartData[0].data[newTime] = accuracy;
+        chartData[1].data[newTime] = notesRandom;
         this.setState({ chartData })
         console.log(chartData);
       }
@@ -110,8 +110,8 @@ export default class ChartView extends React.Component {
 
   render = () => {
     return (
-      <LineChart
-        library={{
+         <LineChart
+            library={{
           legend: {
             labels: {
               // This more specific font property overrides the global property
@@ -167,11 +167,15 @@ export default class ChartView extends React.Component {
 }
 ChartView.propTypes = {
   timeTotal: PropTypes.number,
-  //startTrack: PropTypes.bool,
-  //stopTrack: PropTypes.bool,
+  //eslint-disable-next-line
+  startTrack: PropTypes.bool,
+  //eslint-disable-next-line
+  stopTrack: PropTypes.bool,
 }
 ChartView.defaultProps = {
   timeTotal: 0,
-  //startTrack: false,
-  //stopTrack: false,
+  //eslint-disable-next-line
+  startTrack: false,
+  //eslint-disable-next-line
+  stopTrack: false,
 }

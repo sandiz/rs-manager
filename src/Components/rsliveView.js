@@ -818,10 +818,10 @@ export default class RSLiveView extends React.Component {
             </div>
           </div>
         </div>
-        <div id="chart">
+        <div id="chart" className="hidden">
           <ChartView
             timeTotal={this.state.timeTotal}
-            starTrack={this.state.startTrack}
+            startTrack={this.state.startTrack}
             stopTrack={this.state.stopTrack}
           />
         </div>
