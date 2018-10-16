@@ -1,4 +1,5 @@
 {
+  "disableVersionCheck": true,
   "debugStateMachine": false,
   "debugSongDetails": false,
   "debugCache": false,
