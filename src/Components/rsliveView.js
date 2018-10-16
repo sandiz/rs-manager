@@ -370,6 +370,13 @@ export default class RSLiveView extends React.Component {
     })
   }
 
+  checkForMono = () => {
+    if (window.electronFS.existsSync("/Library/Frameworks/Mono.framework/Commands/mono")) {
+      return true;
+    }
+    return false;
+  }
+
   startTracking = async () => {
     this.setState({ startTrack: true, stopTrack: false })
     console.log("start tracking");
@@ -393,8 +400,15 @@ export default class RSLiveView extends React.Component {
       );
     }
     else {
+      if (!this.checkForMono()) {
+        this.props.updateHeader(
+          this.tabname,
+          `Mono not found in /Library/Frameworks`,
+        );
+        return;
+      }
       cwd = window.dirname + "/tools/RockSniffer/"
-      this.rssniffer = `bash -c "${killcmd}; cd ${cwd}; mono RockSniffer.exe"`
+      this.rssniffer = `bash -c "${killcmd}; cd '${cwd}'; /Library/Frameworks/Mono.framework/Commands/mono RockSniffer.exe"`
       window.process.chdir(cwd);
       console.log(this.rssniffer);
       const options = { name: 'RockSniffer', cwd };
