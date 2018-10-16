@@ -40,6 +40,7 @@ export function generateSql(filters, count = false) {
       sql += `${filter.gate} `;
     }
   }
+  console.log(sql);
   return sql;
 }
 export function generateTunings() {

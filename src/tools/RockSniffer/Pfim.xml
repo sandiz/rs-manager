@@ -1,0 +1,694 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Pfim</name>
+    </assembly>
+    <members>
+        <member name="T:Pfim.CompressedDds">
+            <summary>
+            Class representing decoding compressed direct draw surfaces
+            </summary>
+        </member>
+        <member name="M:Pfim.CompressedDds.ImageInfo(Pfim.DdsHeader)">
+            <summary>Determine image info from header</summary>
+        </member>
+        <member name="M:Pfim.CompressedDds.Decode(System.Byte[],System.Byte[],System.Int32,System.UInt32,System.UInt32)">
+            <summary>Uncompress a given block</summary>
+        </member>
+        <member name="P:Pfim.CompressedDds.PixelDepth">
+            <summary>Number of bytes for a pixel in the decoded data</summary>
+        </member>
+        <member name="M:Pfim.CompressedDds.Decode(System.IO.Stream,Pfim.DdsHeader)">
+            <summary>Decode data into raw rgb format</summary>
+        </member>
+        <member name="T:Pfim.Dds">
+            <summary>
+            Class that represents direct draw surfaces
+            </summary>
+        </member>
+        <member name="M:Pfim.Dds.#ctor(Pfim.DdsHeader,System.Byte[],Pfim.DdsLoadInfo)">
+            <summary>
+            Instantiates a direct draw surface image from a header, the data,
+            and additional info.
+            </summary>
+        </member>
+        <member name="M:Pfim.Dds.CalcSize(Pfim.DdsLoadInfo,Pfim.DdsHeader)">
+            <summary>Calculates the number of bytes to hold image data</summary>
+        </member>
+        <member name="P:Pfim.Dds.BitsPerPixel">
+            <summary>Number of bits that compose a pixel</summary>
+        </member>
+        <member name="P:Pfim.Dds.BytesPerPixel">
+            <summary>Number of bytes that compose a pixel</summary>
+        </member>
+        <member name="P:Pfim.Dds.Stride">
+            <summary>The number of bytes that compose one line</summary>
+        </member>
+        <member name="P:Pfim.Dds.Data">
+            <summary>The raw image data</summary>
+        </member>
+        <member name="P:Pfim.Dds.Width">
+            <summary>Width of the image in pixels</summary>
+        </member>
+        <member name="P:Pfim.Dds.Height">
+            <summary>Height of the image in pixels</summary>
+        </member>
+        <member name="P:Pfim.Dds.Format">
+            <summary>The format of the raw data</summary>
+        </member>
+        <member name="M:Pfim.Dds.Create(System.IO.Stream)">
+            <summary>Create a direct draw image from a stream</summary>
+        </member>
+        <member name="T:Pfim.CompressionAlgorithm">
+            <summary>
+            Denotes the compression algorithm used in the image. Either the image
+            is uncompressed or uses some sort of block compression. The
+            compression used is encoded in the header of image as textual
+            representation of itself. So a DXT1 image is encoded as "1TXD" so the
+            enum represents these values directly
+            </summary>
+        </member>
+        <member name="F:Pfim.CompressionAlgorithm.None">
+            <summary>
+            No compression was used in the image.
+            </summary>
+        </member>
+        <member name="F:Pfim.CompressionAlgorithm.D3DFMT_DXT1">
+            <summary>
+            <see cref="T:Pfim.Dxt1Dds"/>. Also known as BC1
+            </summary>
+        </member>
+        <member name="F:Pfim.CompressionAlgorithm.D3DFMT_DXT2">
+            <summary>
+            Not supported. Also known as BC2
+            </summary>
+        </member>
+        <member name="F:Pfim.CompressionAlgorithm.D3DFMT_DXT3">
+            <summary>
+            <see cref="T:Pfim.Dxt3Dds"/>. Also known as BC3
+            </summary>
+        </member>
+        <member name="F:Pfim.CompressionAlgorithm.D3DFMT_DXT4">
+            <summary>
+            Not supported. Also known as BC4
+            </summary>
+        </member>
+        <member name="F:Pfim.CompressionAlgorithm.D3DFMT_DXT5">
+            <summary>
+            <see cref="T:Pfim.Dxt5Dds"/>. Also known as BC5
+            </summary>
+        </member>
+        <member name="T:Pfim.DdsFlags">
+            <summary>Flags to indicate which members contain valid data.</summary>
+        </member>
+        <member name="F:Pfim.DdsFlags.Caps">
+            <summary>
+            Required in every .dds file.
+            </summary>
+        </member>
+        <member name="F:Pfim.DdsFlags.Height">
+            <summary>
+            Required in every .dds file.
+            </summary>
+        </member>
+        <member name="F:Pfim.DdsFlags.Width">
+            <summary>
+            Required in every .dds file.
+            </summary>
+        </member>
+        <member name="F:Pfim.DdsFlags.Pitch">
+            <summary>
+            Required when pitch is provided for an uncompressed texture.
+            </summary>
+        </member>
+        <member name="F:Pfim.DdsFlags.PixelFormat">
+            <summary>
+            Required in every .dds file.
+            </summary>
+        </member>
+        <member name="F:Pfim.DdsFlags.MipMapCount">
+            <summary>
+            Required in a mipmapped texture.
+            </summary>
+        </member>
+        <member name="F:Pfim.DdsFlags.LinearSize">
+            <summary>
+            Required when pitch is provided for a compressed texture.
+            </summary>
+        </member>
+        <member name="F:Pfim.DdsFlags.Depth">
+            <summary>
+            Required in a depth texture.
+            </summary>
+        </member>
+        <member name="T:Pfim.DdsPixelFormat">
+            <summary>
+            Surface pixel format.
+            https://msdn.microsoft.com/en-us/library/windows/desktop/bb943984(v=vs.85).aspx
+            </summary>
+        </member>
+        <member name="F:Pfim.DdsPixelFormat.Size">
+            <summary>
+            Structure size; set to 32 (bytes).
+            </summary>
+        </member>
+        <member name="F:Pfim.DdsPixelFormat.Flags">
+            <summary>
+            Values which indicate what type of data is in the surface. 
+            </summary>
+        </member>
+        <member name="F:Pfim.DdsPixelFormat.FourCC">
+            <summary>
+            Four-character codes for specifying compressed or custom formats.
+            Possible values include: DXT1, DXT2, DXT3, DXT4, or DXT5.  A
+            FourCC of DX10 indicates the prescense of the DDS_HEADER_DXT10
+            extended header,  and the dxgiFormat member of that structure
+            indicates the true format. When using a four-character code,
+            dwFlags must include DDPF_FOURCC.
+            </summary>
+        </member>
+        <member name="F:Pfim.DdsPixelFormat.RGBBitCount">
+            <summary>
+            Number of bits in an RGB (possibly including alpha) format.
+            Valid when dwFlags includes DDPF_RGB, DDPF_LUMINANCE, or DDPF_YUV.
+            </summary>
+        </member>
+        <member name="F:Pfim.DdsPixelFormat.RBitMask">
+            <summary>
+            Red (or lumiannce or Y) mask for reading color data.
+            For instance, given the A8R8G8B8 format, the red mask would be 0x00ff0000.
+            </summary>
+        </member>
+        <member name="F:Pfim.DdsPixelFormat.GBitMask">
+            <summary>
+            Green (or U) mask for reading color data.
+            For instance, given the A8R8G8B8 format, the green mask would be 0x0000ff00.
+            </summary>
+        </member>
+        <member name="F:Pfim.DdsPixelFormat.BBitMask">
+            <summary>
+            Blue (or V) mask for reading color data.
+            For instance, given the A8R8G8B8 format, the blue mask would be 0x000000ff.
+            </summary>
+        </member>
+        <member name="F:Pfim.DdsPixelFormat.ABitMask">
+            <summary>
+            Alpha mask for reading alpha data. 
+            dwFlags must include DDPF_ALPHAPIXELS or DDPF_ALPHA. 
+            For instance, given the A8R8G8B8 format, the alpha mask would be 0xff000000.
+            </summary>
+        </member>
+        <member name="T:Pfim.DdsHeader">
+            <summary>
+            The header that accompanies all direct draw images
+            https://msdn.microsoft.com/en-us/library/windows/desktop/bb943982(v=vs.85).aspx
+            </summary>
+        </member>
+        <member name="F:Pfim.DdsHeader.SIZE">
+            <summary>
+            Size of a Direct Draw Header in number of bytes.
+            This does not include the magic number
+            </summary>
+        </member>
+        <member name="F:Pfim.DdsHeader.DDS_MAGIC">
+            <summary>
+            The magic number is the 4 bytes that starts off every Direct Draw Surface file.
+            </summary>
+        </member>
+        <member name="M:Pfim.DdsHeader.#ctor(System.IO.Stream)">
+            <summary>Create header from stream</summary>
+        </member>
+        <member name="P:Pfim.DdsHeader.Size">
+            <summary>
+            Size of structure. This member must be set to 124.
+            </summary>
+        </member>
+        <member name="P:Pfim.DdsHeader.Flags">
+            <summary>
+            Flags to indicate which members contain valid data. 
+            </summary>
+        </member>
+        <member name="P:Pfim.DdsHeader.Height">
+            <summary>
+            Surface height in pixels
+            </summary>
+        </member>
+        <member name="P:Pfim.DdsHeader.Width">
+            <summary>
+            Surface width in pixels
+            </summary>
+        </member>
+        <member name="P:Pfim.DdsHeader.PitchOrLinearSize">
+            <summary>
+            The pitch or number of bytes per scan line in an uncompressed texture.
+            The total number of bytes in the top level texture for a compressed texture.
+            </summary>
+        </member>
+        <member name="P:Pfim.DdsHeader.Depth">
+            <summary>
+            Depth of a volume texture (in pixels), otherwise unused. 
+            </summary>
+        </member>
+        <member name="P:Pfim.DdsHeader.MipMapCout">
+            <summary>
+            Number of mipmap levels, otherwise unused.
+            </summary>
+        </member>
+        <member name="P:Pfim.DdsHeader.Reserved1">
+            <summary>
+            Unused
+            </summary>
+        </member>
+        <member name="P:Pfim.DdsHeader.PixelFormat">
+            <summary>
+            The pixel format 
+            </summary>
+        </member>
+        <member name="P:Pfim.DdsHeader.Caps">
+            <summary>
+            Specifies the complexity of the surfaces stored.
+            </summary>
+        </member>
+        <member name="P:Pfim.DdsHeader.Caps2">
+            <summary>
+            Additional detail about the surfaces stored.
+            </summary>
+        </member>
+        <member name="P:Pfim.DdsHeader.Caps3">
+            <summary>
+            Unused
+            </summary>
+        </member>
+        <member name="P:Pfim.DdsHeader.Caps4">
+            <summary>
+            Unused
+            </summary>
+        </member>
+        <member name="P:Pfim.DdsHeader.Reserved2">
+            <summary>
+            Unused
+            </summary>
+        </member>
+        <member name="T:Pfim.DdsLoadInfo">
+            <summary>Contains additional info about the image</summary>
+        </member>
+        <member name="F:Pfim.DdsLoadInfo.divSize">
+            <summary>
+            The length of a block is in pixels.
+            This mainly affects compressed images as they are
+            encoded in blocks that are divSize by divSize.
+            Uncompressed DDS do not need this value.
+            </summary>
+        </member>
+        <member name="F:Pfim.DdsLoadInfo.blockBytes">
+            <summary>
+            Number of bytes needed to decode block of pixels
+            that is divSize by divSize.  This takes into account
+            how many bytes it takes to extract color and alpha information.
+            Uncompressed DDS do not need this value.
+            </summary>
+        </member>
+        <member name="M:Pfim.DdsLoadInfo.#ctor(System.Boolean,System.Boolean,System.Boolean,System.UInt32,System.UInt32,System.Int32)">
+            <summary>Initialize the load info structure</summary>
+        </member>
+        <member name="T:Pfim.UncompressedDds">
+            <summary>
+            A DirectDraw Surface that is not compressed.  
+            Thus what is in the input stream gets directly translated to the image buffer.
+            </summary>
+        </member>
+        <member name="M:Pfim.UncompressedDds.IsSixteenBitAlphaZero(Pfim.DdsHeader)">
+            <summary>Determines if the image is R5G6R5</summary>
+        </member>
+        <member name="M:Pfim.UncompressedDds.IsSixteenBitAlphaOne(Pfim.DdsHeader)">
+            <summary>Determines if the image is R5G5R5A1</summary>
+        </member>
+        <member name="M:Pfim.UncompressedDds.IsThirtyTwoBitRgba(Pfim.DdsHeader)">
+            <summary>Determines if the image is 32bit rgb</summary>
+        </member>
+        <member name="M:Pfim.UncompressedDds.IsTwentyFourBitRgb(Pfim.DdsHeader)">
+            <summary>Determines if the image is 24bit rgb</summary>
+        </member>
+        <member name="M:Pfim.UncompressedDds.ImageInfo(Pfim.DdsHeader)">
+            <summary>Determine image info from header</summary>
+        </member>
+        <member name="M:Pfim.UncompressedDds.Decode(System.IO.Stream,Pfim.DdsHeader)">
+            <summary>Decode data into raw rgb format</summary>
+        </member>
+        <member name="T:Pfim.IDecodeTarga">
+            <summary>
+            Interface describe a class that is able to decode a targa image that may have its pixel
+            start anywhere. For instance, in a bottom left scenario, the first pixel read corresponds to
+            the first pixel on the last row
+            </summary>
+        </member>
+        <member name="M:Pfim.IDecodeTarga.BottomLeft(System.IO.Stream,Pfim.TargaHeader)">
+            <summary>Decode pixels starting at bottom left</summary>
+        </member>
+        <member name="M:Pfim.IDecodeTarga.BottomRight(System.IO.Stream,Pfim.TargaHeader)">
+            <summary>Decode pixels starting at bottom right</summary>
+        </member>
+        <member name="M:Pfim.IDecodeTarga.TopRight(System.IO.Stream,Pfim.TargaHeader)">
+            <summary>Decode pixels starting at top right</summary>
+        </member>
+        <member name="M:Pfim.IDecodeTarga.TopLeft(System.IO.Stream,Pfim.TargaHeader)">
+            <summary>Decode pixels starting at top left</summary>
+        </member>
+        <member name="T:Pfim.IImage">
+            <summary>
+            Defines a common interface that all images are decoded into
+            </summary>
+        </member>
+        <member name="P:Pfim.IImage.Data">
+            <summary>The raw data</summary>
+        </member>
+        <member name="P:Pfim.IImage.Width">
+            <summary>Width of the image in pixels</summary>
+        </member>
+        <member name="P:Pfim.IImage.Height">
+            <summary>Height of the image in pixels</summary>
+        </member>
+        <member name="P:Pfim.IImage.Stride">
+            <summary>The number of bytes that compose one line</summary>
+        </member>
+        <member name="P:Pfim.IImage.Format">
+            <summary>The format of the raw data</summary>
+        </member>
+        <member name="T:Pfim.ImageFormat">
+            <summary>Describes how pixel data is arranged</summary>
+        </member>
+        <member name="F:Pfim.ImageFormat.Rgb24">
+            <summary>Red, green, and blue channels are 8 bits apiece</summary>
+        </member>
+        <member name="F:Pfim.ImageFormat.Rgba32">
+            <summary>
+            Red, green, blue, and alpha are 8 bits apiece
+            </summary>
+        </member>
+        <member name="T:Pfim.Pfim">
+            <summary>Decodes images into a uniform structure</summary>
+        </member>
+        <member name="M:Pfim.Pfim.FromFile(System.String)">
+            <summary>Constructs an image from a given file</summary>
+        </member>
+        <member name="T:Pfim.CompressedTarga">
+            <summary>
+            Defines a series of functions that can decode a compressed targa image
+            </summary>
+        </member>
+        <member name="M:Pfim.CompressedTarga.BottomLeft(System.IO.Stream,Pfim.TargaHeader)">
+            <summary>Fills data starting from the bottom left</summary>
+        </member>
+        <member name="M:Pfim.CompressedTarga.BottomRight(System.IO.Stream,Pfim.TargaHeader)">
+            <summary>Not implemented</summary>
+        </member>
+        <member name="M:Pfim.CompressedTarga.TopRight(System.IO.Stream,Pfim.TargaHeader)">
+            <summary>Not implemented</summary>
+        </member>
+        <member name="M:Pfim.CompressedTarga.TopLeft(System.IO.Stream,Pfim.TargaHeader)">
+            <summary>Not implemented</summary>
+        </member>
+        <member name="M:Pfim.CompressedTarga.RunLength(System.Byte[],System.Byte[],System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Compressed Targa images contain Run Length Packets of length 1 + <paramref name="colorDepth"/>.
+            The first byte contains how long many pixels are encoded in the packet and the following bytes
+            determine what colors will be. This function will expand this packet and store the expansion
+            in the data buffer.
+            </summary>
+            <param name="data">Where the expanded run length data will be stored.</param>
+            <param name="streamBuffer">Buffer that contains the compressed run length info.</param>
+            <param name="dataIndex">Index of where to start storing the expanded data.</param>
+            <param name="streamBufferIndex">Index of where the compressed data.</param>
+            <param name="colorDepth">The number of bytes in a pixel</param>
+        </member>
+        <member name="T:Pfim.Targa">
+            <summary>
+            Provides a mechanism for decoding and storing the decoded information
+            about a targa image
+            </summary>
+        </member>
+        <member name="F:Pfim.Targa.data">
+            <summary>Raw data of the image</summary>
+        </member>
+        <member name="F:Pfim.Targa.header">
+            <summary>Header of the image</summary>
+        </member>
+        <member name="M:Pfim.Targa.#ctor(Pfim.TargaHeader,System.Byte[])">
+            <summary>
+            Constructs a targa image from a targa image and raw data
+            </summary>
+            <param name="header">The targa header</param>
+            <param name="data">The decoded targa data</param>
+        </member>
+        <member name="M:Pfim.Targa.Create(System.IO.Stream)">
+            <summary>
+            Creates a targa image from a given stream. The type of targa is determined from the
+            targa header, which is assumed to be a part of the stream
+            </summary>
+            <param name="str">Stream to read the targa image from</param>
+            <returns>A targa image</returns>
+        </member>
+        <member name="P:Pfim.Targa.Data">
+            <summary>The raw image data</summary>
+        </member>
+        <member name="P:Pfim.Targa.Width">
+            <summary>Width of the image in pixels</summary>
+        </member>
+        <member name="P:Pfim.Targa.Height">
+            <summary>Height of the image in pixels</summary>
+        </member>
+        <member name="P:Pfim.Targa.Stride">
+            <summary>The number of bytes that compose one line</summary>
+        </member>
+        <member name="P:Pfim.Targa.Format">
+            <summary>The format of the raw data</summary>
+        </member>
+        <member name="T:Pfim.TargaHeader">
+            <summary>Class for parsing and storing information from a targa header</summary>
+        </member>
+        <member name="T:Pfim.TargaHeader.TargaImageType">
+            <summary>The targa image's type</summary>
+        </member>
+        <member name="F:Pfim.TargaHeader.TargaImageType.NoData">
+            <summary>No image data included</summary>
+        </member>
+        <member name="F:Pfim.TargaHeader.TargaImageType.UncompressedColorMap">
+            <summary>Uncompressed, color-mapped image</summary>
+        </member>
+        <member name="F:Pfim.TargaHeader.TargaImageType.UncompressedTrueColor">
+            <summary>Uncompressed, true-color image</summary>
+        </member>
+        <member name="F:Pfim.TargaHeader.TargaImageType.UncompressedBW">
+            <summary>Uncompressed, black-and-white image</summary>
+        </member>
+        <member name="F:Pfim.TargaHeader.TargaImageType.RunLengthColorMap">
+            <summary>Run-length encoded, color-mapped image</summary>
+        </member>
+        <member name="F:Pfim.TargaHeader.TargaImageType.RunLengthTrueColor">
+            <summary>Run-length encoded, true-color image</summary>
+        </member>
+        <member name="F:Pfim.TargaHeader.TargaImageType.RunLengthBW">
+            <summary>Run-length encoded, black-and-white image</summary>
+        </member>
+        <member name="T:Pfim.TargaHeader.TargaOrientation">
+            <summary>
+            Targa images may be laid out in such a way that the bytes in the
+            file corresponds to different x and y origins. This enum
+            enumerates all possible origins of the first pixel
+            </summary>
+        </member>
+        <member name="F:Pfim.TargaHeader.TargaOrientation.BottomLeft">
+            <summary>
+            First byte read corresponds to the pixel in the bottom left
+            </summary>
+        </member>
+        <member name="F:Pfim.TargaHeader.TargaOrientation.BottomRight">
+            <summary>
+            First byte read corresponds to the pixel in the bottom right
+            </summary>
+        </member>
+        <member name="F:Pfim.TargaHeader.TargaOrientation.TopLeft">
+            <summary>
+            First byte read corresponds to the pixel in the top left
+            </summary>
+        </member>
+        <member name="F:Pfim.TargaHeader.TargaOrientation.TopRight">
+            <summary>
+            First byte read corresponds to the pixel in the top right
+            </summary>
+        </member>
+        <member name="M:Pfim.TargaHeader.#ctor(System.IO.Stream)">
+            <summary>
+            Instantiate a targa header from a given stream. The stream will be parsed
+            </summary>
+        </member>
+        <member name="P:Pfim.TargaHeader.IDLength">
+            <summary>
+            This field identifies the number of bytes contained in Field 6, the Image ID Field. The maximum number
+            of characters is 255. A value of zero indicates that no Image ID field is included with the image.
+            </summary>
+        </member>
+        <member name="P:Pfim.TargaHeader.HasColorMap">
+            <summary>
+            This field indicates the type of color map (if any) included with the image.
+            </summary>
+        </member>
+        <member name="P:Pfim.TargaHeader.ImageType">
+            <summary>
+            Type of the targa image
+            </summary>
+        </member>
+        <member name="P:Pfim.TargaHeader.ColorMapOrigin">
+            <summary>
+            Index of the first color map entry.
+            </summary>
+        </member>
+        <member name="P:Pfim.TargaHeader.ColorMapLength">
+            <summary>
+            Total number of color map entries included
+            </summary>
+        </member>
+        <member name="P:Pfim.TargaHeader.ColorMapDepth">
+            <summary>
+            Establishes the number of bits per entry. Typically 15, 16, 24 or 32-bit values are used.
+            </summary>
+        </member>
+        <member name="P:Pfim.TargaHeader.XOrigin">
+            <summary>
+            These bytes specify the absolute horizontal coordinate for the lower left corner of the image.
+            </summary>
+        </member>
+        <member name="P:Pfim.TargaHeader.YOrigin">
+            <summary>
+            These bytes specify the absolute vertical coordinate for the lower left corner of the image.
+            </summary>
+        </member>
+        <member name="P:Pfim.TargaHeader.Width">
+            <summary>
+            Width of the image in pixels.
+            </summary>
+        </member>
+        <member name="P:Pfim.TargaHeader.Height">
+            <summary>
+             Height of the image in pixels
+            </summary>
+        </member>
+        <member name="P:Pfim.TargaHeader.PixelDepth">
+            <summary>
+            Number of bits per pixel. This number includes the Attribute or Alpha channel bits
+            </summary>
+        </member>
+        <member name="P:Pfim.TargaHeader.Orientation">
+            <summary>
+            Order in which pixel data is transferred from the file to the screen
+            </summary>
+        </member>
+        <member name="P:Pfim.TargaHeader.ImageId">
+            <summary>
+            This optional field contains identifying information about the
+            image. The maximum length for this field is 255 bytes. Refer to
+            Field 1 for the length of this field. If field 1 is set to Zero
+            indicating that no Image ID exists then these bytes are not
+            written to the file
+            </summary>
+        </member>
+        <member name="P:Pfim.TargaHeader.IsCompressed">
+            <summary>
+            Returns whether the data is run length encoded, which means the
+            image is compressed
+            </summary>
+        </member>
+        <member name="T:Pfim.UncompressedTarga">
+            <summary>
+            Defines a series of functions that can decode a uncompressed targa image
+            </summary>
+        </member>
+        <member name="M:Pfim.UncompressedTarga.BottomLeft(System.IO.Stream,Pfim.TargaHeader)">
+            <summary>Fills data starting from the bottom left</summary>
+        </member>
+        <member name="M:Pfim.UncompressedTarga.BottomRight(System.IO.Stream,Pfim.TargaHeader)">
+            <summary>Not implemented</summary>
+        </member>
+        <member name="M:Pfim.UncompressedTarga.TopRight(System.IO.Stream,Pfim.TargaHeader)">
+            <summary>Not implemented</summary>
+        </member>
+        <member name="M:Pfim.UncompressedTarga.TopLeft(System.IO.Stream,Pfim.TargaHeader)">
+            <summary>Fills data starting from the top left</summary>
+        </member>
+        <member name="T:Pfim.Util">
+            <summary>
+            Utility class housing methods used by multiple image decoders
+            </summary>
+        </member>
+        <member name="F:Pfim.Util.BUFFER_SIZE">
+            <summary>
+            Buffer size to read data from
+            </summary>
+        </member>
+        <member name="M:Pfim.Util.Translate(System.IO.Stream,System.Byte[],System.Int32)">
+            <summary>
+            Takes all the bytes at and after an index and moves them to the front and fills the rest
+            of the buffer with information from the stream.
+            </summary>
+            <remarks>
+            This function is useful when the buffer doesn't have enough information to process a
+            certain amount of information thus more information from the stream has to be read. This
+            preserves the information that hasn't been read by putting it at the front.
+            </remarks>
+            <param name="str">Stream where more data will be read to fill in end of the buffer.</param>
+            <param name="buf">The buffer that contains the data that will be translated.</param>
+            <param name="bufIndex">
+            Start of the translation. The value initially at this index will be the value at index 0
+            in the buffer after translation.
+            </param>
+            <returns>
+            The total number of bytes read into the buffer and translated. May be less than the
+            buffer's length.
+            </returns>
+        </member>
+        <member name="M:Pfim.Util.memset(System.Int32*,System.Int32,System.Int32)">
+            <summary>
+            Sets all the values in a buffer to a single value.
+            </summary>
+            <param name="buffer">Buffer that will have its values set</param>
+            <param name="value">The value that the buffer will contain</param>
+            <param name="length">The number of bytes to write in the buffer</param>
+        </member>
+        <member name="M:Pfim.Util.memset(System.Byte*,System.Byte,System.Int32)">
+            <summary>
+            Sets all the values in a buffer to a single value.
+            </summary>
+            <param name="buffer">Buffer that will have its values set</param>
+            <param name="value">The value that the buffer will contain</param>
+            <param name="length">The number of bytes to write in the buffer</param>
+        </member>
+        <member name="M:Pfim.Util.Fill(System.IO.Stream,System.Byte[],System.Int32)">
+            <summary>
+            Fills the buffer all the way up with info from the stream
+            </summary>
+            <param name="str">Stream that will be used to fill the buffer</param>
+            <param name="buf">Buffer that will house the information from the stream</param>
+            <param name="bufSize">The chunk size of data that will be read from the stream</param>
+        </member>
+        <member name="M:Pfim.Util.FillBottomLeft(System.IO.Stream,System.Byte[],System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Fills a data array starting from the bottom left by reading from a stream.
+            </summary>
+            <param name="str">The stream to read data from.</param>
+            <param name="data">The buffer to be filled with stream data.</param>
+            <param name="rowSize">The size in bytes of each row.</param>
+            <param name="bufSize">The chunk size of data that will be read from the stream</param>
+            <param name="padding">
+            The number of bytes that make up the padding in the stride. rowSize + padding = stride
+            </param>
+        </member>
+        <member name="M:Pfim.Util.Stride(System.Int32,System.Int32)">
+            <summary>
+            Calculates stride of an image in bytes given its width in pixels and pixel depth in bits
+            </summary>
+            <param name="width">Width in pixels</param>
+            <param name="pixelDepth">The number of bits that represents a pixel</param>
+            <returns>The number of bytes that consists of a single line</returns>
+        </member>
+    </members>
+</doc>
