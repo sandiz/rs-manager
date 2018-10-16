@@ -17,7 +17,7 @@ if (buildPlatform === "win") {
 else if (buildPlatform === "mac") {
     platform = "darwin"
     icon = "src/assets/icons/mac/mac.icns"
-    extra_ignore = "src/tools/RockSniffer"
+    extra_ignore = ""
 }
 else {
     console.log("Invalid buildPlatform, valid options: mac, win");
