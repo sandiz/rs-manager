@@ -31,35 +31,34 @@ Rocksmith's UI leaves a lot to be desired especially when you have a lot of song
     and other song info. Needs mono installed, requires elevated privileges on macOS
 
 ## Screenshots
-### Stats
+### Stats - Learn a song and Score Attacks stats
 ![Stats](https://github.com/sandiz/rs-manager/raw/master/screenshots/images/dashboard.stats.png)
-### Songs Owned
+### Songs Owned - All the songs imported via psarc explorer
 ![Songs Owned](https://github.com/sandiz/rs-manager/raw/master/screenshots/images/songs.owned.png)
-### Rocksmith Live
+### Rocksmith Live - Rocksmith Live stats like accuracy, streaks, hits and misses
 ![Rocksmith Live](https://github.com/sandiz/rs-manager/raw/master/screenshots/images/rs-live.png)
-### Songs Available
+### Songs Available - Catalog of all steam DLC released
 ![Songs Available](https://github.com/sandiz/rs-manager/raw/master/screenshots/images/songs.available.png)
-### Song Preview
+### Song Preview - YouTube preview for song selected and other options
 ![Songs Available](https://github.com/sandiz/rs-manager/raw/master/screenshots/images/songPreview.png)
 ### Setlist
-### Generated Setlist
+### Generated Setlist - list of songs chosen via Setlist filters
 ![Filter One](https://raw.githubusercontent.com/sandiz/rs-manager/master/screenshots/images/custom.setlist.filterone.jpg)
 
 ![Filter Two](https://raw.githubusercontent.com/sandiz/rs-manager/master/screenshots/images/custom.setlist.filtertwo.jpg)
-### RS favorites
+### RS favorites - All the songs in rocksmith favorites in-game playlist
 ![Setlist favorites](https://github.com/sandiz/rs-manager/raw/master/screenshots/images/setlist.favorites.png)
-### Setlist Custom
+### Setlist Custom - list of songs manually added to setlist
 ![Setlist Custom](https://github.com/sandiz/rs-manager/raw/master/screenshots/images/setlist.practicelist.png)
-### PSARC Explorer
+### PSARC Explorer - scan and import all Rocksmith songs
 ![PSARC Explorer](https://github.com/sandiz/rs-manager/raw/master/screenshots/images/psarcExplorer.png)
-### PSARC Info/Extract
+### PSARC Info/Extract - inspect psarc files for more details
 ![PSARC Explorer](https://github.com/sandiz/rs-manager/raw/master/screenshots/images/extractFromPsarc.png)
 ### Settings
 ![Settings](https://github.com/sandiz/rs-manager/raw/master/screenshots/images/settings.png)
 
 
 ## TODO
-- rocksmith live stats (mac [investigation](https://github.com/sandiz/RockSnifferLib/commits/mac) in progress)
 - generate youtube playlist of current view
 
 ## Development
