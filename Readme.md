@@ -28,7 +28,7 @@ Rocksmith's UI leaves a lot to be desired especially when you have a lot of song
     - This section is used to create custom setlists from your songs library. There are two types of setlists, [Manual](#setlist-custom) setlist where you add songs manually from the library and [Generated](#generated-setlist) setlist where you use filters to select songs from the library.
 - [Rocksmith Live](#rocksmith-live)
     - Rocksmith Live tracks your current live rocksmith session, showing accuracy, hit/miss streaks
-    and other song info. Needs mono installed, requires elevated privileges on macOS
+    and other song info. (Needs mono and elevated privileges on macOS)
 
 ## Screenshots
 ### Stats - Learn a song and Score Attacks stats
