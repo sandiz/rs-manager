@@ -657,15 +657,15 @@ export default class RSLiveView extends React.Component {
       progress = 0;
     }
     const albumartstyle = this.state.albumArt.length > 0 ? "" : "hidden";
-    const song = this.state.song.length > 0
+    const song = this.state.song && this.state.song.length > 0
       ? (this.state.song.length > 35
         ? this.state.song.substring(0, 35) + "..." : this.state.song)
       : "N/A";
-    const artist = this.state.artist.length > 0
+    const artist = this.state.artist && this.state.artist.length > 0
       ? (this.state.artist.length > 35
         ? this.state.artist.substring(0, 35) + "..." : this.state.artist)
       : "N/A";
-    const album = this.state.album.length > 0
+    const album = this.state.album && this.state.album.length > 0
       ? (this.state.album.length > 35
         ? this.state.album.substring(0, 35) + "..." : this.state.album)
       : "N/A";
