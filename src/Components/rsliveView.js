@@ -52,7 +52,6 @@ export default class RSLiveView extends React.Component {
       /* end table */
       startTrack: false,
       stopTrack: false,
-      win32: window.os.platform() === "win32",
     }
     this.tabname = 'tab-rslive';
     this.columns = [
@@ -279,12 +278,6 @@ export default class RSLiveView extends React.Component {
         numArrangements: 4,
       },
     };*/
-    if (!this.state.win32) {
-      this.props.updateHeader(
-        this.tabname,
-        "Rocksmith live is only available on Windows",
-      );
-    }
   }
 
   componentWillUnmount = async () => {
@@ -333,7 +326,7 @@ export default class RSLiveView extends React.Component {
     const artist = songDetails ? songDetails.artistName : (this.songkeyresults ? unescape(this.songkeyresults.artist) : "");
     const album = songDetails ? songDetails.albumName : (this.songkeyresults ? unescape(this.songkeyresults.album) : "");
     const timeTotal = songDetails
-    ? songDetails.songLength : (this.songkeyresults ? this.songkeyresults.songLength : 0);
+      ? songDetails.songLength : (this.songkeyresults ? this.songkeyresults.songLength : 0);
     if (song !== "" && artist !== "") {
       try {
         this.albumarturl = await albumArt(
@@ -662,7 +655,7 @@ export default class RSLiveView extends React.Component {
       ? (this.state.album.length > 35
         ? this.state.album.substring(0, 35) + "..." : this.state.album)
       : "N/A";
-    const buttonclass = "extraPadding download smallbutton " + (this.state.win32 ? "" : "isDisabled");
+    const buttonclass = "extraPadding download smallbutton ";//+ (this.state.win32 ? "" : "isDisabled");
     return (
       <div className="container-fluid">
         <div className="ta-center">

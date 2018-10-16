@@ -735,6 +735,7 @@ export async function updateSAFCStat(key, value, songID) {
 }
 export async function executeRawSql(sql) {
   const op = await db.get(sql);
+  console.log(op)
   return op;
 }
 window.remote.app.on('window-all-closed', async () => {
