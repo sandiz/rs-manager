@@ -18,6 +18,8 @@ window.sudo = require('sudo-prompt');
 window.exec = require('child_process').exec;
 window.linereader = require('line-by-line');
 window.shortid = require('shortid');
+window.pidusage = require('pidusage');
+
 
 
 const rp = require('request-promise');

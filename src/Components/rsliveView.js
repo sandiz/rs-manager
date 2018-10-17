@@ -7,7 +7,6 @@ import {
   countFormmatter, badgeFormatter, arrangmentFormatter, tuningFormatter,
 } from './songlistView';
 import SongDetailView from './songdetailView';
-import ChartView from './chartView';
 import { getSongBySongKey, initSongsOwnedDB, updateMasteryandPlayed } from '../sqliteService'
 import readProfile from '../steamprofileService';
 import getProfileConfig from '../configService';
@@ -50,8 +49,6 @@ export default class RSLiveView extends React.Component {
       showArtist: '',
       showSAStats: true,
       /* end table */
-      startTrack: false,
-      stopTrack: false,
     }
     this.tabname = 'tab-rslive';
     this.columns = [
@@ -278,10 +275,21 @@ export default class RSLiveView extends React.Component {
         numArrangements: 4,
       },
     };*/
+    try {
+      const songData = await window.fetch("http://127.0.0.1:9938");
+      //if fetch works tracking is active , start sniffing
+      console.log(songData);
+      this.setState({ tracking: true });
+      this.fetchRSSniffer();
+    }
+    catch (e) {
+      //tracking is not active
+    }
   }
 
   componentWillUnmount = async () => {
-    this.stopTracking(false);
+    //this.stopTracking(false);
+    if (this.fetchrstimer) clearInterval(this.fetchrstimer);
   }
 
   animatedNumber = (number) => {
@@ -378,10 +386,10 @@ export default class RSLiveView extends React.Component {
   }
 
   startTracking = async () => {
-    this.setState({ startTrack: true, stopTrack: false })
     console.log("start tracking");
     const killcmd = await this.killPIDs(await this.findPID());
     console.log("kill command: " + killcmd);
+    this.setState({ tracking: true });
     // spawn process
     let cwd = ""
     if (window.os.platform() === "win32") {
@@ -408,7 +416,7 @@ export default class RSLiveView extends React.Component {
         return;
       }
       cwd = window.dirname + "/tools/RockSniffer/"
-      this.rssniffer = `bash -c "${killcmd}; cd '${cwd}'; /Library/Frameworks/Mono.framework/Commands/mono RockSniffer.exe"`
+      this.rssniffer = `bash -c "${killcmd}; cd '${cwd}'; /Library/Frameworks/Mono.framework/Commands/mono RockSniffer.exe -disablesniffing"`
       window.process.chdir(cwd);
       console.log(this.rssniffer);
       const options = { name: 'RockSniffer', cwd };
@@ -421,7 +429,6 @@ export default class RSLiveView extends React.Component {
         },
       );
     }
-    this.setState({ tracking: true });
     this.props.updateHeader(
       this.tabname,
       `Tracking: Active`,
@@ -469,11 +476,11 @@ export default class RSLiveView extends React.Component {
   }
 
   stopTracking = async (reset = true) => {
-    this.setState({ startTrack: false, stopTrack: true })
     if (this.fetchrstimer) clearInterval(this.fetchrstimer);
     console.log("stop tracking");
     const killcmd = await this.killPIDs(await this.findPID());
     console.log("kill command: " + killcmd);
+    this.setState({ tracking: false });
     if (killcmd.includes("no pids")) {
       return;
     }
@@ -824,13 +831,6 @@ export default class RSLiveView extends React.Component {
               </span>
             </div>
           </div>
-        </div>
-        <div id="chart" className="hidden">
-          <ChartView
-            timeTotal={this.state.timeTotal}
-            startTrack={this.state.startTrack}
-            stopTrack={this.state.stopTrack}
-          />
         </div>
         <div>
           <RemoteAll
