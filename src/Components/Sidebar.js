@@ -40,7 +40,7 @@ export default class Sidebar extends React.Component {
       const pidstocheck = []
       if (rssnniferpid !== -1) pidstocheck.push(rssnniferpid);
       if (rsprocesspid !== -1) pidstocheck.push(rsprocesspid);
-      const psdata = await window.pidusage(pidstocheck)
+      const psdata = pidstocheck.length > 0 ? await window.pidusage(pidstocheck) : null;
       const rsprocesscpu = rsprocesspid !== -1 ? psdata[rsprocesspid].cpu.toFixed(2) + "%" : "-";
       const rsprocessmemory = rsprocesspid !== -1 ? Math.round(psdata[rsprocesspid].memory / (1024 * 1024)) + "m" : "-";
       const rssniffercpu = rssnniferpid !== -1 ? psdata[rssnniferpid].cpu.toFixed(2) + "%" : "-";
