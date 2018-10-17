@@ -1,9 +1,0 @@
-{
-  "disableVersionCheck": true,
-  "debugStateMachine": false,
-  "debugSongDetails": false,
-  "debugCache": false,
-  "debugMemoryReadout": false,
-  "debugSystemHandleQuery": false,
-  "debugFileDetailQuery": false
-}

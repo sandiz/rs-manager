@@ -920,3 +920,23 @@ hr {
 .filterTable thead {
   font-size: 18px;
 }
+
+.psTable {
+  width:100%;
+}
+.psTable tbody tr {
+  border: none;
+}
+.psTable tbody td {
+  border: none;
+  
+}
+.psTable tbody tr:nth-child(even) {
+  background-color: inherit;
+  color:inherit;
+}
+
+.psTable tbody tr:nth-child(odd) {
+  background-color: inherit;
+  color:inherit;
+}

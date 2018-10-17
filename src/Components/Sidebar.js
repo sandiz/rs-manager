@@ -13,6 +13,7 @@ export default class Sidebar extends React.Component {
       expandedTabs: [],
       currentChildTab: '',
       versionCm: null,
+      psusage: null,
     }
   }
 
@@ -22,11 +23,45 @@ export default class Sidebar extends React.Component {
     this.toggleActive(this.props.TabsData[0]);
     //this.props.handleChange(TabsData[2], TabsData[2].child[0])
     //this.toggleActive(TabsData[2]);
+    this.startPSMonitor();
   }
 
   setChildActive(val, cid) {
     this.setState({ currentTab: val.id, currentChildTab: cid.id })
     this.props.handleChange(val, cid)
+  }
+
+  startPSMonitor = async () => {
+    setInterval(async () => {
+      const rssniffer = await window.findProcess("name", "RockSniffer.exe");
+      const rssnniferpid = rssniffer.length > 0 ? rssniffer[0].pid : -1;
+      const rsprocess = await window.findProcess("name", "Rocksmith2014");
+      const rsprocesspid = rsprocess.length > 0 ? rsprocess[0].pid : -1;
+      const pidstocheck = []
+      if (rssnniferpid !== -1) pidstocheck.push(rssnniferpid);
+      if (rsprocesspid !== -1) pidstocheck.push(rsprocesspid);
+      const psdata = await window.pidusage(pidstocheck)
+      const rsprocesscpu = rsprocesspid !== -1 ? psdata[rsprocesspid].cpu.toFixed(2) + "%" : "-";
+      const rsprocessmemory = rsprocesspid !== -1 ? Math.round(psdata[rsprocesspid].memory / (1024 * 1024)) + "m" : "-";
+      const rssniffercpu = rssnniferpid !== -1 ? psdata[rssnniferpid].cpu.toFixed(2) + "%" : "-";
+      const rssniffermemory = rssnniferpid !== -1 ? Math.round(psdata[rssnniferpid].memory / (1024 * 1024)) + "m" : "-";
+
+      const ps = (
+        <tbody>
+          <tr>
+            <td style={{ textAlign: 'left' }}>Rocksmith2014</td>
+            <td>{rsprocesscpu}</td>
+            <td>{rsprocessmemory}</td>
+          </tr>
+          <tr>
+            <td style={{ textAlign: 'left' }}>RockSnifer</td>
+            <td>{rssniffercpu}</td>
+            <td>{rssniffermemory}</td>
+          </tr>
+        </tbody>
+      );
+      this.setState({ psusage: ps })
+    }, 1000);
   }
 
   componentDidMount = () => {
@@ -234,6 +269,11 @@ export default class Sidebar extends React.Component {
           </div>
           {tabsList}
         </ul>
+        <div>
+          <table className="psTable">
+            {this.state.psusage}
+          </table>
+        </div>
         {this.state.versionCm}
       </nav>
     );
