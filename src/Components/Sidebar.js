@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types';
 import { createRSSongList } from '../sqliteService';
+import { getShowPSStatsConfig } from '../configService';
 
 export default class Sidebar extends React.Component {
   constructor(props) {
@@ -15,6 +16,7 @@ export default class Sidebar extends React.Component {
       versionCm: null,
       psusage: null,
     }
+    this.psInterval = null;
   }
 
   componentWillMount = async () => {
@@ -26,15 +28,32 @@ export default class Sidebar extends React.Component {
     this.startPSMonitor();
   }
 
+  shouldComponentUpdate = async (nextprops, nextstate) => {
+    if (this.psInterval) clearInterval(this.psInterval);
+    const showpsstats = await getShowPSStatsConfig();
+    if (showpsstats) this.startPSMonitor();
+    else {
+      this.setState({ psusage: null })
+    }
+    return true;
+  }
+
   setChildActive(val, cid) {
     this.setState({ currentTab: val.id, currentChildTab: cid.id })
     this.props.handleChange(val, cid)
   }
 
   startPSMonitor = async () => {
-    setInterval(async () => {
+    if (this.psInterval) clearInterval(this.psInterval);
+    this.psInterval = setInterval(async () => {
+      const showpsstats = await getShowPSStatsConfig();
+      if (!showpsstats) {
+        clearInterval(this.psInterval);
+        this.setState({ psusage: null })
+        return;
+      }
       const rssniffer = await window.findProcess("name", "RockSniffer.exe");
-      const rssnniferpid = rssniffer.length > 0 ? rssniffer[0].pid : -1;
+      const rssnniferpid = rssniffer.length > 0 ? parseInt(rssniffer[0].pid, 10) + 1 : -1;
       const rsprocess = await window.findProcess("name", "Rocksmith2014");
       const rsprocesspid = rsprocess.length > 0 ? rsprocess[0].pid : -1;
       const pidstocheck = []

@@ -5,7 +5,8 @@ import getProfileConfig, {
   updateSteamLoginSecureCookie, getSteamLoginSecureCookie, updateProfileConfig,
   getScoreAttackConfig, updateScoreAttackConfig, updateUseCDLCConfig,
   getUseCDLCConfig, getScoreAttackDashboardConfig, updateScoreAttackDashboard,
-  getSessionIDConfig, updateSessionIDConfig, getMasteryThresholdConfig, updateMasteryThreshold,
+  getSessionIDConfig, updateSessionIDConfig, getMasteryThresholdConfig,
+  updateMasteryThreshold, getShowPSStatsConfig, updatePSStats,
 } from '../configService';
 import {
   resetDB, createRSSongList, addtoRSSongList, isTablePresent, deleteRSSongList,
@@ -79,6 +80,7 @@ export default class SettingsView extends React.Component {
       useCDLCinStats: true,
       scoreAttackDashboard: [true, true, true, true],
       masteryThreshold: 0.95,
+      showPSStats: false,
     };
     this.readConfigs();
     this.refreshSetlist();
@@ -228,6 +230,14 @@ export default class SettingsView extends React.Component {
     });
   }
 
+  handleShowPSStats = (event) => {
+    const t = event.target;
+    const value = t.type === 'checkbox' ? t.checked : t.value;
+    this.setState({
+      showPSStats: value,
+    });
+  }
+
   handleMasteryThreshold = (event) => {
     this.setState({
       masteryThreshold: event.target.value / 100,
@@ -254,6 +264,7 @@ export default class SettingsView extends React.Component {
     const h = await getScoreAttackDashboardConfig();
     const i = await getSessionIDConfig();
     const j = await getMasteryThresholdConfig();
+    const k = await getShowPSStatsConfig();
     this.setState({
       prfldb: d,
       steamLoginSecure: e,
@@ -262,6 +273,7 @@ export default class SettingsView extends React.Component {
       scoreAttackDashboard: h,
       sessionID: i,
       masteryThreshold: j,
+      showPSStats: k,
     });
   }
 
@@ -275,10 +287,14 @@ export default class SettingsView extends React.Component {
     }
     await updateScoreAttackConfig(this.state.showScoreAttack);
     await updateUseCDLCConfig(this.state.useCDLCinStats);
+    await updatePSStats(this.state.showPSStats);
     await updateScoreAttackDashboard(this.state.scoreAttackDashboard);
     await updateMasteryThreshold(this.state.masteryThreshold);
     this.props.handleChange();
     this.props.updateHeader(this.tabname, "Settings Saved!");
+    document.getElementsByTagName("body")[0].scrollTop = 0;
+    document.getElementsByTagName("html")[0].scrollTop = 0;
+    this.props.refreshTabs();
   }
 
   enterPrfldb = async () => {
@@ -547,7 +563,31 @@ export default class SettingsView extends React.Component {
                   <div className="">
                     <span style={{ color: '#ccc' }}>
                       Includes cdlc when calculating stats in Dashboard view
+                    </span>
+                  </div>
+                  <br />
+                  <span style={{ float: 'left' }}>
+                    <a onClick={this.enterCookie}>
+                      Show RSLive Process Usage
+                  </a>
                   </span>
+                  <span style={{
+                    float: 'right',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    width: 400 + 'px',
+                    textAlign: 'right',
+                  }}>
+                    <input
+                      type="checkbox"
+                      checked={this.state.showPSStats}
+                      onChange={this.handleShowPSStats} />
+                  </span>
+                  <br />
+                  <div className="">
+                    <span style={{ color: '#ccc' }}>
+                      shows cpu and memory usage for rslive processes (rocksmith + rocksniffer)
+                    </span>
                   </div>
                   <br />
                   <span style={{ float: 'left' }}>
