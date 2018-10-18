@@ -235,10 +235,10 @@ export default class RSLiveView extends React.Component {
     this.rowEvents = {
       onClick: (e, row, rowIndex) => {
         this.setState({
-          showDetail: true,
-          showSong: row.song,
-          showArtist: row.artist,
-          showAlbum: row.album,
+          //showDetail: true,
+          //showSong: row.song,
+          //showArtist: row.artist,
+          //showAlbum: row.album,
         })
       },
     };
@@ -711,7 +711,7 @@ export default class RSLiveView extends React.Component {
           </a>
         </div>
         <br />
-        <div className="row justify-content-md-center" style={{ marginTop: -30 + 'px' }}>
+        <div key="live-stats" className="row justify-content-md-center" style={{ marginTop: -30 + 'px' }}>
           <div className="col col-md-3 ta-center dashboard-top dashboard-rslive-song-details">
             <div>
               Live Stats
