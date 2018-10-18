@@ -20,6 +20,7 @@ function getDefaultSettings() {
   obj.scoreAttackDashboard = [true, true, true, true]; //easy, medium, hard, master
   obj.sessionID = ""
   obj.masteryThreshold = 0.95
+  obj.showPSStats = false
   return obj;
 }
 export async function getConfig(type) {
@@ -73,6 +74,9 @@ export async function updateScoreAttackDashboard(current) {
 export async function updateMasteryThreshold(current) {
   await updateConfig("masteryThreshold", current);
 }
+export async function updatePSStats(current) {
+  await updateConfig("showPSStats", current);
+}
 
 export default async function getProfileConfig() {
   const d = await getConfig("prfldb");
@@ -104,5 +108,10 @@ export async function getMasteryThresholdConfig() {
 export async function getScoreAttackDashboardConfig() {
   const d = await getConfig("scoreAttackDashboard");
   if (d === '') return [true, true, true, true];
+  return d;
+}
+export async function getShowPSStatsConfig() {
+  const d = await getConfig("showPSStats");
+  if (d === '') return false; //default value
   return d;
 }

@@ -416,7 +416,7 @@ export default class RSLiveView extends React.Component {
         return;
       }
       cwd = window.dirname + "/tools/RockSniffer/"
-      this.rssniffer = `bash -c "${killcmd}; cd '${cwd}'; /Library/Frameworks/Mono.framework/Commands/mono RockSniffer.exe -disablesniffing"`
+      this.rssniffer = `bash -c "${killcmd}; cd '${cwd}'; /Library/Frameworks/Mono.framework/Commands/mono RockSniffer.exe"`
       window.process.chdir(cwd);
       console.log(this.rssniffer);
       const options = { name: 'RockSniffer', cwd };
