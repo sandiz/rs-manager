@@ -335,7 +335,7 @@ export default class RSLiveView extends React.Component {
     const album = songDetails ? songDetails.albumName : (this.songkeyresults ? unescape(this.songkeyresults.album) : "");
     const timeTotal = songDetails
       ? songDetails.songLength : (this.songkeyresults ? this.songkeyresults.songLength : 0);
-    if (song !== "" && artist !== "") {
+    if (song !== "" && artist !== "" && this.lastalbumname !== unescape(album)) {
       try {
         this.albumarturl = await albumArt(
           unescape(artist),
