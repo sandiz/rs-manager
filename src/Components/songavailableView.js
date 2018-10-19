@@ -211,6 +211,11 @@ export default class SongAvailableView extends React.Component {
         const appid = items[0]
         const name = items[1]
         const rdate = Math.trunc(items[2]);
+        this.props.updateHeader(
+          this.tabname,
+          this.childtabname,
+          "Updating from offline copy, Song: " + name,
+        )
         await addToSteamDLCCatalog(appid, replaceRocksmithTerms(name), rdate, true);
         lr.resume();
       });
