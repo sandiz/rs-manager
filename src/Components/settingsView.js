@@ -13,7 +13,6 @@ import {
 } from '../sqliteService';
 import readProfile from '../steamprofileService';
 
-const { path } = window;
 const { remote } = window.require('electron')
 
 const getHeader = (text, size) => {
@@ -408,7 +407,7 @@ export default class SettingsView extends React.Component {
                         ? <a onClick={this.enterPrfldb}>Click to Change </a>
                         : (
                           <a onClick={this.enterPrfldb}>
-                            <i>{path.basename(this.state.prfldb).toLowerCase()}</i>
+                            <i>{window.path.basename(this.state.prfldb).toLowerCase()}</i>
                           </a>
                         )
                     }
@@ -481,7 +480,7 @@ export default class SettingsView extends React.Component {
                   easing="ease-in"
                 >
                   <span style={{ float: 'left' }}>
-                    <a onClick>
+                    <a>
                       Show Score Attack Stats:
                     </a>
                   </span>
@@ -505,9 +504,9 @@ export default class SettingsView extends React.Component {
                   </div>
                   <br />
                   <span style={{ float: 'left' }}>
-                    <a onClick>
+                    <a>
                       Score Attack Panes
-                  </a>
+                    </a>
                   </span>
                   <span style={{
                     float: 'right',
@@ -545,9 +544,9 @@ export default class SettingsView extends React.Component {
                   </div>
                   <br />
                   <span style={{ float: 'left' }}>
-                    <a onClick>
+                    <a>
                       Include CDLC in Stats
-                  </a>
+                    </a>
                   </span>
                   <span style={{
                     float: 'right',
@@ -569,9 +568,9 @@ export default class SettingsView extends React.Component {
                   </div>
                   <br />
                   <span style={{ float: 'left' }}>
-                    <a onClick>
+                    <a>
                       Show RSLive Process Usage
-                  </a>
+                    </a>
                   </span>
                   <span style={{
                     float: 'right',
@@ -593,9 +592,9 @@ export default class SettingsView extends React.Component {
                   </div>
                   <br />
                   <span style={{ float: 'left' }}>
-                    <a onClick>
+                    <a>
                       Mastery Threshold
-                  </a>
+                    </a>
                   </span>
                   <span style={{
                     float: 'right',
@@ -637,9 +636,9 @@ export default class SettingsView extends React.Component {
                   easing="ease-in"
                 >
                   <span style={{ float: 'left', color: 'red', marginTop: 18 + 'px' }}>
-                    <a onClick>
+                    <a>
                       Reset Songs Owned Collection
-                  </a>
+                    </a>
                   </span>
                   <span style={{
                     float: 'right',

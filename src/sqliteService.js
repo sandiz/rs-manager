@@ -574,8 +574,8 @@ export async function getAllSetlist(filter = false) {
   else {
     sql = "SELECT * FROM setlist_meta  order by rowid asc;"
   }
-  const tableState = await isTablePresent("setlist_meta");
-  if (db !== null && tableState) {
+  const tableState = db !== null && await isTablePresent("setlist_meta");
+  if (tableState) {
     const all = await db.all(sql);
     return all;
   }
