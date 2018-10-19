@@ -481,9 +481,9 @@ export default class SettingsView extends React.Component {
                   easing="ease-in"
                 >
                   <span style={{ float: 'left' }}>
-                    <a onClick={this.enterCookie}>
+                    <a onClick>
                       Show Score Attack Stats:
-                  </a>
+                    </a>
                   </span>
                   <span style={{
                     float: 'right',
@@ -505,7 +505,7 @@ export default class SettingsView extends React.Component {
                   </div>
                   <br />
                   <span style={{ float: 'left' }}>
-                    <a onClick={this.enterCookie}>
+                    <a onClick>
                       Score Attack Panes
                   </a>
                   </span>
@@ -545,7 +545,7 @@ export default class SettingsView extends React.Component {
                   </div>
                   <br />
                   <span style={{ float: 'left' }}>
-                    <a onClick={this.enterCookie}>
+                    <a onClick>
                       Include CDLC in Stats
                   </a>
                   </span>
@@ -569,7 +569,7 @@ export default class SettingsView extends React.Component {
                   </div>
                   <br />
                   <span style={{ float: 'left' }}>
-                    <a onClick={this.enterCookie}>
+                    <a onClick>
                       Show RSLive Process Usage
                   </a>
                   </span>
@@ -593,7 +593,7 @@ export default class SettingsView extends React.Component {
                   </div>
                   <br />
                   <span style={{ float: 'left' }}>
-                    <a onClick={this.enterCookie}>
+                    <a onClick>
                       Mastery Threshold
                   </a>
                   </span>
@@ -637,7 +637,7 @@ export default class SettingsView extends React.Component {
                   easing="ease-in"
                 >
                   <span style={{ float: 'left', color: 'red', marginTop: 18 + 'px' }}>
-                    <a onClick={this.enterCookie}>
+                    <a onClick>
                       Reset Songs Owned Collection
                   </a>
                   </span>
