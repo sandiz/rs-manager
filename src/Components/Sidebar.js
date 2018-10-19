@@ -15,6 +15,7 @@ export default class Sidebar extends React.Component {
       currentChildTab: '',
       versionCm: null,
       psusage: null,
+      showpsstats: false,
     }
     this.psInterval = null;
   }
@@ -28,16 +29,6 @@ export default class Sidebar extends React.Component {
     this.startPSMonitor();
   }
 
-  shouldComponentUpdate = async (nextprops, nextstate) => {
-    if (this.psInterval) clearInterval(this.psInterval);
-    const showpsstats = await getShowPSStatsConfig();
-    if (showpsstats) this.startPSMonitor();
-    else {
-      this.setState({ psusage: null })
-    }
-    return true;
-  }
-
   setChildActive(val, cid) {
     this.setState({ currentTab: val.id, currentChildTab: cid.id })
     this.props.handleChange(val, cid)
@@ -45,13 +36,13 @@ export default class Sidebar extends React.Component {
 
   startPSMonitor = async () => {
     if (this.psInterval) clearInterval(this.psInterval);
+    const showpsstats = await getShowPSStatsConfig();
+    this.setState({ psusage: null, showpsstats })
+    if (!showpsstats) {
+      return;
+    }
     this.psInterval = setInterval(async () => {
-      const showpsstats = await getShowPSStatsConfig();
-      if (!showpsstats) {
-        clearInterval(this.psInterval);
-        this.setState({ psusage: null })
-        return;
-      }
+      if (!this.state.showpsstats) { return; }
       const rssniffer = await window.findProcess("name", "RockSniffer.exe");
       const rssnniferpid = rssniffer.length > 0 ? parseInt(rssniffer[0].pid, 10) + 1 : -1;
       const rsprocess = await window.findProcess("name", "Rocksmith2014");
@@ -79,8 +70,8 @@ export default class Sidebar extends React.Component {
           </tr>
         </tbody>
       );
-      this.setState({ psusage: ps })
-    }, 1000);
+      if (this.state.showpsstats) this.setState({ psusage: ps })
+    }, 2000);
   }
 
   componentDidMount = () => {
@@ -207,6 +198,12 @@ export default class Sidebar extends React.Component {
     console.log("Created new setlist ", tablename, displayname);
   }
 
+  refresh = () => {
+    console.log("sidebar refresh")
+    //this.checkForUpdate();
+    this.startPSMonitor();
+  }
+
   toggleActive(val) {
     const index = this.state.expandedTabs.indexOf(val.id)
     const tabs = this.state.expandedTabs
@@ -275,7 +272,7 @@ export default class Sidebar extends React.Component {
     return (
       <nav id="sidebar" className={this.props.showSidebar ? '' : 'active'}>
         <div className="sidebar-header">
-          <h3>Rocksmith 2014</h3>
+          <h3><a href="#" onClick={this.refresh}>Rocksmith 2014</a></h3>
         </div>
 
         <ul className="list-unstyled components" style={{ padding: 0 + 'px' }}>

@@ -71,6 +71,7 @@ class App extends Component {
     this.songlistRef = null;
     //this.handleChange = this.handleChange.bind(this);
     this.selectedTab = null;
+    this.sidebarRef = React.createRef();
   }
 
   componentWillMount = async () => {
@@ -241,6 +242,7 @@ class App extends Component {
     t[2].child = tempChilds;
     t[2].child.push({ name: 'Create New Setlist...', id: 'add-setlist' });
     this.setState({ TabsData: t });
+    this.sidebarRef.current.refresh();
   }
 
   render = () => {
@@ -253,6 +255,7 @@ class App extends Component {
       <div className="App">
         <div className="wrapper">
           <Sidebar
+            ref={this.sidebarRef}
             handleChange={this.handleChange}
             showSidebar={this.state.showSidebar}
             currentProfile={profile}
