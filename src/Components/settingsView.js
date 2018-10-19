@@ -323,6 +323,7 @@ export default class SettingsView extends React.Component {
         type: 'text',
       },
       type: 'input',
+      height: 250,
     })
     console.log(d);
     if (d !== "" && d != null) {
@@ -336,6 +337,7 @@ export default class SettingsView extends React.Component {
         type: 'text',
       },
       type: 'input',
+      height: 250,
     })
     console.log(d);
     if (d !== "" && d != null) {
