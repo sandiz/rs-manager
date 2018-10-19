@@ -116,7 +116,7 @@ export async function initSetlistPlaylistDB(dbname) {
   await db.run(`CREATE TABLE IF NOT EXISTS ${dbname} ( uniqkey char UNIQUE primary key, FOREIGN KEY(uniqkey) REFERENCES songs_owned(uniqkey));`);
 }
 export async function initSetlistDB() {
-  // console.log("__db_call__: initSetlistDB");
+  //console.log("__db_call__: initSetlistDB");
   if (db === null) {
     const dbfilename = window.sqlitePath;
     db = await window.sqlite.open(dbfilename);
@@ -557,21 +557,6 @@ export async function getSetlistMetaInfo(key) {
   const op = await db.get(sql);
   return op;
 }
-export async function getAllSetlist(filter = false) {
-  // console.log("__db_call__: getAllSetlist");
-  let sql = ''
-  if (filter) {
-    sql = "SELECT * FROM setlist_meta where key not like '%setlist_favorites%' and key not like '%rs_song_list%' and is_manual='true' order by rowid asc;"
-  }
-  else {
-    sql = "SELECT * FROM setlist_meta  order by rowid asc;"
-  }
-  if (db !== null) {
-    const all = await db.all(sql);
-    return all;
-  }
-  return null;
-}
 export async function isTablePresent(tablename) {
   const sql = `SELECT count(*) as count FROM sqlite_master WHERE type='table' and name='${tablename}'`;
   const op = await db.get(sql);
@@ -579,6 +564,22 @@ export async function isTablePresent(tablename) {
     return false;
   }
   return true;
+}
+export async function getAllSetlist(filter = false) {
+  //console.log("__db_call__: getAllSetlist");
+  let sql = ''
+  if (filter) {
+    sql = "SELECT * FROM setlist_meta where key not like '%setlist_favorites%' and key not like '%rs_song_list%' and is_manual='true' order by rowid asc;"
+  }
+  else {
+    sql = "SELECT * FROM setlist_meta  order by rowid asc;"
+  }
+  const tableState = await isTablePresent("setlist_meta");
+  if (db !== null && tableState) {
+    const all = await db.all(sql);
+    return all;
+  }
+  return null;
 }
 export async function createRSSongList(
   tablename, displayname,
