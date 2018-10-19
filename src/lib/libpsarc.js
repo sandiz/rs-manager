@@ -125,7 +125,7 @@ async function decryptPsarc(listing, contents) {
   }
   return data
 }
-async function readEntry(fd, idx, bomentries) {
+async function readEntry(data, idx, bomentries) {
   const singlebom = bomentries.entries[idx];
   let entryoffset = singlebom.offset.readUInt32BE(1)
   const entrylength = singlebom.length.readUInt32BE(1)
@@ -137,7 +137,8 @@ async function readEntry(fd, idx, bomentries) {
     if (length === entrylength) { break; }
 
     let buf = Buffer.alloc(z === 0 ? BLOCK_SIZE : z)
-    let { bytesRead, buffer } = await readFD(fd, buf, 0, z === 0 ? BLOCK_SIZE : z, entryoffset)
+    //let { bytesRead, buffer } = await readFD(fd, buf, 0, z === 0 ? BLOCK_SIZE : z, entryoffset)
+    let buffer = data.slice(entryoffset, entryoffset + (z === 0 ? BLOCK_SIZE : z));
     entryoffset += (z === 0 ? BLOCK_SIZE : z)
     try {
       buffer = await unzip(buffer)
@@ -161,14 +162,14 @@ async function readPsarc(psarcFile, fastRead = true) {
     const bomentries = BOM(header.n_entries).parse(slicedbom)
     //console.log(require("util").inspect(bomentries, { depth: null }));
 
-    const fd = await openFD(psarcFile, "r");
-    const rawlisting = await readEntry(fd, 0, bomentries)
+    //const fd = await openFD(psarcFile, "r");
+    const rawlisting = await readEntry(data, 0, bomentries)
     const listing = unescape(rawlisting).split("\n");
     const contents = []
     for (let i = 1; i < bomentries.entries.length; i += 1) {
       if (fastRead) {
         if (listing[i - 1].includes("json")) {
-          const c = await readEntry(fd, i, bomentries)
+          const c = await readEntry(data, i, bomentries)
           contents.push(c)
         }
         else {
@@ -176,7 +177,7 @@ async function readPsarc(psarcFile, fastRead = true) {
         }
       }
       else {
-        const c = await readEntry(fd, i, bomentries)
+        const c = await readEntry(data, i, bomentries)
         contents.push(c)
       }
     }
@@ -265,7 +266,7 @@ async function extractFile(psarcFile, fileToExtract) {
       const key = keys[i];
       const value = entries[keys[i]];
       if (key === fileToExtract) {
-        filename = os.tmpdir() + Date.now() + "_" + path.basename(fileToExtract)
+        filename = os.tmpdir() + "/" + Date.now() + "_" + path.basename(fileToExtract)
         await writeFile(filename, value)
       }
     }
