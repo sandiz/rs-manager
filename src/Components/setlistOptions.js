@@ -25,6 +25,7 @@ export function generateSql(filters, count = false) {
       case "difficulty":
       case "count":
       case "tempo":
+      case "sa_playcount":
         sql += `coalesce(${filter.type},0) ${filter.cmp} ${filter.value} `;
         break;
       case "is_cdlc":
@@ -100,7 +101,12 @@ export default class SetlistOptions extends React.Component {
       },
       {
         type: "count",
-        display: "Playcount",
+        display: "LAS Playcount",
+        cmp: [">=", "<=", "==", "<", ">"],
+      },
+      {
+        type: "sa_playcount",
+        display: "SA Playcount",
         cmp: [">=", "<=", "==", "<", ">"],
       },
       {
