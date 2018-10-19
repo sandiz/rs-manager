@@ -10,6 +10,7 @@ import {
   countSongsOwned, getArrangmentsMastered, getLeadStats,
   getRhythmStats, getBassStats, getRandomSongOwned,
   getRandomSongAvailable, getSAStats, updateScoreAttackStats,
+  initSetlistDB,
 } from '../sqliteService';
 import { replaceRocksmithTerms } from './songavailableView';
 import SongDetailView from './songdetailView';
@@ -64,9 +65,11 @@ export default class DashboardView extends React.Component {
 
   componentWillMount = async () => {
     await initSongsOwnedDB();
+    await initSetlistDB();
     this.fetchStats();
     this.fetchRandomStats();
     this.fetchWeeklySpotlight();
+    this.props.handleChange();
   }
 
   getStatsWidth = (input, min, max) => {
@@ -331,7 +334,9 @@ export default class DashboardView extends React.Component {
         this.tabname,
         `Decrypting ${path.basename(prfldb)}`,
       );
+      console.time("decryptReadProfile")
       const steamProfile = await readProfile(prfldb);
+      console.timeEnd("decryptReadProfile")
       const stats = steamProfile.Stats.Songs;
       const sastats = steamProfile.SongsSA;
       const total = Object.keys(stats).length + Object.keys(sastats).length;
@@ -341,6 +346,7 @@ export default class DashboardView extends React.Component {
         this.tabname,
         `Song Stats Found: ${total}`,
       );
+      const start = window.performance.now();
       await initSongsOwnedDB();
       let keys = Object.keys(stats);
       let updatedRows = 0;
@@ -354,9 +360,6 @@ export default class DashboardView extends React.Component {
         );
         /* loop await */ // eslint-disable-next-line
         const rows = await updateMasteryandPlayed(keys[i], mastery, played);
-        if (rows === 0) {
-          console.log("Missing ID: " + keys[i]);
-        }
         updatedRows += rows;
       }
       //find score attack stats
@@ -387,9 +390,6 @@ export default class DashboardView extends React.Component {
         );
         /* loop await */ // eslint-disable-next-line
         const rows = await updateScoreAttackStats(stat, highestBadge, keys[i]);
-        if (rows === 0) {
-          console.log("Missing ID: " + keys[i]);
-        }
         updatedRows += rows;
       }
 
@@ -398,6 +398,8 @@ export default class DashboardView extends React.Component {
         this.childtabname,
         "Stats Found: " + updatedRows,
       );
+      const end = window.performance.now();
+      console.log("avg updateMastery: ", (end - start) / (keys.length * 2)); //two loops
     }
   }
 

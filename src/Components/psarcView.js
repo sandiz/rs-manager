@@ -214,6 +214,8 @@ export default class PSARCView extends React.Component {
 
   psarcRead = async (results) => {
     const count = results.length;
+    const start = window.performance.now();
+
     let index = 1;
     this.setState({
       files: [],
@@ -241,6 +243,8 @@ export default class PSARCView extends React.Component {
       }
       index += 1
     }
+    const end = window.performance.now();
+    console.log("avg psarcRead: ", (end - start) / results.length);
   }
 
   noData = () => {
@@ -284,6 +288,7 @@ export default class PSARCView extends React.Component {
     let count = 0;
     let fcount = 0;
     let filtered = "";
+    const start = window.performance.now();
     for (let i = 0; i < this.state.files.length; i += 1) {
       this.props.updateHeader(this.tabname, `Updating Songlist with PSARC:  ${this.state.files[i].psarc} (${i}/${this.state.files.length})`);
       const { song } = this.state.files[i];
@@ -303,6 +308,8 @@ export default class PSARCView extends React.Component {
       filtered = `(Filtered: ${fcount})`
     }
     this.props.updateHeader(this.tabname, "Updated Songlist with " + count + " Arrangements. " + filtered);
+    const end = window.performance.now();
+    console.log("avg updateSongList: ", (end - start) / this.state.files.length);
   }
 
   render = () => {
