@@ -8,7 +8,7 @@ import SongAvailableView from './Components/songavailableView';
 import SetlistView from './Components/setlistView';
 import SettingsView from './Components/settingsView';
 import RSLiveView from './Components/rsliveView';
-import { initSetlistDB, getAllSetlist } from './sqliteService';
+import { getAllSetlist } from './sqliteService';
 import './App.css'
 
 const { path } = window;
@@ -75,7 +75,6 @@ class App extends Component {
   }
 
   componentWillMount = async () => {
-    this.refreshTabs();
   }
 
   componentDidMount = async () => {
@@ -97,6 +96,7 @@ class App extends Component {
     const prfldb = await getProfileConfig();
     const steamcookie = await getSteamLoginSecureCookie();
     this.setState({ currentProfile: prfldb, currentCookie: steamcookie });
+    this.refreshTabs();
   }
 
   handleChange = async (tab, child) => {
@@ -227,8 +227,8 @@ class App extends Component {
   }
 
   refreshTabs = async () => {
-    await initSetlistDB();
     const setlists = await getAllSetlist();
+    if (setlists === null) return;
     const t = this.state.TabsData;
     t[2].child = []
     const tempChilds = []

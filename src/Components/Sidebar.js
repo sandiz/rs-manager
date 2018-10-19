@@ -199,7 +199,6 @@ export default class Sidebar extends React.Component {
   }
 
   refresh = () => {
-    console.log("sidebar refresh")
     //this.checkForUpdate();
     this.startPSMonitor();
   }

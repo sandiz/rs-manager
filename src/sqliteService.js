@@ -339,7 +339,7 @@ export default async function updateSongsOwned(psarcResult, isCDLC = false) {
       '${songkey}','${id}', '${uniqkey}', '${lct}', '${mastery}','${count}', '${ap}', '${capo}','${cent}','${tuning}', '${length}', '${notes}', '${tmpo}', '${cdlc}')\
       ;`
   const sqlstr2 = `update songs_owned set is_cdlc='${cdlc}' where id like '${id}';`;
-  console.log(sqlstr2)
+  //console.log(sqlstr2)
   //});
   try {
     await db.run(sqlstr); // Run the query without returning anything
@@ -559,7 +559,6 @@ export async function getSetlistMetaInfo(key) {
 }
 export async function getAllSetlist(filter = false) {
   // console.log("__db_call__: getAllSetlist");
-  await initSetlistDB();
   let sql = ''
   if (filter) {
     sql = "SELECT * FROM setlist_meta where key not like '%setlist_favorites%' and key not like '%rs_song_list%' and is_manual='true' order by rowid asc;"
@@ -567,8 +566,11 @@ export async function getAllSetlist(filter = false) {
   else {
     sql = "SELECT * FROM setlist_meta  order by rowid asc;"
   }
-  const all = await db.all(sql);
-  return all;
+  if (db !== null) {
+    const all = await db.all(sql);
+    return all;
+  }
+  return null;
 }
 export async function isTablePresent(tablename) {
   const sql = `SELECT count(*) as count FROM sqlite_master WHERE type='table' and name='${tablename}'`;
