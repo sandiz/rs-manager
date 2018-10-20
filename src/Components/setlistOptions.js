@@ -28,9 +28,13 @@ export function generateSql(filters, count = false) {
       case "sa_playcount":
         sql += `coalesce(${filter.type},0) ${filter.cmp} ${filter.value} `;
         break;
-      case "capo":
-        if (filter.value) sql += `capofret > 0 `;
-        else sql += `capofret = 0 `;
+      case "centoffset":
+        if (filter.value) sql += `${filter.type} == 0 `;
+        else sql += `${filter.type} > 0 `;
+        break;
+      case "capofret":
+        if (filter.value) sql += `${filter.type} > 0 `;
+        else sql += `${filter.type} = 0 `;
         break;
       case "is_cdlc":
         sql += `${filter.type} ${filter.cmp} '${filter.value}' `;
@@ -129,7 +133,12 @@ export default class SetlistOptions extends React.Component {
         cmp: ["is"],
       },
       {
-        type: "capo",
+        type: "centoffset",
+        display: "A440",
+        cmp: ["is"],
+      },
+      {
+        type: "capofret",
         display: "Capo",
         cmp: ["is"],
       },
@@ -267,7 +276,7 @@ export default class SetlistOptions extends React.Component {
         </select>
       )
     }
-    else if (filter.type === "is_cdlc" || filter.type === "capo") {
+    else if (filter.type === "is_cdlc" || filter.type === "capofret" || filter.type === "centoffset") {
       const defValue = filter.value;
       return (
         <input type="checkbox" defaultChecked={defValue} onChange={event => this.handleCheckboxChange(event, index)} />
