@@ -417,10 +417,13 @@ export default class SetlistView extends React.Component {
                 sortField === null ? this.lastsortfield : sortField,
                 sortOrder === null ? this.lastsortorder : sortOrder,
             )
-            console.log(joinedoutput)
-            output = joinedoutput[0]
-            output[0].acount = joinedoutput[1].acount
-            output[0].songcount = joinedoutput[1].songcount
+            if (joinedoutput.length > 0) {
+                output = joinedoutput[0]
+                if (output.length > 0) {
+                    output[0].acount = joinedoutput[1].acount
+                    output[0].songcount = joinedoutput[1].songcount
+                }
+            }
         } else {
             output = await getSongsFromPlaylistDB(
                 this.lastChildID,
