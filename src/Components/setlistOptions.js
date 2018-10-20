@@ -4,6 +4,79 @@ import { enableScroll, forceNoScroll } from './songdetailView';
 import { deleteRSSongList, createRSSongList, executeRawSql } from '../sqliteService';
 import { allTunings } from './songlistView';
 
+const Fragment = React.Fragment;
+const anyTunings = ["any_standard", "any_non_standard", "any_open", "any_drop"];
+
+export function generateTunings() {
+  const tunings = {}
+  const tuningkeys = Object.keys(allTunings);
+  for (let i = 0; i < tuningkeys.length; i += 1) {
+    const t = allTunings[tuningkeys[i]];
+    const tuningsJSON = `{"string0":${t[0]},"string1":${t[1]},"string2":${t[2]},"string3":${t[3]},"string4":${t[4]},"string5":${t[5]}}`;
+    const escaped = escape(tuningsJSON);
+    tunings[tuningkeys[i]] = escaped;
+  }
+  return tunings;
+}
+
+function generateAnyTuningSql(filter) {
+  const tunings = generateTunings();
+
+  const allStandardTunings = [
+    "E Standard", "Eb Standard", "F Standard",
+    "D Standard", "C# Standard", "C Standard",
+    "B Standard",
+  ]
+  const allStandardJSON = allStandardTunings.map(e => tunings[e]);
+
+  const allNonStandardTunings = Object.keys(allTunings).filter(
+    tuning => !(allStandardTunings.includes(tuning)),
+  );
+  const allNonStandardJSON = allNonStandardTunings.map(e => tunings[e])
+
+  const allOpenTunings = [
+    "Open A", "Open D", "Open G", "Open E",
+  ]
+  const allOpenJSON = allOpenTunings.map(e => tunings[e]);
+
+  const allDropTunings = [
+    "Drop D", "Eb Drop Db", "D Drop C",
+    "C# Drop B", "B Drop A",
+  ]
+  const allDropJSON = allDropTunings.map(e => tunings[e]);
+
+  let tuningtoUse = []
+  switch (filter.value) {
+    default:
+    case "any_standard":
+      tuningtoUse = allStandardJSON;
+      break;
+    case "any_non_standard":
+      tuningtoUse = allNonStandardJSON;
+      break;
+    case "any_open":
+      tuningtoUse = allOpenJSON;
+      break;
+    case "any_drop":
+      tuningtoUse = allDropJSON;
+      break;
+  }
+  let sql = "("
+  for (let i = 0; i < tuningtoUse.length; i += 1) {
+    const tuning = tuningtoUse[i];
+    if (i === tuningtoUse.length - 1) {
+      sql += `tuning like '${tuning}'`
+    }
+    else {
+      sql += `tuning like '${tuning}' OR `
+    }
+  }
+  sql += ")"
+  //const sql = `${filter.type} like '${filter.value}'`
+  //console.log(sql);
+  return sql
+}
+
 export function generateSql(filters, count = false) {
   const countsql = count ? "count(*) as acount, count(distinct songkey) as songcount" : "*"
   let sql = `select ${countsql} from songs_owned `;
@@ -40,7 +113,12 @@ export function generateSql(filters, count = false) {
         sql += `${filter.type} ${filter.cmp} '${filter.value}' `;
         break;
       case "tuning":
-        sql += `${filter.type} like '${filter.value}' `;
+        if (anyTunings.includes(filter.value)) {
+          sql += generateAnyTuningSql(filter);
+        }
+        else {
+          sql += `${filter.type} like '${filter.value}' `;
+        }
         break;
       default:
         break;
@@ -52,17 +130,7 @@ export function generateSql(filters, count = false) {
   console.log(sql);
   return sql;
 }
-export function generateTunings() {
-  const tunings = {}
-  const tuningkeys = Object.keys(allTunings);
-  for (let i = 0; i < tuningkeys.length; i += 1) {
-    const t = allTunings[tuningkeys[i]];
-    const tuningsJSON = `{"string0":${t[0]},"string1":${t[0]},"string2":${t[0]},"string3":${t[0]},"string4":${t[0]},"string5":${t[0]}}`;
-    const escaped = escape(tuningsJSON);
-    tunings[tuningkeys[i]] = escaped;
-  }
-  return tunings;
-}
+
 export default class SetlistOptions extends React.Component {
   constructor(props) {
     super(props)
@@ -257,7 +325,9 @@ export default class SetlistOptions extends React.Component {
       const filtervalU = unescape(filter.value)
       let defValue = filter.value;
       try {
-        JSON.parse(filtervalU);
+        if (!anyTunings.includes(defValue)) {
+          JSON.parse(filtervalU);
+        }
       }
       catch (e) {
         defValue = tunings["E Standard"];
@@ -272,6 +342,14 @@ export default class SetlistOptions extends React.Component {
                 <option value={tuningescaped} key={"tuning_" + filter.id + tuningkey}>{tuningkey}</option>
               );
             })
+          }
+          {
+            <Fragment>
+              <option value="any_standard" key={"tuning_" + filter.id + "any_s"}>Any Standard</option>
+              <option value="any_non_standard" key={"tuning_" + filter.id + "any_ns"}>Any Non-Standard</option>
+              <option value="any_open" key={"tuning_" + filter.id + "any_o"}>Any Open Tuning</option>
+              <option value="any_drop" key={"tuning_" + filter.id + "any_d"}>Any Dropped Tuning</option>
+            </Fragment>
           }
         </select>
       )
@@ -529,7 +607,7 @@ export default class SetlistOptions extends React.Component {
                                   href="#"
                                   onClick={this.runQuery}
                                   style={{ borderBottom: "1px solid gray" }}>
-                                  Run Query
+                                  Test Query
                               </a>: {this.state.numResults} arrangements.
                              </span>
                             </div>
