@@ -277,7 +277,7 @@ export default class SetlistView extends React.Component {
 
     saveSearch = () => {
         const isgen = this.state.setlistMeta.is_generated === "true";
-        if (!isgen) {
+        if (!isgen && this.search !== null) {
             const search = {
                 tabname: this.tabname,
                 childtabname: this.lastChildID,
