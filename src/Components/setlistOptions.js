@@ -28,6 +28,10 @@ export function generateSql(filters, count = false) {
       case "sa_playcount":
         sql += `coalesce(${filter.type},0) ${filter.cmp} ${filter.value} `;
         break;
+      case "capo":
+        if (filter.value) sql += `capofret > 0 `;
+        else sql += `capofret = 0 `;
+        break;
       case "is_cdlc":
         sql += `${filter.type} ${filter.cmp} '${filter.value}' `;
         break;
@@ -121,7 +125,12 @@ export default class SetlistOptions extends React.Component {
       },
       {
         type: "tuning",
-        display: "Tunings",
+        display: "Tuning",
+        cmp: ["is"],
+      },
+      {
+        type: "capo",
+        display: "Capo",
         cmp: ["is"],
       },
     ];
@@ -258,6 +267,12 @@ export default class SetlistOptions extends React.Component {
         </select>
       )
     }
+    else if (filter.type === "is_cdlc" || filter.type === "capo") {
+      const defValue = filter.value;
+      return (
+        <input type="checkbox" defaultChecked={defValue} onChange={event => this.handleCheckboxChange(event, index)} />
+      )
+    }
     return (
       <input
         key={"input_" + filter.id}
@@ -306,6 +321,12 @@ export default class SetlistOptions extends React.Component {
   handleValueChange = (event, index) => {
     const { filters } = this.state;
     filters[index].value = event.target.value;
+    this.setState({ filters });
+  }
+
+  handleCheckboxChange = (event, index) => {
+    const { filters } = this.state;
+    filters[index].value = event.target.checked;
     this.setState({ filters });
   }
 
