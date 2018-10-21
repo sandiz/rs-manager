@@ -2,7 +2,8 @@ import React from 'react'
 import PropTypes from 'prop-types';
 import StatsTableView from './statsTableView';
 import getProfileConfig, {
-  updateProfileConfig, getScoreAttackConfig, getUseCDLCConfig, getScoreAttackDashboardConfig,
+  updateProfileConfig, getScoreAttackConfig, getUseCDLCConfig,
+  getScoreAttackDashboardConfig, getDateFormatConfig, updateDateFormat,
 } from '../configService';
 import readProfile from '../steamprofileService';
 import {
@@ -21,6 +22,7 @@ export default class DashboardView extends React.Component {
   constructor(props) {
     super(props);
     this.tabname = 'tab-dashboard';
+    this.timeFormats = ["dhm", "hm", "ms", "s"]
     this.state = {
       scoreAttackDashboard: [false, false, false, false],
       scdTrueLength: 0,
@@ -36,6 +38,8 @@ export default class DashboardView extends React.Component {
       randomalbum: '',
       randompack: '',
       totalPlayingTime: 0,
+      playingTimeFormat: 'dhm',
+      stats: null,
       maxConsecutiveDays: 0,
       longestStreak: 0,
       highestSolo: 0,
@@ -76,6 +80,52 @@ export default class DashboardView extends React.Component {
     const w = ((input - min) * 100) / (max - min);
     if (Number.isNaN(w)) { return 0; }
     return w;
+  }
+
+  changeTimeFormat = async () => {
+    let index = this.timeFormats.indexOf(this.state.playingTimeFormat);
+    if (index === -1) index = 0
+    if (index >= this.timeFormats.length) index = 0
+    index += 1;
+    await updateDateFormat(this.timeFormats[index])
+    this.setState({
+      playingTimeFormat: this.timeFormats[index],
+    }, () => this.setPlayingTime(this.state.stats));
+  }
+
+  setPlayingTime = (stats) => {
+    let playingText = "";
+    switch (this.state.playingTimeFormat) {
+      default:
+      case "dhm":
+        {
+          const dateObj = this.convertMS(stats.TimePlayed * 1000);
+          playingText = `${dateObj.d} days ${dateObj.h} hours ${dateObj.m} minutes`
+        }
+        break;
+      case "hm":
+        {
+          let m = Math.floor(stats.TimePlayed / 60);
+          const h = Math.floor(m / 60);
+          m %= 60;
+          playingText = `${h} hours ${m} minutes`
+        }
+        break;
+      case "ms":
+        {
+          let s = Math.floor(stats.TimePlayed);
+          const m = Math.floor(s / 60);
+          s %= 60;
+          playingText = `${m} minutes ${s} seconds`
+        }
+        break;
+      case "s":
+        playingText = `${stats.TimePlayed} seconds`;
+        break;
+    }
+    this.setState({
+      totalPlayingTime: playingText,
+    })
   }
 
   convertMS = (ms) => {
@@ -120,19 +170,13 @@ export default class DashboardView extends React.Component {
         if (typeof song.song === 'undefined') { mostPlayed = "-"; }
         else { mostPlayed = unescape(song.song) + " by " + unescape(song.artist); }
       }
-      let playingText = "";
-      const dateObj = this.convertMS(stats.TimePlayed * 1000);
-      if (dateObj.d >= 1) {
-        playingText = `${dateObj.d} Days ${dateObj.h} Hours ${dateObj.m} Minutes`
-      }
-      else {
-        playingText = `${dateObj.h} Hours ${dateObj.m} Minutes`
-      }
       const useCDLCforStats = await getUseCDLCConfig();
       const songscount = await countSongsOwned(useCDLCforStats);
       const arrmaster = await getArrangmentsMastered(useCDLCforStats);
+      const playingTimeFormat = await getDateFormatConfig();
       this.setState({
-        totalPlayingTime: playingText,
+        playingTimeFormat,
+        stats,
         maxConsecutiveDays: stats.MaxConsecutiveDays,
         longestStreak: stats.Streak,
         highestSolo: stats.HighestSoloAccuracy,
@@ -140,7 +184,7 @@ export default class DashboardView extends React.Component {
         songPlays: stats.SongsPlayedCount,
         arrMaster: arrmaster.count + "/" + songscount.count,
         mostPlayed,
-      });
+      }, () => this.setPlayingTime(stats));
       const leadStats = await getLeadStats(useCDLCforStats);
       const lup = leadStats.l - (leadStats.l1 + leadStats.l2 + leadStats.l3
         + leadStats.l4 + leadStats.l5 + leadStats.l6)
@@ -498,7 +542,7 @@ export default class DashboardView extends React.Component {
                 Total Playing Time
                 </div>
               <div style={{ width: 70 + '%' }} className="ta-right">
-                {this.state.totalPlayingTime}
+                <a onClick={this.changeTimeFormat}>{this.state.totalPlayingTime}</a>
               </div>
             </div>
             <div className="stat-container">

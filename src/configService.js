@@ -21,6 +21,7 @@ function getDefaultSettings() {
   obj.sessionID = ""
   obj.masteryThreshold = 0.95
   obj.showPSStats = false
+  obj.dateFormat = "dhm"
   return obj;
 }
 export async function getConfig(type) {
@@ -77,6 +78,9 @@ export async function updateMasteryThreshold(current) {
 export async function updatePSStats(current) {
   await updateConfig("showPSStats", current);
 }
+export async function updateDateFormat(current) {
+  await updateConfig("dateFormat", current);
+}
 
 export default async function getProfileConfig() {
   const d = await getConfig("prfldb");
@@ -113,5 +117,10 @@ export async function getScoreAttackDashboardConfig() {
 export async function getShowPSStatsConfig() {
   const d = await getConfig("showPSStats");
   if (d === '') return false; //default value
+  return d;
+}
+export async function getDateFormatConfig() {
+  const d = await getConfig("dateFormat");
+  if (d === '') return "dhm"; //default value
   return d;
 }

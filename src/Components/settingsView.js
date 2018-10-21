@@ -415,7 +415,7 @@ export default class SettingsView extends React.Component {
                   <br />
                   <div className="">
                     <span style={{ color: '#ccc' }}>
-                      Choose the rocksmith profile to read the stats from.
+                      Choose the rocksmith profile to read stats from.
                     The profile is only read and never written to.<br />
                       RS profile ends with _prfldb and is typically found
                       in your __SteamFolder__/Steam/userdata/__random_number__/221680/remote/
@@ -587,7 +587,7 @@ export default class SettingsView extends React.Component {
                   <br />
                   <div className="">
                     <span style={{ color: '#ccc' }}>
-                      shows cpu and memory usage for rslive processes (rocksmith + rocksniffer)
+                      Shows cpu and memory usage for rslive processes (rocksmith + rocksniffer)
                     </span>
                   </div>
                   <br />
