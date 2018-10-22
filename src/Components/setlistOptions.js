@@ -77,6 +77,38 @@ function generateAnyTuningSql(filter) {
   return sql
 }
 
+function generateBadgeSql(filter) {
+  let mappedValue;
+  let badgeRating;
+
+  if (filter.type === "sa_badge_master") badgeRating = 40;
+  else if (filter.type === "sa_badge_hard") badgeRating = 30;
+  else if (filter.type === "sa_badge_medium") badgeRating = 20;
+  else if (filter.type === "sa_badge_easy") badgeRating = 10;
+
+  switch (filter.value) {
+    case "failed":
+      mappedValue = 1;
+      break;
+    case "silver":
+      mappedValue = 2;
+      break;
+    case "bronze":
+      mappedValue = 3;
+      break;
+    case "gold":
+      mappedValue = 4;
+      break;
+    case "platinum":
+    default:
+      mappedValue = 5;
+      break;
+  }
+
+  const sqlValue = badgeRating + mappedValue;
+  return `(${filter.type} ${filter.cmp} ${sqlValue} AND ${filter.type} != 0) `;
+}
+
 export function generateSql(filters, count = false) {
   const countsql = count ? "count(*) as acount, count(distinct songkey) as songcount" : "*"
   let sql = `select ${countsql} from songs_owned `;
@@ -120,6 +152,12 @@ export function generateSql(filters, count = false) {
           sql += `${filter.type} like '${filter.value}' `;
         }
         break;
+      case "sa_badge_easy":
+      case "sa_badge_medium":
+      case "sa_badge_hard":
+      case "sa_badge_master":
+          sql += generateBadgeSql(filter);
+          break;
       default:
         break;
     }
@@ -209,6 +247,26 @@ export default class SetlistOptions extends React.Component {
         type: "capofret",
         display: "Capo",
         cmp: ["is"],
+      },
+      {
+        type: "sa_badge_easy",
+        display: "SA Easy",
+        cmp: [">=", "<=", "==", "<", ">"],
+      },
+      {
+        type: "sa_badge_medium",
+        display: "SA Medium",
+        cmp: [">=", "<=", "==", "<", ">"],
+      },
+      {
+        type: "sa_badge_hard",
+        display: "SA Hard",
+        cmp: [">=", "<=", "==", "<", ">"],
+      },
+      {
+        type: "sa_badge_master",
+        display: "SA Master",
+        cmp: [">=", "<=", "==", "<", ">"],
       },
     ];
   }
@@ -358,6 +416,18 @@ export default class SetlistOptions extends React.Component {
       const defValue = filter.value;
       return (
         <input type="checkbox" defaultChecked={defValue} onChange={event => this.handleCheckboxChange(event, index)} />
+      )
+    }
+    else if (filter.type === "sa_badge_easy" || filter.type === "sa_badge_medium" || filter.type === "sa_badge_hard" || filter.type === "sa_badge_master") {
+      const defValue = filter.value;
+      return (
+        <select defaultValue={defValue} onChange={event => this.handleValueChange(event, index)}>
+          <option value="platinum" key={filter.type + filter.id + "platinum"}>Platinum</option>
+          <option value="gold" key={filter.type + filter.id + "gold"}>Gold</option>
+          <option value="silver" key={filter.type + filter.id + "silver"}>Silver</option>
+          <option value="bronze" key={filter.type + filter.id + "bronze"}>Bronze</option>
+          <option value="failed" key={filter.type + filter.id + "failed"}>Failed</option>
+        </select>
       )
     }
     return (
