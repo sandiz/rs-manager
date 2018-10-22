@@ -71,7 +71,7 @@ function generateAnyTuningSql(filter) {
       sql += `tuning like '${tuning}' OR `
     }
   }
-  sql += ")"
+  sql += ") "
   //const sql = `${filter.type} like '${filter.value}'`
   //console.log(sql);
   return sql
