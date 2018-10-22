@@ -109,6 +109,15 @@ function generateBadgeSql(filter) {
   return `(${filter.type} ${filter.cmp} ${sqlValue} AND ${filter.type} != 0) `;
 }
 
+function generateFCSql(filter) {
+  if (filter.value === true) {
+    return `${filter.type} IS NOT NULL `;
+  }
+  else {
+    return `${filter.type} IS NULL `;
+  }
+}
+
 export function generateSql(filters, count = false) {
   const countsql = count ? "count(*) as acount, count(distinct songkey) as songcount" : "*"
   let sql = `select ${countsql} from songs_owned `;
@@ -156,8 +165,14 @@ export function generateSql(filters, count = false) {
       case "sa_badge_medium":
       case "sa_badge_hard":
       case "sa_badge_master":
-          sql += generateBadgeSql(filter);
-          break;
+        sql += generateBadgeSql(filter);
+        break;
+      case "sa_fc_easy":
+      case "sa_fc_medium":
+      case "sa_fc_hard":
+      case "sa_fc_master":
+        sql += generateFCSql(filter);
+        break;
       default:
         break;
     }
@@ -267,6 +282,26 @@ export default class SetlistOptions extends React.Component {
         type: "sa_badge_master",
         display: "SA Master",
         cmp: [">=", "<=", "==", "<", ">"],
+      },
+      {
+        type: "sa_fc_easy",
+        display: "FC (SA Easy)",
+        cmp: ["is"],
+      },
+      {
+        type: "sa_fc_medium",
+        display: "FC (SA Medium)",
+        cmp: ["is"],
+      },
+      {
+        type: "sa_fc_hard",
+        display: "FC (SA Hard)",
+        cmp: ["is"],
+      },
+      {
+        type: "sa_fc_master",
+        display: "FC (SA Master)",
+        cmp: ["is"],
       },
     ];
   }
@@ -412,7 +447,7 @@ export default class SetlistOptions extends React.Component {
         </select>
       )
     }
-    else if (filter.type === "is_cdlc" || filter.type === "capofret" || filter.type === "centoffset") {
+    else if (filter.type === "is_cdlc" || filter.type === "capofret" || filter.type === "centoffset" || filter.type === "sa_fc_easy" || filter.type === "sa_fc_medium" || filter.type === "sa_fc_hard" || filter.type === "sa_fc_master") {
       const defValue = filter.value;
       return (
         <input type="checkbox" defaultChecked={defValue} onChange={event => this.handleCheckboxChange(event, index)} />
