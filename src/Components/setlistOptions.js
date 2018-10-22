@@ -422,6 +422,11 @@ export default class SetlistOptions extends React.Component {
         if (!anyTunings.includes(defValue)) {
           JSON.parse(filtervalU);
         }
+        else if (filter.cmp !== "is") {
+          //if filter is "is not" and value is in anyTunings, reset default to estandard
+          defValue = tunings["E Standard"];
+          filter.value = defValue;
+        }
       }
       catch (e) {
         defValue = tunings["E Standard"];
@@ -437,18 +442,23 @@ export default class SetlistOptions extends React.Component {
               );
             })
           }
-          {filter.cmp === "is" && (
-            <Fragment>
-              <option value="any_standard" key={"tuning_" + filter.id + "any_s"}>Any Standard</option>
-              <option value="any_non_standard" key={"tuning_" + filter.id + "any_ns"}>Any Non-Standard</option>
-              <option value="any_open" key={"tuning_" + filter.id + "any_o"}>Any Open Tuning</option>
-              <option value="any_drop" key={"tuning_" + filter.id + "any_d"}>Any Dropped Tuning</option>
-            </Fragment>
-          )}
+          {
+            filter.cmp === "is" && (
+              <Fragment>
+                <option value="any_standard" key={"tuning_" + filter.id + "any_s"}>Any Standard</option>
+                <option value="any_non_standard" key={"tuning_" + filter.id + "any_ns"}>Any Non-Standard</option>
+                <option value="any_open" key={"tuning_" + filter.id + "any_o"}>Any Open Tuning</option>
+                <option value="any_drop" key={"tuning_" + filter.id + "any_d"}>Any Dropped Tuning</option>
+              </Fragment>
+            )
+          }
         </select>
       )
     }
-    else if (filter.type === "is_cdlc" || filter.type === "capofret" || filter.type === "centoffset" || filter.type === "sa_fc_easy" || filter.type === "sa_fc_medium" || filter.type === "sa_fc_hard" || filter.type === "sa_fc_master") {
+    else if (
+      filter.type === "is_cdlc" || filter.type === "capofret" || filter.type === "centoffset"
+      || filter.type === "sa_fc_easy" || filter.type === "sa_fc_medium" || filter.type === "sa_fc_hard" || filter.type === "sa_fc_master"
+    ) {
       const defValue = filter.value;
       return (
         <input type="checkbox" defaultChecked={defValue} onChange={event => this.handleCheckboxChange(event, index)} />
