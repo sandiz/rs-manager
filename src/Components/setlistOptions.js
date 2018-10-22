@@ -71,7 +71,7 @@ function generateAnyTuningSql(filter) {
       sql += `tuning like '${tuning}' OR `
     }
   }
-  sql += ")"
+  sql += ") "
   //const sql = `${filter.type} like '${filter.value}'`
   //console.log(sql);
   return sql
@@ -158,7 +158,8 @@ export function generateSql(filters, count = false) {
           sql += generateAnyTuningSql(filter);
         }
         else {
-          sql += `${filter.type} like '${filter.value}' `;
+          const cmp = filter.cmp === "is" ? "LIKE" : "NOT LIKE";
+          sql += `${filter.type} ${cmp} '${filter.value}' `;
         }
         break;
       case "sa_badge_easy":
@@ -251,7 +252,7 @@ export default class SetlistOptions extends React.Component {
       {
         type: "tuning",
         display: "Tuning",
-        cmp: ["is"],
+        cmp: ["is", "is not"],
       },
       {
         type: "centoffset",
@@ -436,14 +437,14 @@ export default class SetlistOptions extends React.Component {
               );
             })
           }
-          {
+          {filter.cmp === "is" && (
             <Fragment>
               <option value="any_standard" key={"tuning_" + filter.id + "any_s"}>Any Standard</option>
               <option value="any_non_standard" key={"tuning_" + filter.id + "any_ns"}>Any Non-Standard</option>
               <option value="any_open" key={"tuning_" + filter.id + "any_o"}>Any Open Tuning</option>
               <option value="any_drop" key={"tuning_" + filter.id + "any_d"}>Any Dropped Tuning</option>
             </Fragment>
-          }
+          )}
         </select>
       )
     }
