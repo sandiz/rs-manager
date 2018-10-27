@@ -22,6 +22,7 @@ function getDefaultSettings() {
   obj.masteryThreshold = 0.95
   obj.showPSStats = false
   obj.dateFormat = "dhm"
+  obj.dateSrc = "rs"
   obj.steamID = ""
   return obj;
 }
@@ -85,6 +86,9 @@ export async function updatePSStats(current) {
 export async function updateDateFormat(current) {
   await updateConfig("dateFormat", current);
 }
+export async function updateDateSrc(current) {
+  await updateConfig("dateSrc", current);
+}
 
 export default async function getProfileConfig() {
   const d = await getConfig("prfldb");
@@ -126,6 +130,11 @@ export async function getShowPSStatsConfig() {
 export async function getDateFormatConfig() {
   const d = await getConfig("dateFormat");
   if (d === '') return "dhm"; //default value
+  return d;
+}
+export async function getDateSrcConfig() {
+  const d = await getConfig("dateSrc");
+  if (d === '') return "rs"; //default value
   return d;
 }
 export async function getSteamIDConfig() {

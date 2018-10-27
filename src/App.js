@@ -3,7 +3,7 @@ import Sidebar from './Components/Sidebar'
 import PSARCView from './Components/psarcView'
 import SonglistView from './Components/songlistView'
 import DashboardView from './Components/dashboardView'
-import getProfileConfig, { getSteamLoginSecureCookie } from './configService';
+import getProfileConfig, { getSteamIDConfig } from './configService';
 import SongAvailableView from './Components/songavailableView';
 import SetlistView from './Components/setlistView';
 import SettingsView from './Components/settingsView';
@@ -94,7 +94,7 @@ class App extends Component {
 
   updateProfile = async () => {
     const prfldb = await getProfileConfig();
-    const steamcookie = await getSteamLoginSecureCookie();
+    const steamcookie = await getSteamIDConfig();
     this.setState({ currentProfile: prfldb, currentCookie: steamcookie });
     this.refreshTabs();
   }
@@ -250,7 +250,7 @@ class App extends Component {
     let profile = len > 0
       ? path.basename(this.state.currentProfile).slice(0, 6) + "..." + this.state.currentProfile.slice(len - 6, len) : "-";
     profile = profile.toLowerCase();
-    const cookie = this.state.currentCookie.length > 0 ? this.state.currentCookie.slice(0, 16) + "..." : "-";
+    const cookie = this.state.currentCookie.length > 0 ? this.state.currentCookie : "-";
     return (
       <div className="App">
         <div className="wrapper">

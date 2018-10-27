@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 import StatsTableView from './statsTableView';
 import getProfileConfig, {
   updateProfileConfig, getScoreAttackConfig, getUseCDLCConfig,
-  getScoreAttackDashboardConfig, getDateFormatConfig, updateDateFormat,
+  getScoreAttackDashboardConfig, getDateFormatConfig,
+  updateDateFormat, getSteamIDConfig, updateDateSrc, getDateSrcConfig,
 } from '../configService';
 import readProfile from '../steamprofileService';
 import {
@@ -17,6 +18,8 @@ import { replaceRocksmithTerms } from './songavailableView';
 import SongDetailView from './songdetailView';
 
 const { path } = window;
+const Steam = require('steam-webapi');
+
 
 export default class DashboardView extends React.Component {
   constructor(props) {
@@ -39,6 +42,7 @@ export default class DashboardView extends React.Component {
       randompack: '',
       totalPlayingTime: 0,
       playingTimeFormat: 'dhm',
+      playingTimeSrc: 'rs', //rs or steam
       stats: null,
       maxConsecutiveDays: 0,
       longestStreak: 0,
@@ -93,19 +97,92 @@ export default class DashboardView extends React.Component {
     }, () => this.setPlayingTime(this.state.stats));
   }
 
-  setPlayingTime = (stats) => {
+  steamPromise = async (key, steamID) => {
+    return new Promise((resolve, reject) => {
+      Steam.key = key
+      Steam.ready(() => {
+        const steam = new Steam();
+        steam.getOwnedGames({
+          appids_filter: [221680],
+          steamid: steamID,
+          include_played_free_games: false,
+          include_appinfo: 1,
+        }, (err, data) => {
+          if (err) reject(err);
+          else resolve(data);
+          //console.log(minutesPlayed);
+        });
+      });
+    })
+  };
+
+  getTimePlayedSteam = async () => {
+    // if key valid call api get time, then send to get playying text time
+    // if not return please check api key
+    try {
+      // eslint-disable-next-line
+      const internal = require("../internal.json")
+      if (typeof internal.STEAM_API_KEY !== 'undefined' && internal.STEAM_API_KEY.length > 0) {
+        const steamID = await getSteamIDConfig();
+        if (steamID.length > 0) {
+          const data = await this.steamPromise(internal.STEAM_API_KEY, steamID)
+          const minutesPlayed = data.games[0].playtime_forever;
+          return this.getPlayingTimeText(minutesPlayed * 60);
+        }
+        else {
+          return "Please sign in with Steam in settings"
+        }
+      }
+      else {
+        return "STEAM_API_KEY missing in internal.json"
+      }
+    }
+    catch (e) {
+      return "Error Fetching data from Steam"
+    }
+  }
+
+  changePlayingTimeSrc = async () => {
+    let src = "rs"
+    switch (this.state.playingTimeSrc) {
+      case "rs":
+      default:
+        src = "steam"
+        break;
+      case "steam":
+        src = "rs"
+        break;
+    }
+    await updateDateSrc(src)
+    this.setState({ playingTimeSrc: src }, () => this.setPlayingTime(this.state.stats))
+  }
+
+  setPlayingTime = async (stats) => {
     let playingText = "";
+    if (this.state.playingTimeSrc === "steam") {
+      playingText = await this.getTimePlayedSteam();
+    }
+    else {
+      playingText = this.getPlayingTimeText(stats.TimePlayed);
+    }
+    this.setState({
+      totalPlayingTime: playingText,
+    })
+  }
+
+  getPlayingTimeText = (secs) => {
+    let playingText = ""
     switch (this.state.playingTimeFormat) {
       default:
       case "dhm":
         {
-          const dateObj = this.convertMS(stats.TimePlayed * 1000);
+          const dateObj = this.convertMS(secs * 1000);
           playingText = `${dateObj.d} days ${dateObj.h} hours ${dateObj.m} minutes`
         }
         break;
       case "hm":
         {
-          let m = Math.floor(stats.TimePlayed / 60);
+          let m = Math.floor(secs / 60);
           const h = Math.floor(m / 60);
           m %= 60;
           playingText = `${h} hours ${m} minutes`
@@ -113,19 +190,17 @@ export default class DashboardView extends React.Component {
         break;
       case "ms":
         {
-          let s = Math.floor(stats.TimePlayed);
+          let s = Math.floor(secs);
           const m = Math.floor(s / 60);
           s %= 60;
           playingText = `${m} minutes ${s} seconds`
         }
         break;
       case "s":
-        playingText = `${stats.TimePlayed} seconds`;
+        playingText = `${secs} seconds`;
         break;
     }
-    this.setState({
-      totalPlayingTime: playingText,
-    })
+    return playingText;
   }
 
   convertMS = (ms) => {
@@ -174,8 +249,10 @@ export default class DashboardView extends React.Component {
       const songscount = await countSongsOwned(useCDLCforStats);
       const arrmaster = await getArrangmentsMastered(useCDLCforStats);
       const playingTimeFormat = await getDateFormatConfig();
+      const playingTimeSrc = await getDateSrcConfig();
       this.setState({
         playingTimeFormat,
+        playingTimeSrc,
         stats,
         maxConsecutiveDays: stats.MaxConsecutiveDays,
         longestStreak: stats.Streak,
@@ -538,10 +615,13 @@ export default class DashboardView extends React.Component {
                 <hr />
             </div>
             <div className="stat-container">
-              <div style={{ width: 30 + '%' }} className="ta-left">
-                Total Playing Time
-                </div>
-              <div style={{ width: 70 + '%' }} className="ta-right">
+              <div style={{ width: 50 + '%' }} className="ta-left">
+                <a onClick={this.changePlayingTimeSrc}>
+                  Total Playing Time
+                 <span style={{ fontSize: 12 + 'px' }}>(via {this.state.playingTimeSrc === "rs" ? "Rocksmith" : "Steam"})</span>
+                </a>
+              </div>
+              <div style={{ width: 50 + '%' }} className="ta-right">
                 <a onClick={this.changeTimeFormat}>{this.state.totalPlayingTime}</a>
               </div>
             </div>
