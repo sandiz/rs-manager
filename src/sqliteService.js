@@ -54,6 +54,9 @@ export async function initSongsOwnedDB() {
   altersql4 += "alter table songs_owned add sa_fc_hard real default null;"
   altersql4 += "alter table songs_owned add sa_fc_master real default null;"
 
+  let altersql7 = "";
+  altersql7 += "alter table songs_owned add date_las real default null;"
+  altersql7 += "alter table songs_owned add date_sa real default null;"
 
   switch (version) {
     case 0: {
@@ -94,7 +97,11 @@ export async function initSongsOwnedDB() {
       await db.exec(altersql4);
       version += 1
       await setUserVersion(version);
-    /* next case is 6 */ /* 5 used by setlist_meta */
+    /* next case is 7 */ /* 5,6 used by setlist_meta */
+    case 7:
+      await db.exec(altersql7);
+      version += 1
+      await setUserVersion(version);
     default:
       break;
   }
@@ -252,6 +259,18 @@ export async function updateMasteryandPlayed(id, mastery, playedcount) {
   //await db.close();
   const op = await db.run("UPDATE songs_owned SET mastery=?,count=? where id=?", mastery, playedcount, id);
   return op.changes;
+}
+export async function updateRecentlyPlayedSongs(id, date, type = "las" /* las or sa */) {
+  // console.log("__db_call__: updateRecentlyPlayed");
+  //await db.close();
+  if (type === "las") {
+    const op = await db.run("UPDATE songs_owned SET date_las=? where id=?", date, id);
+    return op.changes;
+  }
+  else {
+    const op = await db.run("UPDATE songs_owned SET date_sa=? where id=?", date, id);
+    return op.changes;
+  }
 }
 export async function updateScoreAttackStats(stat, badgeHighest, id) {
   const op = await db.run(

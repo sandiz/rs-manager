@@ -4,10 +4,13 @@ import AnimatedNumber from 'react-animated-number';
 import {
   RemoteAll,
   unescapeFormatter, difficultyFormatter, difficultyClass, round100Formatter,
-  countFormmatter, badgeFormatter, arrangmentFormatter, tuningFormatter,
+  countFormmatter, badgeFormatter, arrangmentFormatter, tuningFormatter, dateFormatter,
 } from './songlistView';
 import SongDetailView from './songdetailView';
-import { getSongBySongKey, initSongsOwnedDB, updateMasteryandPlayed } from '../sqliteService'
+import {
+  getSongBySongKey, initSongsOwnedDB, updateMasteryandPlayed,
+  getSongsOwned, updateRecentlyPlayedSongs,
+} from '../sqliteService'
 import readProfile from '../steamprofileService';
 import getProfileConfig from '../configService';
 
@@ -49,6 +52,128 @@ export default class RSLiveView extends React.Component {
       showArtist: '',
       showSAStats: true,
       /* end table */
+      recentlyplayedsongs: [],
+      rptotalSize: 0,
+      rpsizePerPage: 20,
+      rpsrc: 'las', /*las or sa */
+      rpcolumns: [
+        {
+          dataField: "id",
+          text: "ID",
+          style: (cell, row, rowIndex, colIndex) => {
+            return {
+              width: '20%',
+              cursor: 'pointer',
+            };
+          },
+          hidden: true,
+        },
+        {
+          dataField: "song",
+          text: "Song",
+          style: (cell, row, rowIndex, colIndex) => {
+            return {
+              width: '20%',
+              cursor: 'pointer',
+            };
+          },
+          sort: true,
+          formatter: unescapeFormatter,
+        },
+        {
+          dataField: "artist",
+          text: "Artist",
+          style: (cell, row, rowIndex, colIndex) => {
+            return {
+              width: '19%',
+              cursor: 'pointer',
+            };
+          },
+          sort: true,
+          formatter: unescapeFormatter,
+        },
+        {
+          dataField: "json",
+          text: 'JSON',
+          hidden: true,
+        },
+        {
+          dataField: "arrangement",
+          text: "Arrangement",
+          style: (cell, row, rowIndex, colIndex) => {
+            return {
+              width: '5%',
+              cursor: 'pointer',
+            };
+          },
+          sort: true,
+          formatter: arrangmentFormatter,
+        },
+        {
+          dataField: "mastery",
+          text: "Current Mastery",
+          style: (cell, row, rowIndex, colIndex) => {
+            return {
+              width: '15%',
+              cursor: 'pointer',
+            };
+          },
+          sort: true,
+          formatter: round100Formatter,
+        },
+        {
+          dataField: "tuning",
+          text: "Tuning",
+          style: (cell, row, rowIndex, colIndex) => {
+            return {
+              width: '5%',
+              cursor: 'pointer',
+            };
+          },
+          sort: true,
+          formatter: tuningFormatter,
+        },
+        {
+          dataField: "count",
+          text: "Count",
+          style: (cell, row, rowIndex, colIndex) => {
+            return {
+              width: '5%',
+            };
+          },
+          sort: true,
+          formatter: countFormmatter,
+        },
+        {
+          classes: difficultyClass,
+          dataField: "difficulty",
+          text: "Difficulty",
+          style: (cell, row, rowIndex, colIndex) => {
+            return {
+              width: '5%',
+            };
+          },
+          sort: true,
+          formatter: difficultyFormatter,
+        },
+        {
+          dataField: "sa_playcount",
+          text: 'Play Count',
+          hidden: true,
+        },
+        {
+          dataField: "date_las",
+          text: "Last Played",
+          style: (cell, row, rowIndex, colIndex) => {
+            return {
+              width: '25%',
+              cursor: 'pointer',
+            };
+          },
+          sort: true,
+          formatter: dateFormatter,
+        },
+      ],
     }
     this.tabname = 'tab-rslive';
     this.columns = [
@@ -242,6 +367,7 @@ export default class RSLiveView extends React.Component {
         })
       },
     };
+
     this.fetchrstimer = null;
     this.lastalbumname = "";
     this.lastsongkey = "";
@@ -251,30 +377,7 @@ export default class RSLiveView extends React.Component {
   }
 
   componentDidMount = async () => {
-    /*const songData = {
-      success: true,
-      currentState: 4,
-      memoryReadout: {
-        songTimer: 25.091,
-        songID: "JoniBigY",
-        totalNotesHit: 0,
-        currentHitStreak: 0,
-        highestHitStreak: 0,
-        totalNotesMissed: 25,
-        currentMissStreak: 25,
-        mode: 1,
-        TotalNotes: 25,
-      },
-      songDetails: {
-        songID: "JoniBigY",
-        songName: "Big Yellow Taxi",
-        artistName: "Joni Mitchell",
-        albumName: "Ladies of the Canyon",
-        songLength: 146.703,
-        albumYear: 1970,
-        numArrangements: 4,
-      },
-    };*/
+    await this.refreshRPTable();
     try {
       const songData = await window.fetch("http://127.0.0.1:9938");
       //if fetch works tracking is active , start sniffing
@@ -368,6 +471,134 @@ export default class RSLiveView extends React.Component {
         this.lastsongkey = memoryReadout.songID;
       }
     });
+  }
+
+  refreshRPTable = async () => {
+    const rpcolumns = [
+      {
+        dataField: "id",
+        text: "ID",
+        style: (cell, row, rowIndex, colIndex) => {
+          return {
+            width: '20%',
+            cursor: 'pointer',
+          };
+        },
+        hidden: true,
+      },
+      {
+        dataField: "song",
+        text: "Song",
+        style: (cell, row, rowIndex, colIndex) => {
+          return {
+            width: '20%',
+            cursor: 'pointer',
+          };
+        },
+        sort: true,
+        formatter: unescapeFormatter,
+      },
+      {
+        dataField: "artist",
+        text: "Artist",
+        style: (cell, row, rowIndex, colIndex) => {
+          return {
+            width: '19%',
+            cursor: 'pointer',
+          };
+        },
+        sort: true,
+        formatter: unescapeFormatter,
+      },
+      {
+        dataField: "json",
+        text: 'JSON',
+        hidden: true,
+      },
+      {
+        dataField: "arrangement",
+        text: "Arrangement",
+        style: (cell, row, rowIndex, colIndex) => {
+          return {
+            width: '5%',
+            cursor: 'pointer',
+          };
+        },
+        sort: true,
+        formatter: arrangmentFormatter,
+      },
+      {
+        dataField: "mastery",
+        text: "Current Mastery",
+        style: (cell, row, rowIndex, colIndex) => {
+          return {
+            width: '15%',
+            cursor: 'pointer',
+          };
+        },
+        sort: true,
+        formatter: round100Formatter,
+      },
+      {
+        dataField: "tuning",
+        text: "Tuning",
+        style: (cell, row, rowIndex, colIndex) => {
+          return {
+            width: '5%',
+            cursor: 'pointer',
+          };
+        },
+        sort: true,
+        formatter: tuningFormatter,
+      },
+      {
+        dataField: "count",
+        text: "Count",
+        style: (cell, row, rowIndex, colIndex) => {
+          return {
+            width: '5%',
+          };
+        },
+        sort: true,
+        formatter: countFormmatter,
+      },
+      {
+        classes: difficultyClass,
+        dataField: "difficulty",
+        text: "Difficulty",
+        style: (cell, row, rowIndex, colIndex) => {
+          return {
+            width: '5%',
+          };
+        },
+        sort: true,
+        formatter: difficultyFormatter,
+      },
+      {
+        dataField: "sa_playcount",
+        text: 'Play Count',
+        hidden: true,
+      },
+      {
+        dataField: this.state.rpsrc === "las" ? "date_las" : "date_sa",
+        text: "Last Played",
+        style: (cell, row, rowIndex, colIndex) => {
+          return {
+            width: '25%',
+            cursor: 'pointer',
+          };
+        },
+        sort: true,
+        formatter: dateFormatter,
+      },
+    ]
+    this.setState({ rpcolumns });
+    this.handleRPTableChange("cdm", {
+      page: this.state.page,
+      sizePerPage: this.state.rpsizePerPage,
+      sortField: this.state.rpsrc === "las" ? "date_las" : "date_sa",
+      sortOrder: "desc",
+    })
   }
 
   refreshTable = async () => {
@@ -627,6 +858,76 @@ export default class RSLiveView extends React.Component {
     }
   }
 
+  updateRecentlyPlayed = async () => {
+    const prfldb = await getProfileConfig();
+    if (prfldb === '' || prfldb === null) {
+      this.props.updateHeader(
+        this.tabname,
+        `No Profile found, please update it in Settings!`,
+      );
+      return;
+    }
+    if (prfldb.length > 0) {
+      this.props.updateHeader(
+        this.tabname,
+        `Decrypting ${window.path.basename(prfldb)}`,
+      );
+      const steamProfile = await readProfile(prfldb);
+      const stats = steamProfile.Songs;
+      const sastats = steamProfile.SongsSA;
+      await initSongsOwnedDB();
+      let keys = Object.keys(stats);
+      let updatedRows = 0;
+      //find mastery stats
+      for (let i = 0; i < keys.length; i += 1) {
+        const stat = stats[keys[i]];
+        const ts = stat.TimeStamp;
+        this.props.updateHeader(
+          this.tabname,
+          `Updating Stat for SongID:  ${keys[i]} (${i}/${keys.length})`,
+        );
+        /*loop await */ // eslint-disable-next-line
+        const rows = await updateRecentlyPlayedSongs(keys[i], ts, "las");
+        if (rows === 0) {
+          console.log("Missing ID: " + keys[i]);
+        }
+        updatedRows += rows;
+      }
+      //find score attack stats
+      keys = Object.keys(sastats);
+      for (let i = 0; i < keys.length; i += 1) {
+        const stat = sastats[keys[i]];
+        const ts = stat.TimeStamp;
+        this.props.updateHeader(
+          this.tabname,
+          `Updating Stat for SongID:  ${keys[i]} (${i}/${keys.length})`,
+        );
+        /* loop await */ // eslint-disable-next-line
+        const rows = await updateRecentlyPlayedSongs(keys[i], ts, "sa");
+        if (rows === 0) {
+          console.log("Missing ID: " + keys[i]);
+        }
+        updatedRows += rows;
+      }
+
+      this.props.updateHeader(
+        this.tabname,
+        "Finished updating recently played songs: " + updatedRows,
+      );
+      if (this.state.tracking) {
+        setTimeout(() => {
+          this.props.updateHeader(
+            this.tabname,
+            "Tracking: Active",
+          );
+        }, 5000);
+      }
+
+      // refresh view
+      this.refreshRPTable();
+    }
+  }
+
   handleTableChange = async (type, {
     page,
     sizePerPage,
@@ -652,6 +953,43 @@ export default class RSLiveView extends React.Component {
     else {
       this.setState({ songs: output, page, totalSize: 0 });
     }
+  }
+
+  handleRPTableChange = async (type, {
+    page,
+    sizePerPage,
+    sortField, //newest sort field
+    sortOrder, // newest sort order
+    filters, // an object which have current filter status per column
+    data,
+  }) => {
+    const zeroIndexPage = page - 1
+    const start = zeroIndexPage * sizePerPage;
+    const output = await getSongsOwned(
+      start,
+      sizePerPage,
+      sortField == null ? (this.state.rpsrc === "las" ? "date_las" : "date_sa") : sortField,
+      sortOrder,
+      "",
+      "",
+    )
+    if (output.length > 0) {
+      this.setState({ recentlyplayedsongs: output, page, rptotalSize: output[0].acount });
+    }
+    else {
+      this.setState({ recentlyplayedsongs: output, page, rptotalSize: 0 });
+    }
+  }
+
+  changeRPSrc = async () => {
+    let src = ""
+    if (this.state.rpsrc === "las") {
+      src = "sa"
+    }
+    else {
+      src = "las"
+    }
+    this.setState({ rpsrc: src }, () => this.refreshRPTable());
   }
 
   render = () => {
@@ -708,6 +1046,11 @@ export default class RSLiveView extends React.Component {
             onClick={this.updateMastery}
             className={buttonclass}>
             Update Mastery
+          </a>
+          <a
+            onClick={this.updateRecentlyPlayed}
+            className={buttonclass}>
+            Update Recently Played
           </a>
         </div>
         <br />
@@ -844,6 +1187,35 @@ export default class RSLiveView extends React.Component {
             rowEvents={this.rowEvents}
             paginate={false}
           />
+        </div>
+        <br /><br />
+        <div>
+          <h2 className="ta-left" style={{ color: 'wheat' }}>
+            Recently Played -&nbsp;
+            <span style={{
+              fontSize: 28 + 'px',
+              border: 'none',
+              borderBottom: 1 + 'px',
+              borderBottomStyle: 'dotted',
+            }}>
+              <a href="#" onClick={this.changeRPSrc}>
+                {this.state.rpsrc === "las" ? "Learn A Song" : "Score Attack"}
+              </a>
+            </span>
+          </h2>
+          <div>
+            <RemoteAll
+              keyField="id"
+              data={this.state.recentlyplayedsongs}
+              page={this.state.page}
+              sizePerPage={this.state.rpsizePerPage}
+              totalSize={this.state.rptotalSize}
+              onTableChange={this.handleRPTableChange}
+              columns={this.state.rpcolumns}
+              rowEvents={this.rowEvents}
+              paginate
+            />
+          </div>
         </div>
         <div>
           <SongDetailView

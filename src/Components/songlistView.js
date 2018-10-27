@@ -4,6 +4,7 @@ import paginationFactory from 'react-bootstrap-table2-paginator';
 import filterFactory from 'react-bootstrap-table2-filter';
 import ReactTooltip from 'react-tooltip'
 import PropTypes from 'prop-types';
+import moment from 'moment';
 import readProfile from '../steamprofileService';
 import {
   initSetlistPlaylistDB, getSongsOwned, countSongsOwned, updateMasteryandPlayed,
@@ -350,6 +351,13 @@ export function tuningFormatter(cell, row) {
     }
   }
   return <span>Custom</span>
+}
+export function dateFormatter(cell, row) {
+  if (cell == null || cell === 0) {
+    return <span>-</span>
+  }
+  const m = moment.unix(cell)
+  return <span>{m.fromNow()}</span>
 }
 export const RemoteAll = ({
   keyField,
