@@ -21,11 +21,12 @@ window.shortid = require('shortid');
 window.pidusage = require('pidusage');
 
 
-
 const rp = require('request-promise');
 const isDev = require('electron-is-dev');
 const express = require('express')
-
+const openid = require('openid');
+const nodeUrl = require('url');
+const util = require('util')
 
 const exp = express()
 window.PROD_YT_PORT = 8000;
@@ -108,6 +109,144 @@ Object.defineProperty(Array.prototype, "equals", { enumerable: false });
 /* we start a local youtube http proxy because youtube doesnt like serving monetized videos to file:// sources */
 exp.listen(window.YT_PORT, () => console.log(`RSManager listening on port ${window.YT_PORT} for yt requests (/yt/:vid).`))
 exp.get('/yt/:vid', (req, res) => res.send(`<iframe id="yt-video" allowFullScreen style="height:95%;width:100%" src="https://www.youtube.com/embed/${req.params.vid}?modestbranding=0;&rel=0&amp;&amp;showinfo=0"" frameborder="0"></iframe>`))
+
+window.STEAM_AUTH_URL = "http://localhost:" + window.YT_PORT
+const relyingParty = new openid.RelyingParty(
+    window.STEAM_AUTH_URL + "/verify-steam",
+    window.STEAM_AUTH_URL,
+    true,
+    false,
+    []
+);
+const getCookie = filter => new Promise((resolve, reject) => {
+    window.remote.session.defaultSession.cookies.get(filter, (error, cookies) => {
+        if (error) reject(error);
+        else resolve(cookies);
+    })
+});
+
+exp.get('/verify-steam', async (req, res) => {
+    relyingParty.verifyAssertion(req, async (err, result) => {
+        if (err) {
+            console.log(err);
+            console.log(JSON.stringify(err));
+            res.end("Error.")
+        } else if (!result || !result.authenticated) {
+            res.end('Failed to authenticate user.');
+        } else {
+            steamID = result.claimedIdentifier.replace('https://steamcommunity.com/openid/id/', '');
+            res.write("Logged in.");
+            res.end();
+        }
+    });
+})
+
+/* make cookies set by steam not expire */
+var cookies = window.remote.session.defaultSession.cookies;
+cookies.on('changed', function (event, cookie, cause, removed) {
+    if (cookie.session && !removed) {
+        var url = util.format('%s://%s%s', (!cookie.httpOnly && cookie.secure) ? 'https' : 'http', cookie.domain, cookie.path);
+        cookies.set({
+            url: url,
+            name: cookie.name,
+            value: cookie.value,
+            domain: cookie.domain,
+            path: cookie.path,
+            secure: cookie.secure,
+            httpOnly: cookie.httpOnly,
+            expirationDate: Math.floor(new Date().getTime() / 1000) + 1209600
+        }, function (err) {
+            if (err) {
+                //console.error('Error trying to persist cookie', err, cookie);
+            }
+        });
+    }
+});
+
+window.steamAuth = async () => {
+    const windowParams = {
+        alwaysOnTop: true,
+        autoHideMenuBar: true,
+        webPreferences: {
+            nodeIntegration: false,
+            'web-security': false,
+        }
+    }
+    const config = {
+        redirectUri: 'http://localhost'
+    };
+
+    const auth = electronSteamAuth(config, windowParams);
+    const options = {
+        relyingParty,
+    }
+    const token = await auth.authenticate(options);
+    return token;
+}
+
+function electronSteamAuth(config, windowParams) {
+    authenticate = async (opts) => {
+        opts = opts || {};
+
+        var rely = opts.relyingParty;
+
+        return new Promise(function (resolve, reject) {
+            rely.authenticate('https://steamcommunity.com/openid', false, function (error, providerUrl) {
+                const authWindow = new window.remote.BrowserWindow(windowParams || { 'use-content-size': true });
+
+                authWindow.loadURL(providerUrl);
+                authWindow.show();
+
+                authWindow.on('closed', () => {
+                    reject(new Error('window was closed by user'));
+                });
+
+                onCallback = async (url) => {
+                    var query = nodeUrl.parse(url, true).query;
+                    if (query['openid.identity'] === undefined) {
+                        reject(new Error('cannot authenticate through Steam'));
+                        authWindow.removeAllListeners('closed');
+                        setImmediate(function () {
+                            authWindow.close();
+                        });
+                    } else {
+                        const sls = await getCookie({
+                            name: 'steamLoginSecure',
+                            domain: 'store.steampowered.com'
+                        });
+                        const sid = await getCookie({
+                            name: 'sessionid',
+                        })
+                        const cookie = sls[0].value
+                        const cookieSess = sid[0].value
+                        resolve({
+                            response_nonce: query['openid.response_nonce'],
+                            assoc_handle: query['openid.assoc_handle'],
+                            identity: query['openid.identity'],
+                            steam_id: query['openid.identity'].match(/\/id\/(.*$)/)[1],
+                            sig: query['openid.sig'],
+                            cookie,
+                            cookieSess,
+                        });
+                        authWindow.removeAllListeners('closed');
+                        setImmediate(function () {
+                            authWindow.close();
+                        });
+                    }
+                }
+
+                window.remote.session.defaultSession.webRequest.onBeforeRedirect({}, (details, callback) => {
+                    onCallback(details.redirectURL)
+                })
+
+            });
+        });
+    }
+
+    return {
+        authenticate: authenticate
+    };
+};
 
 window.remote.app.on("quit", () => {
     exp.close();

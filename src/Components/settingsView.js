@@ -7,6 +7,7 @@ import getProfileConfig, {
   getUseCDLCConfig, getScoreAttackDashboardConfig, updateScoreAttackDashboard,
   getSessionIDConfig, updateSessionIDConfig, getMasteryThresholdConfig,
   updateMasteryThreshold, getShowPSStatsConfig, updatePSStats,
+  updateSteamIDConfig, getSteamIDConfig,
 } from '../configService';
 import {
   resetDB, createRSSongList, addtoRSSongList, isTablePresent, deleteRSSongList,
@@ -14,7 +15,7 @@ import {
 import readProfile from '../steamprofileService';
 
 const { remote } = window.require('electron')
-
+const Fragment = React.Fragment;
 const getHeader = (text, size) => {
   let header = null;
   switch (size) {
@@ -80,6 +81,7 @@ export default class SettingsView extends React.Component {
       scoreAttackDashboard: [true, true, true, true],
       masteryThreshold: 0.95,
       showPSStats: false,
+      steamID: '',
     };
     this.readConfigs();
     this.refreshSetlist();
@@ -264,6 +266,7 @@ export default class SettingsView extends React.Component {
     const i = await getSessionIDConfig();
     const j = await getMasteryThresholdConfig();
     const k = await getShowPSStatsConfig();
+    const l = await getSteamIDConfig();
     this.setState({
       prfldb: d,
       steamLoginSecure: e,
@@ -273,6 +276,7 @@ export default class SettingsView extends React.Component {
       sessionID: i,
       masteryThreshold: j,
       showPSStats: k,
+      steamID: l,
     });
   }
 
@@ -343,6 +347,21 @@ export default class SettingsView extends React.Component {
       this.setState({ sessionID: d });
     }
     this.props.handleChange();
+  }
+
+  steamLogin = async () => {
+    try {
+      const token = await window.steamAuth();
+      console.log(token)
+      // save sls, sid, steamID
+      await updateSteamLoginSecureCookie(token.cookie)
+      await updateSessionIDConfig(token.cookieSess)
+      await updateSteamIDConfig(token.steam_id);
+      this.readConfigs();
+    }
+    catch (e) {
+      console.log("error with steam auth", e);
+    }
   }
 
   render = () => {
@@ -424,7 +443,7 @@ export default class SettingsView extends React.Component {
                   <br />
                   <span style={{ float: 'left' }}>
                     <a onClick={this.enterCookie}>
-                      Steam Login Cookie (steamLoginSecure) / SessionID (sessionId):
+                      Steam OAuth
                   </a>
                   </span>
                   <span style={{
@@ -436,26 +455,23 @@ export default class SettingsView extends React.Component {
                     paddingRight: 1 + 'px',
                   }}>
                     {
-                      this.state.steamLoginSecure === ''
-                        ? <a onClick={this.enterCookie}>Click to Change </a>
-                        : (
+                      (
+                        <Fragment>
                           <i>
                             <a onClick={this.enterCookie}>
-                              {(this.state.steamLoginSecure).toLowerCase()}
+                              {(this.state.steamID).toLowerCase()}
                             </a><br />
-                            <a onClick={this.enterCookie}>
-                              {(this.state.sessionID).toLowerCase()}
-                            </a>
                           </i>
-                        )
+                          <a onClick={this.steamLogin}>
+                            <img src="https://steamcommunity-a.akamaihd.net/public/images/signinthroughsteam/sits_01.png" alt="steam login" />
+                          </a>
+                        </Fragment>
+                      )
                     }
                   </span>
                   <br />
                   <div className="">
                     <span style={{ color: '#ccc' }}>
-                      Steam Login Cookie and SessionID is used to update owned/acquired date in
-                      Songs &gt; DLC Catalog.
-                      The login cookie is valid as long the browser session is valid.
                       The app queries your
                       <a style={{ color: 'blue' }} onClick={() => window.shell.openExternal("http://store.steampowered.com/dynamicstore/userdata/")}>
                         &nbsp;userdata&nbsp;
@@ -465,8 +481,6 @@ export default class SettingsView extends React.Component {
                         &nbsp;purchase history&nbsp;
                       </a>
                       to fetch owned/acquired date.
-                     You can check your data by logging on to steam in a browser
-                     and clicking those links.
                   </span>
                   </div>
                 </Collapsible>

@@ -467,7 +467,7 @@ export default class SongAvailableView extends React.Component {
       this.props.updateHeader(
         this.tabname,
         this.childtabname,
-        `Invalid Cookie,Please update Steam Login Cookie in Settings!`,
+        `Failed to query Steam, please login with Steam in settings!`,
       );
       return;
     }
