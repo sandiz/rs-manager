@@ -8918,6 +8918,11 @@ qs@6.5.1:
   resolved "https://registry.yarnpkg.com/qs/-/qs-6.5.1.tgz#349cdf6eef89ec45c12d7d5eb3fc0c870343a6d8"
   integrity sha512-eRzhrN1WSINYCDCbrz796z37LOe3m5tmW7RQf6oBntukAG1nmovJvhnwHHRMAfeoItc1m2Hk02WER2aQ/iqs+A==
 
+qs@~1.2.2:
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/qs/-/qs-1.2.2.tgz#19b57ff24dc2a99ce1f8bdf6afcda59f8ef61f88"
+  integrity sha1-GbV/8k3CqZzh+L32r82ln472H4g=
+
 qs@~6.5.2:
   version "6.5.2"
   resolved "https://registry.yarnpkg.com/qs/-/qs-6.5.2.tgz#cb3ae806e8740444584ef154ce8ee98d403f3e36"
@@ -10286,6 +10291,13 @@ stealthy-require@^1.1.0:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/stealthy-require/-/stealthy-require-1.1.1.tgz#35b09875b4ff49f26a777e509b3090a3226bf24b"
   integrity sha1-NbCYdbT/SfJqd35QmzCQoyJr8ks=
+
+steam-webapi@^0.6.5:
+  version "0.6.5"
+  resolved "https://registry.yarnpkg.com/steam-webapi/-/steam-webapi-0.6.5.tgz#76d3f168cf613b68c3c4d4cb9965f3322ca85fe3"
+  integrity sha1-dtPxaM9hO2jDxNTLmWXzMiyoX+M=
+  dependencies:
+    qs "~1.2.2"
 
 stream-browserify@^2.0.1:
   version "2.0.1"
