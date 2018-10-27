@@ -7620,6 +7620,13 @@ onetime@^2.0.0:
   dependencies:
     mimic-fn "^1.0.0"
 
+openid@^2.0.6:
+  version "2.0.6"
+  resolved "https://registry.yarnpkg.com/openid/-/openid-2.0.6.tgz#707375e59ab9f73025899727679b20328171c9aa"
+  integrity sha1-cHN15Zq59zAliZcnZ5sgMoFxyao=
+  dependencies:
+    request "^2.61.0"
+
 opn@5.4.0, opn@^5.1.0:
   version "5.4.0"
   resolved "https://registry.yarnpkg.com/opn/-/opn-5.4.0.tgz#cb545e7aab78562beb11aa3bfabc7042e1761035"
@@ -9522,7 +9529,7 @@ request-promise@^4.2.2:
     stealthy-require "^1.1.0"
     tough-cookie ">=2.3.3"
 
-request@^2.34, request@^2.45.0, request@^2.72.0, request@^2.79.0, request@^2.87.0, request@^2.88.0:
+request@^2.34, request@^2.45.0, request@^2.61.0, request@^2.72.0, request@^2.79.0, request@^2.87.0, request@^2.88.0:
   version "2.88.0"
   resolved "https://registry.yarnpkg.com/request/-/request-2.88.0.tgz#9c2fca4f7d35b592efe57c7f0a55e81052124fef"
   integrity sha512-NAqBSrijGLZdM0WZNsInLJpkJokL72XYjUpnB0iwsRgxh7dB6COrHnTBNwN0E+lHDAJzu7kLAkDeY08z2/A0hg==

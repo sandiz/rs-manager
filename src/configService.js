@@ -22,6 +22,7 @@ function getDefaultSettings() {
   obj.masteryThreshold = 0.95
   obj.showPSStats = false
   obj.dateFormat = "dhm"
+  obj.steamID = ""
   return obj;
 }
 export async function getConfig(type) {
@@ -68,6 +69,9 @@ export async function updateSteamLoginSecureCookie(value) {
 }
 export async function updateSessionIDConfig(value) {
   await updateConfig("sessionID", value);
+}
+export async function updateSteamIDConfig(value) {
+  await updateConfig("steamID", value);
 }
 export async function updateScoreAttackDashboard(current) {
   await updateConfig("scoreAttackDashboard", current);
@@ -122,5 +126,10 @@ export async function getShowPSStatsConfig() {
 export async function getDateFormatConfig() {
   const d = await getConfig("dateFormat");
   if (d === '') return "dhm"; //default value
+  return d;
+}
+export async function getSteamIDConfig() {
+  const d = await getConfig("steamID");
+  if (d === '') return ""; //default value
   return d;
 }
