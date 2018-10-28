@@ -357,7 +357,7 @@ export default class SettingsView extends React.Component {
       await updateSteamLoginSecureCookie(token.cookie)
       await updateSessionIDConfig(token.cookieSess)
       await updateSteamIDConfig(token.steam_id);
-      this.readConfigs();
+      await this.readConfigs();
     }
     catch (e) {
       console.log("error with steam auth", e);
