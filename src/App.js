@@ -8,7 +8,7 @@ import SongAvailableView from './Components/songavailableView';
 import SetlistView from './Components/setlistView';
 import SettingsView from './Components/settingsView';
 import RSLiveView from './Components/rsliveView';
-import { getAllSetlist } from './sqliteService';
+import { getAllSetlist, initSongsOwnedDB } from './sqliteService';
 import './App.css'
 
 const { path } = window;
@@ -67,10 +67,11 @@ class App extends Component {
         },
       ],
       searchHistory: {},
+      selectedTab: null,
     };
     this.songlistRef = null;
     //this.handleChange = this.handleChange.bind(this);
-    this.selectedTab = null;
+    //this.selectedTab = null;
     this.sidebarRef = React.createRef();
   }
 
@@ -78,7 +79,9 @@ class App extends Component {
   }
 
   componentDidMount = async () => {
+    await initSongsOwnedDB("tab-dashboard", this.updateHeader);
     await this.updateProfile();
+    this.updateHeader("tab-dashboard", "Rocksmith 2014 Dashboard")
   }
 
   getSearchHistory = (key) => {
@@ -103,16 +106,12 @@ class App extends Component {
     const text = (tab == null) ? "" : tab.name
       + (child == null ? "" : ` >  ${child.name}`);
 
-    this.setState({
-      currentTab: tab,
-      currentChildTab: child,
-      appTitle: text,
-    });
-    this.selectedTab = null;
+
+    let selectedTab = null;
     switch (tab.id) {
       default:
       case "tab-dashboard":
-        this.selectedTab = (
+        selectedTab = (
           <DashboardView
             currentTab={tab}
             updateHeader={this.updateHeader}
@@ -122,7 +121,7 @@ class App extends Component {
         )
         break;
       case "tab-psarc":
-        this.selectedTab = (
+        selectedTab = (
           <PSARCView
             currentTab={tab}
             updateHeader={this.updateHeader}
@@ -131,7 +130,7 @@ class App extends Component {
         )
         break;
       case "tab-settings":
-        this.selectedTab = (
+        selectedTab = (
           <SettingsView
             currentTab={tab}
             updateHeader={this.updateHeader}
@@ -142,7 +141,7 @@ class App extends Component {
         )
         break;
       case "tab-setlist":
-        this.selectedTab = (
+        selectedTab = (
           <SetlistView
             currentTab={tab}
             currentChildTab={child}
@@ -159,7 +158,7 @@ class App extends Component {
         switch (child.id) {
           default:
           case "songs-owned":
-            this.selectedTab = (
+            selectedTab = (
               <SonglistView
                 updateHeader={this.updateChildHeader}
                 resetHeader={this.resetHeader}
@@ -170,7 +169,7 @@ class App extends Component {
             )
             break;
           case "songs-available":
-            this.selectedTab = (
+            selectedTab = (
               <SongAvailableView
                 currentTab={tab}
                 currentChildTab={child}
@@ -187,7 +186,7 @@ class App extends Component {
         }
         break;
       case "tab-rslive":
-        this.selectedTab = (
+        selectedTab = (
           <RSLiveView
             currentTab={tab}
             updateHeader={this.updateHeader}
@@ -196,6 +195,12 @@ class App extends Component {
         )
         break;
     }
+    this.setState({
+      currentTab: tab,
+      currentChildTab: child,
+      appTitle: text,
+      selectedTab,
+    });
   }
 
   updateHeader = (tabname, text) => {
@@ -309,7 +314,7 @@ class App extends Component {
               </div>
             </nav>
             <div>
-              {this.selectedTab}
+              {this.state.selectedTab}
             </div>
           </div>
         </div>

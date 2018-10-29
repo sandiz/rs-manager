@@ -191,7 +191,7 @@ export function generateSql(filters, count = false) {
       sql += `${filter.gate} `;
     }
   }
-  console.log(sql);
+  //console.log(sql);
   return sql;
 }
 

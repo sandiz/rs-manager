@@ -12,7 +12,6 @@ import {
   countSongsOwned, getArrangmentsMastered, getLeadStats,
   getRhythmStats, getBassStats, getRandomSongOwned,
   getRandomSongAvailable, getSAStats, updateScoreAttackStats,
-  initSetlistDB,
 } from '../sqliteService';
 import { replaceRocksmithTerms } from './songavailableView';
 import SongDetailView from './songdetailView';
@@ -72,8 +71,6 @@ export default class DashboardView extends React.Component {
   }
 
   componentWillMount = async () => {
-    await initSongsOwnedDB();
-    await initSetlistDB();
     this.fetchStats();
     this.fetchRandomStats();
     this.fetchWeeklySpotlight();

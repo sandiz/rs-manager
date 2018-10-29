@@ -113,7 +113,7 @@ export default class SetlistView extends React.Component {
                 formatter: round100Formatter,
             },
             {
-                dataField: "tuning",
+                dataField: "tuning_weight",
                 text: "Tuning",
                 style: (cell, row, rowIndex, colIndex) => {
                     return {
@@ -201,11 +201,6 @@ export default class SetlistView extends React.Component {
                 hidden: true,
             },
             {
-                dataField: "tuning",
-                text: 'Tuning',
-                hidden: true,
-            },
-            {
                 dataField: "capofret",
                 text: 'Capo',
                 hidden: true,
@@ -231,7 +226,7 @@ export default class SetlistView extends React.Component {
         this.lastChildID = props.currentChildTab.id;
         this.fetchMeta();
         this.handleTableChange("cdm", {
-            page: this.state.page,
+            page: 1,
             sizePerPage: this.state.sizePerPage,
             filters: {},
         })
@@ -244,8 +239,9 @@ export default class SetlistView extends React.Component {
         this.lastChildID = nextprops.currentChildTab.id;
         const showSAStats = await getScoreAttackConfig();
         this.fetchMeta();
-
-        this.setState({ showSAStats, isDeleted: false }, () => {
+        this.setState({
+            showSAStats, page: 1, totalSize: 0, isDeleted: false,
+        }, () => {
 
         });
         return true;
@@ -295,7 +291,9 @@ export default class SetlistView extends React.Component {
         const metaInfo = await getSetlistMetaInfo(this.lastChildID);
         const showOptions = metaInfo.is_manual == null && metaInfo.is_generated == null;
         //console.log("fetchMeta: ", metaInfo);
-        this.setState({ showOptions, setlistMeta: metaInfo }, () => {
+        this.setState({
+            showOptions, page: 1, totalSize: 0, songs: [], setlistMeta: metaInfo,
+        }, () => {
             this.getSearch();
         });
     }
