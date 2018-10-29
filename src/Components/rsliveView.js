@@ -173,6 +173,24 @@ export default class RSLiveView extends React.Component {
           sort: true,
           formatter: dateFormatter,
         },
+        {
+          dataField: "sa_highest_badge",
+          text: 'Badges',
+          sort: true,
+          style: (cell, row, rowIndex, colIndex) => {
+            return {
+              width: '20%',
+              display: this.state.showSAStats ? "" : "none",
+            };
+          },
+          headerStyle: (cell, row, rowIndex, colIndex) => {
+            return {
+              width: '20%',
+              display: this.state.showSAStats ? "" : "none",
+            };
+          },
+          formatter: badgeFormatter,
+        },
       ],
     }
     this.tabname = 'tab-rslive';
@@ -585,6 +603,24 @@ export default class RSLiveView extends React.Component {
         },
         sort: true,
         formatter: dateFormatter,
+      },
+      {
+        dataField: "sa_highest_badge",
+        text: 'Badges',
+        sort: true,
+        style: (cell, row, rowIndex, colIndex) => {
+          return {
+            width: '20%',
+            display: this.state.showSAStats ? "" : "none",
+          };
+        },
+        headerStyle: (cell, row, rowIndex, colIndex) => {
+          return {
+            width: '20%',
+            display: this.state.showSAStats ? "" : "none",
+          };
+        },
+        formatter: badgeFormatter,
       },
     ]
     this.setState({ rpcolumns });
