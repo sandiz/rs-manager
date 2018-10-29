@@ -11,6 +11,22 @@ export async function setUserVersion(version) {
   const sql = `pragma user_version=${version};`;
   await db.get(sql);
 }
+export async function initSetlistPlaylistDB(dbname) {
+  // console.log("__db_call__: initSetlistPlaylistDB");
+  if (db === null) {
+    const dbfilename = window.sqlitePath;
+    db = await window.sqlite.open(dbfilename);
+  }
+  await db.run(`CREATE TABLE IF NOT EXISTS ${dbname} ( uniqkey char UNIQUE primary key, FOREIGN KEY(uniqkey) REFERENCES songs_owned(uniqkey));`);
+}
+export async function initSetlistDB() {
+  //console.log("__db_call__: initSetlistDB");
+  if (db === null) {
+    const dbfilename = window.sqlitePath;
+    db = await window.sqlite.open(dbfilename);
+  }
+  await db.run("CREATE TABLE IF NOT EXISTS setlist_meta (key char primary key, name char);");
+}
 export async function initSongsOwnedDB() {
   //console.log("__db_call__: initSongsOwnedDB ");
   if (db === null) {
@@ -19,6 +35,7 @@ export async function initSongsOwnedDB() {
   }
   const createTableSql = "CREATE TABLE IF NOT EXISTS songs_owned (album char, artist char, song char, arrangement char, json char, psarc char, dlc char, sku char, difficulty float, dlckey char, songkey char, id char, uniqkey char primary key, mastery float default 0, count int default 0, lastConversionTime real, constraint id_unique unique (id) );";
   await db.run(createTableSql);
+  await initSetlistDB(); // init setlist db with songs db so all migrations can be in one place
   let version = await getUserVersion();
 
   let altersql = "";
@@ -53,6 +70,13 @@ export async function initSongsOwnedDB() {
   altersql4 += "alter table songs_owned add sa_fc_medium real default null;"
   altersql4 += "alter table songs_owned add sa_fc_hard real default null;"
   altersql4 += "alter table songs_owned add sa_fc_master real default null;"
+
+  let altersql5 = "";
+  altersql5 += "alter table setlist_meta add is_manual boolean default null;"
+  altersql5 += "alter table setlist_meta add is_generated boolean default null;"
+  altersql5 += "alter table setlist_meta add view_sql char default null;"
+  let altersql6 = "";
+  altersql6 += "alter table setlist_meta add is_rssetlist boolean default null;"
 
   let altersql7 = "";
   altersql7 += "alter table songs_owned add date_las real default null;"
@@ -97,47 +121,6 @@ export async function initSongsOwnedDB() {
       await db.exec(altersql4);
       version += 1
       await setUserVersion(version);
-    /* next case is 7 */ /* 5,6 used by setlist_meta */
-    case 7:
-      await db.exec(altersql7);
-      version += 1
-      await setUserVersion(version);
-    default:
-      break;
-  }
-}
-export async function initSongsAvailableDB() {
-  //console.log("__db_call__: initSongsAvailableDB");
-  if (db === null) {
-    const dbfilename = window.sqlitePath;
-    db = await window.sqlite.open(dbfilename);
-  }
-  await db.run("CREATE TABLE IF NOT EXISTS songs_available (appid char primary key, name char, release_date float, owned boolean default false, acquired_date float default NULL);");
-}
-export async function initSetlistPlaylistDB(dbname) {
-  // console.log("__db_call__: initSetlistPlaylistDB");
-  if (db === null) {
-    const dbfilename = window.sqlitePath;
-    db = await window.sqlite.open(dbfilename);
-  }
-  await db.run(`CREATE TABLE IF NOT EXISTS ${dbname} ( uniqkey char UNIQUE primary key, FOREIGN KEY(uniqkey) REFERENCES songs_owned(uniqkey));`);
-}
-export async function initSetlistDB() {
-  //console.log("__db_call__: initSetlistDB");
-  if (db === null) {
-    const dbfilename = window.sqlitePath;
-    db = await window.sqlite.open(dbfilename);
-  }
-  let version = await getUserVersion();
-  await db.run("CREATE TABLE IF NOT EXISTS setlist_meta (key char primary key, name char);");
-
-  let altersql5 = "";
-  altersql5 += "alter table setlist_meta add is_manual boolean default null;"
-  altersql5 += "alter table setlist_meta add is_generated boolean default null;"
-  altersql5 += "alter table setlist_meta add view_sql char default null;"
-  let altersql6 = "";
-  altersql6 += "alter table setlist_meta add is_rssetlist boolean default null;"
-  switch (version) {
     case 5:
       // add is_manual, is_generated, view_sql in setlist_meta
       await db.exec(altersql5);
@@ -147,16 +130,28 @@ export async function initSetlistDB() {
       await db.exec(altersql6);
       version += 1
       await setUserVersion(version);
-      break;
+    /* next case is 7 */ /* 5,6 used by setlist_meta */
+    case 7:
+      await db.exec(altersql7);
+      version += 1
+      await setUserVersion(version);
     default:
       break;
   }
-
   await db.run("REPLACE INTO setlist_meta VALUES('setlist_practice','Practice List', 'true', 'false', '', 'false');")
   await initSetlistPlaylistDB("setlist_practice");
   await db.run("REPLACE INTO setlist_meta VALUES('setlist_favorites','RS Favorites', 'true', 'false', '', 'true');")
   await initSetlistPlaylistDB("setlist_favorites");
 }
+export async function initSongsAvailableDB() {
+  //console.log("__db_call__: initSongsAvailableDB");
+  if (db === null) {
+    const dbfilename = window.sqlitePath;
+    db = await window.sqlite.open(dbfilename);
+  }
+  await db.run("CREATE TABLE IF NOT EXISTS songs_available (appid char primary key, name char, release_date float, owned boolean default false, acquired_date float default NULL);");
+}
+
 export async function addToSteamDLCCatalog(dlc, name, releaseDate, dontparseDate = false) {
   // console.log("__db_call__: addToSteamDLCCatalog");
   let sqlstr = ";";
