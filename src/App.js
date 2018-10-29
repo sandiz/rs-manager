@@ -10,6 +10,7 @@ import SettingsView from './Components/settingsView';
 import RSLiveView from './Components/rsliveView';
 import { getAllSetlist, initSongsOwnedDB } from './sqliteService';
 import './App.css'
+import HelpView from './Components/HelpView';
 
 const { path } = window;
 
@@ -65,6 +66,11 @@ class App extends Component {
           name: 'Settings',
           child: [],
         },
+        {
+          id: 'tab-help',
+          name: 'Help',
+          child: [],
+        },
       ],
       searchHistory: {},
       selectedTab: null,
@@ -78,10 +84,10 @@ class App extends Component {
   componentWillMount = async () => {
     await initSongsOwnedDB("tab-dashboard", this.updateHeader);
     await this.updateProfile();
-        // default tabs on startup
+    // default tabs on startup
     this.handleChange(this.state.TabsData[0]);
-        //this.props.handleChange(TabsData[2], TabsData[2].child[0])
-        //this.toggleActive(TabsData[2]);
+    //this.props.handleChange(TabsData[2], TabsData[2].child[0])
+    //this.toggleActive(TabsData[2]);
     this.updateHeader("tab-dashboard", "Rocksmith 2014 Dashboard")
   }
 
@@ -138,6 +144,14 @@ class App extends Component {
             resetHeader={this.resetHeader}
             handleChange={this.updateProfile}
             refreshTabs={this.refreshTabs}
+          />
+        )
+        break;
+      case "tab-help":
+        selectedTab = (
+          <HelpView
+            currentTab={tab}
+            updateHeader={this.updateHeader}
           />
         )
         break;

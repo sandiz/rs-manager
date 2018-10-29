@@ -429,7 +429,7 @@ export default class DashboardView extends React.Component {
     const weekly = { title: '', url: '' };
     for (let i = 0; i < posts.length; i += 1) {
       const post = posts[i].data;
-      if (post.stickied && post.title.includes("Weekly Song Spotlight")) {
+      if (post.title.includes("Weekly Song Spotlight")) {
         const [keyIgnored, value] = post.title.split(":");
         weekly.title = value;
         weekly.url = post.url;
