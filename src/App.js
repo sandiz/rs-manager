@@ -76,11 +76,12 @@ class App extends Component {
   }
 
   componentWillMount = async () => {
-  }
-
-  componentDidMount = async () => {
     await initSongsOwnedDB("tab-dashboard", this.updateHeader);
     await this.updateProfile();
+        // default tabs on startup
+    this.handleChange(this.state.TabsData[0]);
+        //this.props.handleChange(TabsData[2], TabsData[2].child[0])
+        //this.toggleActive(TabsData[2]);
     this.updateHeader("tab-dashboard", "Rocksmith 2014 Dashboard")
   }
 
