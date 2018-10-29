@@ -24,6 +24,7 @@ function getDefaultSettings() {
   obj.dateFormat = "dhm"
   obj.dateSrc = "rs"
   obj.steamID = ""
+  obj.steamAPIKey = ""
   return obj;
 }
 export async function getConfig(type) {
@@ -89,6 +90,9 @@ export async function updateDateFormat(current) {
 export async function updateDateSrc(current) {
   await updateConfig("dateSrc", current);
 }
+export async function updateSteamAPIKey(current) {
+  await updateConfig("steamAPIKey", current);
+}
 
 export default async function getProfileConfig() {
   const d = await getConfig("prfldb");
@@ -139,6 +143,11 @@ export async function getDateSrcConfig() {
 }
 export async function getSteamIDConfig() {
   const d = await getConfig("steamID");
+  if (d === '') return ""; //default value
+  return d;
+}
+export async function getSteamAPIKeyConfig() {
+  const d = await getConfig("steamAPIKey");
   if (d === '') return ""; //default value
   return d;
 }

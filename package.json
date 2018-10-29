@@ -60,7 +60,8 @@
     "package-mac": "node scripts/package.js mac",
     "package-win": "node scripts/package.js win",
     "contributors:add": "all-contributors add",
-    "contributors:generate": "all-contributors generate"
+    "contributors:generate": "all-contributors generate",
+    "contributors:check": "all-contributors check"
   },
   "devDependencies": {
     "all-contributors-cli": "^5.4.0",

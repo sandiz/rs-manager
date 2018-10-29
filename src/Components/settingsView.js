@@ -7,7 +7,7 @@ import getProfileConfig, {
   getUseCDLCConfig, getScoreAttackDashboardConfig, updateScoreAttackDashboard,
   getSessionIDConfig, updateSessionIDConfig, getMasteryThresholdConfig,
   updateMasteryThreshold, getShowPSStatsConfig, updatePSStats,
-  updateSteamIDConfig, getSteamIDConfig,
+  updateSteamIDConfig, getSteamIDConfig, updateSteamAPIKey, getSteamAPIKeyConfig,
 } from '../configService';
 import {
   resetDB, createRSSongList, addtoRSSongList, isTablePresent, deleteRSSongList,
@@ -82,6 +82,7 @@ export default class SettingsView extends React.Component {
       masteryThreshold: 0.95,
       showPSStats: false,
       steamID: '',
+      steamAPIKey: '',
     };
     this.readConfigs();
     this.refreshSetlist();
@@ -245,6 +246,12 @@ export default class SettingsView extends React.Component {
     });
   }
 
+  handleTextBasedSetting = (event, key) => {
+    const state = {}
+    state[key] = event.target.value
+    this.setState(state)
+  }
+
   refreshSetlist = async () => {
     const setliststatus = []
     for (let i = 0; i <= 5; i += 1) {
@@ -267,6 +274,8 @@ export default class SettingsView extends React.Component {
     const j = await getMasteryThresholdConfig();
     const k = await getShowPSStatsConfig();
     const l = await getSteamIDConfig();
+    const m = await getSteamAPIKeyConfig();
+
     this.setState({
       prfldb: d,
       steamLoginSecure: e,
@@ -277,6 +286,7 @@ export default class SettingsView extends React.Component {
       masteryThreshold: j,
       showPSStats: k,
       steamID: l,
+      steamAPIKey: m,
     });
   }
 
@@ -293,6 +303,7 @@ export default class SettingsView extends React.Component {
     await updatePSStats(this.state.showPSStats);
     await updateScoreAttackDashboard(this.state.scoreAttackDashboard);
     await updateMasteryThreshold(this.state.masteryThreshold);
+    await updateSteamAPIKey(this.state.steamAPIKey);
     this.props.handleChange();
     this.props.updateHeader(this.tabname, "Settings Saved!");
     document.getElementsByTagName("body")[0].scrollTop = 0;
@@ -604,34 +615,62 @@ export default class SettingsView extends React.Component {
                       Shows cpu and memory usage for rslive processes (rocksmith + rocksniffer)
                     </span>
                   </div>
-                  <br />
-                  <span style={{ float: 'left' }}>
-                    <a>
-                      Mastery Threshold
-                    </a>
-                  </span>
-                  <span style={{
-                    float: 'right',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    width: 400 + 'px',
-                    textAlign: 'right',
-                  }}>
-                    <input
-                      style={{ textAlign: 'right' }}
-                      type="number"
-                      value={this.state.masteryThreshold * 100}
-                      min={0}
-                      max={100}
-                      onChange={this.handleMasteryThreshold} />
-                  </span>
-                  <br />
-                  <div className="">
-                    <span style={{ color: '#ccc' }}>
-                      Songs needs to have mastery &gt;=
-                      this threshold to be considered &quot;mastered&quot;.
-                  </span>
-                  </div>
+                  <Fragment>
+                    <br />
+                    <span style={{ float: 'left' }}>
+                      <a>
+                        Mastery Threshold
+                      </a>
+                    </span>
+                    <span style={{
+                      float: 'right',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      width: 400 + 'px',
+                      textAlign: 'right',
+                    }}>
+                      <input
+                        style={{ textAlign: 'right' }}
+                        type="number"
+                        value={this.state.masteryThreshold * 100}
+                        min={0}
+                        max={100}
+                        onChange={this.handleMasteryThreshold} />
+                    </span>
+                    <br />
+                    <div className="">
+                      <span style={{ color: '#ccc' }}>
+                        Songs needs to have mastery &gt;=
+                        this threshold to be considered &quot;mastered&quot;.
+                      </span>
+                    </div>
+                  </Fragment>
+                  <Fragment>
+                    <br />
+                    <span style={{ float: 'left' }}>
+                      <a>
+                        Steam API Key
+                      </a>
+                    </span>
+                    <span style={{
+                      float: 'right',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      width: 400 + 'px',
+                      textAlign: 'right',
+                    }}>
+                      <input
+                        style={{ textAlign: 'right', width: 75 + '%' }}
+                        value={this.state.steamAPIKey}
+                        onChange={event => this.handleTextBasedSetting(event, "steamAPIKey")} />
+                    </span>
+                    <br />
+                    <div className="">
+                      <span style={{ color: '#ccc' }}>
+                        Some stats require Steam API key, you can get yours  <a style={{ color: 'blue' }} onClick={() => window.shell.openExternal("https://steamcommunity.com/dev/apikey")}> here</a>. (Currently used by: Playtime)
+                      </span>
+                    </div>
+                  </Fragment>
                 </Collapsible>
                 <br />
                 <Collapsible
