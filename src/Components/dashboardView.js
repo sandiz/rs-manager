@@ -4,7 +4,7 @@ import StatsTableView from './statsTableView';
 import getProfileConfig, {
   updateProfileConfig, getScoreAttackConfig, getUseCDLCConfig,
   getScoreAttackDashboardConfig, getDateFormatConfig,
-  updateDateFormat, getSteamIDConfig, updateDateSrc, getDateSrcConfig,
+  updateDateFormat, getSteamIDConfig, updateDateSrc, getDateSrcConfig, getSteamAPIKeyConfig,
 } from '../configService';
 import readProfile from '../steamprofileService';
 import {
@@ -118,11 +118,11 @@ export default class DashboardView extends React.Component {
     // if not return please check api key
     try {
       // eslint-disable-next-line
-      const internal = require("../internal.json")
-      if (typeof internal.STEAM_API_KEY !== 'undefined' && internal.STEAM_API_KEY.length > 0) {
+      const steamKey = await getSteamAPIKeyConfig();
+      if (steamKey.length > 0) {
         const steamID = await getSteamIDConfig();
         if (steamID.length > 0) {
-          const data = await this.steamPromise(internal.STEAM_API_KEY, steamID)
+          const data = await this.steamPromise(steamKey, steamID)
           const minutesPlayed = data.games[0].playtime_forever;
           return this.getPlayingTimeText(minutesPlayed * 60);
         }
@@ -131,7 +131,7 @@ export default class DashboardView extends React.Component {
         }
       }
       else {
-        return "STEAM_API_KEY missing in internal.json"
+        return "STEAM_API_KEY missing in Settings"
       }
     }
     catch (e) {
