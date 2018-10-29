@@ -36,6 +36,8 @@ export async function initSongsOwnedDB(updateTab = "", updateFunc = null) {
   }
   const createTableSql = "CREATE TABLE IF NOT EXISTS songs_owned (album char, artist char, song char, arrangement char, json char, psarc char, dlc char, sku char, difficulty float, dlckey char, songkey char, id char, uniqkey char primary key, mastery float default 0, count int default 0, lastConversionTime real, constraint id_unique unique (id) );";
   await db.run(createTableSql);
+  const createIgnoredIDSql = "create table if not exists ignored_arrangements (id char, constraint id_unique unique (id) )";
+  await db.run(createIgnoredIDSql)
   await initSetlistDB(); // init setlist db with songs db so all migrations can be in one place
   let version = await getUserVersion();
 
@@ -131,11 +133,12 @@ export async function initSongsOwnedDB(updateTab = "", updateFunc = null) {
       version += 1
       await setUserVersion(version);
     case 6:
+      // add is_rssetlist
       await db.exec(altersql6);
       version += 1
       await setUserVersion(version);
-    /* next case is 7 */ /* 5,6 used by setlist_meta */
     case 7:
+      // add date_las, date_sa
       await db.exec(altersql7);
       version += 1
       await setUserVersion(version);
@@ -254,6 +257,16 @@ export async function isDLCInDB(dlc) {
   }
   return true;
 }
+export async function isSongIDIgnored(songid) {
+  //  console.log("__db_call__: isDLCInDB");
+  let sqlstr = "";
+  sqlstr += `SELECT count(id) as count from ignored_arrangements where id == '${songid}'`
+  const res = await db.get(sqlstr); // Run the query without returning anything
+  if (res.count === 0) {
+    return false;
+  }
+  return true;
+}
 export async function updateOwnedInDB(dlc) {
   //.console.log("__db_call__: updateOwnedInDB");
   let sqlstr = "";
@@ -331,6 +344,10 @@ export async function removeFromSongsOwned(songid) {
   const sql = `delete from songs_owned where id = '${songid}'`;
   await db.run(sql);
 }
+export async function addToIgnoreArrangements(songid) {
+  const sql = `insert or ignore into ignored_arrangements (id) VALUES('${songid}');`;
+  await db.run(sql);
+}
 export default async function updateSongsOwned(psarcResult, isCDLC = false) {
   // console.log("__db_call__: updateSongsOwned");
   let sqlstr = "";
@@ -363,6 +380,12 @@ export default async function updateSongsOwned(psarcResult, isCDLC = false) {
   let mastery = 0
   let count = 0
   let cdlc = isCDLC;
+  const isIgnored = await isSongIDIgnored(id)
+  if (isIgnored) {
+    console.log(id, "ignored..");
+    return;
+  }
+
   sqlstr = `select mastery, count, is_cdlc from songs_owned where song='${song}' AND
   album='${album}' AND artist='${artist}' AND arrangement='${arrangement}'`;
   const op = await db.all(sqlstr);

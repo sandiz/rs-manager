@@ -8,7 +8,8 @@ import moment from 'moment';
 import readProfile from '../steamprofileService';
 import {
   initSetlistPlaylistDB, getSongsOwned, countSongsOwned, updateMasteryandPlayed,
-  initSongsOwnedDB, addToFavorites, updateScoreAttackStats, removeFromSongsOwned,
+  initSongsOwnedDB, addToFavorites, updateScoreAttackStats,
+  removeFromSongsOwned, addToIgnoreArrangements,
 } from '../sqliteService';
 import getProfileConfig, { updateProfileConfig, getScoreAttackConfig } from '../configService';
 import SongDetailView from './songdetailView';
@@ -838,6 +839,11 @@ export default class SonglistView extends React.Component {
     await this.refreshView();
   }
 
+  ignoreArrangement = async () => {
+    await addToIgnoreArrangements(this.state.showSongID)
+    await this.refreshView();
+  }
+
   handleTableChange = async (type, {
     page,
     sizePerPage,
@@ -927,6 +933,7 @@ export default class SonglistView extends React.Component {
             showDetail={this.state.showDetail}
             close={() => this.setState({ showDetail: false })}
             removeFromDB={this.removeFromDB}
+            ignoreArrangement={this.ignoreArrangement}
             isSongview
             isSetlist={false}
             songID={this.state.showSongID}
