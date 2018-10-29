@@ -717,6 +717,9 @@ export async function getSongsFromPlaylistDB(dbname, start = 0, count = 10, sort
     case "artist":
       searchSql = `artist like '%${escape(search)}%'`
       break;
+    case "arrangement":
+      searchSql = `arrangement like '%${search}%'`
+      break;
     default: break;
   }
   if (search === "") {
