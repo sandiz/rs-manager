@@ -554,6 +554,7 @@ export default class SetlistView extends React.Component {
                                         <option value="song">Song</option>
                                         <option value="artist">Artist</option>
                                         <option value="album">Album</option>
+                                        <option value="arrangement">Arrangement</option>
                                     </select>
                                     <br /><br />
                                 </div>
