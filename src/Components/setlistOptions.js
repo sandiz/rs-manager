@@ -148,28 +148,18 @@ export function generateSql(filters, count = false) {
         break;
       case "capofret":
         if (filter.value) sql += `${filter.type} > 0 `;
-        else sql += `${filter.type} == 0 `;
+        else sql += `${filter.type} = 0 `;
         break;
       case "is_cdlc":
         sql += `${filter.type} ${filter.cmp} '${filter.value}' `;
         break;
       case "tuning":
-        {
-          if (anyTunings.includes(filter.value)) {
-            sql += generateAnyTuningSql(filter);
-          }
-          else {
-            const cmp = filter.cmp === "is" ? "LIKE" : "NOT LIKE";
-            sql += `${filter.type} ${cmp} '${filter.value}' `;
-          }
-          let capoFilterPresent = false
-          let centOffsetPresent = false
-          filters.forEach((item) => {
-            if (item.type === "capofret") capoFilterPresent = true
-            else if (item.type === "centoffset") centOffsetPresent = true
-          })
-          if (capoFilterPresent === false) sql += "AND capofret == 0 "
-          if (centOffsetPresent === false) sql += "AND centoffset == 0 "
+        if (anyTunings.includes(filter.value)) {
+          sql += generateAnyTuningSql(filter);
+        }
+        else {
+          const cmp = filter.cmp === "is" ? "LIKE" : "NOT LIKE";
+          sql += `${filter.type} ${cmp} '${filter.value}' `;
         }
         break;
       case "sa_badge_easy":
