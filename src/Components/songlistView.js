@@ -347,10 +347,10 @@ export function tuningFormatter(cell, row) {
             break;
         }
       }
-      return <span>{tuningkeys[i]} <span className={suffix === "" ? "hidden" : ""}>(Capo: {row.capofret}<sup>{suffix})</sup></span> {offset}</span>
+      return <span title={cell}>{tuningkeys[i]} - {cell} <span className={suffix === "" ? "hidden" : ""}>(Capo: {row.capofret}<sup>{suffix})</sup></span> {offset}</span>
     }
   }
-  return <span>Custom</span>
+  return <span>Custom {JSON.stringify(combinedt)}</span>
 }
 export function dateFormatter(cell, row) {
   if (cell == null || cell === 0) {
@@ -505,7 +505,7 @@ export default class SonglistView extends React.Component {
         formatter: round100Formatter,
       },
       {
-        dataField: "tuning",
+        dataField: "tuning_weight",
         text: "Tuning",
         style: (cell, row, rowIndex, colIndex) => {
           return {
@@ -595,11 +595,6 @@ export default class SonglistView extends React.Component {
       {
         dataField: "arrangementProperties",
         text: 'ArrProp',
-        hidden: true,
-      },
-      {
-        dataField: "tuning",
-        text: 'Tuning',
         hidden: true,
       },
       {

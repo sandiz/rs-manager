@@ -122,7 +122,7 @@ export default class RSLiveView extends React.Component {
           formatter: round100Formatter,
         },
         {
-          dataField: "tuning",
+          dataField: "tuning_weight",
           text: "Tuning",
           style: (cell, row, rowIndex, colIndex) => {
             return {
@@ -254,7 +254,7 @@ export default class RSLiveView extends React.Component {
         formatter: round100Formatter,
       },
       {
-        dataField: "tuning",
+        dataField: "tuning_weight",
         text: "Tuning",
         style: (cell, row, rowIndex, colIndex) => {
           return {
@@ -339,11 +339,6 @@ export default class RSLiveView extends React.Component {
       {
         dataField: "arrangementProperties",
         text: 'ArrProp',
-        hidden: true,
-      },
-      {
-        dataField: "tuning",
-        text: 'Tuning',
         hidden: true,
       },
       {
@@ -540,7 +535,7 @@ export default class RSLiveView extends React.Component {
         formatter: round100Formatter,
       },
       {
-        dataField: "tuning",
+        dataField: "tuning_weight",
         text: "Tuning",
         style: (cell, row, rowIndex, colIndex) => {
           return {

@@ -27,7 +27,8 @@ export async function initSetlistDB() {
   }
   await db.run("CREATE TABLE IF NOT EXISTS setlist_meta (key char primary key, name char);");
 }
-export async function initSongsOwnedDB() {
+export async function initSongsOwnedDB(updateTab = "", updateFunc = null) {
+  if (updateFunc) updateFunc(updateTab, "Initializing database..")
   //console.log("__db_call__: initSongsOwnedDB ");
   if (db === null) {
     const dbfilename = window.sqlitePath;
@@ -82,6 +83,9 @@ export async function initSongsOwnedDB() {
   altersql7 += "alter table songs_owned add date_las real default null;"
   altersql7 += "alter table songs_owned add date_sa real default null;"
 
+  let altersql8 = "";
+  altersql8 += "alter table songs_owned add tuning_weight int default null;"
+
   switch (version) {
     case 0: {
       // add score attack stats
@@ -135,6 +139,26 @@ export async function initSongsOwnedDB() {
       await db.exec(altersql7);
       version += 1
       await setUserVersion(version);
+    case 8: {
+      // create tuning weights from existing tuning
+      await db.exec(altersql8)
+      const all = await db.all("select rowid, tuning from songs_owned");
+      const promises = []
+      for (let i = 0; i < all.length; i += 1) {
+        const row = all[i]
+        const tuning = JSON.parse(unescape(row.tuning));
+        const sum = Math.abs(tuning.string0) + Math.abs(tuning.string1)
+          + Math.abs(tuning.string2) + Math.abs(tuning.string3)
+          + Math.abs(tuning.string4) + Math.abs(tuning.string5)
+        const stmt = `update songs_owned set tuning_weight=${sum} where rowid=${row.rowid}`;
+        // eslint-disable-next-line
+        promises.push(db.exec(stmt));
+      }
+      if (updateFunc) updateFunc(updateTab, `Updating tuning weights..`)
+      await Promise.all(promises)
+      version += 1
+      await setUserVersion(version);
+    }
     default:
       break;
   }
@@ -142,6 +166,7 @@ export async function initSongsOwnedDB() {
   await initSetlistPlaylistDB("setlist_practice");
   await db.run("REPLACE INTO setlist_meta VALUES('setlist_favorites','RS Favorites', 'true', 'false', '', 'true');")
   await initSetlistPlaylistDB("setlist_favorites");
+  if (updateFunc) updateFunc(updateTab, "Initialization complete.")
 }
 export async function initSongsAvailableDB() {
   //console.log("__db_call__: initSongsAvailableDB");
@@ -328,6 +353,10 @@ export default async function updateSongsOwned(psarcResult, isCDLC = false) {
   const capo = psarcResult.capofret;
   const cent = psarcResult.centoffset;
   const tuning = escape(psarcResult.tuning);
+  const tuningJSON = JSON.parse(psarcResult.tuning)
+  const tuningWeight = Math.abs(tuningJSON.string0) + Math.abs(tuningJSON.string1)
+    + Math.abs(tuningJSON.string2) + Math.abs(tuningJSON.string3)
+    + Math.abs(tuningJSON.string4) + Math.abs(tuningJSON.string5)
   const notes = psarcResult.maxNotes;
   const tmpo = psarcResult.tempo;
   const length = psarcResult.songLength;
@@ -342,7 +371,6 @@ export default async function updateSongsOwned(psarcResult, isCDLC = false) {
     count = op[0].count === null ? 0 : op[0].count;
     cdlc = op[0].is_cdlc === "true" ? true : isCDLC;
   }
-
   sqlstr = `INSERT OR IGNORE INTO songs_owned (album, artist, song, arrangement, json, psarc, dlc, sku, difficulty, dlckey, songkey,\
   id,uniqkey, lastConversionTime, mastery, \
   count, arrangementProperties, capofret, centoffset, tuning,\
@@ -352,7 +380,7 @@ export default async function updateSongsOwned(psarcResult, isCDLC = false) {
       '${dlc}','${sku}',${difficulty},'${dlckey}',
       '${songkey}','${id}', '${uniqkey}', '${lct}', '${mastery}','${count}', '${ap}', '${capo}','${cent}','${tuning}', '${length}', '${notes}', '${tmpo}', '${cdlc}')\
       ;`
-  const sqlstr2 = `update songs_owned set is_cdlc='${cdlc}' where id like '${id}';`;
+  const sqlstr2 = `update songs_owned set is_cdlc='${cdlc}', tuning_weight='${tuningWeight}' where id like '${id}';`;
   //console.log(sqlstr2)
   //});
   try {
@@ -752,7 +780,7 @@ export async function updateSAFCStat(key, value, songID) {
 }
 export async function executeRawSql(sql) {
   const op = await db.get(sql);
-  console.log(op)
+  //console.log(op)
   return op;
 }
 window.remote.app.on('window-all-closed', async () => {
