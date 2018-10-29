@@ -20,12 +20,8 @@ export default class Sidebar extends React.Component {
     this.psInterval = null;
   }
 
-  componentWillMount = async () => {
-    // default tabs on startup
-    this.props.handleChange(this.props.TabsData[0]);
-    this.toggleActive(this.props.TabsData[0]);
-    //this.props.handleChange(TabsData[2], TabsData[2].child[0])
-    //this.toggleActive(TabsData[2]);
+  componentDidMount = async () => {
+    this.toggleActive(this.state.TabsData[0]);
     this.startPSMonitor();
   }
 
