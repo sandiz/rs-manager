@@ -347,7 +347,7 @@ export function tuningFormatter(cell, row) {
             break;
         }
       }
-      return <span title={cell}>{tuningkeys[i]} - {cell} <span className={suffix === "" ? "hidden" : ""}>(Capo: {row.capofret}<sup>{suffix})</sup></span> {offset}</span>
+      return <span title={cell}>{tuningkeys[i]}<span className={suffix === "" ? "hidden" : ""}>(Capo: {row.capofret}<sup>{suffix})</sup></span> {offset}</span>
     }
   }
   return <span>Custom {JSON.stringify(combinedt)}</span>
