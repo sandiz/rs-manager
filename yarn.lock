@@ -9992,6 +9992,13 @@ shortid@^2.2.13:
   dependencies:
     nanoid "^1.0.7"
 
+showdown@^1.8.7:
+  version "1.8.7"
+  resolved "https://registry.yarnpkg.com/showdown/-/showdown-1.8.7.tgz#c4ccf300063adb0ef75a1b94b29a6cb6f7c36008"
+  integrity sha512-S1wyj80vu2lZZ7xm2ijr6e3VxHxPu8WfhTH7R6nelbIQeyl2g0ioEohS0YtFim8yAFMbQ8sQuXxiKvr10rKbTg==
+  dependencies:
+    yargs "^10.0.3"
+
 signal-exit@^3.0.0, signal-exit@^3.0.2:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/signal-exit/-/signal-exit-3.0.2.tgz#b5fdc08f1287ea1178628e415e25132b73646c6d"
