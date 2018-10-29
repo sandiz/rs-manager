@@ -341,15 +341,6 @@ export default class SongDetailView extends React.Component {
             </div>
           </div>
           <div className="centerButton list-unstyled">
-
-            <a
-              className={songliststyle}
-              onClick={async () => {
-                await this.props.removeFromDB();
-                this.handleHide();
-              }}>
-              <span>Delete Song from DB</span>
-            </a>
             <a
               onClick={this.choosePlay}
               className={ptstyle}>
@@ -398,8 +389,8 @@ export default class SongDetailView extends React.Component {
           <div className={songliststylegeneric}>
             <br />
             <Collapsible
-              trigger={expandButton('Other Stats', 6)}
-              triggerWhenOpen={collapseButton('Other Stats', 6)}
+              trigger={expandButton('More Options', 6)}
+              triggerWhenOpen={collapseButton('More Options', 6)}
               transitionTime={200}
               easing="ease-in"
               close
@@ -561,6 +552,32 @@ export default class SongDetailView extends React.Component {
                   }
                 </div>
               </div>
+              <br />
+              <div className="options-flex-center">
+                <div style={{ marginRight: 30 + 'px' }} className="options-flex-div">
+                  <a
+                    style={{ width: 100 + '%' }}
+                    className={songliststyle}
+                    onClick={async () => {
+                      await this.props.removeFromDB();
+                      this.handleHide();
+                    }}>
+                    <span>Delete Song from DB</span>
+                  </a>
+                </div>
+                <div style={{}} className="options-flex-div">
+                  <a
+                    style={{ width: 100 + '%' }}
+                    className={songliststyle}
+                    onClick={async () => {
+                      await this.props.removeFromDB();
+                      await this.props.ignoreArrangement();
+                      this.handleHide();
+                    }}>
+                    <span>Delete and Never Import</span>
+                  </a>
+                </div>
+              </div>
             </Collapsible>
           </div>
         </div>
@@ -583,6 +600,7 @@ SongDetailView.propTypes = {
   dlcappid: PropTypes.string,
   removeFromSetlist: PropTypes.func,
   removeFromDB: PropTypes.func,
+  ignoreArrangement: PropTypes.func,
   songID: PropTypes.string,
   isGenerated: PropTypes.bool,
   isRSSetlist: PropTypes.bool,
@@ -601,6 +619,7 @@ SongDetailView.defaultProps = {
   close: () => { },
   removeFromSetlist: () => { },
   removeFromDB: () => { },
+  ignoreArrangement: () => { },
   songID: '',
   isGenerated: false,
   isRSSetlist: false,

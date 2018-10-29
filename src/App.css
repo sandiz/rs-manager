@@ -874,6 +874,11 @@ hr {
   align-items: left;
   justify-content: left;
 }
+.options-flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 .options-flex-right {
   display: flex;
   align-items: right;
