@@ -372,6 +372,21 @@ tbody tr:hover {
   transition: all 0.3s;
   pointer-events: none;
 }
+.modal-window-help {
+  position: fixed;
+  background-color: rgba(0, 0, 0, 0.9);
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 999;
+  opacity: 0;
+  -webkit-transition: all 0.3s;
+  -moz-transition: all 0.3s;
+  transition: all 0.3s;
+  pointer-events: none;
+}
+
 
 .modal-window:target {
   opacity: 1;
@@ -385,6 +400,13 @@ tbody tr:hover {
   background: azure;
   color: #444;
   border-radius: 20px;
+}
+
+.modal-window-help>div {
+  width: 720px;
+  position: relative;
+  margin: 1% auto;
+  padding: 2rem;
 }
 .width-75 {
   width: 76% !important;
