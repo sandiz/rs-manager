@@ -78,6 +78,9 @@ export default class HelpView extends React.Component {
       case "settings":
         data = await readFile(window.dirname + "/../help/settings.md");
         break;
+      case "getting-started":
+        data = await readFile(window.dirname + "/../help/getting-started.md");
+        break;
 
       default:
         break;
@@ -97,6 +100,15 @@ export default class HelpView extends React.Component {
               (
                 <div>
                   <br />
+                  <a
+                    style={{
+                      color: 'blue',
+                      fontWeight: this.state.defaultReadme === "getting-started" ? "bolder" : "normal",
+                      borderBottom: this.state.defaultReadme === "getting-started" ? "1px solid" : "none",
+                    }}
+                    href="#"
+                    onClick={() => this.changeTo('getting-started')}>Getting Started</a>&nbsp;
+              |
                   <a
                     style={{
                       color: 'blue',
@@ -196,7 +208,7 @@ HelpView.propTypes = {
 }
 HelpView.defaultProps = {
   //currentTab: null,
-  defaultReadme: "dashboard",
+  defaultReadme: "getting-started",
   popupMode: false,
   showHelp: true,
   closeHelp: () => { },
