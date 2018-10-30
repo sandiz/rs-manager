@@ -74,7 +74,7 @@ class App extends Component {
       ],
       searchHistory: {},
       selectedTab: null,
-      readme: 'dashboard',
+      readme: 'getting-started',
       showhelp: false,
     };
     this.songlistRef = null;
