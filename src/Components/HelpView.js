@@ -108,8 +108,7 @@ export default class HelpView extends React.Component {
                     }}
                     href="#"
                     onClick={() => this.changeTo('getting-started')}>Getting Started</a>&nbsp;
-              |
-                  <a
+                  | <a
                     style={{
                       color: 'blue',
                       fontWeight: this.state.defaultReadme === "dashboard" ? "bolder" : "normal",
