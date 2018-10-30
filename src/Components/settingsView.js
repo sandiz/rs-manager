@@ -674,8 +674,8 @@ export default class SettingsView extends React.Component {
                 </Collapsible>
                 <br />
                 <Collapsible
-                  trigger={expandButton("Import Setlists")}
-                  triggerWhenOpen={collapseButton("Import Setlists")}
+                  trigger={expandButton("Import RS Songlist")}
+                  triggerWhenOpen={collapseButton("Import RS Songlist")}
                   transitionTime={200}
                   easing="ease-in"
                 >
