@@ -74,6 +74,8 @@ class App extends Component {
       ],
       searchHistory: {},
       selectedTab: null,
+      readme: 'dashboard',
+      showhelp: false,
     };
     this.songlistRef = null;
     //this.handleChange = this.handleChange.bind(this);
@@ -265,12 +267,51 @@ class App extends Component {
     this.sidebarRef.current.refresh();
   }
 
+  openHelp = () => {
+    const currentTab = this.state.currentTab.id
+    const currentChildTab = this.state.currentChildTab ? this.state.currentChildTab.id : null;
+    let readme = "dashboard"
+    switch (currentTab) {
+      default:
+      case "tab-dashboard":
+        readme = "dashboard"
+        break;
+      case "tab-songs":
+        switch (currentChildTab) {
+          default:
+          case "songs-owned":
+            readme = "songs-owned"
+            break;
+          case "songs-available":
+            readme = "dlc-catalog"
+            break;
+        }
+        break;
+      case "tab-setlist":
+        readme = "setlists"
+        break;
+      case "tab-psarc":
+        readme = "psarc-explorer"
+        break;
+      case "tab-rslive":
+        readme = "rs-live"
+        break;
+    }
+    this.setState({ showhelp: true, readme })
+  }
+
+  closeHelp = () => {
+    this.setState({ showhelp: false })
+  }
+
   render = () => {
     const len = this.state.currentProfile.length;
     let profile = len > 0
       ? path.basename(this.state.currentProfile).slice(0, 6) + "..." + this.state.currentProfile.slice(len - 6, len) : "-";
     profile = profile.toLowerCase();
     const cookie = this.state.currentCookie.length > 0 ? this.state.currentCookie : "-";
+    const showhelpstyle = "modal-window-help " + (this.state.showhelp ? "" : "hidden")
+    const helpstyle = (this.state.currentTab !== null && (this.state.currentTab.id === "tab-settings" || this.state.currentTab.id === "tab-help")) ? "hidden" : ""
     return (
       <div className="App">
         <div className="wrapper">
@@ -326,10 +367,27 @@ class App extends Component {
                     </li>
                   </ul>
                 </div>
+                <a onClick={this.openHelp} className={helpstyle}>
+                  <img
+                    alt="help"
+                    style={{ width: 70 + '%' }}
+                    src="data:image/svg+xml;utf8;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pgo8IS0tIEdlbmVyYXRvcjogQWRvYmUgSWxsdXN0cmF0b3IgMTkuMC4wLCBTVkcgRXhwb3J0IFBsdWctSW4gLiBTVkcgVmVyc2lvbjogNi4wMCBCdWlsZCAwKSAgLS0+CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0iQ2FwYV8xIiB4PSIwcHgiIHk9IjBweCIgdmlld0JveD0iMCAwIDUyIDUyIiBzdHlsZT0iZW5hYmxlLWJhY2tncm91bmQ6bmV3IDAgMCA1MiA1MjsiIHhtbDpzcGFjZT0icHJlc2VydmUiIHdpZHRoPSI2NHB4IiBoZWlnaHQ9IjY0cHgiPgo8Zz4KCTxwYXRoIGQ9Ik0yNiwwQzExLjY2MywwLDAsMTEuNjYzLDAsMjZzMTEuNjYzLDI2LDI2LDI2czI2LTExLjY2MywyNi0yNlM0MC4zMzcsMCwyNiwweiBNMjYsNTBDMTIuNzY3LDUwLDIsMzkuMjMzLDIsMjYgICBTMTIuNzY3LDIsMjYsMnMyNCwxMC43NjcsMjQsMjRTMzkuMjMzLDUwLDI2LDUweiIgZmlsbD0iIzAwMDAwMCIvPgoJPHBhdGggZD0iTTI2LDM3Yy0wLjU1MywwLTEsMC40NDctMSwxdjJjMCwwLjU1MywwLjQ0NywxLDEsMXMxLTAuNDQ3LDEtMXYtMkMyNywzNy40NDcsMjYuNTUzLDM3LDI2LDM3eiIgZmlsbD0iIzAwMDAwMCIvPgoJPHBhdGggZD0iTTI2LjExMyw5LjAwMUMyNi4wNzUsOS4wMDEsMjYuMDM3LDksMjUuOTk4LDljLTIuMTE2LDAtNC4xMDYsMC44MTUtNS42MTUsMi4zMDRDMTguODQ3LDEyLjgxOSwxOCwxNC44NDIsMTgsMTcgICBjMCwwLjU1MywwLjQ0NywxLDEsMXMxLTAuNDQ3LDEtMWMwLTEuNjE4LDAuNjM1LTMuMTM2LDEuNzg3LTQuMjcyYzEuMTUzLTEuMTM3LDIuNjg4LTEuNzY1LDQuMjk5LTEuNzI3ICAgYzMuMTYxLDAuMDQ0LDUuODY5LDIuNzUyLDUuOTEzLDUuOTEzYzAuMDI5LDIuMDg0LTAuOTk5LDQuMDAyLTIuNzUxLDUuMTMyQzI2LjU4OCwyMy43NjIsMjUsMjYuNzk0LDI1LDMwLjE1OFYzMyAgIGMwLDAuNTUzLDAuNDQ3LDEsMSwxczEtMC40NDcsMS0xdi0yLjg0MmMwLTIuNjQyLDEuMjc2LTUuMTA1LDMuMzMyLTYuNDMyYzIuMzM1LTEuNTA2LDMuNzA2LTQuMDYzLDMuNjY3LTYuODQgICBDMzMuOTM5LDEyLjU5OSwzMC40MDEsOS4wNjEsMjYuMTEzLDkuMDAxeiIgZmlsbD0iIzAwMDAwMCIvPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+Cjwvc3ZnPgo=" />
+                </a>
               </div>
             </nav>
             <div>
               {this.state.selectedTab}
+            </div>
+            <div ref={(ref) => { this.modal_div = ref }} id="open-modal" style={{ opacity: 1, pointerEvents: "auto" }} className={showhelpstyle}>
+              <div id="" className="width-75">
+                <HelpView
+                  updateHeader={this.updateHeader}
+                  popupMode
+                  showHelp={this.state.showhelp}
+                  defaultReadme={this.state.readme}
+                  closeHelp={this.closeHelp}
+                />
+              </div>
             </div>
           </div>
         </div>
