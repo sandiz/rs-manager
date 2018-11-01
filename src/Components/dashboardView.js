@@ -4,21 +4,23 @@ import StatsTableView from './statsTableView';
 import getProfileConfig, {
   updateProfileConfig, getScoreAttackConfig, getUseCDLCConfig,
   getScoreAttackDashboardConfig, getDateFormatConfig,
-  updateDateFormat, getSteamIDConfig, updateDateSrc, getDateSrcConfig, getSteamAPIKeyConfig,
+  updateDateFormat, getSteamIDConfig, updateDateSrc,
+  getDateSrcConfig, getSteamAPIKeyConfig, readFile, writeFile,
 } from '../configService';
 import readProfile from '../steamprofileService';
 import {
   updateMasteryandPlayed, initSongsOwnedDB, getSongByID,
   countSongsOwned, getArrangmentsMastered, getLeadStats,
   getRhythmStats, getBassStats, getRandomSongOwned,
-  getRandomSongAvailable, getSAStats, updateScoreAttackStats,
+  getRandomSongAvailable, getSAStats, updateScoreAttackStats, getLastNSongs,
 } from '../sqliteService';
 import { replaceRocksmithTerms } from './songavailableView';
 import SongDetailView from './songdetailView';
+import { getBadgeName } from './songlistView';
 
 const { path } = window;
 const Steam = require('steam-webapi');
-
+const albumArt = require('./../lib/album-art');
 
 export default class DashboardView extends React.Component {
   constructor(props) {
@@ -67,6 +69,7 @@ export default class DashboardView extends React.Component {
       samediumwidth: [0, 0, 0, 0, 0, 0, 0],
       saeasy: [0, 0, 0, 0, 0, 0, 0],
       saeasywidth: [0, 0, 0, 0, 0, 0, 0],
+
     }
   }
 
@@ -526,6 +529,110 @@ export default class DashboardView extends React.Component {
     await this.fetchStats();
   }
 
+  generateStats = async () => {
+    this.props.updateHeader(
+      this.tabname,
+      `Generating, please wait..`,
+    );
+    const timePlayed = this.state.stats.TimePlayed / (60 * 60);
+    //readFile template
+    let template = await readFile(window.dirname + "/template.html");
+    template = template.toString('utf-8');
+
+    // replace
+    template = template.replace("{TIME}", Math.ceil(timePlayed));
+    template = template.replace("{SONG}", this.state.songPlays);
+    const top3Songs = await getLastNSongs("count", 3);
+    const recent3Songs = await getLastNSongs("recent", 3);
+    const sa3Songs = await getLastNSongs("sa", 3);
+    const md3Songs = await getLastNSongs("md", 3);
+    const all = {
+      TOP3: top3Songs,
+      RP: recent3Songs,
+      SA: sa3Songs,
+      MD: md3Songs,
+    }
+    let j = 0;
+    let l = 0;
+    const keys = Object.keys(all);
+    for (let k = 0; k < keys.length; k += 1) {
+      const items = all[keys[k]];
+      for (let i = 0; i < items.length; i += 1) {
+        const lsong = unescape(items[i].song).toLowerCase();
+        const song = lsong.length > 20 ? lsong.substring(0, 20).trim() + "..." : lsong;
+
+        const lartist = unescape(items[i].artist).toLowerCase();
+        const artist = lartist.length > 20 ? lartist.substring(0, 16).trim() + "..." : lartist;
+
+        const album = unescape(items[i].album);
+        const root = keys[k];
+        j = i % 3;
+
+        //eslint-disable-next-line
+        let url = await albumArt(
+          lartist,
+          { album, size: 'large' },
+        );
+        if (url.toString().toLowerCase().includes("error:")) {
+          const a1 = lartist.split("feat.")[0];
+          console.log(lartist, a1)
+          //eslint-disable-next-line
+          url = await albumArt(
+            a1,
+            { size: 'large' },
+          );
+        }
+        console.log(url);
+        if (root === "SA") {
+          let badge = "gp_failed";
+          let name = "easy";
+          const highest = items[i].sa_highest_badge;
+          if (highest > 40) {
+            name = "master"
+            badge = getBadgeName(highest - 40, true);
+          }
+          else if (highest > 30) {
+            name = "hard"
+            badge = getBadgeName(highest - 30, true);
+          }
+          else if (highest > 20) {
+            name = "medium"
+            badge = getBadgeName(highest - 20, true);
+          }
+          else if (highest > 10) {
+            name = "easy"
+            badge = getBadgeName(highest - 10, true);
+          }
+          else {
+            name = ""
+            badge = getBadgeName(highest, true);
+          }
+
+          template = template.replace(`{BG${j + 1}}`, badge);
+          template = template.replace(`{BGNAME${j + 1}}`, name);
+        }
+        template = template.replace(`{${root}_SONG_${j + 1}_NAME}`, song);
+        template = template.replace(`{${root}_ARTIST_${j + 1}_NAME}`, artist);
+        template = template.replace(`{${root}_PIC_${j + 1}}`, url);
+        template = template.replace(`{PT${l + 1}}`, Math.round(items[i].mastery * 100) + "%");
+        template = template.replace(`{WD${l + 1}}`, Math.round(items[i].mastery * 100) + "%");
+        l += 1;
+      }
+    }
+
+    //write
+    const newFile = window.os.tmpdir() + "/rs_info.html"
+    await writeFile(newFile, template);
+
+    //show
+    const templateHtml = "file:///" + newFile
+    window.openInfographic(templateHtml);
+    this.props.updateHeader(
+      this.tabname,
+      `Rocksmith 2014 Dashboard`,
+    );
+  }
+
   render = () => {
     let sacolwidth = "col-sm-3";
     if (this.state.scdTrueLength > 2) sacolwidth = "col-sm-2-2"
@@ -535,10 +642,18 @@ export default class DashboardView extends React.Component {
       <div className="container-fluid" style={{ marginTop: -20 + 'px' }}>
         <div className="centerButton list-unstyled">
           <a
+            onClick={this.generateStats}
+            style={{
+              width: 15 + '%',
+            }}
+            className="extraPadding download">
+            Generate Infographic
+            </a>
+          <a
             onClick={this.refreshStats}
             className="extraPadding download">
             Refresh Stats from Profile
-          </a>
+            </a>
         </div>
         <br />
         <div className="row justify-content-md-center" style={{ marginTop: -38 + 'px' }}>
@@ -797,7 +912,8 @@ export default class DashboardView extends React.Component {
             isWeekly={this.state.showweekly}
           />
         </div>
-      </div>);
+      </div>
+    );
   }
 }
 DashboardView.propTypes = {

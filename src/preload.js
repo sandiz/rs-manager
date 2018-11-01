@@ -248,6 +248,36 @@ function electronSteamAuth(config, windowParams) {
     };
 };
 
+window.openInfographic = async (path) => {
+    const windowParams = {
+        height: 1050,
+        autoHideMenuBar: true,
+        'use-content-size': true,
+        webPreferences: {
+            nodeIntegration: false,
+            'web-security': false,
+        },
+        frame: false,
+        enableLargerThanScreen: true
+    }
+    const authWindow = new window.remote.BrowserWindow(windowParams || { 'use-content-size': true });
+    authWindow.loadURL(path);
+    authWindow.show();
+    /*
+    setTimeout(() => {
+        console.log("settimeout")
+        authWindow.capturePage((image) => {
+            console.log("captureImage")
+            window.electronFS.writeFile('/tmp/test.png', image.toPNG(), (err) => {
+                if (err) throw err;
+                console.log('It\'s saved!');
+            })
+        })
+    }, 5000);
+    */
+    return authWindow;
+}
+
 window.remote.app.on("quit", () => {
     exp.close();
 })
