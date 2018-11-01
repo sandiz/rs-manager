@@ -809,6 +809,39 @@ export async function executeRawSql(sql) {
   //console.log(op)
   return op;
 }
+export async function getLastNSongs(type = "count", count = 3) {
+  let sql = "";
+  switch (type) {
+    case "count":
+      sql = `select song, artist, album, mastery from songs_owned order by (count + sa_playcount) desc limit ${count};`
+      break;
+    case "recent":
+      sql = `select song, artist, mastery, album
+              from songs_owned
+              group by songkey 
+              order by max(coalesce(date_las,0), coalesce(date_sa, 0)) desc
+              limit ${count}`
+      break;
+    case "sa":
+      sql = `select song, artist, mastery, album, sa_highest_badge
+              from songs_owned
+              order by sa_highest_badge desc
+              limit ${count}`
+      break;
+    case "md":
+      sql = `select song, artist, mastery, album
+              from songs_owned
+              where (count+sa_playcount)> 0 and is_cdlc='false'
+              order by difficulty desc
+              limit ${count}`
+      break;
+    default:
+      sql = ";"
+      break;
+  }
+  const op = await db.all(sql)
+  return op;
+}
 window.remote.app.on('window-all-closed', async () => {
   await saveSongsOwnedDB();
   console.log("Saved to db..");
