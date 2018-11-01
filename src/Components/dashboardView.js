@@ -69,7 +69,7 @@ export default class DashboardView extends React.Component {
       samediumwidth: [0, 0, 0, 0, 0, 0, 0],
       saeasy: [0, 0, 0, 0, 0, 0, 0],
       saeasywidth: [0, 0, 0, 0, 0, 0, 0],
-
+      isGenInfo: false,
     }
   }
 
@@ -530,6 +530,7 @@ export default class DashboardView extends React.Component {
   }
 
   generateStats = async () => {
+    this.setState({ isGenInfo: true })
     this.props.updateHeader(
       this.tabname,
       `Generating, please wait..`,
@@ -631,6 +632,7 @@ export default class DashboardView extends React.Component {
       this.tabname,
       `Rocksmith 2014 Dashboard`,
     );
+    this.setState({ isGenInfo: false })
   }
 
   render = () => {
@@ -638,6 +640,7 @@ export default class DashboardView extends React.Component {
     if (this.state.scdTrueLength > 2) sacolwidth = "col-sm-2-2"
     const scoreattackstyle = "col ta-center dashboard-bottom " + (this.state.showsastats ? sacolwidth : "hidden");
     const arrstyle = "col ta-center dashboard-bottom col-md-3";
+    const infostyle = this.state.isGenInfo ? "extraPadding download isDisabled" : "extraPadding download";
     return (
       <div className="container-fluid" style={{ marginTop: -20 + 'px' }}>
         <div className="centerButton list-unstyled">
@@ -646,7 +649,8 @@ export default class DashboardView extends React.Component {
             style={{
               width: 15 + '%',
             }}
-            className="extraPadding download">
+            ref={this.infoRef}
+            className={infostyle}>
             Generate Infographic
             </a>
           <a
