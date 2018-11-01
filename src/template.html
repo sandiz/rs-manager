@@ -1,6 +1,8 @@
-<html class=""><head>
-    <script>
-     document.onkeydown = function(evt) {
+<html class="">
+
+<head>
+  <script>
+    document.onkeydown = function (evt) {
       evt = evt || window.event;
       var isEscape = false;
       if ("key" in evt) {
@@ -13,40 +15,51 @@
       }
     };
 
-    </script>
-    <style type="text/css">/**=====================================**/
+  </script>
+  <style type="text/css">
+    /**=====================================**/
     .isDisabled {
-      cursor: not-allowed !important; 
+      cursor: not-allowed !important;
       opacity: 0.5 !important;
       pointer-events: none;
     }
+
     .font-weight-semibold {
       font-weight: 600;
     }
+
     .pikto-select-dark:focus {
       color: white;
     }
+
     .pikto-select-dark option {
       color: white;
     }
+
     .pikto-select-dark:-moz-focusring {
       color: transparent;
       text-shadow: 0 0 0 white;
     }
+
     .pikto-select-light:focus {
       color: black;
     }
+
     .pikto-select-light option {
       color: black;
     }
+
     .pikto-select-light:-moz-focusring {
       color: transparent;
       text-shadow: 0 0 0 black;
     }
-    body, html {
+
+    body,
+    html {
       margin: 0px;
       background-color: #192028;
     }
+
     /***************************************************
     CSS on elements on infographic
     ***************************************************/
@@ -55,6 +68,7 @@
       -ms-text-size-adjust: 100%;
       -moz-text-size-adjust: 100%;
     }
+
     .pikto-block {
       background-image: none;
       background: transparent;
@@ -63,17 +77,20 @@
       /* hides objects when rotated edges are out of block/canvas */
       transition: background 0.3s ease;
     }
+
     .pikto-block-bgimage {
       width: inherit;
       height: inherit;
     }
+
     .pikto-obj-selected {
       border: 1px solid !important;
     }
+
     .pikto-obj-selected.pikto-obj-locked {
       border: solid 1px #f00 !important;
     }
-    
+
     /* Bootstrap sets box-sizing: border-box; on everything.  But since we were using the default box-sizing: content-box; in v3, this leaves some SVG elements (especially rectangles) out-of-place. */
     /* Likewise Bootstrap's font smoothing looks different from the old behaviour (significantly thinner text). */
     .pikto-obj {
@@ -83,6 +100,7 @@
       -webkit-font-smoothing: auto;
       position: absolute;
     }
+
     .pikto-obj svg {
       position: absolute;
       top: 0;
@@ -91,6 +109,7 @@
       float: left;
       overflow: visible;
     }
+
     .pikto-obj .onload {
       position: absolute;
       width: 100%;
@@ -99,21 +118,25 @@
       background-repeat: no-repeat;
       background-size: 50%;
     }
+
     .pikto-obj-subobj {
       width: 100%;
       height: 100%;
       position: absolute;
       border-radius: 10px;
     }
+
     .pikto-obj-svg {
       overflow: hidden;
       position: relative;
     }
+
     .pikto-obj-url:hover {
       border: 1px dashed #ff9615;
       opacity: 0.8;
       cursor: pointer;
     }
+
     .pikto-obj-rich-text {
       white-space: pre-line;
       word-break: keep-all;
@@ -122,50 +145,60 @@
       display: block;
       height: auto;
       color: black;
-      font-feature-settings: "liga" 0, "clig" 0;
+      font-feature-settings: "liga"0, "clig"0;
       font-variant-ligatures: no-common-ligatures;
     }
+
     .pikto-obj-rich-text.va-middle {
-        /*  using CSS3 transform */
-        position: absolute !important;
-        /* Add important to override 'static !important' on pikto-link */
-        top: 50%;
-        width: 100%;
-        -webkit-transform: translate(0, -50%);
-        -moz-transform: translate(0, -50%);
-        -o-transform: translate(0, -50%);
-        -ms-transform: translate(0, -50%);
-        /* using table cell, the parent has to be 'display: table'
+      /*  using CSS3 transform */
+      position: absolute !important;
+      /* Add important to override 'static !important' on pikto-link */
+      top: 50%;
+      width: 100%;
+      -webkit-transform: translate(0, -50%);
+      -moz-transform: translate(0, -50%);
+      -o-transform: translate(0, -50%);
+      -ms-transform: translate(0, -50%);
+      /* using table cell, the parent has to be 'display: table'
         display: table-cell;
         vertical-align: middle;
         */
     }
-    .pikto-obj-rich-text ul, .pikto-obj-rich-text ol {
-        display: block;
-        margin: 0;
-        padding-left: calc(15em / 22 + 9.455px) !important;
-    }
-    .pikto-obj-rich-text ul {
-        list-style-type: disc;
-        width: inherit;
-        word-break: break-word;
-    }
-    .pikto-obj-rich-text ul > li {
-          /*This is the default text-align value, it inherits its parent text-align value after a long delay.*/
-          text-align: inherit;
-    }
+
+    .pikto-obj-rich-text ul,
     .pikto-obj-rich-text ol {
-        list-style-type: decimal;
+      display: block;
+      margin: 0;
+      padding-left: calc(15em / 22 + 9.455px) !important;
     }
+
+    .pikto-obj-rich-text ul {
+      list-style-type: disc;
+      width: inherit;
+      word-break: break-word;
+    }
+
+    .pikto-obj-rich-text ul>li {
+      /*This is the default text-align value, it inherits its parent text-align value after a long delay.*/
+      text-align: inherit;
+    }
+
+    .pikto-obj-rich-text ol {
+      list-style-type: decimal;
+    }
+
     .pikto-obj-rich-text p {
-        margin: 0;
+      margin: 0;
     }
-    .pikto-obj-rich-text em > strong {
-        font-style: inherit;
+
+    .pikto-obj-rich-text em>strong {
+      font-style: inherit;
     }
-    .pikto-obj-rich-text li > p {
-        display: inline;
+
+    .pikto-obj-rich-text li>p {
+      display: inline;
     }
+
     .pikto-obj-text {
       white-space: pre-line;
       word-break: keep-all;
@@ -175,36 +208,44 @@
       height: auto;
       /* CHENX change height 100% to auto */
       color: black;
-      font-feature-settings: "liga" 0, "clig" 0;
+      font-feature-settings: "liga"0, "clig"0;
       font-variant-ligatures: no-common-ligatures;
     }
-    .pikto-obj-text ul, .pikto-obj-text ol {
-        display: block;
-        margin: 0;
-        padding-left: calc(15em / 22 + 9.455px) !important;
-    }
-    .pikto-obj-text ul {
-        list-style-type: disc;
-        width: inherit;
-        word-break: break-word;
-    }
-    .pikto-obj-text ul > li {
-          /*This is the default text-align value, it inherits its parent text-align value after a long delay.*/
-          text-align: inherit;
-    }
+
+    .pikto-obj-text ul,
     .pikto-obj-text ol {
-        list-style-type: decimal;
+      display: block;
+      margin: 0;
+      padding-left: calc(15em / 22 + 9.455px) !important;
     }
-    .pikto-obj-text p, .pikto-obj-text span {
-        margin: 0;
-        padding: 0;
-        word-wrap: break-word;
-        font-size: inherit;
-        font-family: inherit;
-        line-height: inherit;
-        letter-spacing: inherit;
-        text-align: inherit;
+
+    .pikto-obj-text ul {
+      list-style-type: disc;
+      width: inherit;
+      word-break: break-word;
     }
+
+    .pikto-obj-text ul>li {
+      /*This is the default text-align value, it inherits its parent text-align value after a long delay.*/
+      text-align: inherit;
+    }
+
+    .pikto-obj-text ol {
+      list-style-type: decimal;
+    }
+
+    .pikto-obj-text p,
+    .pikto-obj-text span {
+      margin: 0;
+      padding: 0;
+      word-wrap: break-word;
+      font-size: inherit;
+      font-family: inherit;
+      line-height: inherit;
+      letter-spacing: inherit;
+      text-align: inherit;
+    }
+
     .pikto-obj-text-edit {
       /* CHENX edit border style, previous -> border: 1px solid #f00; */
       box-shadow: 0 0 0 2px #0fb4bb;
@@ -215,6 +256,7 @@
       transition-delay: none;
       cursor: text;
     }
+
     [contenteditable] {
       -webkit-user-select: text;
       /* Chrome all / Safari all */
@@ -224,15 +266,16 @@
       /* IE 10+ */
       user-select: text;
     }
+
     [contenteditable]:focus {
       outline: 0px solid transparent;
     }
-    
+
     /* CHENX no need to add hover effect when edit mode */
     .pikto-obj-text-edit.pikto-obj:hover {
       border: 1px solid transparent;
     }
-    
+
     /*
       Style for text to vertically align
       there is 2 method which using css3 transform or display table, choose one
@@ -252,38 +295,41 @@
       vertical-align: middle;
       */
     }
-    
+
     /*LINK ELEMENTS----------------------------------*/
     .pikto-link {
       position: static !important;
       text-decoration: none;
       color: inherit;
     }
+
     .pikto-link:hover,
     .pikto-link .pikto-obj-text:hover {
       opacity: 0.7;
       filter: alpha(opacity=70);
     }
+
     .pikto-link .pikto-obj:hover {
       opacity: 0.7 !important;
       filter: alpha(opacity=70) !important;
     }
-    
+
     /*END LINK ELEMENTS----------------------------------*/
     /***** iOS compatibility *****/
     body {
       -webkit-touch-callout: none !important;
     }
+
     a {
       -webkit-user-select: none !important;
     }
-    
+
     /***** Internet Explorer compatibility *****/
     /* IE 9 displays a blue border around linked images (or purple if the link has been visited).  Make it like other browsers, by hiding it. */
     .pikto-canvas-wrap a img {
       border: none;
     }
-    
+
     /*OBJECT ELEMENTS--------------------------------------------------------------------------------------------*/
     .pikto-canvas-wrap h1,
     .pikto-canvas-wrap h2,
@@ -300,7 +346,7 @@
       letter-spacing: inherit;
       text-align: inherit;
     }
-    
+
     /* TODO need to put a global class for maps v4 that applies to all (embed output editor), need to ask UI team where is the better place for this! for now just import the whole thing. do note that we import this only for v4 maps losing styles for popover and hidden states. might as well include / hardcode those specific styles without needing to import the whole thing
     
     WARNING: preview rendering branch links the css to this file directly. import might not work! */
@@ -309,71 +355,105 @@
     }
 
     .gp_bronze {
-  margin: -8px;
-  width: 40px;
-  height: 40px !important;
-  background-size: 90% !important;
-  background-image: url("data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9JzQ1MScgd2lkdGg9JzQ1MScgIGZpbGw9IiNDRDdGMzIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHZlcnNpb249IjEuMSIgeD0iMHB4IiB5PSIwcHgiIHZpZXdCb3g9IjAgMCAxMDAgMTAwIiBlbmFibGUtYmFja2dyb3VuZD0ibmV3IDAgMCAxMDAgMTAwIiB4bWw6c3BhY2U9InByZXNlcnZlIj48cGF0aCBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjJweCIgZmlsbD0iI0NEN0YzMiIgZD0iTTUwLjUsMjMuNWMtMTgsMC0yNyw5LTI3LDE4YzAsMTgsMTgsNDUsMjcsNDVzMjctMjcsMjctNDVDNzcuNSwzMi41LDY4LjUsMjMuNSw1MC41LDIzLjV6Ij48L3BhdGg+PC9zdmc+");
-}
-.gp_failed {
-  margin: -8px;
-  width: 40px;
-  height: 40px !important;
-  background-size: 90% !important;
-  background-image: url("data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9JzQ1MScgd2lkdGg9JzQ1MScgIGZpbGw9IiNDRDdGMzIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHZlcnNpb249IjEuMSIgeD0iMHB4IiB5PSIwcHgiIHZpZXdCb3g9IjAgMCAxMDAgMTAwIiBlbmFibGUtYmFja2dyb3VuZD0ibmV3IDAgMCAxMDAgMTAwIiB4bWw6c3BhY2U9InByZXNlcnZlIj48cGF0aCBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjJweCIgZmlsbD0iI2RjMzU0NSIgZD0iTTUwLjUsMjMuNWMtMTgsMC0yNyw5LTI3LDE4YzAsMTgsMTgsNDUsMjcsNDVzMjctMjcsMjctNDVDNzcuNSwzMi41LDY4LjUsMjMuNSw1MC41LDIzLjV6Ij48L3BhdGg+PC9zdmc+");
-}
-.gp_silver {
-  margin: -8px;
-  width: 40px;
-  height: 40px !important;;
-  background-size: 90% !important;
-  background-image: url("data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9JzQ1MScgd2lkdGg9JzQ1MScgIGZpbGw9IiNDMEMwQzAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHZlcnNpb249IjEuMSIgeD0iMHB4IiB5PSIwcHgiIHZpZXdCb3g9IjAgMCAxMDAgMTAwIiBlbmFibGUtYmFja2dyb3VuZD0ibmV3IDAgMCAxMDAgMTAwIiB4bWw6c3BhY2U9InByZXNlcnZlIj48cGF0aCBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjJweCIgZmlsbD0iI0MwQzBDMCIgZD0iTTUwLjUsMjMuNWMtMTgsMC0yNyw5LTI3LDE4YzAsMTgsMTgsNDUsMjcsNDVzMjctMjcsMjctNDVDNzcuNSwzMi41LDY4LjUsMjMuNSw1MC41LDIzLjV6Ij48L3BhdGg+PC9zdmc+");
-}
-.gp_gold {
-  margin: -8px;
-  width: 40px;
-  height: 40px !important;;
-  background-size: 90% !important;
-  background-image: url("data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9JzQ1MScgd2lkdGg9JzQ1MScgIGZpbGw9IiNDRDdGMzIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHZlcnNpb249IjEuMSIgeD0iMHB4IiB5PSIwcHgiIHZpZXdCb3g9IjAgMCAxMDAgMTAwIiBlbmFibGUtYmFja2dyb3VuZD0ibmV3IDAgMCAxMDAgMTAwIiB4bWw6c3BhY2U9InByZXNlcnZlIj4NCiAgPGRlZnM+DQogICAgICAgIDwhLS0gYSB0cmFuc3BhcmVudCBnbG93IHRoYXQgdGFrZXMgb24gdGhlIGNvbG91ciBvZiB0aGUgb2JqZWN0IGl0J3MgYXBwbGllZCB0byAtLT4NCiAgICAgICAgPGZpbHRlciBpZD0iZ2xvdyI+DQogICAgICAgICAgICA8ZmVHYXVzc2lhbkJsdXIgc3RkRGV2aWF0aW9uPSIyLjUiIHJlc3VsdD0iY29sb3JlZEJsdXIiLz4NCiAgICAgICAgICAgIDxmZU1lcmdlPg0KICAgICAgICAgICAgICAgIDxmZU1lcmdlTm9kZSBpbj0iY29sb3JlZEJsdXIiLz4NCiAgICAgICAgICAgICAgICA8ZmVNZXJnZU5vZGUgaW49IlNvdXJjZUdyYXBoaWMiLz4NCiAgICAgICAgICAgIDwvZmVNZXJnZT4NCiAgICAgICAgPC9maWx0ZXI+DQogICAgICAgIA0KICA8L2RlZnM+DQogIDxwYXRoIGZpbHRlcj0idXJsKCNnbG93KSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIycHgiIGZpbGw9IiNmZmQ3MDAiIGQ9Ik01MC41LDIzLjVjLTE4LDAtMjcsOS0yNywxOGMwLDE4LDE4LDQ1LDI3LDQ1czI3LTI3LDI3LTQ1Qzc3LjUsMzIuNSw2OC41LDIzLjUsNTAuNSwyMy41eiI+PC9wYXRoPg0KPC9zdmc+");
-}
-.gp_platinum {
-  margin: -8px;
-  width: 40px;
-  height: 40px !important;;
-  background-size: 90% !important;
-  background-image: url("data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9JzQ1MScgd2lkdGg9JzQ1MScgIGZpbGw9IiNDRDdGMzIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHZlcnNpb249IjEuMSIgeD0iMHB4IiB5PSIwcHgiIHZpZXdCb3g9IjAgMCAxMDAgMTAwIiBlbmFibGUtYmFja2dyb3VuZD0ibmV3IDAgMCAxMDAgMTAwIiB4bWw6c3BhY2U9InByZXNlcnZlIj4NCiAgPGRlZnM+DQogICAgICAgIDwhLS0gYSB0cmFuc3BhcmVudCBnbG93IHRoYXQgdGFrZXMgb24gdGhlIGNvbG91ciBvZiB0aGUgb2JqZWN0IGl0J3MgYXBwbGllZCB0byAtLT4NCiAgICAgICAgPGZpbHRlciBpZD0iZ2xvdyI+DQogICAgICAgICAgICA8ZmVHYXVzc2lhbkJsdXIgc3RkRGV2aWF0aW9uPSIyLjUiIHJlc3VsdD0iY29sb3JlZEJsdXIiLz4NCiAgICAgICAgICAgIDxmZU1lcmdlPg0KICAgICAgICAgICAgICAgIDxmZU1lcmdlTm9kZSBpbj0iY29sb3JlZEJsdXIiLz4NCiAgICAgICAgICAgICAgICA8ZmVNZXJnZU5vZGUgaW49IlNvdXJjZUdyYXBoaWMiLz4NCiAgICAgICAgICAgIDwvZmVNZXJnZT4NCiAgICAgICAgPC9maWx0ZXI+DQogIDwvZGVmcz4NCiAgPHBhdGggZmlsdGVyPSJ1cmwoI2dsb3cpIiBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjJweCIgZmlsbD0iI2U1ZTRlMiIgZD0iTTUwLjUsMjMuNWMtMTgsMC0yNyw5LTI3LDE4YzAsMTgsMTgsNDUsMjcsNDVzMjctMjcsMjctNDVDNzcuNSwzMi41LDY4LjUsMjMuNSw1MC41LDIzLjV6Ij48L3BhdGg+DQo8L3N2Zz4=");
-}
-.iconPreview {
-    background-position: 50%;
-    background-repeat: no-repeat;
-    background-size: 65%;
-    height: 100%;
-    max-height: 100px;
-    max-width: 100px;
-}  
-    </style>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lekton|Vast+Shadow|Caveat|Squada+One" media="all"></head>
+      margin: -8px;
+      width: 40px;
+      height: 40px !important;
+      background-size: 90% !important;
+      background-image: url("data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9JzQ1MScgd2lkdGg9JzQ1MScgIGZpbGw9IiNDRDdGMzIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHZlcnNpb249IjEuMSIgeD0iMHB4IiB5PSIwcHgiIHZpZXdCb3g9IjAgMCAxMDAgMTAwIiBlbmFibGUtYmFja2dyb3VuZD0ibmV3IDAgMCAxMDAgMTAwIiB4bWw6c3BhY2U9InByZXNlcnZlIj48cGF0aCBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjJweCIgZmlsbD0iI0NEN0YzMiIgZD0iTTUwLjUsMjMuNWMtMTgsMC0yNyw5LTI3LDE4YzAsMTgsMTgsNDUsMjcsNDVzMjctMjcsMjctNDVDNzcuNSwzMi41LDY4LjUsMjMuNSw1MC41LDIzLjV6Ij48L3BhdGg+PC9zdmc+");
+    }
+
+    .gp_failed {
+      margin: -8px;
+      width: 40px;
+      height: 40px !important;
+      background-size: 90% !important;
+      background-image: url("data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9JzQ1MScgd2lkdGg9JzQ1MScgIGZpbGw9IiNDRDdGMzIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHZlcnNpb249IjEuMSIgeD0iMHB4IiB5PSIwcHgiIHZpZXdCb3g9IjAgMCAxMDAgMTAwIiBlbmFibGUtYmFja2dyb3VuZD0ibmV3IDAgMCAxMDAgMTAwIiB4bWw6c3BhY2U9InByZXNlcnZlIj48cGF0aCBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjJweCIgZmlsbD0iI2RjMzU0NSIgZD0iTTUwLjUsMjMuNWMtMTgsMC0yNyw5LTI3LDE4YzAsMTgsMTgsNDUsMjcsNDVzMjctMjcsMjctNDVDNzcuNSwzMi41LDY4LjUsMjMuNSw1MC41LDIzLjV6Ij48L3BhdGg+PC9zdmc+");
+    }
+
+    .gp_silver {
+      margin: -8px;
+      width: 40px;
+      height: 40px !important;
+      ;
+      background-size: 90% !important;
+      background-image: url("data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9JzQ1MScgd2lkdGg9JzQ1MScgIGZpbGw9IiNDMEMwQzAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHZlcnNpb249IjEuMSIgeD0iMHB4IiB5PSIwcHgiIHZpZXdCb3g9IjAgMCAxMDAgMTAwIiBlbmFibGUtYmFja2dyb3VuZD0ibmV3IDAgMCAxMDAgMTAwIiB4bWw6c3BhY2U9InByZXNlcnZlIj48cGF0aCBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjJweCIgZmlsbD0iI0MwQzBDMCIgZD0iTTUwLjUsMjMuNWMtMTgsMC0yNyw5LTI3LDE4YzAsMTgsMTgsNDUsMjcsNDVzMjctMjcsMjctNDVDNzcuNSwzMi41LDY4LjUsMjMuNSw1MC41LDIzLjV6Ij48L3BhdGg+PC9zdmc+");
+    }
+
+    .gp_gold {
+      margin: -8px;
+      width: 40px;
+      height: 40px !important;
+      ;
+      background-size: 90% !important;
+      background-image: url("data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9JzQ1MScgd2lkdGg9JzQ1MScgIGZpbGw9IiNDRDdGMzIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHZlcnNpb249IjEuMSIgeD0iMHB4IiB5PSIwcHgiIHZpZXdCb3g9IjAgMCAxMDAgMTAwIiBlbmFibGUtYmFja2dyb3VuZD0ibmV3IDAgMCAxMDAgMTAwIiB4bWw6c3BhY2U9InByZXNlcnZlIj4NCiAgPGRlZnM+DQogICAgICAgIDwhLS0gYSB0cmFuc3BhcmVudCBnbG93IHRoYXQgdGFrZXMgb24gdGhlIGNvbG91ciBvZiB0aGUgb2JqZWN0IGl0J3MgYXBwbGllZCB0byAtLT4NCiAgICAgICAgPGZpbHRlciBpZD0iZ2xvdyI+DQogICAgICAgICAgICA8ZmVHYXVzc2lhbkJsdXIgc3RkRGV2aWF0aW9uPSIyLjUiIHJlc3VsdD0iY29sb3JlZEJsdXIiLz4NCiAgICAgICAgICAgIDxmZU1lcmdlPg0KICAgICAgICAgICAgICAgIDxmZU1lcmdlTm9kZSBpbj0iY29sb3JlZEJsdXIiLz4NCiAgICAgICAgICAgICAgICA8ZmVNZXJnZU5vZGUgaW49IlNvdXJjZUdyYXBoaWMiLz4NCiAgICAgICAgICAgIDwvZmVNZXJnZT4NCiAgICAgICAgPC9maWx0ZXI+DQogICAgICAgIA0KICA8L2RlZnM+DQogIDxwYXRoIGZpbHRlcj0idXJsKCNnbG93KSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIycHgiIGZpbGw9IiNmZmQ3MDAiIGQ9Ik01MC41LDIzLjVjLTE4LDAtMjcsOS0yNywxOGMwLDE4LDE4LDQ1LDI3LDQ1czI3LTI3LDI3LTQ1Qzc3LjUsMzIuNSw2OC41LDIzLjUsNTAuNSwyMy41eiI+PC9wYXRoPg0KPC9zdmc+");
+    }
+
+    .gp_platinum {
+      margin: -8px;
+      width: 40px;
+      height: 40px !important;
+      ;
+      background-size: 90% !important;
+      background-image: url("data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9JzQ1MScgd2lkdGg9JzQ1MScgIGZpbGw9IiNDRDdGMzIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHZlcnNpb249IjEuMSIgeD0iMHB4IiB5PSIwcHgiIHZpZXdCb3g9IjAgMCAxMDAgMTAwIiBlbmFibGUtYmFja2dyb3VuZD0ibmV3IDAgMCAxMDAgMTAwIiB4bWw6c3BhY2U9InByZXNlcnZlIj4NCiAgPGRlZnM+DQogICAgICAgIDwhLS0gYSB0cmFuc3BhcmVudCBnbG93IHRoYXQgdGFrZXMgb24gdGhlIGNvbG91ciBvZiB0aGUgb2JqZWN0IGl0J3MgYXBwbGllZCB0byAtLT4NCiAgICAgICAgPGZpbHRlciBpZD0iZ2xvdyI+DQogICAgICAgICAgICA8ZmVHYXVzc2lhbkJsdXIgc3RkRGV2aWF0aW9uPSIyLjUiIHJlc3VsdD0iY29sb3JlZEJsdXIiLz4NCiAgICAgICAgICAgIDxmZU1lcmdlPg0KICAgICAgICAgICAgICAgIDxmZU1lcmdlTm9kZSBpbj0iY29sb3JlZEJsdXIiLz4NCiAgICAgICAgICAgICAgICA8ZmVNZXJnZU5vZGUgaW49IlNvdXJjZUdyYXBoaWMiLz4NCiAgICAgICAgICAgIDwvZmVNZXJnZT4NCiAgICAgICAgPC9maWx0ZXI+DQogIDwvZGVmcz4NCiAgPHBhdGggZmlsdGVyPSJ1cmwoI2dsb3cpIiBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjJweCIgZmlsbD0iI2U1ZTRlMiIgZD0iTTUwLjUsMjMuNWMtMTgsMC0yNyw5LTI3LDE4YzAsMTgsMTgsNDUsMjcsNDVzMjctMjcsMjctNDVDNzcuNSwzMi41LDY4LjUsMjMuNSw1MC41LDIzLjV6Ij48L3BhdGg+DQo8L3N2Zz4=");
+    }
+
+    .iconPreview {
+      background-position: 50%;
+      background-repeat: no-repeat;
+      background-size: 65%;
+      height: 100%;
+      max-height: 100px;
+      max-width: 100px;
+    }
+  </style>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lekton|Vast+Shadow|Caveat|Squada+One" media="all">
+</head>
+
+
+<body style="overflow: auto;" class="">
     
-    
-    <body style="overflow: auto;" class="">
-      
-      
-    
-    
-    
-    
-    
-      <div id="appContainer" class="app-container"><div>          <div id="pikto-preview-container" class="pikto-preview-container"><div class="pikto-preview-sub-container"><div id="pikto-preview-wrapper" class="pikto-preview-wrapper"><div id="pikto-canvas" data-pid="33911836" data-title="" data-l="free" data-template-source="0" data-id="14067141" data-default-papersize="a4-p" data-theme-ctype="Infographic" data-theme-level="" class="pikto-canvas pikto-upload-dropzone unselectable" style="width: 800px;"> <div id="block_0" class="pikto-block" style="background-color: rgb(25, 32, 40); height: 240px;"><div id="pik_obj_918" class="pikto-obj wyndle-item" style="left: 102px; top: 81.5px; width: 596px; opacity: 1; height: 68px;"><div id="pik_obj_918_txt" class="pikto-obj-text" style="font-family: 'Vast Shadow'; font-size: 66px; line-height: 1; letter-spacing: 0px; text-align: center;"><div><span style="color:rgb(245, 241, 228);">&nbsp;ROCKSMITH<br></span></div></div></div><div id="pik_obj_919" class="pikto-obj wyndle-item" style="left: 225px; top: 116.5px; width: 350px; opacity: 1; height: 82px;"><div id="pik_obj_919_txt" class="pikto-obj-text" style="font-family: Caveat; font-size: 80px; line-height: 1; letter-spacing: 0px; text-align: center;"><div><span style="color: rgb(251, 89, 45);">journey<br></span></div></div></div><div id="pik_obj_1061" class="pikto-obj wyndle-item" style="left: 233px; top: -0.5px; width: 350px; opacity: 1; height: 82px;"><div id="pik_obj_1061_txt" class="pikto-obj-text" style="font-family: Caveat; font-size: 80px; line-height: 1; letter-spacing: 0px; text-align: center;"><div><span style="color:rgb(251, 89, 45);">my<br></span></div></div></div></div><div id="block_1" class="pikto-block" style="background-color: rgb(25, 32, 40); height: 240px;"><div id="pik_obj_1120" class="pikto-obj wyndle-item" style="left: 51.9617px; top: 27px; width: 302px; opacity: 1; height: 36px;"><div id="pik_obj_1120_txt" class="pikto-obj-text" style="font-family: 'Vast Shadow'; font-size: 31px; line-height: 1.1; letter-spacing: 0px; text-align: left;"><div><span style="color:rgb(245, 241, 228);">TIME&nbsp;</span><span style="color:rgb(245, 241, 228);">PLAYED<br></span></div></div></div><div id="pik_obj_1121" class="pikto-obj wyndle-item" style="left: 434.289px; top: 28px; width: 334px; opacity: 1; height: 36px;"><div id="pik_obj_1121_txt" class="pikto-obj-text" style="font-family: 'Vast Shadow'; font-size: 31px; line-height: 1.1; letter-spacing: 0px; text-align: left;"><div><span style="color:rgb(245, 241, 228);">SONGS&nbsp;</span><span style="color:rgb(245, 241, 228);">PLAYED<br></span></div></div></div><div id="pik_obj_973" class="pikto-obj wyndle-item" data-pathcount="1" style="left: 479.672px; top: 72.5px; width: 243.238px; height: 97px; opacity: 1;"><div><svg version="1.1" id="pik_obj_973_svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="100%" height="100%" viewBox="0 0 32 32" enable-background="new 0 0 32 32" xml:space="preserve" preserveAspectRatio="none">
+    <div id="appContainer" class="app-container">
+      <div>
+        <div id="pikto-preview-container" class="pikto-preview-container">
+          <div class="pikto-preview-sub-container">
+            <div id="pikto-preview-wrapper" class="pikto-preview-wrapper">
+              <div id="pikto-canvas" data-pid="33911836" data-title="" data-l="free" data-template-source="0" data-id="14067141"
+                data-default-papersize="a4-p" data-theme-ctype="Infographic" data-theme-level="" class="pikto-canvas pikto-upload-dropzone unselectable"
+                style="width: 800px;">
+
+
+         <div id="block_0" class="pikto-block" style="background-color: rgb(25, 32, 40); height: 240px;">
+          <div id="pik_obj_918" class="pikto-obj wyndle-item" style="left: 102px; top: 81.5px; width: 596px; opacity: 1; height: 68px;">
+            <div id="pik_obj_918_txt" class="pikto-obj-text" style="font-family: 'Vast Shadow'; font-size: 66px; line-height: 1; letter-spacing: 0px; text-align: center;"><div><span style="color:rgb(245, 241, 228);">&nbsp;ROCKSMITH<br></span></div>
+          </div>
+        </div>
+        <div id="pik_obj_919" class="pikto-obj wyndle-item" style="left: 225px; top: 116.5px; width: 350px; opacity: 1; height: 82px;">
+          <div id="pik_obj_919_txt" class="pikto-obj-text" style="font-family: Caveat; font-size: 80px; line-height: 1; letter-spacing: 0px; text-align: center;"><div><span style="color: rgb(251, 89, 45);">journey<br></span></div>
+        </div>
+      </div>
+      <div id="pik_obj_1061" class="pikto-obj wyndle-item" style="left: 233px; top: -0.5px; width: 350px; opacity: 1; height: 82px;">
+        <div id="pik_obj_1061_txt" class="pikto-obj-text" style="font-family: Caveat; font-size: 80px; line-height: 1; letter-spacing: 0px; text-align: center;"><div><span style="color:rgb(251, 89, 45);">my<br></span></div>
+      </div>
+      </div>
+      </div>
+
+
+         
+         <div id="block_1" class="pikto-block" style="background-color: rgb(25, 32, 40); height: 240px;"><div id="pik_obj_1120" class="pikto-obj wyndle-item" style="left: 51.9617px; top: 27px; width: 302px; opacity: 1; height: 36px;"><div id="pik_obj_1120_txt" class="pikto-obj-text" style="font-family: 'Vast Shadow'; font-size: 31px; line-height: 1.1; letter-spacing: 0px; text-align: left;"><div><span style="color:rgb(245, 241, 228);">TIME&nbsp;</span><span style="color:rgb(245, 241, 228);">PLAYED<br></span></div></div></div><div id="pik_obj_1121" class="pikto-obj wyndle-item" style="left: 434.289px; top: 28px; width: 334px; opacity: 1; height: 36px;"><div id="pik_obj_1121_txt" class="pikto-obj-text" style="font-family: 'Vast Shadow'; font-size: 31px; line-height: 1.1; letter-spacing: 0px; text-align: left;"><div><span style="color:rgb(245, 241, 228);">SONGS&nbsp;</span><span style="color:rgb(245, 241, 228);">PLAYED<br></span></div></div></div><div id="pik_obj_973" class="pikto-obj wyndle-item" data-pathcount="1" style="left: 479.672px; top: 72.5px; width: 243.238px; height: 97px; opacity: 1;"><div><svg version="1.1" id="pik_obj_973_svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="100%" height="100%" viewBox="0 0 32 32" enable-background="new 0 0 32 32" xml:space="preserve" preserveAspectRatio="none">
     <path d="M0,0v32h32V0H0z" fill="#fb592d"></path>
     </svg></div></div><div id="pik_obj_974" class="pikto-obj wyndle-item" style="left: 488.954px; top: 79px; width: 225px; opacity: 1; height: 86px;"><div id="pik_obj_974_txt" class="pikto-obj-text" style="font-family: 'Squada One'; font-size: 84.5407px; line-height: 1; letter-spacing: 0px; text-align: center;"><div><span style="color:rgb(25, 32, 40);">{SONG}<br></span></div></div></div><div id="pik_obj_1136" class="pikto-obj wyndle-item" data-pathcount="1" style="left: 87.3448px; top: 72.5px; width: 231.236px; height: 97px; opacity: 1;"><div><svg version="1.1" id="pik_obj_1136_svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="100%" height="100%" viewBox="0 0 32 32" enable-background="new 0 0 32 32" xml:space="preserve" preserveAspectRatio="none">
     <path d="M0,0v32h32V0H0z" fill="#fb592d"></path>
-    </svg></div></div><div id="pik_obj_1137" class="pikto-obj wyndle-item" style="left: 91.9615px; top: 78px; width: 222px; opacity: 1; height: 86px;"><div id="pik_obj_1137_txt" class="pikto-obj-text" style="font-family: 'Squada One'; font-size: 84.5407px; line-height: 1; letter-spacing: 0px; text-align: center;"><div><span style="color:rgb(25, 32, 40);">{TIME}<br></span></div></div></div><div id="pik_obj_1140" class="pikto-obj wyndle-item" style="left: 321.579px; top: 142.5px; width: 46px; opacity: 1; height: 34px;"><div id="pik_obj_1140_txt" class="pikto-obj-text" style="font-family: 'Squada One'; font-size: 32px; line-height: 1; letter-spacing: 0px; text-align: left;"><div><span style="color:rgb(251, 89, 45);">hrs</span><span style="color:rgb(25, 32, 40);"><br></span></div></div></div></div><div id="block_2" class="pikto-block" style="background-color: rgb(25, 32, 40); height: 549px;"><div id="pik_obj_920" class="pikto-obj wyndle-item" style="left: 70.384px; top: 20.5px; width: 255px; opacity: 1; height: 98px;"><div id="pik_obj_920_txt" class="pikto-obj-text" style="font-family: 'Vast Shadow'; font-size: 44px; line-height: 1.1; letter-spacing: 0px; text-align: center;"><div><span style="color:rgb(245, 241, 228);">MOST<br></span></div><div><span style="color:rgb(245, 241, 228);">PLAYED&nbsp;<br></span></div></div></div><div id="pik_obj_922" class="pikto-obj wyndle-item" style="left: 538px; top: 31.5px; width: 94px; opacity: 1; height: 62px;"><div id="pik_obj_922_txt" class="pikto-obj-text" style="font-family: 'Squada One'; font-size: 60px; line-height: 1; letter-spacing: 0px; text-align: center;"><div><span style="color: rgb(25, 32, 40);">01</span><span style="color: rgb(255, 255, 255);"><br></span></div></div></div><div id="pik_obj_923" class="pikto-obj wyndle-item" style="left: 48.9466px; top: 176.768px; width: 220px; opacity: 1; height: 23px;"><div id="pik_obj_923_txt" class="pikto-obj-text" style="font-family: Lekton; font-size: 18px; line-height: 1.2; letter-spacing: 0px; text-align: left;"><div><span style="color:rgb(255, 255, 255);">{TOP3_SONG_1_NAME}</span><span style="color:rgb(255, 255, 255);"><br></span></div></div></div><div id="pik_obj_924" class="pikto-obj wyndle-item" style="left: 48.9466px; top: 220.768px; width: 181px; height: 20px; opacity: 1;"><svg id="pik_obj_924_line" width="{WD1}" height="100%" preserveAspectRatio="none" viewBox="0 0 180.9999999999995 20"><path d="M0 10 l 180.9999999999995 0" stroke-width="2" stroke="#fb592d"></path></svg></div><div id="pik_obj_933" class="pikto-obj wyndle-item" style="left: -4.44776px; top: 463px; width: 808.994px; height: 20px; opacity: 1; transform: matrix(0, -1, 1, 0, 0, 0);"><svg id="pik_obj_933_line" width="100%" height="100%" preserveAspectRatio="none" viewBox="0 0 808.9943016412759 20.000001828683242"><path d="M0 10.000000914341621 l 808.9943016412759 0" stroke-width="2.0000001828683245" stroke="#fb592d"></path></svg></div><div id="pik_obj_1063" class="pikto-obj wyndle-item" style="left: 418.289px; top: 20.5px; width: 350px; opacity: 1; height: 98px;"><div id="pik_obj_1063_txt" class="pikto-obj-text" style="font-family: 'Vast Shadow'; font-size: 44px; line-height: 1.1; letter-spacing: 0px; text-align: center;"><div><span style="color:rgb(245, 241, 228);">LAST<br></span></div><div><span style="color:rgb(245, 241, 228);">PLAYED<br></span></div></div></div><div id="pik_obj_1215" class="pikto-obj wyndle-item" style="left: 48.9466px; top: 199.768px; width: 220px; opacity: 1; height: 23px;"><div id="pik_obj_1215_txt" class="pikto-obj-text" style="font-family: Lekton; font-size: 18px; line-height: 1.2; letter-spacing: 0px; text-align: left;"><div><span style="color:rgb(245, 241, 228);">{TOP3_ARTIST_1_NAME}</span></div></div></div><div id="pik_obj_1216" class="pikto-obj wyndle-item" style="left: 48.9466px; top: 240.768px; width: 36px; opacity: 1; height: 38px;"><div id="pik_obj_1216_txt" class="pikto-obj-text" style="font-family: Lekton; font-size: 14px; line-height: 1.2; letter-spacing: 0px; text-align: left;"><div><span style="color:rgb(251, 89, 45);font-weight:bold;">{PT1}</span><span style="color:rgb(245, 241, 228);"><br></span></div></div></div><div id="pik_obj_1221" class="pikto-obj wyndle-item" style="left: 278.932px; top: 176.768px; width: 92px; height: 86.2993px; opacity: 1;"><img id="pik_obj_1221_img" class="pikto-obj-subobj" src="{TOP3_PIC_1}"></div><div id="pik_obj_1236" class="pikto-obj wyndle-item" style="left: 48.9466px; top: 292.732px; width: 220px; opacity: 1; height: 23px;"><div id="pik_obj_1236_txt" class="pikto-obj-text" style="font-family: Lekton; font-size: 18px; line-height: 1.2; letter-spacing: 0px; text-align: left;"><div><span style="color:rgb(255, 255, 255);">{TOP3_SONG_2_NAME}</span><span style="color:rgb(255, 255, 255);"><br></span></div></div></div><div id="pik_obj_1237" class="pikto-obj wyndle-item" style="left: 48.9466px; top: 336.5px; width: 181px; height: 20px; opacity: 1;"><svg id="pik_obj_1237_line" width="{WD2}" height="100%" preserveAspectRatio="none" viewBox="0 0 132.99999999999963 20"><path d="M0 10 l 132.99999999999963 0" stroke-width="2" stroke="#fb592d"></path></svg></div><div id="pik_obj_1238" class="pikto-obj wyndle-item" style="left: 48.9466px; top: 315.732px; width: 220px; opacity: 1; height: 23px;"><div id="pik_obj_1238_txt" class="pikto-obj-text" style="font-family: Lekton; font-size: 18px; line-height: 1.2; letter-spacing: 0px; text-align: left;"><div><span style="color:rgb(245, 241, 228);">{TOP3_ARTIST_2_NAME}<br></span></div></div></div><div id="pik_obj_1239" class="pikto-obj wyndle-item" style="left: 48.9466px; top: 359.156px; width: 36px; opacity: 1; height: 20px;"><div id="pik_obj_1239_txt" class="pikto-obj-text" style="font-family: Lekton; font-size: 14px; line-height: 1.2; letter-spacing: 0px; text-align: left;"><div><span style="color:rgb(251, 89, 45);font-weight:bold;">{PT2}</span><span style="color:rgb(245, 241, 228);"><br></span></div></div></div><div id="pik_obj_1247" class="pikto-obj wyndle-item" style="left: 278.932px; top: 292.5px; width: 93px; height: 86.6582px; opacity: 1;"><img id="pik_obj_1247_img" class="pikto-obj-subobj" src="{TOP3_PIC_2}"></div><div id="pik_obj_1248" class="pikto-obj wyndle-item" style="left: 48.9466px; top: 413.232px; width: 220px; opacity: 1; height: 23px;"><div id="pik_obj_1248_txt" class="pikto-obj-text" style="font-family: Lekton; font-size: 18px; line-height: 1.2; letter-spacing: 0px; text-align: left;"><div><span style="color:rgb(255, 255, 255);">{TOP3_SONG_3_NAME}</span><span style="color:rgb(255, 255, 255);"><br></span></div></div></div><div id="pik_obj_1249" class="pikto-obj wyndle-item" style="left: 48.9466px; top: 457px; width: 181px; height: 20px; opacity: 1;"><svg id="pik_obj_1249_line" width="{WD3}" height="100%" preserveAspectRatio="none" viewBox="0 0 132.99999999999963 20"><path d="M0 10 l 132.99999999999963 0" stroke-width="2" stroke="#fb592d"></path></svg></div><div id="pik_obj_1250" class="pikto-obj wyndle-item" style="left: 48.9466px; top: 436.232px; width: 220px; opacity: 1; height: 23px;"><div id="pik_obj_1250_txt" class="pikto-obj-text" style="font-family: Lekton; font-size: 18px; line-height: 1.2; letter-spacing: 0px; text-align: left;"><div><span style="color:rgb(245, 241, 228);">{TOP3_ARTIST_3_NAME}<br></span></div></div></div><div id="pik_obj_1251" class="pikto-obj wyndle-item" style="left: 48.9466px; top: 477px; width: 36px; opacity: 1; height: 20px;"><div id="pik_obj_1251_txt" class="pikto-obj-text" style="font-family: Lekton; font-size: 14px; line-height: 1.2; letter-spacing: 0px; text-align: left;"><div><span style="color:rgb(251, 89, 45);font-weight:bold;">{PT3}</span><span style="color:rgb(245, 241, 228);"><br></span></div></div></div><div id="pik_obj_1252" class="pikto-obj wyndle-item" style="left: 278.932px; top: 413px; width: 93px; height: 86.6582px; opacity: 1;"><img id="pik_obj_1252_img" class="pikto-obj-subobj" src="{TOP3_PIC_3}"></div><div id="pik_obj_1328" class="pikto-obj wyndle-item" style="left: 434.289px; top: 176.768px; width: 220px; opacity: 1; height: 23px;"><div id="pik_obj_1328_txt" class="pikto-obj-text" style="font-family: Lekton; font-size: 18px; line-height: 1.2; letter-spacing: 0px; text-align: left;"><div><span style="color:rgb(255, 255, 255);">{RP_SONG_1_NAME}</span><span style="color:rgb(255, 255, 255);"><br></span></div></div></div><div id="pik_obj_1329" class="pikto-obj wyndle-item" style="left: 434.289px; top: 220.768px; width: 181px; height: 20px; opacity: 1;"><svg id="pik_obj_1329_line" width="{WD4}" height="100%" preserveAspectRatio="none" viewBox="0 0 180.9999999999995 20"><path d="M0 10 l 180.9999999999995 0" stroke-width="2" stroke="#fb592d"></path></svg></div><div id="pik_obj_1330" class="pikto-obj wyndle-item" style="left: 434.289px; top: 199.768px; width: 220px; opacity: 1; height: 23px;"><div id="pik_obj_1330_txt" class="pikto-obj-text" style="font-family: Lekton; font-size: 18px; line-height: 1.2; letter-spacing: 0px; text-align: left;"><div><span style="color:rgb(245, 241, 228);">{RP_ARTIST_1_NAME}<br></span></div></div></div><div id="pik_obj_1331" class="pikto-obj wyndle-item" style="left: 434.289px; top: 240.768px; width: 36px; opacity: 1; height: 20px;"><div id="pik_obj_1331_txt" class="pikto-obj-text" style="font-family: Lekton; font-size: 14px; line-height: 1.2; letter-spacing: 0px; text-align: left;"><div><span style="color:rgb(251, 89, 45);font-weight:bold;">{PT4}</span><span style="color:rgb(245, 241, 228);"><br></span></div></div></div><div id="pik_obj_1332" class="pikto-obj wyndle-item" style="left: 664.274px; top: 176.768px; width: 92px; height: 86.2993px; opacity: 1;"><img id="pik_obj_1332_img" class="pikto-obj-subobj" src="{RP_PIC_1}"></div><div id="pik_obj_1333" class="pikto-obj wyndle-item" style="left: 434.289px; top: 292.732px; width: 220px; opacity: 1; height: 23px;"><div id="pik_obj_1333_txt" class="pikto-obj-text" style="font-family: Lekton; font-size: 18px; line-height: 1.2; letter-spacing: 0px; text-align: left;"><div><span style="color:rgb(255, 255, 255);">{RP_SONG_2_NAME}</span><span style="color:rgb(255, 255, 255);"><br></span></div></div></div><div id="pik_obj_1334" class="pikto-obj wyndle-item" style="left: 434.289px; top: 336.5px; width: 181px; height: 20px; opacity: 1;"><svg id="pik_obj_1334_line" width="{WD5}" height="100%" preserveAspectRatio="none" viewBox="0 0 132.99999999999963 20"><path d="M0 10 l 132.99999999999963 0" stroke-width="2" stroke="#fb592d"></path></svg></div><div id="pik_obj_1335" class="pikto-obj wyndle-item" style="left: 434.289px; top: 315.732px; width: 220px; opacity: 1; height: 23px;"><div id="pik_obj_1335_txt" class="pikto-obj-text" style="font-family: Lekton; font-size: 18px; line-height: 1.2; letter-spacing: 0px; text-align: left;"><div><span style="color:rgb(245, 241, 228);">{RP_ARTIST_2_NAME}<br></span></div></div></div><div id="pik_obj_1336" class="pikto-obj wyndle-item" style="left: 434.289px; top: 359.156px; width: 36px; opacity: 1; height: 20px;"><div id="pik_obj_1336_txt" class="pikto-obj-text" style="font-family: Lekton; font-size: 14px; line-height: 1.2; letter-spacing: 0px; text-align: left;"><div><span style="color:rgb(251, 89, 45);font-weight:bold;">{PT5}</span><span style="color:rgb(245, 241, 228);"><br></span></div></div></div><div id="pik_obj_1337" class="pikto-obj wyndle-item" style="left: 664.274px; top: 292.5px; width: 93px; height: 86.6582px; opacity: 1;"><img id="pik_obj_1337_img" class="pikto-obj-subobj" src="{RP_PIC_2}"></div><div id="pik_obj_1338" class="pikto-obj wyndle-item" style="left: 434.289px; top: 413.232px; width: 220px; opacity: 1; height: 23px;"><div id="pik_obj_1338_txt" class="pikto-obj-text" style="font-family: Lekton; font-size: 18px; line-height: 1.2; letter-spacing: 0px; text-align: left;"><div><span style="color:rgb(255, 255, 255);">{RP_SONG_3_NAME}</span><span style="color:rgb(255, 255, 255);"><br></span></div></div></div><div id="pik_obj_1339" class="pikto-obj wyndle-item" style="left: 434.289px; top: 457px; width: 181px; height: 20px; opacity: 1;"><svg id="pik_obj_1339_line" width="{WD6}" height="100%" preserveAspectRatio="none" viewBox="0 0 132.99999999999963 20"><path d="M0 10 l 132.99999999999963 0" stroke-width="2" stroke="#fb592d"></path></svg></div><div id="pik_obj_1340" class="pikto-obj wyndle-item" style="left: 434.289px; top: 436.232px; width: 220px; opacity: 1; height: 23px;"><div id="pik_obj_1340_txt" class="pikto-obj-text" style="font-family: Lekton; font-size: 18px; line-height: 1.2; letter-spacing: 0px; text-align: left;"><div><span style="color:rgb(245, 241, 228);">{RP_ARTIST_3_NAME}<br></span></div></div></div><div id="pik_obj_1341" class="pikto-obj wyndle-item" style="left: 434.289px; top: 477px; width: 36px; opacity: 1; height: 20px;"><div id="pik_obj_1341_txt" class="pikto-obj-text" style="font-family: Lekton; font-size: 14px; line-height: 1.2; letter-spacing: 0px; text-align: left;"><div><span style="color:rgb(251, 89, 45);font-weight:bold;">{PT6}</span><span style="color:rgb(245, 241, 228);"><br></span></div></div></div><div id="pik_obj_1342" class="pikto-obj wyndle-item" style="left: 664.275px; top: 413px; width: 93px; height: 86.6582px; opacity: 1;"><img id="pik_obj_1342_img" class="pikto-obj-subobj" src="{RP_PIC_3}"></div></div>
+    </svg></div></div><div id="pik_obj_1137" class="pikto-obj wyndle-item" style="left: 91.9615px; top: 78px; width: 222px; opacity: 1; height: 86px;"><div id="pik_obj_1137_txt" class="pikto-obj-text" style="font-family: 'Squada One'; font-size: 84.5407px; line-height: 1; letter-spacing: 0px; text-align: center;"><div><span style="color:rgb(25, 32, 40);">{TIME}<br></span></div></div></div><div id="pik_obj_1140" class="pikto-obj wyndle-item" style="left: 321.579px; top: 142.5px; width: 46px; opacity: 1; height: 34px;"><div id="pik_obj_1140_txt" class="pikto-obj-text" style="font-family: 'Squada One'; font-size: 32px; line-height: 1; letter-spacing: 0px; text-align: left;"><div><span style="color:rgb(251, 89, 45);">hrs</span><span style="color:rgb(25, 32, 40);"><br></span></div></div></div></div>
+
+
+
+    <div id="block_2" class="pikto-block" style="background-color: rgb(25, 32, 40); height: 549px;"><div id="pik_obj_920" class="pikto-obj wyndle-item" style="left: 70.384px; top: 20.5px; width: 255px; opacity: 1; height: 98px;"><div id="pik_obj_920_txt" class="pikto-obj-text" style="font-family: 'Vast Shadow'; font-size: 44px; line-height: 1.1; letter-spacing: 0px; text-align: center;"><div><span style="color:rgb(245, 241, 228);">MOST<br></span></div><div><span style="color:rgb(245, 241, 228);">PLAYED&nbsp;<br></span></div></div></div><div id="pik_obj_922" class="pikto-obj wyndle-item" style="left: 538px; top: 31.5px; width: 94px; opacity: 1; height: 62px;"><div id="pik_obj_922_txt" class="pikto-obj-text" style="font-family: 'Squada One'; font-size: 60px; line-height: 1; letter-spacing: 0px; text-align: center;"><div><span style="color: rgb(25, 32, 40);">01</span><span style="color: rgb(255, 255, 255);"><br></span></div></div></div><div id="pik_obj_923" class="pikto-obj wyndle-item" style="left: 48.9466px; top: 176.768px; width: 220px; opacity: 1; height: 23px;"><div id="pik_obj_923_txt" class="pikto-obj-text" style="font-family: Lekton; font-size: 18px; line-height: 1.2; letter-spacing: 0px; text-align: left;"><div><span style="color:rgb(255, 255, 255);">{TOP3_SONG_1_NAME}</span><span style="color:rgb(255, 255, 255);"><br></span></div></div></div><div id="pik_obj_924" class="pikto-obj wyndle-item" style="left: 48.9466px; top: 220.768px; width: 181px; height: 20px; opacity: 1;"><svg id="pik_obj_924_line" width="{WD1}" height="100%" preserveAspectRatio="none" viewBox="0 0 180.9999999999995 20"><path d="M0 10 l 180.9999999999995 0" stroke-width="2" stroke="#fb592d"></path></svg></div><div id="pik_obj_933" class="pikto-obj wyndle-item" style="left: -4.44776px; top: 463px; width: 808.994px; height: 20px; opacity: 1; transform: matrix(0, -1, 1, 0, 0, 0);"><svg id="pik_obj_933_line" width="100%" height="100%" preserveAspectRatio="none" viewBox="0 0 808.9943016412759 20.000001828683242"><path d="M0 10.000000914341621 l 808.9943016412759 0" stroke-width="2.0000001828683245" stroke="#fb592d"></path></svg></div><div id="pik_obj_1063" class="pikto-obj wyndle-item" style="left: 418.289px; top: 20.5px; width: 350px; opacity: 1; height: 98px;"><div id="pik_obj_1063_txt" class="pikto-obj-text" style="font-family: 'Vast Shadow'; font-size: 44px; line-height: 1.1; letter-spacing: 0px; text-align: center;"><div><span style="color:rgb(245, 241, 228);">LAST<br></span></div><div><span style="color:rgb(245, 241, 228);">PLAYED<br></span></div></div></div><div id="pik_obj_1215" class="pikto-obj wyndle-item" style="left: 48.9466px; top: 199.768px; width: 220px; opacity: 1; height: 23px;"><div id="pik_obj_1215_txt" class="pikto-obj-text" style="font-family: Lekton; font-size: 18px; line-height: 1.2; letter-spacing: 0px; text-align: left;"><div><span style="color:rgb(245, 241, 228);">{TOP3_ARTIST_1_NAME}</span></div></div></div><div id="pik_obj_1216" class="pikto-obj wyndle-item" style="left: 48.9466px; top: 240.768px; width: 36px; opacity: 1; height: 38px;"><div id="pik_obj_1216_txt" class="pikto-obj-text" style="font-family: Lekton; font-size: 14px; line-height: 1.2; letter-spacing: 0px; text-align: left;"><div><span style="color:rgb(251, 89, 45);font-weight:bold;">{PT1}</span><span style="color:rgb(245, 241, 228);"><br></span></div></div></div><div id="pik_obj_1221" class="pikto-obj wyndle-item" style="left: 278.932px; top: 176.768px; width: 92px; height: 86.2993px; opacity: 1;"><img id="pik_obj_1221_img" class="pikto-obj-subobj" src="{TOP3_PIC_1}"></div><div id="pik_obj_1236" class="pikto-obj wyndle-item" style="left: 48.9466px; top: 292.732px; width: 220px; opacity: 1; height: 23px;"><div id="pik_obj_1236_txt" class="pikto-obj-text" style="font-family: Lekton; font-size: 18px; line-height: 1.2; letter-spacing: 0px; text-align: left;"><div><span style="color:rgb(255, 255, 255);">{TOP3_SONG_2_NAME}</span><span style="color:rgb(255, 255, 255);"><br></span></div></div></div><div id="pik_obj_1237" class="pikto-obj wyndle-item" style="left: 48.9466px; top: 336.5px; width: 181px; height: 20px; opacity: 1;"><svg id="pik_obj_1237_line" width="{WD2}" height="100%" preserveAspectRatio="none" viewBox="0 0 132.99999999999963 20"><path d="M0 10 l 132.99999999999963 0" stroke-width="2" stroke="#fb592d"></path></svg></div><div id="pik_obj_1238" class="pikto-obj wyndle-item" style="left: 48.9466px; top: 315.732px; width: 220px; opacity: 1; height: 23px;"><div id="pik_obj_1238_txt" class="pikto-obj-text" style="font-family: Lekton; font-size: 18px; line-height: 1.2; letter-spacing: 0px; text-align: left;"><div><span style="color:rgb(245, 241, 228);">{TOP3_ARTIST_2_NAME}<br></span></div></div></div><div id="pik_obj_1239" class="pikto-obj wyndle-item" style="left: 48.9466px; top: 359.156px; width: 36px; opacity: 1; height: 20px;"><div id="pik_obj_1239_txt" class="pikto-obj-text" style="font-family: Lekton; font-size: 14px; line-height: 1.2; letter-spacing: 0px; text-align: left;"><div><span style="color:rgb(251, 89, 45);font-weight:bold;">{PT2}</span><span style="color:rgb(245, 241, 228);"><br></span></div></div></div><div id="pik_obj_1247" class="pikto-obj wyndle-item" style="left: 278.932px; top: 292.5px; width: 93px; height: 86.6582px; opacity: 1;"><img id="pik_obj_1247_img" class="pikto-obj-subobj" src="{TOP3_PIC_2}"></div><div id="pik_obj_1248" class="pikto-obj wyndle-item" style="left: 48.9466px; top: 413.232px; width: 220px; opacity: 1; height: 23px;"><div id="pik_obj_1248_txt" class="pikto-obj-text" style="font-family: Lekton; font-size: 18px; line-height: 1.2; letter-spacing: 0px; text-align: left;"><div><span style="color:rgb(255, 255, 255);">{TOP3_SONG_3_NAME}</span><span style="color:rgb(255, 255, 255);"><br></span></div></div></div><div id="pik_obj_1249" class="pikto-obj wyndle-item" style="left: 48.9466px; top: 457px; width: 181px; height: 20px; opacity: 1;"><svg id="pik_obj_1249_line" width="{WD3}" height="100%" preserveAspectRatio="none" viewBox="0 0 132.99999999999963 20"><path d="M0 10 l 132.99999999999963 0" stroke-width="2" stroke="#fb592d"></path></svg></div><div id="pik_obj_1250" class="pikto-obj wyndle-item" style="left: 48.9466px; top: 436.232px; width: 220px; opacity: 1; height: 23px;"><div id="pik_obj_1250_txt" class="pikto-obj-text" style="font-family: Lekton; font-size: 18px; line-height: 1.2; letter-spacing: 0px; text-align: left;"><div><span style="color:rgb(245, 241, 228);">{TOP3_ARTIST_3_NAME}<br></span></div></div></div><div id="pik_obj_1251" class="pikto-obj wyndle-item" style="left: 48.9466px; top: 477px; width: 36px; opacity: 1; height: 20px;"><div id="pik_obj_1251_txt" class="pikto-obj-text" style="font-family: Lekton; font-size: 14px; line-height: 1.2; letter-spacing: 0px; text-align: left;"><div><span style="color:rgb(251, 89, 45);font-weight:bold;">{PT3}</span><span style="color:rgb(245, 241, 228);"><br></span></div></div></div><div id="pik_obj_1252" class="pikto-obj wyndle-item" style="left: 278.932px; top: 413px; width: 93px; height: 86.6582px; opacity: 1;"><img id="pik_obj_1252_img" class="pikto-obj-subobj" src="{TOP3_PIC_3}"></div><div id="pik_obj_1328" class="pikto-obj wyndle-item" style="left: 434.289px; top: 176.768px; width: 220px; opacity: 1; height: 23px;"><div id="pik_obj_1328_txt" class="pikto-obj-text" style="font-family: Lekton; font-size: 18px; line-height: 1.2; letter-spacing: 0px; text-align: left;"><div><span style="color:rgb(255, 255, 255);">{RP_SONG_1_NAME}</span><span style="color:rgb(255, 255, 255);"><br></span></div></div></div><div id="pik_obj_1329" class="pikto-obj wyndle-item" style="left: 434.289px; top: 220.768px; width: 181px; height: 20px; opacity: 1;"><svg id="pik_obj_1329_line" width="{WD4}" height="100%" preserveAspectRatio="none" viewBox="0 0 180.9999999999995 20"><path d="M0 10 l 180.9999999999995 0" stroke-width="2" stroke="#fb592d"></path></svg></div><div id="pik_obj_1330" class="pikto-obj wyndle-item" style="left: 434.289px; top: 199.768px; width: 220px; opacity: 1; height: 23px;"><div id="pik_obj_1330_txt" class="pikto-obj-text" style="font-family: Lekton; font-size: 18px; line-height: 1.2; letter-spacing: 0px; text-align: left;"><div><span style="color:rgb(245, 241, 228);">{RP_ARTIST_1_NAME}<br></span></div></div></div><div id="pik_obj_1331" class="pikto-obj wyndle-item" style="left: 434.289px; top: 240.768px; width: 36px; opacity: 1; height: 20px;"><div id="pik_obj_1331_txt" class="pikto-obj-text" style="font-family: Lekton; font-size: 14px; line-height: 1.2; letter-spacing: 0px; text-align: left;"><div><span style="color:rgb(251, 89, 45);font-weight:bold;">{PT4}</span><span style="color:rgb(245, 241, 228);"><br></span></div></div></div><div id="pik_obj_1332" class="pikto-obj wyndle-item" style="left: 664.274px; top: 176.768px; width: 92px; height: 86.2993px; opacity: 1;"><img id="pik_obj_1332_img" class="pikto-obj-subobj" src="{RP_PIC_1}"></div><div id="pik_obj_1333" class="pikto-obj wyndle-item" style="left: 434.289px; top: 292.732px; width: 220px; opacity: 1; height: 23px;"><div id="pik_obj_1333_txt" class="pikto-obj-text" style="font-family: Lekton; font-size: 18px; line-height: 1.2; letter-spacing: 0px; text-align: left;"><div><span style="color:rgb(255, 255, 255);">{RP_SONG_2_NAME}</span><span style="color:rgb(255, 255, 255);"><br></span></div></div></div><div id="pik_obj_1334" class="pikto-obj wyndle-item" style="left: 434.289px; top: 336.5px; width: 181px; height: 20px; opacity: 1;"><svg id="pik_obj_1334_line" width="{WD5}" height="100%" preserveAspectRatio="none" viewBox="0 0 132.99999999999963 20"><path d="M0 10 l 132.99999999999963 0" stroke-width="2" stroke="#fb592d"></path></svg></div><div id="pik_obj_1335" class="pikto-obj wyndle-item" style="left: 434.289px; top: 315.732px; width: 220px; opacity: 1; height: 23px;"><div id="pik_obj_1335_txt" class="pikto-obj-text" style="font-family: Lekton; font-size: 18px; line-height: 1.2; letter-spacing: 0px; text-align: left;"><div><span style="color:rgb(245, 241, 228);">{RP_ARTIST_2_NAME}<br></span></div></div></div><div id="pik_obj_1336" class="pikto-obj wyndle-item" style="left: 434.289px; top: 359.156px; width: 36px; opacity: 1; height: 20px;"><div id="pik_obj_1336_txt" class="pikto-obj-text" style="font-family: Lekton; font-size: 14px; line-height: 1.2; letter-spacing: 0px; text-align: left;"><div><span style="color:rgb(251, 89, 45);font-weight:bold;">{PT5}</span><span style="color:rgb(245, 241, 228);"><br></span></div></div></div><div id="pik_obj_1337" class="pikto-obj wyndle-item" style="left: 664.274px; top: 292.5px; width: 93px; height: 86.6582px; opacity: 1;"><img id="pik_obj_1337_img" class="pikto-obj-subobj" src="{RP_PIC_2}"></div><div id="pik_obj_1338" class="pikto-obj wyndle-item" style="left: 434.289px; top: 413.232px; width: 220px; opacity: 1; height: 23px;"><div id="pik_obj_1338_txt" class="pikto-obj-text" style="font-family: Lekton; font-size: 18px; line-height: 1.2; letter-spacing: 0px; text-align: left;"><div><span style="color:rgb(255, 255, 255);">{RP_SONG_3_NAME}</span><span style="color:rgb(255, 255, 255);"><br></span></div></div></div><div id="pik_obj_1339" class="pikto-obj wyndle-item" style="left: 434.289px; top: 457px; width: 181px; height: 20px; opacity: 1;"><svg id="pik_obj_1339_line" width="{WD6}" height="100%" preserveAspectRatio="none" viewBox="0 0 132.99999999999963 20"><path d="M0 10 l 132.99999999999963 0" stroke-width="2" stroke="#fb592d"></path></svg></div><div id="pik_obj_1340" class="pikto-obj wyndle-item" style="left: 434.289px; top: 436.232px; width: 220px; opacity: 1; height: 23px;"><div id="pik_obj_1340_txt" class="pikto-obj-text" style="font-family: Lekton; font-size: 18px; line-height: 1.2; letter-spacing: 0px; text-align: left;"><div><span style="color:rgb(245, 241, 228);">{RP_ARTIST_3_NAME}<br></span></div></div></div><div id="pik_obj_1341" class="pikto-obj wyndle-item" style="left: 434.289px; top: 477px; width: 36px; opacity: 1; height: 20px;"><div id="pik_obj_1341_txt" class="pikto-obj-text" style="font-family: Lekton; font-size: 14px; line-height: 1.2; letter-spacing: 0px; text-align: left;"><div><span style="color:rgb(251, 89, 45);font-weight:bold;">{PT6}</span><span style="color:rgb(245, 241, 228);"><br></span></div></div></div><div id="pik_obj_1342" class="pikto-obj wyndle-item" style="left: 664.275px; top: 413px; width: 93px; height: 86.6582px; opacity: 1;"><img id="pik_obj_1342_img" class="pikto-obj-subobj" src="{RP_PIC_3}"></div></div>
 
   
   
   
   
-  <div id="block_2" class="pikto-block" style="background-color: rgb(25, 32, 40); height: 549px;"><div id="pik_obj_920" class="pikto-obj wyndle-item" style="left: 70.384px;top: 20.5px;width: 259px;opacity: 1;height: 98px;"><div id="pik_obj_920_txt" class="pikto-obj-text" style="font-family: 'Vast Shadow'; font-size: 44px; line-height: 1.1; letter-spacing: 0px; text-align: center;"><div><span style="color:rgb(245, 241, 228);">SCORE<br></span></div><div><span style="color:rgb(245, 241, 228);">ATTACK<br></span></div></div></div><div id="pik_obj_922" class="pikto-obj wyndle-item" style="left: 538px; top: 31.5px; width: 94px; opacity: 1; height: 62px;"><div id="pik_obj_922_txt" class="pikto-obj-text" style="font-family: 'Squada One'; font-size: 60px; line-height: 1; letter-spacing: 0px; text-align: center;"><div><span style="color: rgb(25, 32, 40);">01</span><span style="color: rgb(255, 255, 255);"><br></span></div></div></div><div id="pik_obj_923" class="pikto-obj wyndle-item" style="left: 48.9466px; top: 176.768px; width: 220px; opacity: 1; height: 23px;"><div id="pik_obj_923_txt" class="pikto-obj-text" style="font-family: Lekton; font-size: 18px; line-height: 1.2; letter-spacing: 0px; text-align: left;"><div><span style="color:rgb(255, 255, 255);">{SA_SONG_1_NAME}</span><span style="color:rgb(255, 255, 255);"><br></span></div></div></div><div id="pik_obj_924" class="pikto-obj wyndle-item" style="left: 48.9466px; top: 220.768px; width: 181px; height: 20px; opacity: 1;"><svg id="pik_obj_924_line" width="{WD7}" height="100%" preserveAspectRatio="none" viewBox="0 0 180.9999999999995 20"><path d="M0 10 l 180.9999999999995 0" stroke-width="2" stroke="#fb592d"></path></svg></div><div id="pik_obj_933" class="pikto-obj wyndle-item" style="left: -4.44776px;top: 463px;width: 808.994px;height: 20px;opacity: 1;transform: matrix(0, -1, 1, 0, 0, 0);"><svg id="pik_obj_933_line" width="100%" height="100%" preserveAspectRatio="none" viewBox="0 0 808.9943016412759 20.000001828683242"><path d="M0 10.000000914341621 l 808.9943016412759 0" stroke-width="2.0000001828683245" stroke="#fb592d"></path></svg></div><div id="pik_obj_1063" class="pikto-obj wyndle-item" style="left: 418.289px; top: 20.5px; width: 350px; opacity: 1; height: 98px;"><div id="pik_obj_1063_txt" class="pikto-obj-text" style="font-family: 'Vast Shadow'; font-size: 44px; line-height: 1.1; letter-spacing: 0px; text-align: center;"><div><span style="color:rgb(245, 241, 228);">MOST<br></span></div><div><span style="color:rgb(245, 241, 228);">DIFFICULT<br></span></div></div></div><div id="pik_obj_1215" class="pikto-obj wyndle-item" style="left: 48.9466px;top: 199.768px;width: 220px;opacity: 1;height: 23px;"><div id="pik_obj_1215_txt" class="pikto-obj-text" style="font-family: Lekton; font-size: 18px; line-height: 1.2; letter-spacing: 0px; text-align: left;"><div><span style="color:rgb(245, 241, 228);">{SA_ARTIST_1_NAME}</span></div></div></div><div id="pik_obj_1216" class="pikto-obj wyndle-item" style="left: 48.9466px;top: 240.768px;width: 36px;opacity: 1;/* height: 38px; */"><div id="pik_obj_1216_txt" class="pikto-obj-text" style="font-family: Lekton; font-size: 14px; line-height: 1.2; letter-spacing: 0px; text-align: left;"><div class="iconPreview {BG1}"><span style="
+  <div id="block_3" class="pikto-block" style="background-color: rgb(25, 32, 40); height: 549px;"><div id="pik_obj_920" class="pikto-obj wyndle-item" style="left: 70.384px;top: 20.5px;width: 259px;opacity: 1;height: 98px;"><div id="pik_obj_920_txt" class="pikto-obj-text" style="font-family: 'Vast Shadow'; font-size: 44px; line-height: 1.1; letter-spacing: 0px; text-align: center;"><div><span style="color:rgb(245, 241, 228);">SCORE<br></span></div><div><span style="color:rgb(245, 241, 228);">ATTACK<br></span></div></div></div><div id="pik_obj_922" class="pikto-obj wyndle-item" style="left: 538px; top: 31.5px; width: 94px; opacity: 1; height: 62px;"><div id="pik_obj_922_txt" class="pikto-obj-text" style="font-family: 'Squada One'; font-size: 60px; line-height: 1; letter-spacing: 0px; text-align: center;"><div><span style="color: rgb(25, 32, 40);">01</span><span style="color: rgb(255, 255, 255);"><br></span></div></div></div><div id="pik_obj_923" class="pikto-obj wyndle-item" style="left: 48.9466px; top: 176.768px; width: 220px; opacity: 1; height: 23px;"><div id="pik_obj_923_txt" class="pikto-obj-text" style="font-family: Lekton; font-size: 18px; line-height: 1.2; letter-spacing: 0px; text-align: left;"><div><span style="color:rgb(255, 255, 255);">{SA_SONG_1_NAME}</span><span style="color:rgb(255, 255, 255);"><br></span></div></div></div><div id="pik_obj_924" class="pikto-obj wyndle-item" style="left: 48.9466px; top: 220.768px; width: 181px; height: 20px; opacity: 1;"><svg id="pik_obj_924_line" width="{WD7}" height="100%" preserveAspectRatio="none" viewBox="0 0 180.9999999999995 20"><path d="M0 10 l 180.9999999999995 0" stroke-width="2" stroke="#fb592d"></path></svg></div><div id="pik_obj_933" class="pikto-obj wyndle-item" style="left: -4.44776px;top: 463px;width: 808.994px;height: 20px;opacity: 1;transform: matrix(0, -1, 1, 0, 0, 0);"><svg id="pik_obj_933_line" width="100%" height="100%" preserveAspectRatio="none" viewBox="0 0 808.9943016412759 20.000001828683242"><path d="M0 10.000000914341621 l 808.9943016412759 0" stroke-width="2.0000001828683245" stroke="#fb592d"></path></svg></div><div id="pik_obj_1063" class="pikto-obj wyndle-item" style="left: 418.289px; top: 20.5px; width: 350px; opacity: 1; height: 98px;"><div id="pik_obj_1063_txt" class="pikto-obj-text" style="font-family: 'Vast Shadow'; font-size: 44px; line-height: 1.1; letter-spacing: 0px; text-align: center;"><div><span style="color:rgb(245, 241, 228);">MOST<br></span></div><div><span style="color:rgb(245, 241, 228);">DIFFICULT<br></span></div></div></div><div id="pik_obj_1215" class="pikto-obj wyndle-item" style="left: 48.9466px;top: 199.768px;width: 220px;opacity: 1;height: 23px;"><div id="pik_obj_1215_txt" class="pikto-obj-text" style="font-family: Lekton; font-size: 18px; line-height: 1.2; letter-spacing: 0px; text-align: left;"><div><span style="color:rgb(245, 241, 228);">{SA_ARTIST_1_NAME}</span></div></div></div><div id="pik_obj_1216" class="pikto-obj wyndle-item" style="left: 48.9466px;top: 240.768px;width: 36px;opacity: 1;/* height: 38px; */"><div id="pik_obj_1216_txt" class="pikto-obj-text" style="font-family: Lekton; font-size: 14px; line-height: 1.2; letter-spacing: 0px; text-align: left;"><div class="iconPreview {BG1}"><span style="
     color: #fb592d;
     position: absolute;
     left: 29.9466px;
@@ -397,26 +477,8 @@
     
     <div style="display: flex;/* margin-top: 22px; */justify-content: center;padding-top: 66px;padding-bottom: 33px;">
       <br><br>
-      <button style="cursor:pointer;background-color: #f5f1e4;height: 36px;font-size: 25px;font-family: Lekton;border-radius: 6px;padding: 6px;border: 1px solid black;width: 30%;margin-right: 12px;">Share Screenshot</button><button onclick="javascript: window.close();" style="cursor: pointer; background-color: #f5f1e4;height: 36px;font-size: 25px;font-family: Lekton;border-radius: 6px;padding: 6px;border: 1px solid black;width: 20%;">Close</button>
-      </div> 
-    
-    
-      
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+      <button style="cursor:pointer;background-color: #f5f1e4;height: 36px;font-size: 25px;font-family: Lekton;border-radius: 6px;padding: 6px;border: 1px solid black;width: 30%;margin-right: 12px;">Share
+        Screenshot</button><button onclick="javascript: window.close();" style="cursor: pointer; background-color: #f5f1e4;height: 36px;font-size: 25px;font-family: Lekton;border-radius: 6px;padding: 6px;border: 1px solid black;width: 20%;">Close</button>
+    </div>
     
     </body></html>
