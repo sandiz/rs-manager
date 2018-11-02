@@ -12,7 +12,7 @@ import {
   updateMasteryandPlayed, initSongsOwnedDB, getSongByID,
   countSongsOwned, getArrangmentsMastered, getLeadStats,
   getRhythmStats, getBassStats, getRandomSongOwned,
-  getRandomSongAvailable, getSAStats, updateScoreAttackStats, getLastNSongs,
+  getRandomSongAvailable, getSAStats, updateScoreAttackStats, getLastNSongs, getPathBreakdown,
 } from '../sqliteService';
 import { replaceRocksmithTerms } from './songavailableView';
 import SongDetailView from './songdetailView';
@@ -530,12 +530,21 @@ export default class DashboardView extends React.Component {
   }
 
   generateStats = async () => {
-    this.setState({ isGenInfo: true })
+    this.setState({ isGenInfo: true });
     this.props.updateHeader(
       this.tabname,
       `Generating, please wait..`,
     );
-    const timePlayed = this.state.stats.TimePlayed / (60 * 60);
+    let timePlayed = "";
+    timePlayed = this.state.stats.TimePlayed / (60 * 60);
+    const steamKey = await getSteamAPIKeyConfig();
+    if (steamKey.length > 0) {
+      const steamID = await getSteamIDConfig();
+      if (steamID.length > 0) {
+        const data = await this.steamPromise(steamKey, steamID)
+        timePlayed = data.games[0].playtime_forever / 60;
+      }
+    }
     //readFile template
     let template = await readFile(window.dirname + "/template.html");
     template = template.toString('utf-8');
@@ -620,6 +629,37 @@ export default class DashboardView extends React.Component {
         l += 1;
       }
     }
+
+    const [lsm, lsp, lts] = await getPathBreakdown("lead");
+    const lsmper = (lsm.count / lts.count * 100);
+    const lspper = (lsp.count / lts.count * 100);
+    template = template.replace("{lsm}", lsmper + "%")
+    template = template.replace("{lsp}", lspper + "%")
+    template = template.replace("{lsmnum}", lsm.count)
+    template = template.replace("{lspnum}", lsp.count)
+    template = template.replace("{ltsnum}", lts.count)
+
+    const [rsm, rsp, rts] = await getPathBreakdown("rhythm");
+    const rsmper = (rsm.count / rts.count * 100);
+    const rspper = (rsp.count / rts.count * 100);
+    const rtsper = (rts.count / lts.count * 100);
+    template = template.replace("{rsm}", rsmper + "%")
+    template = template.replace("{rsp}", rspper + "%")
+    template = template.replace("{rts}", rtsper + "%")
+    template = template.replace("{rsmnum}", rsm.count)
+    template = template.replace("{rspnum}", rsp.count)
+    template = template.replace("{rtsnum}", rts.count)
+
+    const [bsm, bsp, bts] = await getPathBreakdown("bass");
+    const bsmper = (bsm.count / bts.count * 100);
+    const bspper = (bsp.count / bts.count * 100);
+    const btsper = (bts.count / lts.count * 100);
+    template = template.replace("{bsm}", bsmper + "%")
+    template = template.replace("{bsp}", bspper + "%")
+    template = template.replace("{bts}", btsper + "%")
+    template = template.replace("{bsmnum}", bsm.count)
+    template = template.replace("{bspnum}", bsp.count)
+    template = template.replace("{btsnum}", bts.count)
 
     //write
     const newFile = window.os.tmpdir() + "/rs_info.html"
