@@ -842,6 +842,24 @@ export async function getLastNSongs(type = "count", count = 3) {
   const op = await db.all(sql)
   return op;
 }
+export async function getPathBreakdown(path = "lead") {
+  //console.log("__db_call__: getRandomSongOwned");
+  await initSongsOwnedDB();
+  const masteryT = await getMasteryThresholdConfig();
+  const smsql = `
+               select count(id) as count from songs_owned 
+               where mastery >= '${masteryT}' AND arrangement like '%${path}%';
+               `;
+
+  const spsql = `select count(id) as count from songs_owned
+               where (count > 0 OR sa_playcount > 0) AND arrangement like '%${path}%';`
+
+  const tsql = `select count(id) as count from songs_owned
+               where arrangement like '%${path}%';
+               `
+  const op = [await db.get(smsql), await db.get(spsql), await db.get(tsql)]
+  return op;
+}
 window.remote.app.on('window-all-closed', async () => {
   await saveSongsOwnedDB();
   console.log("Saved to db..");

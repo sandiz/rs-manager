@@ -258,23 +258,16 @@ window.openInfographic = async (path) => {
             'web-security': false,
         },
         frame: false,
-        enableLargerThanScreen: true
+        enableLargerThanScreen: true,
+        webPreferences: {
+            preload: window.path.join(__dirname, "./preload2.js"),
+            webSecurity: false,
+        },
     }
     const authWindow = new window.remote.BrowserWindow(windowParams || { 'use-content-size': true });
     authWindow.loadURL(path);
     authWindow.show();
-    /*
-    setTimeout(() => {
-        console.log("settimeout")
-        authWindow.capturePage((image) => {
-            console.log("captureImage")
-            window.electronFS.writeFile('/tmp/test.png', image.toPNG(), (err) => {
-                if (err) throw err;
-                console.log('It\'s saved!');
-            })
-        })
-    }, 5000);
-    */
+    authWindow.webContents.openDevTools({ mode: 'detach' });
     return authWindow;
 }
 
