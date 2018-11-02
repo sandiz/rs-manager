@@ -524,6 +524,7 @@
               window.electronFS.writeFile(filePath, data, (error) => {
                 if (error) throw error;
                 window.shell.openExternal("file://" + filePath)
+                window.close()
                 console.log('Write PDF successfully.')
               })
           })
