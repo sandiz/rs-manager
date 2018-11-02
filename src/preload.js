@@ -251,7 +251,6 @@ function electronSteamAuth(config, windowParams) {
 window.openInfographic = async (path) => {
     const windowParams = {
         height: 1050,
-        width: 820,
         autoHideMenuBar: true,
         'use-content-size': true,
         webPreferences: {
