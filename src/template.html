@@ -1,4 +1,5 @@
 <html class=""><head>
+  <title>infographic</title>
   <script>
     document.onkeydown = function (evt) {
       evt = evt || window.event;
@@ -501,10 +502,20 @@
       function saveSS() {
         var windows = window.remote.BrowserWindow.getAllWindows();
         if(windows.length > 1) {
-          var wc = windows[0].webContents;
+          var windowInfo = null;
+          for(let i = 0; i < windows.length; i+= 1) {
+            if(windows[i].getTitle() == "infographic") {
+              windowInfo = windows[i];
+            }
+          }
+          if(windowInfo === null) return;
+          var wc = windowInfo.webContents;
           wc.printToPDF({
             marginsType: 1,
             printBackground: true,
+            printSelectionOnly : false,
+            landscape: false,
+
           }, (error, data) => {
             if (error) throw error;
               const filePath = window.os.tmpdir() + "/print.pdf"
