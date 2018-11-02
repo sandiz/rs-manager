@@ -251,6 +251,7 @@ function electronSteamAuth(config, windowParams) {
 window.openInfographic = async (path) => {
     const windowParams = {
         height: 1050,
+        width: 820,
         autoHideMenuBar: true,
         'use-content-size': true,
         webPreferences: {
@@ -267,6 +268,7 @@ window.openInfographic = async (path) => {
     const authWindow = new window.remote.BrowserWindow(windowParams || { 'use-content-size': true });
     authWindow.loadURL(path);
     authWindow.show();
+    //authWindow.webContents.openDevTools({ mode: 'detach' });
     return authWindow;
 }
 
