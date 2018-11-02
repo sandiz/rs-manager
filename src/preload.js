@@ -267,7 +267,6 @@ window.openInfographic = async (path) => {
     const authWindow = new window.remote.BrowserWindow(windowParams || { 'use-content-size': true });
     authWindow.loadURL(path);
     authWindow.show();
-    authWindow.webContents.openDevTools({ mode: 'detach' });
     return authWindow;
 }
 
