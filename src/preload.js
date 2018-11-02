@@ -258,7 +258,7 @@ window.openInfographic = async (path) => {
             'web-security': false,
         },
         frame: false,
-        enableLargerThanScreen: true,
+        //enableLargerThanScreen: true,
         webPreferences: {
             preload: window.path.join(__dirname, "./preload2.js"),
             webSecurity: false,
@@ -267,7 +267,9 @@ window.openInfographic = async (path) => {
     const authWindow = new window.remote.BrowserWindow(windowParams || { 'use-content-size': true });
     authWindow.loadURL(path);
     authWindow.show();
-    //authWindow.webContents.openDevTools({ mode: 'detach' });
+    if(isDev) {
+        authWindow.webContents.openDevTools({ mode: 'detach' });
+    }
     return authWindow;
 }
 
