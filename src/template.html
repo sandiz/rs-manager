@@ -409,13 +409,13 @@
 </head>
 
 
-<body style="overflow: hidden;" class="">
+<body style=" overflow: hidden; " class="">
     
     <div id="appContainer" class="app-container" style="
-  overflow: auto;      /* Make sure the inner div is not larger than the container      * so that we have room to scroll.      */
-  max-height: 100%;      /* Pick an arbitrary margin/padding that should be bigger      * than the max width of all the scroll bars across      * the devices you are targeting.      * padding = -margin      */
-  margin-right: -100px;
-  padding-right: 100px;
+   overflow: auto;       /* Make sure the inner div is not larger than the container      * so that we have room to scroll.      */
+   max-height: 100%;      /* Pick an arbitrary margin/padding that should be bigger      * than the max width of all the scroll bars across      * the devices you are targeting.      * padding = -margin      */
+  /* margin-right: -100px; */
+  /* padding-right: 100px; */
 ">
       <div>
         <div id="pikto-preview-container" class="pikto-preview-container">
@@ -510,6 +510,8 @@
           }
           if(windowInfo === null) return;
           var wc = windowInfo.webContents;
+          document.body.style["overflow"] = "auto"
+          document.getElementById("appContainer").style.maxHeight = "";
           wc.printToPDF({
             marginsType: 1,
             printBackground: true,
