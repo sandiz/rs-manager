@@ -809,29 +809,50 @@ export async function executeRawSql(sql) {
   //console.log(op)
   return op;
 }
-export async function getLastNSongs(type = "count", count = 3) {
+export async function getLastNSongs(type = "count", count = 3, infoID = "overall") {
   let sql = "";
+  let wheresql = "";
+  switch (infoID) {
+    case "overall":
+    default:
+      break;
+    case "lead":
+      wheresql = " and arrangement like '%lead%' and arrangement not like '%combo%' ";
+      break;
+    case "rhythm":
+      wheresql = " and arrangement like '%rhythm%' ";
+      break;
+    case "bass":
+      wheresql = " and arrangement like '%bass%' ";
+      break;
+  }
   switch (type) {
     case "count":
-      sql = `select song, artist, album, mastery from songs_owned order by (count + sa_playcount) desc limit ${count};`
+      sql = `select song, artist, album, mastery 
+            from songs_owned
+            where is_cdlc='false' ${wheresql} 
+            order by (count + sa_playcount) 
+            desc limit ${count};`
       break;
     case "recent":
       sql = `select song, artist, mastery, album
               from songs_owned
-              group by songkey 
+              where is_cdlc='false' ${wheresql} 
               order by max(coalesce(date_las,0), coalesce(date_sa, 0)) desc
               limit ${count}`
       break;
     case "sa":
       sql = `select song, artist, mastery, album, sa_highest_badge
               from songs_owned
+              where is_cdlc='false' ${wheresql} 
               order by sa_highest_badge desc
               limit ${count}`
       break;
     case "md":
+      wheresql = wheresql.replace("where", "and")
       sql = `select song, artist, mastery, album
               from songs_owned
-              where (count+sa_playcount)> 0 and is_cdlc='false'
+              where (count+sa_playcount)> 0 and is_cdlc='false' ${wheresql}
               order by difficulty desc
               limit ${count}`
       break;

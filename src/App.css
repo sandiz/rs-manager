@@ -492,6 +492,9 @@ tbody tr:hover {
 .hidden {
   display: none;
 }
+.inline {
+  display: inline;
+}
 
 .psarcFiles{
   height:282px;
