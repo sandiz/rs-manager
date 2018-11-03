@@ -37,6 +37,7 @@
         + '.getinfo&artist='
         + artist
         + (opts.album !== null ? '&album=' + opts.album : ''))
+    console.log(url)
     const response = fetch(url, {
       method: 'GET',
     })

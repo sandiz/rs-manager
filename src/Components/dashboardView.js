@@ -12,7 +12,9 @@ import {
   updateMasteryandPlayed, initSongsOwnedDB, getSongByID,
   countSongsOwned, getArrangmentsMastered, getLeadStats,
   getRhythmStats, getBassStats, getRandomSongOwned,
-  getRandomSongAvailable, getSAStats, updateScoreAttackStats, getLastNSongs, getPathBreakdown,
+  getRandomSongAvailable, getSAStats,
+  updateScoreAttackStats, getLastNSongs,
+  getPathBreakdown, updateRecentlyPlayedSongs,
 } from '../sqliteService';
 import { replaceRocksmithTerms } from './songavailableView';
 import SongDetailView from './songdetailView';
@@ -69,7 +71,7 @@ export default class DashboardView extends React.Component {
       samediumwidth: [0, 0, 0, 0, 0, 0, 0],
       saeasy: [0, 0, 0, 0, 0, 0, 0],
       saeasywidth: [0, 0, 0, 0, 0, 0, 0],
-      isGenInfo: false,
+      genInfoState: "default", // default,showoptions, generating
     }
   }
 
@@ -441,6 +443,64 @@ export default class DashboardView extends React.Component {
     this.setState({ weeklysongspotlight: weekly });
   }
 
+  updateRecentlyPlayed = async () => {
+    const prfldb = await getProfileConfig();
+    if (prfldb === '' || prfldb === null) {
+      this.props.updateHeader(
+        this.tabname,
+        `No Profile found, please update it in Settings!`,
+      );
+      return;
+    }
+    if (prfldb.length > 0) {
+      this.props.updateHeader(
+        this.tabname,
+        `Decrypting ${window.path.basename(prfldb)}`,
+      );
+      const steamProfile = await readProfile(prfldb);
+      const stats = steamProfile.Songs;
+      const sastats = steamProfile.SongsSA;
+      await initSongsOwnedDB();
+      let keys = Object.keys(stats);
+      let updatedRows = 0;
+      //find mastery stats
+      for (let i = 0; i < keys.length; i += 1) {
+        const stat = stats[keys[i]];
+        const ts = stat.TimeStamp;
+        this.props.updateHeader(
+          this.tabname,
+          `Updating RecentlyPlayed for SongID:  ${keys[i]} (${i}/${keys.length})`,
+        );
+        /*loop await */ // eslint-disable-next-line
+        const rows = await updateRecentlyPlayedSongs(keys[i], ts, "las");
+        if (rows === 0) {
+          console.log("Missing ID: " + keys[i]);
+        }
+        updatedRows += rows;
+      }
+      //find score attack stats
+      keys = Object.keys(sastats);
+      for (let i = 0; i < keys.length; i += 1) {
+        const stat = sastats[keys[i]];
+        const ts = stat.TimeStamp;
+        this.props.updateHeader(
+          this.tabname,
+          `Updating Stat for SongID:  ${keys[i]} (${i}/${keys.length})`,
+        );
+        /* loop await */ // eslint-disable-next-line
+        const rows = await updateRecentlyPlayedSongs(keys[i], ts, "sa");
+        if (rows === 0) {
+          console.log("Missing ID: " + keys[i]);
+        }
+        updatedRows += rows;
+      }
+      this.props.updateHeader(
+        this.tabname,
+        "Finished updating recently played songs: " + updatedRows,
+      );
+    }
+  }
+
   updateMastery = async () => {
     const prfldb = await getProfileConfig();
     if (prfldb === '' || prfldb === null) {
@@ -525,12 +585,17 @@ export default class DashboardView extends React.Component {
   }
 
   refreshStats = async () => {
+    await this.updateRecentlyPlayed();
     await this.updateMastery();
     await this.fetchStats();
   }
 
+  showInfoOptions = async () => {
+    this.setState({ genInfoState: "showoptions" });
+  }
+
   generateStats = async () => {
-    this.setState({ isGenInfo: true });
+    this.setState({ genInfoState: "generating" });
     this.props.updateHeader(
       this.tabname,
       `Generating, please wait..`,
@@ -552,10 +617,12 @@ export default class DashboardView extends React.Component {
     // replace
     template = template.replace("{TIME}", Math.ceil(timePlayed));
     template = template.replace("{SONG}", this.state.songPlays);
-    const top3Songs = await getLastNSongs("count", 3);
-    const recent3Songs = await getLastNSongs("recent", 3);
-    const sa3Songs = await getLastNSongs("sa", 3);
-    const md3Songs = await getLastNSongs("md", 3);
+
+    const infoID = document.getElementById("info_path").value
+    const top3Songs = await getLastNSongs("count", 3, infoID);
+    const recent3Songs = await getLastNSongs("recent", 3, infoID);
+    const sa3Songs = await getLastNSongs("sa", 3, infoID);
+    const md3Songs = await getLastNSongs("md", 3, infoID);
     const all = {
       TOP3: top3Songs,
       RP: recent3Songs,
@@ -578,21 +645,22 @@ export default class DashboardView extends React.Component {
         const root = keys[k];
         j = i % 3;
 
+        const a1 = lartist.split("feat.")[0].trim();
         //eslint-disable-next-line
         let url = await albumArt(
-          lartist,
+          a1,
           { album, size: 'large' },
         );
         if (url.toString().toLowerCase().includes("error:")) {
-          const a1 = lartist.split("feat.")[0];
-          console.log(lartist, a1)
           //eslint-disable-next-line
           url = await albumArt(
             a1,
             { size: 'large' },
           );
         }
-        console.log(url);
+        if (!url.toString().includes("http")) {
+          url = "https://rootzwiki.com/uploads/monthly_03_2012/post-50649-0-21085700-1331079268_thumb.jpg";
+        }
         if (root === "SA") {
           let badge = "gp_failed";
           let name = "easy";
@@ -635,6 +703,8 @@ export default class DashboardView extends React.Component {
     const lspper = (lsp.count / lts.count * 100);
     template = template.replace("{lsm}", lsmper + "%")
     template = template.replace("{lsp}", lspper + "%")
+    template = template.replace("{lts}", 100 + "%")
+
     template = template.replace("{lsmnum}", lsm.count)
     template = template.replace("{lspnum}", lsp.count)
     template = template.replace("{ltsnum}", lts.count)
@@ -672,7 +742,7 @@ export default class DashboardView extends React.Component {
       this.tabname,
       `Rocksmith 2014 Dashboard`,
     );
-    this.setState({ isGenInfo: false })
+    this.setState({ genInfoState: "default" })
   }
 
   render = () => {
@@ -680,12 +750,54 @@ export default class DashboardView extends React.Component {
     if (this.state.scdTrueLength > 2) sacolwidth = "col-sm-2-2"
     const scoreattackstyle = "col ta-center dashboard-bottom " + (this.state.showsastats ? sacolwidth : "hidden");
     const arrstyle = "col ta-center dashboard-bottom col-md-3";
-    const infostyle = this.state.isGenInfo ? "extraPadding download isDisabled" : "extraPadding download";
+    //      genInfoState: "default", // default,showoptions, generating
+    let infostyle = ""
+    let infodetailstyle = ""
+    switch (this.state.genInfoState) {
+      case "default":
+        infostyle = "extraPadding download"
+        infodetailstyle = "hidden"
+        break;
+      case "showoptions":
+        infostyle = "hidden"
+        infodetailstyle = "inline"
+        break;
+      case "generating":
+        infostyle = "extraPadding download isDisabled"
+        infodetailstyle = "hidden"
+        break;
+      default:
+        break;
+    }
     return (
       <div className="container-fluid" style={{ marginTop: -20 + 'px' }}>
         <div className="centerButton list-unstyled">
+          <div className={infodetailstyle}>
+            <select id="info_path">
+              <option value="overall">Overall</option>
+              <option value="lead">Lead</option>
+              <option value="rhythm">Rhythm</option>
+              <option value="bass">Bass</option>
+            </select>
+            <a
+              onClick={() => { this.setState({ genInfoState: "default" }) }}
+              style={{
+                width: 5 + '%',
+              }}
+              className="extraPadding download">
+              Back
+            </a>
+            <a
+              onClick={this.generateStats}
+              style={{
+                width: 5 + '%',
+              }}
+              className="extraPadding download">
+              Go
+            </a>
+          </div>
           <a
-            onClick={this.generateStats}
+            onClick={this.showInfoOptions}
             style={{
               width: 15 + '%',
             }}

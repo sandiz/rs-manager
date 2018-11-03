@@ -256,18 +256,14 @@ window.openInfographic = async (path) => {
         webPreferences: {
             nodeIntegration: false,
             'web-security': false,
+            preload: window.path.join(__dirname, "./preload2.js"),
         },
         frame: false,
-        //enableLargerThanScreen: true,
-        webPreferences: {
-            preload: window.path.join(__dirname, "./preload2.js"),
-            webSecurity: false,
-        },
     }
     const authWindow = new window.remote.BrowserWindow(windowParams || { 'use-content-size': true });
     authWindow.loadURL(path);
     authWindow.show();
-    if(isDev) {
+    if (isDev) {
         authWindow.webContents.openDevTools({ mode: 'detach' });
     }
     return authWindow;
