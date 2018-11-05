@@ -95,7 +95,7 @@ export default class HelpView extends React.Component {
     return (
       <div className="container-fluid">
         <div className="row justify-content-lg-center">
-          <div className="col col-lg-10 settings ta-center" style={{ backgroundColor: bgColor, height: 1000 + 'px', overflow: 'auto' }}>
+          <div className="col col-lg-10 settings ta-center" style={{ backgroundColor: bgColor, height: 800 + 'px' }}>
             {
               (
                 <div>
@@ -191,6 +191,7 @@ export default class HelpView extends React.Component {
                 textAlign: 'left',
                 backgroundColor: bgColor,
                 overflow: 'auto',
+                height: 685 + 'px',
               }}
               //eslint-disable-next-line
               dangerouslySetInnerHTML={{
