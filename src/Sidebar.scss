@@ -20,6 +20,14 @@
             .expanded {
                 display: none !important;
             }
+            &:hover {
+                color: black !important;
+                background: azure !important;
+                border-radius: 2px;
+                .select-row {
+                    color: black !important;
+                }
+            }
             &.selected {
                 color: black !important;
                 background: azure !important;
