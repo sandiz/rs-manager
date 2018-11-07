@@ -165,8 +165,6 @@ export async function initSongsOwnedDB(updateTab = "", updateFunc = null) {
     default:
       break;
   }
-  await db.run("REPLACE INTO setlist_meta VALUES('setlist_practice','Practice List', 'true', 'false', '', 'false');")
-  await initSetlistPlaylistDB("setlist_practice");
   await db.run("REPLACE INTO setlist_meta VALUES('setlist_favorites','RS Favorites', 'true', 'false', '', 'true');")
   await initSetlistPlaylistDB("setlist_favorites");
   if (updateFunc) updateFunc(updateTab, "Initialization complete.")
@@ -634,10 +632,10 @@ export async function getAllSetlist(filter = false) {
   //console.log("__db_call__: getAllSetlist");
   let sql = ''
   if (filter) {
-    sql = "SELECT * FROM setlist_meta where key not like '%setlist_favorites%' and key not like '%rs_song_list%' and is_manual='true' order by rowid asc;"
+    sql = "SELECT * FROM setlist_meta where key not like '%setlist_favorites%' and key not like '%rs_song_list%' and is_manual='true' order by name asc;"
   }
   else {
-    sql = "SELECT * FROM setlist_meta  order by rowid asc;"
+    sql = "SELECT * FROM setlist_meta order by name asc;"
   }
   const tableState = db !== null && await isTablePresent("setlist_meta");
   if (tableState) {

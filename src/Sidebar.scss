@@ -1,0 +1,99 @@
+/* changing background-color, border-color, font-family, font size */
+
+.sidebar-custom {
+    height: 100%;
+    .deni-react-treeview-container {
+        background-color: rgb(32, 33, 46) !important;
+        border: none;
+        font-size: 1.1em;
+        width: 100%;
+        font-family: inherit;
+        height: 100% !important;
+        /* changing the font color, font size and line's height */
+        .deni-react-treeview-item-container {
+            height: 46px;
+            padding-left: 0px !important;
+            /* changing the font color, and padding top and bottom (left is not recommended) */
+            .colapsed {
+                display: none !important;
+            }
+            .expanded {
+                display: none !important;
+            }
+            &.selected {
+                color: black !important;
+                background: azure !important;
+                border-radius: 2px;
+                .select-row {
+                    color: black !important;
+                }
+            }
+            .icon-and-text {
+                color: wheat;
+                padding-top: 6px;
+                padding-bottom: 6px;
+                width: 100%;
+                height: 100%;
+                &:hover {
+                    color: black !important;
+                    background: azure !important;
+                    border-radius: 2px;
+                }
+                /* changing the selected item properties */
+                &.selected {
+                    color: black !important;
+                    background: azure !important;
+                    border-radius: 2px;
+                }
+                /* changing the icons of the folders expanded */
+                .icon {
+                    width: 0px !important;
+                    height: 0px !important;
+                    background-image: none !important;
+                    /* changing the icons of the folders colapsed */
+                    /* &.colapsed {
+                        display: none !important;
+                    }*/
+                    /*
+                    background-image: url(https://denifakedata.herokuapp.com/images/closed-folder.png) !important; //}
+                    /* changing the icons of the folders expanded */
+                    /*&.expanded {
+                        background-image: url(https://denifakedata.herokuapp.com/images/opened-folder.png) !important;
+                    }*/
+                    /* changing the icons of the items */
+                    &.isleaf {
+                        background-image: none !important;
+                    }
+                }
+            }
+            .treeview-item-custom {
+                display: flex;
+                flex: 1;
+                .treeview-item-custom-text {
+                    flex: 1;
+                    padding-left: 5px !important;
+                }
+                .child-and-leaf {
+                    padding-left: 25px !important;
+                    font-size: 0.85em !important;
+                }
+                .parent-only {
+                    padding-left: inherit;
+                    font-size: inherit;
+                }
+                .actionButton {
+                    margin-right: 5px;
+                    cursor: pointer;
+                    opacity: 0.5;
+                    &.trash {
+                        color: #ff6666;
+                    }
+                    &.edit {
+                        color: #006699; //#00cc44;
+                        margin-top: 1px;
+                    }
+                }
+            }
+        }
+    }
+}

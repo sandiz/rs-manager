@@ -24,52 +24,52 @@ class App extends Component {
       appTitle: '',
       currentProfile: '',
       currentCookie: '',
-      TabsData: [
+      TabsV2Data: [
         {
           id: 'tab-dashboard',
           name: 'Dashboard',
-          child: [],
+          children: [],
         },
         {
           id: 'tab-songs',
           name: 'Songs',
-          child: [
+          children: [
             {
-              name: 'Owned',
               id: 'songs-owned',
+              name: 'Owned',
+              isLeaf: true,
             },
             {
-              name: 'DLC Catalog',
               id: 'songs-available',
+              name: 'DLC Catalog',
+              isLeaf: true,
             },
           ],
         },
         {
           id: 'tab-setlist',
           name: 'Setlists',
-          child: [],
+          children: [],
         },
         {
           id: 'tab-psarc',
           name: 'psarc Explorer',
-          child: [],
+          children: [],
         },
         {
           id: 'tab-rslive',
           name: 'Rocksmith Live',
-          tag: 'BETA',
-          child: [],
-          //platform: 'win32', //works only in windows for now
+          children: [],
         },
         {
           id: 'tab-settings',
           name: 'Settings',
-          child: [],
+          children: [],
         },
         {
           id: 'tab-help',
           name: 'Help',
-          child: [],
+          children: [],
         },
       ],
       searchHistory: {},
@@ -87,7 +87,7 @@ class App extends Component {
     await initSongsOwnedDB("tab-dashboard", this.updateHeader);
     await this.updateProfile();
     // default tabs on startup
-    this.handleChange(this.state.TabsData[0]);
+    //sthis.handleChange(this.state.TabsData[0]);
     //this.props.handleChange(TabsData[2], TabsData[2].child[0])
     //this.toggleActive(TabsData[2]);
     this.updateHeader("tab-dashboard", "Rocksmith 2014 Dashboard")
@@ -251,19 +251,17 @@ class App extends Component {
   refreshTabs = async () => {
     const setlists = await getAllSetlist();
     if (setlists === null) return;
-    const t = this.state.TabsData;
-    t[2].child = []
+    const t2 = this.state.TabsV2Data;
+    t2[2].child = []
     const tempChilds = []
     for (let i = 0; i < setlists.length; i += 1) {
       const setlist = setlists[i];
-      const setlistObj = { name: unescape(setlist.name), id: setlist.key }
-      if (setlist.key === "setlist_practice") tempChilds.splice(0, 0, setlistObj)
-      else if (setlist.key === "setlist_favorites") tempChilds.splice(1, 0, setlistObj)
-      else tempChilds.push(setlistObj);
+      const setlistObj = { name: unescape(setlist.name), id: setlist.key, isLeaf: true }
+      tempChilds.push(setlistObj);
     }
-    t[2].child = tempChilds;
-    t[2].child.push({ name: 'Create New Setlist...', id: 'add-setlist' });
-    this.setState({ TabsData: t });
+    t2[2].children = tempChilds;
+    t2[2].children.unshift({ name: 'Create New Setlist...', id: 'add-setlist', isLeaf: true });
+    this.setState({ TabsV2Data: t2 });
     this.sidebarRef.current.refresh();
   }
 
@@ -322,7 +320,7 @@ class App extends Component {
             currentProfile={profile}
             steamConnected={cookie}
             ytConnected={false}
-            TabsData={this.state.TabsData}
+            TabsV2Data={this.state.TabsV2Data}
             RefreshTabs={this.refreshTabs}
           />
           <div id="content">
