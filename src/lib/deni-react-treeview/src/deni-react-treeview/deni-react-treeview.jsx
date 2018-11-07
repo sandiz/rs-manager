@@ -70,7 +70,7 @@ function _createComponentsChildren(treeview, parent, level, children) {
     borderRadius: 4 + 'px',
   } : null;
   return (
-    <div style={style}>
+    <div style={style} className="sidebar-scroll">
       {
         (parent.props.item && parent.props.item.expanded && children && children.length) ?
           children.map(function (child) {
