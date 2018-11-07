@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import TreeView from '../lib/deni-react-treeview'
 import { createRSSongList } from '../sqliteService';
 import { getShowPSStatsConfig } from '../configService';
-import '../Sidebar.scss'
+import '../css/Sidebar.scss'
 
 export default class Sidebar extends React.Component {
   constructor(props) {
