@@ -39,6 +39,8 @@ const child = spawn("yarn", [
     "--ignore=config.dev.json",
     "--ignore=rsdb.dev.sqlite",
     "--ignore=screenshots/",
+    "--ignore=src/lib/deni-react-treeview/node_modules/",
+    "--ignore=src/lib/deni-react-treeview/gh-pages/",
     extra_ignore.length > 0 ? `--ignore=${extra_ignore}` : ""
 ]);
 
