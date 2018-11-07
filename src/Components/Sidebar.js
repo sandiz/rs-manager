@@ -93,7 +93,6 @@ export default class Sidebar extends React.Component {
       }
     }
     let cm = null;
-    updateAvailable = true;
     if (updateAvailable) {
       cm = (
         <div>
