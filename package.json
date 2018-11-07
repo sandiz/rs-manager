@@ -14,7 +14,6 @@
     "chart.js": "^2.7.2",
     "chartjs-plugin-zoom": "^0.6.5",
     "csv-parse": "^3.1.2",
-    "deni-react-treeview": "^0.2.12",
     "dotenv": "6.0.0",
     "dotenv-expand": "4.2.0",
     "electron-is-dev": "^1.0.1",

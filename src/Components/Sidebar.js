@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types';
-import TreeView from 'deni-react-treeview';
+import TreeView from '../lib/deni-react-treeview'
 import { createRSSongList } from '../sqliteService';
 import { getShowPSStatsConfig } from '../configService';
 import '../Sidebar.scss'
