@@ -1,7 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types';
+import TreeView from 'deni-react-treeview';
 import { createRSSongList } from '../sqliteService';
 import { getShowPSStatsConfig } from '../configService';
+import '../Sidebar.scss'
 
 export default class Sidebar extends React.Component {
   constructor(props) {
@@ -18,6 +20,7 @@ export default class Sidebar extends React.Component {
       showpsstats: false,
     }
     this.psInterval = null;
+    this.treeViewRef = React.createRef();
   }
 
   componentDidMount = async () => {
@@ -90,6 +93,7 @@ export default class Sidebar extends React.Component {
       }
     }
     let cm = null;
+    updateAvailable = true;
     if (updateAvailable) {
       cm = (
         <div>
@@ -199,6 +203,80 @@ export default class Sidebar extends React.Component {
     this.startPSMonitor();
   }
 
+  onSelectItem = (item) => {
+    const api = this.treeViewRef.current.api;
+    const parent = api.getParentNode(item);
+    if (typeof item.children !== "undefined") {
+      if (item.children.length === 0) {
+        this.props.handleChange(item, null);
+        return;
+      } else {
+        //TreeViewItemHelper.treeviewItemExpandButtonMouseDown(this.treeViewRef.current, item);
+        /*item.expanded = !item.expanded;
+        if (item.expanded) {
+          api.selectItem(item.children[0]);
+          this.props.handleChange(item, item.children[0])
+        }*/
+        //console.log(item)
+        return;
+      }
+    }
+    if (item.id === "add-setlist") {
+      this.createNewSetlist();
+      return;
+    }
+    this.props.handleChange(parent, item);
+  }
+
+  onAfterLoad = (data, item) => {
+    if (data.length > 0) {
+      /* ugly hack */
+      /* for some reason treeviewRef is null, unless we wait a bit */
+      setTimeout(() => {
+        const api = this.treeViewRef.current.api;
+        api.selectItem(data[0]);
+      }, 250);
+    }
+  }
+
+  onRenderItem = (item, treeview) => {
+    let extraChildren = null;
+    const isChildAndLeaf = item.isLeaf && treeview.api.getParentNode(item) !== null;
+    if (typeof item.children !== "undefined" && item.children.length > 0) {
+      extraChildren = (
+        <React.Fragment>
+          <a className="dropdown-toggle" data-toggle="collapse">
+            <span className="actionButton trash" />
+          </a>
+        </React.Fragment>
+      )
+    }
+    const childclass = isChildAndLeaf ? "treeview-item-custom-text child-and-leaf" : "treeview-item-custom-text parent-only";
+    return (
+      <div className="treeview-item-custom">
+        <span className={childclass}>{item.name}</span>
+        {extraChildren}
+      </div>
+    )
+  }
+
+  getSublist = (tab) => {
+    return tab.child.map((childtab, index2) => {
+      if (childtab.id === "add-setlist") {
+        return (
+          <li key={`child-key-${childtab.id}`}>
+            <a className={this.state.currentTab === tab.id && this.state.currentChildTab === childtab.id ? 'activeChildTab' : 'inactiveChildTab'} onClick={() => this.createNewSetlist()}>{childtab.name}</a><sup>{childtab.tag}</sup>
+          </li>
+        );
+      }
+      return (
+        <li key={`child-key-${childtab.id}`}>
+          <a className={this.state.currentTab === tab.id && this.state.currentChildTab === childtab.id ? 'activeChildTab' : 'inactiveChildTab'} onClick={() => this.setChildActive(tab, childtab)}>{childtab.name}</a><sup>{childtab.tag}</sup>
+        </li>
+      );
+    })
+  }
+
   toggleActive(val) {
     const index = this.state.expandedTabs.indexOf(val.id)
     const tabs = this.state.expandedTabs
@@ -215,55 +293,6 @@ export default class Sidebar extends React.Component {
   }
 
   render() {
-    let tabsList = {};
-    tabsList = this.props.TabsData.map((tab, index) => {
-      const { platform } = tab;
-      if (typeof platform !== 'undefined' && platform.length > 0 && window.os.platform() !== platform) {
-        return null;
-      }
-      let ulclassList = '';
-      if (this.state.currentTab === tab.id) {
-        ulclassList += this.activeClass;
-        if (tab.child.length === 0) {
-          ulclassList += ' activeChildTab';
-        }
-      }
-      else {
-        ulclassList += 'inactiveList';
-        if (tab.child.length === 0) {
-          ulclassList += ' inactiveChildTab';
-        }
-      }
-
-      return (
-        <li key={`key-${tab.id}`} className={ulclassList}>
-          <a
-            onClick={() => this.toggleActive(tab)}
-            className={tab.child.length > 0 ? 'dropdown-toggle' : ''}
-            data-toggle={tab.child.length > 0 ? 'collapse' : ''}>{tab.name} <sup>{tab.tag}</sup></a>
-          <ul
-            className={this.state.expandedTabs.indexOf(tab.id) !== -1
-              ? this.expandedClass : this.collapseClass}>
-            {
-              tab.child.map((childtab, index2) => {
-                if (childtab.id === "add-setlist") {
-                  return (
-                    <li key={`child-key-${childtab.id}`}>
-                      <a className={this.state.currentTab === tab.id && this.state.currentChildTab === childtab.id ? 'activeChildTab' : 'inactiveChildTab'} onClick={() => this.createNewSetlist()}>{childtab.name}</a><sup>{childtab.tag}</sup>
-                    </li>
-                  );
-                }
-                return (
-                  <li key={`child-key-${childtab.id}`}>
-                    <a className={this.state.currentTab === tab.id && this.state.currentChildTab === childtab.id ? 'activeChildTab' : 'inactiveChildTab'} onClick={() => this.setChildActive(tab, childtab)}>{childtab.name}</a><sup>{childtab.tag}</sup>
-                  </li>
-                );
-              })
-            }
-          </ul>
-        </li>
-      );
-    });
     return (
       <nav id="sidebar" className={this.props.showSidebar ? '' : 'active'}>
         <div className="sidebar-header">
@@ -278,7 +307,19 @@ export default class Sidebar extends React.Component {
               YouTube: {this.props.ytConnected ? 'Connected' : 'Disconnected'}
             </p>
           </div>
-          {tabsList}
+          <div className="sidebar-custom">
+            <TreeView
+              //eslint-disable-next-line
+              ref={this.treeViewRef}
+              className="sidebar-tree"
+              showIcon={false}
+              items={this.props.TabsV2Data}
+              onSelectItem={this.onSelectItem}
+              onAfterLoad={this.onAfterLoad}
+              onRenderItem={this.onRenderItem}
+              selectRow
+            />
+          </div>
         </ul>
         <div>
           <table className="psTable">
@@ -296,13 +337,15 @@ Sidebar.propTypes = {
   currentProfile: PropTypes.string,
   steamConnected: PropTypes.string,
   ytConnected: PropTypes.bool,
-  TabsData: PropTypes.array,
+  TabsV2Data: PropTypes.array,
+  //TabsData: PropTypes.array,
   RefreshTabs: PropTypes.func,
 }
 Sidebar.defaultProps = {
-  currentProfile: 'sandi',
+  currentProfile: '',
   steamConnected: false,
   ytConnected: false,
-  TabsData: [],
+  TabsV2Data: [],
+  //TabsData: [],
   RefreshTabs: () => { },
 }
