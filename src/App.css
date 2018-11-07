@@ -16,6 +16,23 @@ body {
   font-family: "Roboto Condensed", sans-serif;
   background: rgb(231,239,242);
 }
+
+
+body::-webkit-scrollbar {
+  width: .5em;
+}
+
+body::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0);
+  box-shadow: inset 0 0 6px rgba(0,0,0,0);
+}
+
+body::-webkit-scrollbar-thumb {
+  background-color: wheat;
+  outline: 1px solid black;
+}
+
+
 .background-image {
   background-image: url(assets/bg.jpg);
   background-size: 100%;
