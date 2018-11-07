@@ -635,7 +635,14 @@ export async function getAllSetlist(filter = false) {
     sql = "SELECT * FROM setlist_meta where key not like '%setlist_favorites%' and key not like '%rs_song_list%' and is_manual='true' order by name asc;"
   }
   else {
-    sql = "SELECT * FROM setlist_meta order by name asc;"
+    sql = `
+    select * from setlist_meta
+    order by
+      CASE
+        WHEN name LIKE '%New%20Setlist%' THEN substr(name, 20)
+      END desc,
+    name asc
+    `
   }
   const tableState = db !== null && await isTablePresent("setlist_meta");
   if (tableState) {
