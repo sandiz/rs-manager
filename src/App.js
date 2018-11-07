@@ -9,7 +9,7 @@ import SetlistView from './Components/setlistView';
 import SettingsView from './Components/settingsView';
 import RSLiveView from './Components/rsliveView';
 import { getAllSetlist, initSongsOwnedDB } from './sqliteService';
-import './App.css'
+import './css/App.css'
 import HelpView from './Components/HelpView';
 
 const { path } = window;
