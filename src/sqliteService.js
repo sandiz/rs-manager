@@ -639,7 +639,7 @@ export async function getAllSetlist(filter = false) {
     select * from setlist_meta
     order by
       CASE
-        WHEN name LIKE '%New%20Setlist%' THEN substr(name, 20)
+        WHEN name LIKE '%New%20Setlist%' AND is_manual != 'true' AND is_generated != 'true' AND is_rssetlist != 'true' THEN substr(name, 20)
       END desc,
     name collate nocase asc 
     `

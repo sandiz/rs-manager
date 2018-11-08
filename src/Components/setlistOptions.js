@@ -625,7 +625,9 @@ export default class SetlistOptions extends React.Component {
                           checked={this.state.isManual === true}
                           onChange={this.handleManual}
                         />
-                        <label style={{ paddingLeft: 10 + 'px' }} htmlFor="setlist_manual">Manual (Add Songs manually)</label>
+                        <span className="manual" style={{ display: 'inline-flex' }}>
+                          <label style={{ paddingLeft: 34 + 'px' }} htmlFor="setlist_manual">Manual (Add Songs manually)</label>
+                        </span>
                       </div>
                       <div>
                         <input
@@ -635,7 +637,9 @@ export default class SetlistOptions extends React.Component {
                           checked={this.state.isGenerated === true}
                           onChange={this.handleGenerated}
                         />
-                        <label style={{ paddingLeft: 10 + 'px' }} htmlFor="setlist_generated">Generated (Add Songs via filters)</label>
+                        <span className="generated" style={{ display: 'inline-flex' }}>
+                          <label style={{ paddingLeft: 34 + 'px' }} htmlFor="setlist_generated">Generated (Add Songs via filters)</label>
+                        </span>
                       </div>
                     </td>
                   </tr>

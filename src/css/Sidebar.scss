@@ -7,6 +7,63 @@
     border-radius: 4px,
 }
 
+.manual {
+    background-image: url("../assets/tree-icons/box.svg") !important;
+    background-repeat: no-repeat;
+    background-position-x: 6px;
+    background-size: 22px;
+}
+
+.guitar {
+    background-image: url("../assets/tree-icons/guitar.svg") !important;
+    background-repeat: no-repeat;
+    background-position-x: 7px;
+    background-size: 22px;
+}
+
+.catalog {
+    background-image: url("../assets/tree-icons/catalog.svg") !important;
+    background-repeat: no-repeat;
+    background-position-x: 5px;
+    background-size: 22px;
+}
+
+.add {
+    background-image: url("../assets/tree-icons/add.svg") !important;
+    background-repeat: no-repeat;
+    background-position-x: 6px;
+    background-position-y: -1px;
+    background-size: 23px;
+}
+
+.generated {
+    background-image: url("../assets/tree-icons/generated.svg") !important;
+    background-repeat: no-repeat;
+    background-position-x: 6px;
+    background-size: 22px;
+}
+
+.manual {
+    background-image: url("../assets/tree-icons/manual.svg") !important;
+    background-repeat: no-repeat;
+    background-position-x: 6px;
+    background-size: 22px;
+}
+
+.rs {
+    background-image: url("../assets/tree-icons/rs.svg") !important;
+    background-repeat: no-repeat;
+    background-position-x: 6px;
+    background-size: 22px;
+}
+
+.new {
+    background-image: url("../assets/tree-icons/box.svg") !important;
+    background-repeat: no-repeat;
+    background-position-x: 6px;
+    background-size: 22px;
+}
+
 .sidebar-custom {
     height: 100%;
     .deni-react-treeview-container {
@@ -91,55 +148,6 @@
                 .child-and-leaf {
                     padding-left: 35px !important;
                     font-size: 0.85em !important;
-                }
-                .manual {
-                    background-image: url("../assets/tree-icons/box.svg") !important;
-                    background-repeat: no-repeat;
-                    background-position-x: 5px;
-                    background-size: 22px;
-                }
-                .guitar {
-                    background-image: url("../assets/tree-icons/guitar.svg") !important;
-                    background-repeat: no-repeat;
-                    background-position-x: 7px;
-                    background-size: 22px;
-                }
-                .catalog {
-                    background-image: url("../assets/tree-icons/catalog.svg") !important;
-                    background-repeat: no-repeat;
-                    background-position-x: 5px;
-                    background-size: 22px;
-                }
-                .add {
-                    background-image: url("../assets/tree-icons/add.svg") !important;
-                    background-repeat: no-repeat;
-                    background-position-x: 6px;
-                    background-position-y: -1px;
-                    background-size: 23px;
-                }
-                .generated {
-                    background-image: url("../assets/tree-icons/generated.svg") !important;
-                    background-repeat: no-repeat;
-                    background-position-x: 6px;
-                    background-size: 22px;
-                }
-                .manual {
-                    background-image: url("../assets/tree-icons/manual.svg") !important;
-                    background-repeat: no-repeat;
-                    background-position-x: 6px;
-                    background-size: 22px;
-                }
-                .rs {
-                    background-image: url("../assets/tree-icons/rs.svg") !important;
-                    background-repeat: no-repeat;
-                    background-position-x: 6px;
-                    background-size: 22px;
-                }
-                .new {
-                    background-image: url("../assets/tree-icons/box2.png") !important;
-                    background-repeat: no-repeat;
-                    background-position-x: 6px;
-                    background-size: 22px;
                 }
                 .parent-only {
                     padding-left: inherit;
