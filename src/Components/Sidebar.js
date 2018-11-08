@@ -282,7 +282,38 @@ export default class Sidebar extends React.Component {
         </React.Fragment>
       )
     }
-    const childclass = isChildAndLeaf ? "treeview-item-custom-text child-and-leaf" : "treeview-item-custom-text parent-only";
+    let childclass = isChildAndLeaf ? "treeview-item-custom-text child-and-leaf" : "treeview-item-custom-text parent-only";
+    const parent = treeview.api.getParentNode(item)
+    switch (item.id) {
+      case "songs-owned":
+        childclass += " guitar"
+        break;
+      case "songs-available":
+        childclass += " catalog"
+        break;
+      case "add-setlist":
+        childclass += " add"
+        break;
+      default:
+        if (parent != null && parent.id === "tab-setlist") {
+          const isGenerated = (item.isGenerated === true)
+          const isManual = (item.isManual === true)
+          const isRSSetlist = (item.isRSSetlist === true)
+          if (isRSSetlist) {
+            childclass += " rs";
+          }
+          else if (isGenerated) {
+            childclass += " generated";
+          }
+          else if (isManual) {
+            childclass += " manual";
+          }
+          else {
+            childclass += " new";
+          }
+        }
+        break;
+    }
     return (
       <div className="treeview-item-custom">
         <span className={childclass}>{item.name}</span>

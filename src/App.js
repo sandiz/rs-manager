@@ -257,7 +257,14 @@ class App extends Component {
     const tempChilds = []
     for (let i = 0; i < setlists.length; i += 1) {
       const setlist = setlists[i];
-      const setlistObj = { name: unescape(setlist.name), id: setlist.key, isLeaf: true }
+      const setlistObj = {
+        name: unescape(setlist.name),
+        id: setlist.key,
+        isLeaf: true,
+        isManual: setlist.is_manual === "true",
+        isGenerated: setlist.is_generated === "true",
+        isRSSetlist: setlist.is_rssetlist === "true",
+      }
       tempChilds.push(setlistObj);
     }
     t2[2].children = tempChilds;
