@@ -641,7 +641,7 @@ export async function getAllSetlist(filter = false) {
       CASE
         WHEN name LIKE '%New%20Setlist%' THEN substr(name, 20)
       END desc,
-    name asc
+    name collate nocase asc 
     `
   }
   const tableState = db !== null && await isTablePresent("setlist_meta");
