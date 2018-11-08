@@ -3,10 +3,10 @@ import PropTypes from 'prop-types';
 import TreeView from '../lib/deni-react-treeview'
 import { createRSSongList } from '../sqliteService';
 import { getShowPSStatsConfig } from '../configService';
+import { getState, saveState } from '../stateService';
 
 import("../css/Sidebar.scss")
-//const sidebarCSS = "../css/Sidebar.scss"
-//import("../css/Sidebar.scss")
+
 export default class Sidebar extends React.Component {
   constructor(props) {
     super(props)
@@ -21,18 +21,36 @@ export default class Sidebar extends React.Component {
       psusage: null,
       showpsstats: false,
     }
+    this.serializedState = {
+      "tab-songs": false,
+      "tab-setlist": false,
+    }
+    this.componentID = "sidebar";
+    this.readSidebarState();
     this.psInterval = null;
     this.treeViewRef = React.createRef();
+    this.tabsToSave = ["tab-songs", "tab-setlist"]
   }
 
   componentDidMount = async () => {
-    this.toggleActive(this.state.TabsData[0]);
+    //this.toggleActive(this.state.TabsData[0]);
     this.startPSMonitor();
   }
 
   setChildActive(val, cid) {
     this.setState({ currentTab: val.id, currentChildTab: cid.id })
     this.props.handleChange(val, cid)
+  }
+
+  getSerializedState = () => {
+    return this.serializedState;
+  }
+
+  readSidebarState = async () => {
+    const state = await getState(this.componentID);
+    if (state != null) {
+      this.serializedState = state;
+    }
   }
 
   startPSMonitor = async () => {
@@ -201,10 +219,24 @@ export default class Sidebar extends React.Component {
 
   refresh = () => {
     //this.checkForUpdate();
-    this.startPSMonitor();
+    //this.startPSMonitor();
   }
 
-  onSelectItem = (item) => {
+  onExpanded = async (item) => {
+    if (this.tabsToSave.includes(item.id)) {
+      this.serializedState[item.id] = item.expanded;
+      await saveState(this.componentID, this.serializedState);
+    }
+  }
+
+  onColapsed = async (item) => {
+    if (this.tabsToSave.includes(item.id)) {
+      this.serializedState[item.id] = item.expanded;
+      await saveState(this.componentID, this.serializedState);
+    }
+  }
+
+  onSelectItem = async (item) => {
     const api = this.treeViewRef.current.api;
     const parent = api.getParentNode(item);
     if (typeof item.children !== "undefined") {
@@ -212,13 +244,7 @@ export default class Sidebar extends React.Component {
         this.props.handleChange(item, null);
         return;
       } else {
-        //TreeViewItemHelper.treeviewItemExpandButtonMouseDown(this.treeViewRef.current, item);
-        /*item.expanded = !item.expanded;
-        if (item.expanded) {
-          api.selectItem(item.children[0]);
-          this.props.handleChange(item, item.children[0])
-        }*/
-        //console.log(item)
+        /*item.expanded = !item.expanded; */
         return;
       }
     }
@@ -243,6 +269,10 @@ export default class Sidebar extends React.Component {
   onRenderItem = (item, treeview) => {
     let extraChildren = null;
     const isChildAndLeaf = item.isLeaf && treeview.api.getParentNode(item) !== null;
+    const restoreExpansion = this.tabsToSave.includes(item.id)
+    if (restoreExpansion) {
+      item.expanded = this.serializedState[item.id]
+    }
     if (typeof item.children !== "undefined" && item.children.length > 0) {
       extraChildren = (
         <React.Fragment>
@@ -318,6 +348,8 @@ export default class Sidebar extends React.Component {
               onSelectItem={this.onSelectItem}
               onAfterLoad={this.onAfterLoad}
               onRenderItem={this.onRenderItem}
+              onExpanded={this.onExpanded}
+              onColapsed={this.onColapsed}
               selectRow
             />
           </div>
