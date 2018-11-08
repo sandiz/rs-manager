@@ -8,6 +8,7 @@ export async function saveState(componentID, stateObj) {
 
 export async function getState(componentID) {
   const state = await getConfig("state");
+  if (state === '') return null;
   if (componentID in state) {
     return state[componentID]
   }
