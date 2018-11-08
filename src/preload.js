@@ -36,9 +36,11 @@ window.path = null;
 
 if (window.os.platform() === 'win32') {
     window.path = require("path").win32;
+    window.sidebarCSS = "css/Sidebar.scss"
 }
 else {
     window.path = require("path");
+    window.sidebarCSS = "css/Sidebar-mac.scss"
 }
 
 

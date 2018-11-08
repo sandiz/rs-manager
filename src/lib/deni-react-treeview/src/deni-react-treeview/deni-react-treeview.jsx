@@ -62,11 +62,11 @@ class DeniReactTreeView extends React.Component {
 DeniReactTreeView.defaultProps = treeviewProps.defaultProps;
 
 function _createComponentsChildren(treeview, parent, level, children) {
-  const style = level > 1 && parent.props.item && parent.props.item.expanded && children && children.length ? {
+  const style = level > 1 && parent.props.item && parent.props.item.expanded && children && children.length > 5 ? {
     overflow: 'auto',
     maxHeight: 285 + 'px',
     color: 'black',
-    boxShadow: "inset 0 -32px 84px -40px rgb(104, 113, 108)",
+    //boxShadow: "inset 0 -32px 84px -40px rgb(104, 113, 108)",
     borderRadius: 4 + 'px',
   } : null;
   return (
