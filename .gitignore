@@ -29,3 +29,4 @@ release-to-github.sh
 src/tools/RockSniffer/cache/
 src/tools/RockSniffer/output/
 src/tools/RockSniffer/sniffer.log
+src/lib/deni-react-treeview/package-lock.json

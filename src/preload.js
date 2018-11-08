@@ -272,3 +272,8 @@ window.openInfographic = async (path) => {
 window.remote.app.on("quit", () => {
     exp.close();
 })
+
+process.once('loaded', () => {
+    global.electron = require('electron')
+    electron.webFrame.setZoomFactor(1)
+})

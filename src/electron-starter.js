@@ -82,7 +82,43 @@ function createWindow() {
             { label: "Select All", accelerator: "CmdOrCtrl+A", selector: "selectAll:" },
             { label: "Toggle Developer Tools", role: "toggleDevTools" }
         ]
-    }
+    }, {
+        label: 'View',
+        submenu: [
+          {
+            label: 'Reload',
+            accelerator: 'CmdOrCtrl+R',
+            click (item, focusedWindow) {
+              if (focusedWindow) focusedWindow.reload()
+            }
+          },
+          {
+            label: 'Toggle Developer Tools',
+            accelerator: process.platform === 'darwin' ? 'Alt+Command+I' : 'Ctrl+Shift+I',
+            click (item, focusedWindow) {
+              if (focusedWindow) focusedWindow.webContents.toggleDevTools()
+            }
+          },
+          {
+            type: 'separator'
+          },
+          {
+            role: 'resetzoom'
+          },
+          {
+            role: 'zoomin'
+          },
+          {
+            role: 'zoomout'
+          },
+          {
+            type: 'separator'
+          },
+          {
+            role: 'togglefullscreen'
+          }
+        ]
+      },
     ];
 
     Menu.setApplicationMenu(Menu.buildFromTemplate(template));
@@ -90,6 +126,7 @@ function createWindow() {
     mainWindow.on("closed", () => {
         mainWindow = null;
     });
+
 }
 
 app.on("ready", createWindow);
