@@ -1,32 +1,7 @@
 /* changing background-color, border-color, font-family, font size */
 
-.sidebar-scroll {
-    &::-webkit-scrollbar {
-        width: .5em;
-    }
-    &::-webkit-scrollbar-track {
-        -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0);
-        box-shadow: inset 0 0 6px rgba(0,0,0,0);
-    }
-    &::-webkit-scrollbar-thumb {
-        background-color: wheat;
-        outline: 1px solid black;
-    }
-}
-
 .sidebar-custom {
     height: 100%;
-    &::-webkit-scrollbar {
-        width: .5em;
-    }
-    &::-webkit-scrollbar-track {
-        -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0);
-        box-shadow: inset 0 0 6px rgba(0,0,0,0);
-    }
-    &::-webkit-scrollbar-thumb {
-        background-color: wheat;
-        outline: 1px solid black;
-    }
     .deni-react-treeview-container {
         background-color: rgb(32, 33, 46) !important;
         border: none;

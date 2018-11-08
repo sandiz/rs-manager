@@ -16,21 +16,42 @@
 
 body {
     font-family: "Roboto Condensed", sans-serif;
-    background: rgb(231, 239, 242);
+    background: rgba(1, 1, 1, 0.75);
 }
 
-body::-webkit-scrollbar {
-    width: .5em;
+/* Turn on custom 8px wide scrollbar */
+
+::-webkit-scrollbar {
+    width: 10px;
+    /* 1px wider than Lion. */
+    /* This is more usable for users trying to click it. */
+    background-color: rgba(0, 0, 0, 0);
+    -webkit-border-radius: 100px;
 }
 
-body::-webkit-scrollbar-track {
-    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0);
-    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0);
+/* hover effect for both scrollbar area, and scrollbar 'thumb' */
+
+::-webkit-scrollbar:hover {
+    background-color: rgba(0, 0, 0, 0.09);
 }
 
-body::-webkit-scrollbar-thumb {
-    background-color: wheat;
-    outline: 1px solid black;
+/* The scrollbar 'thumb' ...that marque oval shape in a scrollbar */
+
+::-webkit-scrollbar-thumb:vertical {
+    /* This is the EXACT color of Mac OS scrollbars. 
+     Yes, I pulled out digital color meter */
+    background: rgba(0, 0, 0, 0.5);
+    -webkit-border-radius: 100px;
+    background-clip: padding-box;
+    border: 2px solid rgba(0, 0, 0, 0);
+    min-height: 10px;
+    /*Prevent it from getting too small */
+}
+
+::-webkit-scrollbar-thumb:vertical:active {
+    background: rgba(0, 0, 0, 0.61);
+    /* Some darker color when you click it */
+    -webkit-border-radius: 100px;
 }
 
 .background-image {
