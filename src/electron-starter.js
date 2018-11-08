@@ -85,40 +85,33 @@ function createWindow() {
     }, {
         label: 'View',
         submenu: [
-          {
-            label: 'Reload',
-            accelerator: 'CmdOrCtrl+R',
-            click (item, focusedWindow) {
-              if (focusedWindow) focusedWindow.reload()
+            {
+                label: 'Reload',
+                accelerator: 'CmdOrCtrl+R',
+                click(item, focusedWindow) {
+                    if (focusedWindow) focusedWindow.reload()
+                }
+            },
+            {
+                type: 'separator'
+            },
+            {
+                role: 'resetzoom'
+            },
+            {
+                role: 'zoomin'
+            },
+            {
+                role: 'zoomout'
+            },
+            {
+                type: 'separator'
+            },
+            {
+                role: 'togglefullscreen'
             }
-          },
-          {
-            label: 'Toggle Developer Tools',
-            accelerator: process.platform === 'darwin' ? 'Alt+Command+I' : 'Ctrl+Shift+I',
-            click (item, focusedWindow) {
-              if (focusedWindow) focusedWindow.webContents.toggleDevTools()
-            }
-          },
-          {
-            type: 'separator'
-          },
-          {
-            role: 'resetzoom'
-          },
-          {
-            role: 'zoomin'
-          },
-          {
-            role: 'zoomout'
-          },
-          {
-            type: 'separator'
-          },
-          {
-            role: 'togglefullscreen'
-          }
         ]
-      },
+    },
     ];
 
     Menu.setApplicationMenu(Menu.buildFromTemplate(template));
