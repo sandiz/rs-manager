@@ -1,9 +1,9 @@
 /* changing background-color, border-color, font-family, font size */
+
 .sidebar-scroll {
     overflow: auto;
     max-height: 40vh;
-    color: 'black';
-    //boxShadow: "inset 0 -32px 84px -40px rgb(104, 113, 108)",
+    color: black; //boxShadow: "inset 0 -32px 84px -40px rgb(104, 113, 108)",
     border-radius: 4px,
 }
 
