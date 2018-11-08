@@ -86,6 +86,7 @@ class App extends Component {
   componentWillMount = async () => {
     await initSongsOwnedDB("tab-dashboard", this.updateHeader);
     await this.updateProfile();
+    await this.refreshTabs();
     // default tabs on startup
     //sthis.handleChange(this.state.TabsData[0]);
     //this.props.handleChange(TabsData[2], TabsData[2].child[0])
@@ -108,7 +109,7 @@ class App extends Component {
     const prfldb = await getProfileConfig();
     const steamcookie = await getSteamIDConfig();
     this.setState({ currentProfile: prfldb, currentCookie: steamcookie });
-    this.refreshTabs();
+    //this.refreshTabs();
   }
 
   handleChange = async (tab, child) => {
@@ -249,9 +250,9 @@ class App extends Component {
   }
 
   refreshTabs = async () => {
+    const t2 = this.state.TabsV2Data;
     const setlists = await getAllSetlist();
     if (setlists === null) return;
-    const t2 = this.state.TabsV2Data;
     t2[2].child = []
     const tempChilds = []
     for (let i = 0; i < setlists.length; i += 1) {
