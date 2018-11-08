@@ -16,7 +16,7 @@
 
 body {
     font-family: "Roboto Condensed", sans-serif;
-    background: rgba(1, 1, 1, 0.75);
+    background: black;
 }
 
 /* Turn on custom 8px wide scrollbar */
@@ -25,7 +25,7 @@ body {
     width: 10px;
     /* 1px wider than Lion. */
     /* This is more usable for users trying to click it. */
-    background-color: rgba(0, 0, 0, 0);
+    background-color: dimgray;
     -webkit-border-radius: 100px;
 }
 
@@ -49,7 +49,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb:vertical:active {
-    background: rgba(0, 0, 0, 0.61);
+    /* background: rgba(0, 0, 0, 0.61); */
     /* Some darker color when you click it */
     -webkit-border-radius: 100px;
 }
