@@ -120,26 +120,13 @@ export default class Sidebar extends React.Component {
             style={{
               width: 100 + '%',
               position: 'absolute',
-              bottom: 70 + 'px',
               fontSize: 13 + 'px',
+              left: -13 + 'px',
+              top: 55 + 'px',
             }}
             className="ta-center"
           >
-            New Version Available: {serverVersion}
-          </div>
-          <div
-            style={{
-              width: 100 + '%',
-              position: 'absolute',
-              bottom: 17 + 'px',
-              fontSize: 13 + 'px',
-            }}
-            className="ta-center"
-          >
-            <a
-              onClick={() => window.shell.openExternal(downloadUrl)}
-              style={{ width: 50 + '%' }}
-              className="extraPadding download">Download</a>
+            <a href="#" onClick={() => window.shell.openExternal(downloadUrl)}> New Version Available: {serverVersion}</a>
           </div>
         </div>
       )
@@ -150,8 +137,9 @@ export default class Sidebar extends React.Component {
           style={{
             width: 100 + '%',
             position: 'absolute',
-            bottom: 17 + 'px',
             fontSize: 13 + 'px',
+            left: -13 + 'px',
+            top: 55 + 'px',
           }}
           className="ta-center">
           {"v" + currVersion}
@@ -358,7 +346,8 @@ export default class Sidebar extends React.Component {
     return (
       <nav id="sidebar" className={this.props.showSidebar ? '' : 'active'}>
         <div className="sidebar-header">
-          <h3><a href="#" onClick={this.refresh}>Rocksmith 2014</a></h3>
+          <h3>Rocksmith 2014</h3>
+          {this.state.versionCm}
         </div>
 
         <ul className="list-unstyled components" style={{ padding: 0 + 'px' }}>
@@ -390,7 +379,6 @@ export default class Sidebar extends React.Component {
             {this.state.psusage}
           </table>
         </div>
-        {this.state.versionCm}
       </nav>
     );
   }
