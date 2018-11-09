@@ -29,7 +29,7 @@ export default class Sidebar extends React.Component {
     this.readSidebarState();
     this.psInterval = null;
     this.treeViewRef = React.createRef();
-    this.tabsToSave = ["tab-songs", "tab-setlist"]
+    //this.tabsToSave = ["tab-songs", "tab-setlist"]
   }
 
   componentDidMount = async () => {
@@ -211,22 +211,27 @@ export default class Sidebar extends React.Component {
   }
 
   onExpanded = async (item) => {
-    if (this.tabsToSave.includes(item.id)) {
-      this.serializedState[item.id] = item.expanded;
-      await saveState(this.componentID, this.serializedState);
-    }
+    if (item === null) return;
+    this.serializedState[item.id] = item.expanded;
+    await saveState(this.componentID, this.serializedState);
   }
 
   onColapsed = async (item) => {
-    if (this.tabsToSave.includes(item.id)) {
-      this.serializedState[item.id] = item.expanded;
-      await saveState(this.componentID, this.serializedState);
-    }
+    if (item === null) return;
+    this.serializedState[item.id] = item.expanded;
+    await saveState(this.componentID, this.serializedState);
   }
 
   onSelectItem = async (item) => {
     const api = this.treeViewRef.current.api;
-    const parent = api.getParentNode(item);
+    let parent = api.getParentNode(item);
+    if (item.id === "add-setlist") {
+      this.createNewSetlist();
+      return;
+    }
+    else if (item.id.includes("folder")) {
+      return;
+    }
     if (typeof item.children !== "undefined") {
       if (item.children.length === 0) {
         this.props.handleChange(item, null);
@@ -236,9 +241,8 @@ export default class Sidebar extends React.Component {
         return;
       }
     }
-    if (item.id === "add-setlist") {
-      this.createNewSetlist();
-      return;
+    if (parent.isFolder === true) {
+      parent = api.getParentNode(parent);
     }
     this.props.handleChange(parent, item);
   }
@@ -257,8 +261,7 @@ export default class Sidebar extends React.Component {
   onRenderItem = (item, treeview) => {
     let extraChildren = null;
     const isChildAndLeaf = item.isLeaf && treeview.api.getParentNode(item) !== null;
-    const restoreExpansion = this.tabsToSave.includes(item.id)
-    if (restoreExpansion) {
+    if (this.serializedState != null && item.id in this.serializedState) {
       item.expanded = this.serializedState[item.id]
     }
     if (typeof item.children !== "undefined" && item.children.length > 0) {
@@ -270,8 +273,10 @@ export default class Sidebar extends React.Component {
         </React.Fragment>
       )
     }
-    let childclass = isChildAndLeaf ? "treeview-item-custom-text child-and-leaf" : "treeview-item-custom-text parent-only";
+    let childclass = isChildAndLeaf || item.isFolder ? "treeview-item-custom-text child-and-leaf" : "treeview-item-custom-text parent-only";
     const parent = treeview.api.getParentNode(item)
+    const gp = parent ? treeview.api.getParentNode(parent) : null
+    let level3class = "treeview-item-custom"
     switch (item.id) {
       case "songs-owned":
         childclass += " guitar"
@@ -283,10 +288,17 @@ export default class Sidebar extends React.Component {
         childclass += " add"
         break;
       default:
-        if (parent != null && parent.id === "tab-setlist") {
+        if (parent != null
+          && (parent.id === "tab-setlist"
+            || (gp != null && gp.id === "tab-setlist")
+          )
+        ) {
+          if (gp != null && gp.id === "tab-setlist") level3class += " level3"
           const isGenerated = (item.isGenerated === true)
           const isManual = (item.isManual === true)
           const isRSSetlist = (item.isRSSetlist === true)
+          const isFolder = (item.isFolder === true)
+          const isStarred = (item.isStarred === true)
           if (isRSSetlist) {
             childclass += " rs";
           }
@@ -296,14 +308,24 @@ export default class Sidebar extends React.Component {
           else if (isManual) {
             childclass += " manual";
           }
+          else if (isFolder && item.id === "folder_starred") {
+            childclass += " starred-folder";
+          }
+          else if (isFolder) {
+            childclass += " folder";
+          }
           else {
             childclass += " new";
+          }
+
+          if (isStarred) {
+            childclass += " starred";
           }
         }
         break;
     }
     return (
-      <div className="treeview-item-custom">
+      <div className={level3class}>
         <span className={childclass}>{item.name}</span>
         {extraChildren}
       </div>

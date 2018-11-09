@@ -88,6 +88,11 @@ export async function initSongsOwnedDB(updateTab = "", updateFunc = null) {
   let altersql8 = "";
   altersql8 += "alter table songs_owned add tuning_weight int default null;"
 
+  let altersql9 = "";
+  altersql9 += "alter table setlist_meta add is_starred boolean default null;"
+  altersql9 += "alter table setlist_meta add is_folder boolean default null;"
+  altersql9 += "alter table setlist_meta add parent_folder char default null;"
+
   switch (version) {
     case 0: {
       // add score attack stats
@@ -128,7 +133,7 @@ export async function initSongsOwnedDB(updateTab = "", updateFunc = null) {
       version += 1
       await setUserVersion(version);
     case 5:
-      // add is_manual, is_generated, view_sql in setlist_meta
+      // add is_manual, is_generated, view_sql to setlist_meta
       await db.exec(altersql5);
       version += 1
       await setUserVersion(version);
@@ -162,10 +167,16 @@ export async function initSongsOwnedDB(updateTab = "", updateFunc = null) {
       version += 1
       await setUserVersion(version);
     }
+    case 9:
+      // add is_starred, is_folder and parent_folder to setlist_meta
+      await db.exec(altersql9)
+      version += 1
+      await setUserVersion(version);
     default:
       break;
   }
-  await db.run("REPLACE INTO setlist_meta VALUES('setlist_favorites','RS Favorites', 'true', 'false', '', 'true');")
+  await db.run("REPLACE INTO setlist_meta VALUES('setlist_favorites','RS Favorites', 'true', 'false', '', 'true', 'false', 'false', '');")
+  await db.run("REPLACE INTO setlist_meta VALUES('folder_starred','Starred', 'false', 'false', '', 'false', 'false', 'true', '');")
   await initSetlistPlaylistDB("setlist_favorites");
   if (updateFunc) updateFunc(updateTab, "Initialization complete.")
 }
@@ -637,7 +648,12 @@ export async function getAllSetlist(filter = false) {
   else {
     sql = `
     select * from setlist_meta
+    where is_starred != 'true' OR is_starred is null 
+    AND parent_folder is null
     order by
+      CASE
+        WHEN key LIKE '%folder_starred%' THEN 1
+      END desc,
       CASE
         WHEN name LIKE '%New%20Setlist%' AND is_manual != 'true' AND is_generated != 'true' AND is_rssetlist != 'true' THEN substr(name, 20)
       END desc,
@@ -651,9 +667,20 @@ export async function getAllSetlist(filter = false) {
   }
   return null;
 }
+export async function getStarredSetlists() {
+  const sql = `SELECT * FROM setlist_meta where is_starred='true' order by name collate nocase asc;`
+  const op = await db.all(sql);
+  return op;
+}
+export async function getChildOfSetlistFolder(foldername) {
+  const sql = `SELECT * FROM setlist_meta where parent_folder='${foldername}' order by name asc;`
+  const op = await db.all(sql);
+  return op;
+}
 export async function createRSSongList(
   tablename, displayname,
   isgenerated = null, ismanual = null, viewsql = null, isrscustom = null,
+  isstarred = null, isfolder = null, parentfolder = null,
 ) {
   await initSetlistPlaylistDB(tablename);
   await db.run(`
@@ -663,7 +690,10 @@ export async function createRSSongList(
     '${ismanual}', 
     '${isgenerated}',
     '${viewsql}',
-    '${isrscustom}'
+    '${isrscustom}',
+    '${isstarred}',
+    '${isfolder}',
+    '${parentfolder}'
     );`)
 }
 export async function addtoRSSongList(tablename, songkey) {

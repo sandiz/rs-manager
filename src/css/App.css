@@ -17,6 +17,7 @@
 body {
     font-family: "Roboto Condensed", sans-serif;
     background: black;
+    user-select: none;
 }
 
 /* Turn on custom 8px wide scrollbar */

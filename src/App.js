@@ -8,7 +8,7 @@ import SongAvailableView from './Components/songavailableView';
 import SetlistView from './Components/setlistView';
 import SettingsView from './Components/settingsView';
 import RSLiveView from './Components/rsliveView';
-import { getAllSetlist, initSongsOwnedDB } from './sqliteService';
+import { getAllSetlist, initSongsOwnedDB, getStarredSetlists } from './sqliteService';
 import './css/App.css'
 import HelpView from './Components/HelpView';
 
@@ -249,6 +249,21 @@ class App extends Component {
     this.setState({ showSidebar: !this.state.showSidebar });
   }
 
+  createSetlistObject = (setlist) => {
+    const isFolder = setlist.is_folder === "true";
+    const setlistObj = {
+      name: unescape(setlist.name),
+      id: setlist.key,
+      isLeaf: !isFolder,
+      isManual: setlist.is_manual === "true",
+      isGenerated: setlist.is_generated === "true",
+      isRSSetlist: setlist.is_rssetlist === "true",
+      isStarred: setlist.is_starred === "true",
+      isFolder: setlist.is_folder === "true",
+    }
+    return setlistObj;
+  }
+
   refreshTabs = async () => {
     const t2 = this.state.TabsV2Data;
     const setlists = await getAllSetlist();
@@ -257,14 +272,18 @@ class App extends Component {
     const tempChilds = []
     for (let i = 0; i < setlists.length; i += 1) {
       const setlist = setlists[i];
-      const setlistObj = {
-        name: unescape(setlist.name),
-        id: setlist.key,
-        isLeaf: true,
-        isManual: setlist.is_manual === "true",
-        isGenerated: setlist.is_generated === "true",
-        isRSSetlist: setlist.is_rssetlist === "true",
+      const isFolder = setlist.is_folder === "true";
+      const setlistObj = this.createSetlistObject(setlist)
+      if (isFolder && setlistObj.id === "folder_starred") {
+        setlistObj.children = [];
+        //eslint-disable-next-line
+        const childItems = await getStarredSetlists();
+        for (let j = 0; j < childItems.length; j += 1) {
+          const setlistchild = childItems[j];
+          setlistObj.children.push(this.createSetlistObject(setlistchild));
+        }
       }
+
       tempChilds.push(setlistObj);
     }
     t2[2].children = tempChilds;
