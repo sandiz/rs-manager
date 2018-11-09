@@ -7,61 +7,90 @@
     border-radius: 4px,
 }
 
-.manual {
-    background-image: url("../assets/tree-icons/box.svg") !important;
+.sidebar-icon-bg {
     background-repeat: no-repeat;
     background-position-x: 6px;
     background-size: 22px;
+}
+
+.level3 {
+    padding-left: 15px;
+}
+
+.manual {
+    @extend .sidebar-icon-bg;
+    background-image: url("../assets/tree-icons/box.svg") !important;
 }
 
 .guitar {
+    @extend .sidebar-icon-bg;
     background-image: url("../assets/tree-icons/guitar.svg") !important;
-    background-repeat: no-repeat;
     background-position-x: 7px;
-    background-size: 22px;
 }
 
 .catalog {
+    @extend .sidebar-icon-bg;
     background-image: url("../assets/tree-icons/catalog.svg") !important;
-    background-repeat: no-repeat;
     background-position-x: 5px;
-    background-size: 22px;
 }
 
 .add {
+    @extend .sidebar-icon-bg;
     background-image: url("../assets/tree-icons/add.svg") !important;
-    background-repeat: no-repeat;
-    background-position-x: 6px;
     background-position-y: -1px;
-    background-size: 23px;
 }
 
 .generated {
+    @extend .sidebar-icon-bg;
     background-image: url("../assets/tree-icons/generated.svg") !important;
-    background-repeat: no-repeat;
-    background-position-x: 6px;
-    background-size: 22px;
 }
 
 .manual {
+    @extend .sidebar-icon-bg;
     background-image: url("../assets/tree-icons/manual.svg") !important;
-    background-repeat: no-repeat;
-    background-position-x: 6px;
-    background-size: 22px;
 }
 
 .rs {
+    @extend .sidebar-icon-bg;
     background-image: url("../assets/tree-icons/rs.svg") !important;
-    background-repeat: no-repeat;
-    background-position-x: 6px;
-    background-size: 22px;
 }
 
 .new {
+    @extend .sidebar-icon-bg;
     background-image: url("../assets/tree-icons/box.svg") !important;
-    background-repeat: no-repeat;
-    background-position-x: 6px;
-    background-size: 22px;
+}
+
+.folder {
+    @extend .sidebar-icon-bg;
+    background-image: url("../assets/tree-icons/folder.svg") !important;
+    background-position-y: -2px;
+}
+
+.starred {
+    @extend .sidebar-icon-bg;
+    background-image: url("../assets/tree-icons/starred.svg") !important;
+    background-position-y: -2px;
+}
+
+.starred-folder {
+    @extend .sidebar-icon-bg;
+    background-image: url("../assets/tree-icons/event.svg") !important;
+    background-position-y: -2px;
+}
+
+.setlist-option-starred {
+    @extend .starred;
+    width: 100%;
+    display: inline-block;
+    background-position-y: 4px;
+}
+
+.setlist-option-starred-gray {
+    @extend .starred;
+    width: 100%;
+    display: inline-block;
+    filter: grayscale(100%);
+    background-position-y: 4px;
 }
 
 .sidebar-custom {
@@ -148,6 +177,7 @@
                 .child-and-leaf {
                     padding-left: 35px !important;
                     font-size: 0.85em !important;
+                    margin-left: 2px;
                 }
                 .parent-only {
                     padding-left: inherit;

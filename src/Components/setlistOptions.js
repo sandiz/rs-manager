@@ -193,6 +193,9 @@ export default class SetlistOptions extends React.Component {
       isGenerated: null,
       isManual: null,
       isRSSetlist: null,
+      isStarred: false,
+      isFolder: false,
+      parentFolder: '',
       filters: [],
       numResults: 0,
     }
@@ -314,6 +317,7 @@ export default class SetlistOptions extends React.Component {
         isGenerated: nextprops.info.is_generated === "true",
         isManual: nextprops.info.is_manual === "true",
         isRSSetlist: nextprops.info.is_rssetlist === "true",
+        isStarred: nextprops.info.is_starred === "true",
       })
       if (nextprops.info.is_manual === "true") {
         this.setState({
@@ -538,6 +542,7 @@ export default class SetlistOptions extends React.Component {
     await createRSSongList(
       this.props.info.key, this.state.setlistName, this.state.isGenerated,
       this.state.isManual, JSON.stringify(this.state.filters), this.state.isRSSetlist,
+      this.state.isStarred, this.state.isFolder, this.state.parentFolder,
     );
     this.props.refreshTabs();
     this.props.fetchMeta();
@@ -592,6 +597,8 @@ export default class SetlistOptions extends React.Component {
     const modalinfostyle = "width-75-2"
     const buttonstyle = "extraPadding download"
     if (this.props.showOptions === false) { return null; }
+    const starredstyle = this.state.isStarred
+      ? "setlist-option-starred" : "setlist-option-starred-gray"
     forceNoScroll()
     return (
       <div ref={(ref) => { this.modal_div = ref }} id="open-modal" className="modal-window" style={{ opacity: 1, pointerEvents: "auto" }}>
@@ -610,6 +617,12 @@ export default class SetlistOptions extends React.Component {
                     <td style={{ border: 'none', width: 20 + '%', borderRight: '1px solid' }}>Name</td>
                     <td style={{ border: 'none', width: 80 + '%', textAlign: 'left' }}>
                       <input type="text" defaultValue={this.state.setlistName} onChange={this.handleChange} style={{ paddingLeft: 10 + 'px', width: 80 + '%' }} />
+                      <div
+                        style={{ cursor: 'pointer' }}
+                        onClick={() => this.setState({ isStarred: !this.state.isStarred })}
+                        className={starredstyle}>
+                        &nbsp;
+                        </div>
                     </td>
                   </tr>
                   <tr style={{ backgroundColor: 'inherit', border: 'none', color: 'black' }}>
