@@ -1046,6 +1046,7 @@ export default class RSLiveView extends React.Component {
         ? this.state.album.substring(0, 35) + "..." : this.state.album)
       : "N/A";
     const buttonclass = "extraPadding download smallbutton ";//+ (this.state.win32 ? "" : "isDisabled");
+    const updateMasteryclass = buttonclass + ((this.state.songKey.length <= 0) ? "isDisabled" : "");
     return (
       <div className="container-fluid">
         <div className="ta-center">
@@ -1075,7 +1076,7 @@ export default class RSLiveView extends React.Component {
           }
           <a
             onClick={this.updateMastery}
-            className={buttonclass}>
+            className={updateMasteryclass}>
             Update Mastery
           </a>
           <a

@@ -11,6 +11,7 @@ import RSLiveView from './Components/rsliveView';
 import { getAllSetlist, initSongsOwnedDB, getStarredSetlists } from './sqliteService';
 import './css/App.css'
 import HelpView from './Components/HelpView';
+import { getState } from './stateService';
 
 const { path } = window;
 
@@ -249,9 +250,10 @@ class App extends Component {
     this.setState({ showSidebar: !this.state.showSidebar });
   }
 
-  createSetlistObject = (setlist) => {
+  createSetlistObject = async (setlist, state) => {
     const isFolder = setlist.is_folder === "true";
-    const setlistObj = {
+
+    let setlistObj = {
       name: unescape(setlist.name),
       id: setlist.key,
       isLeaf: !isFolder,
@@ -261,11 +263,27 @@ class App extends Component {
       isStarred: setlist.is_starred === "true",
       isFolder: setlist.is_folder === "true",
     }
+    setlistObj = this.addExpandFlag(setlistObj, state);
     return setlistObj;
+  }
+
+  addExpandFlag = (item, state) => {
+    if (state != null) {
+      if (item.id in state) {
+        item.expanded = state[item.id]
+      }
+    }
+    return item;
   }
 
   refreshTabs = async () => {
     const t2 = this.state.TabsV2Data;
+    const state = await getState("sidebar");
+    for (let k = 0; k < t2.length; k += 1) {
+      let item = t2[k];
+      item.expanded = false;
+      item = this.addExpandFlag(item, state);
+    }
     const setlists = await getAllSetlist();
     if (setlists === null) return;
     t2[2].child = []
@@ -273,14 +291,16 @@ class App extends Component {
     for (let i = 0; i < setlists.length; i += 1) {
       const setlist = setlists[i];
       const isFolder = setlist.is_folder === "true";
-      const setlistObj = this.createSetlistObject(setlist)
+      //eslint-disable-next-line
+      const setlistObj = await this.createSetlistObject(setlist, state)
       if (isFolder && setlistObj.id === "folder_starred") {
         setlistObj.children = [];
         //eslint-disable-next-line
         const childItems = await getStarredSetlists();
         for (let j = 0; j < childItems.length; j += 1) {
           const setlistchild = childItems[j];
-          setlistObj.children.push(this.createSetlistObject(setlistchild));
+          //eslint-disable-next-line
+          setlistObj.children.push(await this.createSetlistObject(setlistchild, state));
         }
       }
 

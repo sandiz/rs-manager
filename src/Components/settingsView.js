@@ -7,7 +7,7 @@ import getProfileConfig, {
   getUseCDLCConfig, getScoreAttackDashboardConfig, updateScoreAttackDashboard,
   getSessionIDConfig, updateSessionIDConfig, getMasteryThresholdConfig,
   updateMasteryThreshold, getShowPSStatsConfig, updatePSStats,
-  updateSteamIDConfig, getSteamIDConfig, updateSteamAPIKey, getSteamAPIKeyConfig,
+  updateSteamIDConfig, getSteamIDConfig, updateSteamAPIKey, getSteamAPIKeyConfig, updateConfig,
 } from '../configService';
 import {
   resetDB, createRSSongList, addtoRSSongList, isTablePresent, deleteRSSongList,
@@ -325,6 +325,12 @@ export default class SettingsView extends React.Component {
   resetdb = async () => {
     await resetDB('songs_owned');
     this.props.updateHeader(this.tabname, "Songs Owned collection is now reset!");
+  }
+
+  resetSidebarState = async () => {
+    await updateConfig("state", {});
+    this.props.refreshTabs();
+    this.props.updateHeader(this.tabname, "Sidebar state is now reset!");
   }
 
   enterCookie = async () => {
@@ -683,8 +689,8 @@ export default class SettingsView extends React.Component {
                 </Collapsible>
                 <br />
                 <Collapsible
-                  trigger={expandButton("Song Collection")}
-                  triggerWhenOpen={collapseButton("Song Collection")}
+                  trigger={expandButton("Reset Collection")}
+                  triggerWhenOpen={collapseButton("Reset Collection")}
                   transitionTime={200}
                   easing="ease-in"
                 >
@@ -697,11 +703,30 @@ export default class SettingsView extends React.Component {
                     float: 'right',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
-                    width: 400 + 'px',
+                    width: 50 + '%',
                     textAlign: 'right',
                   }}>
                     <a
                       onClick={this.resetdb}
+                      className="extraPadding download">
+                      Reset
+                  </a>
+                  </span>
+                  <br /> <br />
+                  <span style={{ float: 'left', color: 'red', marginTop: 18 + 'px' }}>
+                    <a>
+                      Reset Sidebar State
+                    </a>
+                  </span>
+                  <span style={{
+                    float: 'right',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    width: 50 + '%',
+                    textAlign: 'right',
+                  }}>
+                    <a
+                      onClick={this.resetSidebarState}
                       className="extraPadding download">
                       Reset
                   </a>

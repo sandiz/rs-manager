@@ -164,7 +164,8 @@ export default class SongDetailView extends React.Component {
     const items = []
     const output = await getAllSetlist(true);
     for (let i = 0; i < output.length; i += 1) {
-      items.push(<option key={output[i].key} value={output[i].key}>{output[i].name}</option>);
+      items.push(<option key={output[i].key} value={output[i].key}>
+        {unescape(output[i].name)}</option>);
       //here I will be creating my options dynamically based on
       //what props are currently passed to the parent component
     }
@@ -278,7 +279,7 @@ export default class SongDetailView extends React.Component {
     return (
       <div ref={(ref) => { this.modal_div = ref }} id="open-modal" className="modal-window" style={{ opacity: 1, pointerEvents: "auto" }}>
         <div id="modal-info" className={modalinfostyle}>
-          <a onKeyUp={this.onKeyUp} title="Close" className="modal-close" onClick={this.handleHide}>Close</a>
+          <a title="Close" className="modal-close" onClick={this.handleHide}>Close</a>
           <br />
           <div style={{ textAlign: 'center' }}>
             <h4 style={{ fontSize: 150 + "%", fontWeight: 'bold' }}>{unescape(this.props.song)}
@@ -379,7 +380,7 @@ export default class SongDetailView extends React.Component {
                         className={songlistanddashstyle}>
                         Add to Setlist
                     </a>
-                      <select className={selectsetliststyle} onChange={this.saveSetlist} style={{ width: 12 + '%', margin: 12 + 'px' }}>
+                      <select className={selectsetliststyle} onChange={this.saveSetlist} style={{ width: 21 + '%', margin: 12 + 'px' }}>
                         {this.state.setlists}
                       </select>
                     </span>
