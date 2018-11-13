@@ -211,13 +211,17 @@ export default class Sidebar extends React.Component {
   }
 
   onExpanded = async (item) => {
-    if (item === null) return;
+    if (item === null
+      || item.children === null
+      || (typeof item.children !== 'undefined' && item.children.length === 0)) return;
     this.serializedState[item.id] = item.expanded;
     await saveState(this.componentID, this.serializedState);
   }
 
   onColapsed = async (item) => {
-    if (item === null) return;
+    if (item === null
+      || item.children === null
+      || (typeof item.children !== 'undefined' && item.children.length === 0)) return;
     this.serializedState[item.id] = item.expanded;
     await saveState(this.componentID, this.serializedState);
   }
@@ -261,9 +265,6 @@ export default class Sidebar extends React.Component {
   onRenderItem = (item, treeview) => {
     let extraChildren = null;
     const isChildAndLeaf = item.isLeaf && treeview.api.getParentNode(item) !== null;
-    if (this.serializedState != null && item.id in this.serializedState) {
-      item.expanded = this.serializedState[item.id]
-    }
     if (typeof item.children !== "undefined" && item.children.length > 0) {
       extraChildren = (
         <React.Fragment>
