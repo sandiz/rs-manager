@@ -167,7 +167,7 @@ export default class SettingsView extends React.Component {
 
       //create table for setlist
       //insert setlist to setlist_meta
-      await createRSSongList(tablename, displayname, null, null, null, true);
+      await createRSSongList(tablename, displayname, false, false, false, true);
       const steamProfile = await readProfile(this.state.prfldb);
       const songRoot = steamProfile.SongListsRoot.SongLists;
       const currentSetlist = songRoot[setlistnum] === 'undefined' ? [] : songRoot[setlistnum];
@@ -329,7 +329,7 @@ export default class SettingsView extends React.Component {
 
   resetSidebarState = async () => {
     await updateConfig("state", {});
-    this.props.refreshTabs();
+    await this.props.refreshTabs();
     this.props.updateHeader(this.tabname, "Sidebar state is now reset!");
   }
 

@@ -548,7 +548,7 @@ export default class SetlistView extends React.Component {
                                         type="search"
                                     />
                                     &nbsp; &nbsp;
-          <select id="search_field" onChange={this.refreshView}>
+                                    <select id="search_field" onChange={this.refreshView}>
                                         <option value="anything">Anything</option>
                                         <option value="song">Song</option>
                                         <option value="artist">Artist</option>

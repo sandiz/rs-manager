@@ -22,6 +22,19 @@ module.exports = {
                 }
             }
         }
+        classNames.push(item.id)
+        if (item.isFolder) {
+            if (item.expanded)
+                classNames.push("folder-item-expanded");
+            else
+                classNames.push("folder-item");
+        }
+        else if (item.isLeaf) {
+            if (item.expanded)
+                classNames.push("leaf-item-expanded");
+            else
+                classNames.push("leaf-item");
+        }
 
         return classNames.join(' ');
     },

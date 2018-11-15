@@ -21,15 +21,11 @@ export default class Sidebar extends React.Component {
       psusage: null,
       showpsstats: false,
     }
-    this.serializedState = {
-      "tab-songs": false,
-      "tab-setlist": false,
-    }
+    this.serializedState = {}
     this.componentID = "sidebar";
     this.readSidebarState();
     this.psInterval = null;
     this.treeViewRef = React.createRef();
-    //this.tabsToSave = ["tab-songs", "tab-setlist"]
   }
 
   componentDidMount = async () => {
@@ -42,14 +38,16 @@ export default class Sidebar extends React.Component {
     this.props.handleChange(val, cid)
   }
 
-  getSerializedState = () => {
-    return this.serializedState;
-  }
-
   readSidebarState = async () => {
     const state = await getState(this.componentID);
     if (state != null) {
       this.serializedState = state;
+    }
+    else {
+      this.serializedState = {
+        "tab-songs": false,
+        "tab-setlist": false,
+      }
     }
   }
 
@@ -196,22 +194,35 @@ export default class Sidebar extends React.Component {
     return 0;
   }
 
-  createNewSetlist = async () => {
+  createNewSetlist = async (isFolder = false) => {
     const ts = Math.round((new Date()).getTime() / 1000);
-    const tablename = "setlist_custom_" + ts;
-    const displayname = "New Setlist #" + ts;
-    await createRSSongList(tablename, displayname);
+    let tablename = ""
+    let displayname = "";
+    if (isFolder) {
+      tablename = "folder_custom_" + ts;
+      displayname = "New Folder #" + ts;
+      await createRSSongList(tablename, displayname,
+        false, false, "", false,
+        false, true, "");
+    }
+    else {
+      tablename = "setlist_custom_" + ts;
+      displayname = "New Setlist #" + ts;
+      await createRSSongList(tablename, displayname);
+    }
     this.props.RefreshTabs();
     console.log("Created new setlist ", tablename, displayname);
   }
 
-  refresh = () => {
+  refresh = async () => {
     //this.checkForUpdate();
     //this.startPSMonitor();
+    await this.readSidebarState();
   }
 
   onExpanded = async (item) => {
     if (item === null
+      || (item && item.isLeaf)
       || item.children === null
       || (typeof item.children !== 'undefined' && item.children.length === 0)) return;
     this.serializedState[item.id] = item.expanded;
@@ -220,6 +231,7 @@ export default class Sidebar extends React.Component {
 
   onColapsed = async (item) => {
     if (item === null
+      || (item && item.isLeaf)
       || item.children === null
       || (typeof item.children !== 'undefined' && item.children.length === 0)) return;
     this.serializedState[item.id] = item.expanded;
@@ -233,7 +245,12 @@ export default class Sidebar extends React.Component {
       this.createNewSetlist();
       return;
     }
+    else if (item.id === "add-setlist-folder") {
+      this.createNewSetlist(true)
+      return;
+    }
     else if (item.id.includes("folder")) {
+      api.unselectItem();
       return;
     }
     if (typeof item.children !== "undefined") {
@@ -262,15 +279,26 @@ export default class Sidebar extends React.Component {
     }
   }
 
+  editFolder = (e, item, treeview) => {
+    const api = this.treeViewRef.current.api;
+    const parent = api.getParentNode(item);
+    this.props.handleChange(parent, item);
+  }
+
   onRenderItem = (item, treeview) => {
     let extraChildren = null;
     const isChildAndLeaf = item.isLeaf && treeview.api.getParentNode(item) !== null;
-    if (typeof item.children !== "undefined" && item.children.length > 0) {
+    if (typeof item.children !== "undefined" && item.isFolder) {
       extraChildren = (
         <React.Fragment>
-          <a className="dropdown-toggle" data-toggle="collapse">
-            <span className="actionButton trash" />
-          </a>
+          {
+            //eslint-disable-next-line
+            <span className="edit" onClick={e => this.editFolder(e, item, treeview)} />
+          }
+          {
+            //eslint-disable-next-line
+            <a className="dropdown-toggle" data-toggle="collapse" />
+          }
         </React.Fragment>
       )
     }
@@ -287,6 +315,9 @@ export default class Sidebar extends React.Component {
         break;
       case "add-setlist":
         childclass += " add"
+        break;
+      case "add-setlist-folder":
+        childclass += " add-folder"
         break;
       default:
         if (parent != null
