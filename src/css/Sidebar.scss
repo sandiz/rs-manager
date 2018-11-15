@@ -48,12 +48,16 @@
     @extend .sidebar-icon-bg;
     background-image: url("../assets/tree-icons/guitar.svg") !important;
     background-position-x: 7px;
+    background-size: 22px;
+    background-position-y: 0px;
 }
 
 .catalog {
     @extend .sidebar-icon-bg;
     background-image: url("../assets/tree-icons/catalog.svg") !important;
-    background-position-x: 5px;
+    background-position-x: 6px;
+    background-size: 21px;
+    background-position-y: 0px;
 }
 
 .add {
