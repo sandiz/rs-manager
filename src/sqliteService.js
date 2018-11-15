@@ -639,6 +639,41 @@ export async function isTablePresent(tablename) {
   }
   return true;
 }
+export async function getAllSetlistNoFolder() {
+  //console.log("__db_call__: getAllSetlist");
+  let sql = ''
+  sql = `
+    SELECT * from setlist_meta
+    WHERE 
+    (
+      /* filter starred setlist */
+      (is_starred is NOT NULL AND is_starred != 'true') 
+      OR 
+      (is_starred is NULL)
+    ) 
+    AND (
+      /* filter setlist that has a parent */
+       (is_folder is NOT NULL AND is_folder != 'true') 
+      OR 
+      (is_folder is NULL)
+    )
+    ORDER BY
+    name collate nocase asc 
+    `
+  const tableState = db !== null && await isTablePresent("setlist_meta");
+  if (tableState) {
+    const all = await db.all(sql);
+    for (let i = 0; i < all.length; i += 1) {
+      if (all[i].parent_folder != null && all[i].parent_folder.length > 0) {
+        //eslint-disable-next-line
+        const meta = await getSetlistMetaInfo(all[i].parent_folder)
+        all[i].parent_folder_name = meta.name
+      }
+    }
+    return all;
+  }
+  return null;
+}
 export async function getAllSetlist(filter = false) {
   //console.log("__db_call__: getAllSetlist");
   let sql = ''
@@ -741,7 +776,6 @@ export async function getSongCountFromPlaylistDB(dbname) {
 export async function updateFolderName(key, foldername) {
   const sql = `update setlist_meta set name='${foldername}' where key='${key}'`
   const op = await db.run(sql)
-  console.log(sql, op)
   return op.changes
 }
 export async function relinkSetlists(folder, deleteorreparent = "delete") {
@@ -757,6 +791,17 @@ export async function relinkSetlists(folder, deleteorreparent = "delete") {
     const sql = `UPDATE setlist_meta set parent_folder=null where parent_folder='${folder}'`
     await db.exec(sql);
   }
+}
+export async function updateParentOfSetlist(setlistkey, parentkey, setparent) {
+  let sql = ""
+  if (!setparent) {
+    sql = `UPDATE setlist_meta set parent_folder=null where key='${setlistkey}' AND parent_folder='${parentkey}'`
+  }
+  else {
+    sql = `UPDATE setlist_meta set parent_folder='${parentkey}' where key='${setlistkey}'`
+  }
+  const op = await db.run(sql)
+  return op.changes
 }
 export async function getSongsFromGeneratedPlaylist(
   meta,

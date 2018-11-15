@@ -194,7 +194,7 @@ export default class Sidebar extends React.Component {
     return 0;
   }
 
-  createNewSetlist = async (isFolder = false) => {
+  createNewSetlist = async (isFolder, api) => {
     const ts = Math.round((new Date()).getTime() / 1000);
     let tablename = ""
     let displayname = "";
@@ -210,8 +210,9 @@ export default class Sidebar extends React.Component {
       displayname = "New Setlist #" + ts;
       await createRSSongList(tablename, displayname);
     }
-    this.props.RefreshTabs();
+    await this.props.RefreshTabs();
     console.log("Created new setlist ", tablename, displayname);
+    api.selectItem(tablename);
   }
 
   refresh = async () => {
@@ -242,15 +243,18 @@ export default class Sidebar extends React.Component {
     const api = this.treeViewRef.current.api;
     let parent = api.getParentNode(item);
     if (item.id === "add-setlist") {
-      this.createNewSetlist();
+      api.unselectItem();
+      await this.createNewSetlist(false, api);
       return;
     }
     else if (item.id === "add-setlist-folder") {
-      this.createNewSetlist(true)
+      api.unselectItem();
+      await this.createNewSetlist(true, api)
       return;
     }
-    else if (item.id.includes("folder")) {
-      api.unselectItem();
+    else if (item.id.includes("folder") && !item.id.includes("starred")) {
+      //api.unselectItem();
+      this.editFolder(item, parent)
       return;
     }
     if (typeof item.children !== "undefined") {
@@ -279,9 +283,9 @@ export default class Sidebar extends React.Component {
     }
   }
 
-  editFolder = (e, item, treeview) => {
-    const api = this.treeViewRef.current.api;
-    const parent = api.getParentNode(item);
+  editFolder = (item, parent) => {
+    //const api = this.treeViewRef.current.api;
+    // const parent = api.getParentNode(item);
     this.props.handleChange(parent, item);
   }
 
@@ -292,8 +296,10 @@ export default class Sidebar extends React.Component {
       extraChildren = (
         <React.Fragment>
           {
-            //eslint-disable-next-line
-            <span className="edit" onClick={e => this.editFolder(e, item, treeview)} />
+            /*
+            item.id === "folder_starred" ? null
+              : <span className="edit" onClick={e => this.editFolder(e, item, treeview)} />
+            */
           }
           {
             //eslint-disable-next-line

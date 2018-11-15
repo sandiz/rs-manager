@@ -639,7 +639,7 @@ export default class SetlistOptions extends React.Component {
                   <tr style={{ backgroundColor: 'inherit', border: 'none', color: 'black' }}>
                     <td style={{ border: 'none', width: 20 + '%', borderRight: '1px solid' }}>Name</td>
                     <td style={{ border: 'none', width: 80 + '%', textAlign: 'left' }}>
-                      <input type="text" defaultValue={this.state.setlistName} onChange={this.handleChange} style={{ paddingLeft: 10 + 'px', width: 80 + '%' }} />
+                      <input type="text" defaultValue={this.state.setlistName} onChange={this.handleChange} style={{ marginLeft: 30 + 'px', paddingLeft: 10 + 'px', width: 80 + '%' }} />
                       <div
                         style={{ cursor: 'pointer' }}
                         onClick={() => this.setState({ isStarred: !this.state.isStarred })}
@@ -653,7 +653,7 @@ export default class SetlistOptions extends React.Component {
                     <td style={{
                       border: 'none', width: 80 + '%', textAlign: 'left', fontSize: 16 + 'px',
                     }}>
-                      <div>
+                      <div style={{ marginLeft: 30 + 'px' }}>
                         <input
                           type="radio"
                           id="setlist_manual"
@@ -665,7 +665,7 @@ export default class SetlistOptions extends React.Component {
                           <label style={{ paddingLeft: 34 + 'px' }} htmlFor="setlist_manual">Manual - Add Songs manually</label>
                         </span>
                       </div>
-                      <div>
+                      <div style={{ marginLeft: 30 + 'px' }}>
                         <input
                           type="radio"
                           id="setlist_generated"
@@ -677,7 +677,7 @@ export default class SetlistOptions extends React.Component {
                           <label style={{ paddingLeft: 34 + 'px' }} htmlFor="setlist_generated">Generated  - Add Songs via filters</label>
                         </span>
                       </div>
-                      <div>
+                      <div style={{ marginLeft: 30 + 'px' }}>
                         <input
                           disabled
                           type="radio"
@@ -700,6 +700,7 @@ export default class SetlistOptions extends React.Component {
                     <td style={{ border: 'none', width: 20 + '%', borderRight: '1px solid' }}>Folder</td>
                     <td style={{ border: 'none', width: 80 + '%', textAlign: 'left' }}>
                       <select
+                        style={{ marginLeft: 30 + 'px', width: 40 + '%' }}
                         id="folder"
                         defaultValue={this.state.selectedFolder}
                         onChange={(e) => {

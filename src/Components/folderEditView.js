@@ -1,6 +1,10 @@
 import React from 'react'
 import PropTypes from 'prop-types';
-import { updateFolderName, deleteRSSongList, relinkSetlists } from '../sqliteService';
+import {
+  updateFolderName, deleteRSSongList,
+  relinkSetlists, getAllSetlistNoFolder,
+  getChildOfSetlistFolder, updateParentOfSetlist,
+} from '../sqliteService';
 
 export default class FolderEditView extends React.Component {
   constructor(props) {
@@ -8,6 +12,8 @@ export default class FolderEditView extends React.Component {
     this.state = {
       folder: props.folder,
       isDeleted: false,
+      allsetlists: [],
+      checkedsetlist: [],
     }
   }
 
@@ -16,10 +22,14 @@ export default class FolderEditView extends React.Component {
       this.setState({
         folder: nextprops.folder,
         isDeleted: false,
-      })
+      }, () => this.refresh())
       return true;
     }
     return false;
+  }
+
+  componentWillMount = async () => {
+    this.refresh();
   }
 
   handleChange = (event) => {
@@ -28,16 +38,50 @@ export default class FolderEditView extends React.Component {
     this.setState({ folder: c });
   }
 
+  refresh = async () => {
+    const allsetlists = await getAllSetlistNoFolder();
+    const checkedsetlist = []
+
+    for (let k = 0; k < allsetlists.length; k += 1) {
+      const setlist = allsetlists[k];
+      checkedsetlist[setlist.key] = false;
+    }
+    const childrens = await getChildOfSetlistFolder(this.state.folder.id)
+    for (let i = 0; i < childrens.length; i += 1) {
+      const child = childrens[i];
+      checkedsetlist[child.key] = true;
+    }
+    this.setState({
+      allsetlists,
+      checkedsetlist,
+    })
+  }
+
   saveOptions = async () => {
+    this.props.updateHeader(this.props.currentTab.id,
+      this.state.folder.id,
+      "Saving folder: " + this.state.folder.name);
     await updateFolderName(this.state.folder.id, escape(this.state.folder.name))
+    const keys = Object.keys(this.state.checkedsetlist)
+    if (keys.length > 0) {
+      for (let i = 0; i < keys.length; i += 1) {
+        const key = keys[i];
+        const setlistKey = key;
+        const parentKey = this.state.folder.id;
+        //eslint-disable-next-line
+        await updateParentOfSetlist(setlistKey, parentKey, this.state.checkedsetlist[key]);
+      }
+    }
     this.props.refreshTabs();
     this.props.updateHeader(this.props.currentTab.id,
       this.state.folder.id,
       "Saved folder: " + this.state.folder.name);
+    this.refresh();
   }
 
   delete = async () => {
-    if (this.props.folder.children.length > 0) {
+    const childrens = await getChildOfSetlistFolder(this.state.folder.id)
+    if (childrens.length > 0) {
       const remote = window.remote
       const dialog = remote.dialog
       dialog.showMessageBox(
@@ -46,7 +90,7 @@ export default class FolderEditView extends React.Component {
           type: 'question',
           buttons: ['Move to Parent', 'Delete'],
           title: 'Confirm',
-          message: 'The folder contains setlists, do you want to move it to the parent folder or delete ?',
+          message: 'This folder contains setlists, do you want to move it to the parent folder or delete them ?',
         }, async (response) => {
           if (response === 0) {
             await relinkSetlists(this.props.folder.id, "relink");
@@ -91,6 +135,55 @@ export default class FolderEditView extends React.Component {
     );
   }
 
+  onChange = async (e, item) => {
+    const checkedsetlist = this.state.checkedsetlist;
+    checkedsetlist[item.key] = e.target.checked;
+    this.setState({ checkedsetlist })
+  }
+
+  getSetlistInput = () => {
+    if (this.state.allsetlists.length > 0) {
+      const checkboxes = this.state.allsetlists.map((item) => {
+        const checked = item.key in this.state.checkedsetlist
+          ? this.state.checkedsetlist[item.key] : false;
+        return (
+          <div key={item.key}>
+            <input
+              onChange={e => this.onChange(e, item)}
+              checked={checked}
+              key={item.key}
+              value={item.key}
+              type="checkbox"
+              style={{ fontSize: 14 + 'px' }}
+              id={item.key}
+            />
+            <span style={{ paddingLeft: 10 + 'px' }}>
+              <label htmlFor={item.key}>
+                {unescape(item.name)}
+              </label>
+              {
+                (item.parent_folder !== null && item.parent_folder.length > 0)
+                  ? (
+                    <span style={{
+                      fontSize: 12 + 'px',
+                      color: 'darkgray',
+                      marginLeft: 10 + 'px',
+                    }}>
+                      &nbsp;current parent: {unescape(item.parent_folder_name)}
+                    </span>
+                  )
+                  : null
+              }
+            </span>
+            <br />
+          </div>
+        )
+      });
+      return checkboxes;
+    }
+    return null;
+  }
+
   render = () => {
     if (this.state.isDeleted) return null;
     return (
@@ -114,6 +207,19 @@ export default class FolderEditView extends React.Component {
                           value={unescape(this.state.folder.name)}
                           onChange={this.handleChange}
                           style={{ paddingLeft: 10 + 'px', marginLeft: 30 + 'px', width: 80 + '%' }} />
+                      </td>
+                    </tr>
+                    <tr style={{ backgroundColor: 'inherit', border: 'none', color: 'black' }}>
+                      <td style={{ border: 'none', width: 20 + '%', borderRight: '1px solid' }}>All Setlists</td>
+                      <td style={{ border: 'none', width: 80 + '%', textAlign: 'left' }}>
+                        <div style={{
+                          marginLeft: 30 + 'px',
+                          fontSize: 16 + 'px',
+                          maxHeight: 350 + 'px',
+                          overflow: 'auto',
+                        }}>
+                          {this.getSetlistInput()}
+                        </div>
                       </td>
                     </tr>
                   </tbody>
