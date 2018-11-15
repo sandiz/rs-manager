@@ -10,11 +10,16 @@
 .sidebar-icon-bg {
     background-repeat: no-repeat;
     background-position-x: 6px;
-    background-size: 22px;
+    background-position-y: -2px;
+    background-size: 23px;
 }
 
 .level3 {
     padding-left: 15px;
+}
+
+.folder-item-expanded {
+    border-bottom: 1px solid wheat !important;
 }
 
 .manual {
@@ -38,6 +43,7 @@
     @extend .sidebar-icon-bg;
     background-image: url("../assets/tree-icons/add.svg") !important;
     background-position-y: -1px;
+    background-size: 24px;
 }
 
 .generated {
@@ -58,24 +64,62 @@
 .new {
     @extend .sidebar-icon-bg;
     background-image: url("../assets/tree-icons/box.svg") !important;
+    background-position-y: 0px;
+    background-size: 22px;
+    background-position-x: 8px;
+}
+
+.folder-item-expanded:hover .edit {
+    @extend .sidebar-icon-bg;
+    width: 24px;
+    background-size: 18px;
+    position: relative;
+    left: -27px;
+    top: 2px;
+    background-image: url("../assets/tree-icons/edit.svg") !important;
+    background-position-y: 0px;
+    cursor: pointer;
+}
+
+.folder-item:hover .edit {
+    @extend .sidebar-icon-bg;
+    width: 24px;
+    background-size: 18px;
+    position: relative;
+    left: -27px;
+    top: 2px;
+    background-image: url("../assets/tree-icons/edit.svg") !important;
+    background-position-y: 0px;
+    cursor: pointer;
 }
 
 .folder {
     @extend .sidebar-icon-bg;
     background-image: url("../assets/tree-icons/folder.svg") !important;
-    background-position-y: -2px;
+    background-position-y: -1px;
+    background-size: 21px;
+    background-position-x: 7px;
+}
+
+.add-folder {
+    @extend .sidebar-icon-bg;
+    background-image: url("../assets/tree-icons/add-folder.svg") !important;
+    background-position-y: 1px;
+    background-size: 24px;
 }
 
 .starred {
     @extend .sidebar-icon-bg;
     background-image: url("../assets/tree-icons/starred.svg") !important;
-    background-position-y: -2px;
+    background-position-y: -0.95px;
 }
 
 .starred-folder {
     @extend .sidebar-icon-bg;
     background-image: url("../assets/tree-icons/event.svg") !important;
-    background-position-y: -2px;
+    background-size: 25px;
+    background-position-x: 7px;
+    background-position-y: 0px;
 }
 
 .setlist-option-starred {
@@ -128,6 +172,17 @@
                 .select-row {
                     color: black !important;
                 }
+            }
+            &.add-setlist-folder {
+                float: right;
+                position: relative;
+                left: -5px;
+                width: 120px;
+            }
+            &.add-setlist {
+                width: 115px;
+                margin-left: 2px;
+                float: left;
             }
             .icon-and-text {
                 color: wheat;

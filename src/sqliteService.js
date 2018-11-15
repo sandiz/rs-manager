@@ -647,15 +647,26 @@ export async function getAllSetlist(filter = false) {
   }
   else {
     sql = `
-    select * from setlist_meta
-    where is_starred != 'true' OR is_starred is null 
-    AND parent_folder is null
-    order by
+    SELECT * from setlist_meta
+    WHERE (
+      /* filter starred setlist */
+      (is_starred is NOT NULL AND is_starred != 'true') 
+      OR 
+      (is_starred is NULL)
+    ) 
+    AND (
+      /* filter setlist that has a parent */
+      parent_folder is NULL OR substr(parent_folder, 0, 7) NOT LIKE '%folder%'
+    )
+    ORDER BY
       CASE
         WHEN key LIKE '%folder_starred%' THEN 1
       END desc,
       CASE
-        WHEN name LIKE '%New%20Setlist%' AND is_manual != 'true' AND is_generated != 'true' AND is_rssetlist != 'true' THEN substr(name, 20)
+        WHEN is_folder == 'true' THEN 2
+      END desc,
+      CASE
+        WHEN name LIKE '%New%20%' AND is_manual != 'true' AND is_generated != 'true' AND is_rssetlist != 'true' THEN substr(name, 20)
       END desc,
     name collate nocase asc 
     `
@@ -672,6 +683,11 @@ export async function getStarredSetlists() {
   const op = await db.all(sql);
   return op;
 }
+export async function getFolderSetlists() {
+  const sql = `SELECT * FROM setlist_meta where is_folder='true' order by name collate nocase asc;`
+  const op = await db.all(sql);
+  return op;
+}
 export async function getChildOfSetlistFolder(foldername) {
   const sql = `SELECT * FROM setlist_meta where parent_folder='${foldername}' order by name asc;`
   const op = await db.all(sql);
@@ -679,11 +695,15 @@ export async function getChildOfSetlistFolder(foldername) {
 }
 export async function createRSSongList(
   tablename, displayname,
-  isgenerated = null, ismanual = null, viewsql = null, isrscustom = null,
-  isstarred = null, isfolder = null, parentfolder = null,
+  isgenerated = false, ismanual = false,
+  viewsql = "", isrscustom = false,
+  isstarred = false, isfolder = false,
+  parentfolder = "",
 ) {
-  await initSetlistPlaylistDB(tablename);
-  await db.run(`
+  if (isfolder !== true) {
+    await initSetlistPlaylistDB(tablename);
+  }
+  const sql = `
     REPLACE INTO setlist_meta VALUES(
     '${tablename}',
     '${escape(displayname)}', 
@@ -694,15 +714,22 @@ export async function createRSSongList(
     '${isstarred}',
     '${isfolder}',
     '${parentfolder}'
-    );`)
+    );`
+  await db.run(sql);
 }
 export async function addtoRSSongList(tablename, songkey) {
   const sql = `replace into '${tablename}' (uniqkey) select uniqkey from songs_owned where songkey like '%${songkey}%'`
   const op = await db.run(sql)
   return op.changes;
 }
-export async function deleteRSSongList(tablename) {
-  const sql = `DELETE from setlist_meta where key='${tablename}'; DROP TABLE '${tablename}';`;
+export async function deleteRSSongList(tablename, drop = true) {
+  let sql = "";
+  if (drop) {
+    sql = `DELETE from setlist_meta where key='${tablename}'; DROP TABLE '${tablename}';`;
+  }
+  else {
+    sql = `DELETE from setlist_meta where key='${tablename}';`;
+  }
   await db.exec(sql)
 }
 export async function getSongCountFromPlaylistDB(dbname) {
@@ -710,6 +737,26 @@ export async function getSongCountFromPlaylistDB(dbname) {
   const sql = `SELECT count(*) as songcount, count(distinct songkey) as count FROM ${dbname} order by uniqkey collate nocase;`
   const all = await db.get(sql);
   return all;
+}
+export async function updateFolderName(key, foldername) {
+  const sql = `update setlist_meta set name='${foldername}' where key='${key}'`
+  const op = await db.run(sql)
+  console.log(sql, op)
+  return op.changes
+}
+export async function relinkSetlists(folder, deleteorreparent = "delete") {
+  if (deleteorreparent === "delete") {
+    const setlists = await getChildOfSetlistFolder(folder);
+    for (let i = 0; i < setlists.length; i += 1) {
+      const setlist = setlists[i];
+      //eslint-disable-next-line
+      await deleteRSSongList(setlist.key, true)
+    }
+  }
+  else {
+    const sql = `UPDATE setlist_meta set parent_folder=null where parent_folder='${folder}'`
+    await db.exec(sql);
+  }
 }
 export async function getSongsFromGeneratedPlaylist(
   meta,

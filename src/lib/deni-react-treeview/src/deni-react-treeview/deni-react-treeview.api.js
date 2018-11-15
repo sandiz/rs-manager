@@ -98,6 +98,9 @@ module.exports = (scope) => {
       treeviewApiImpl.selectItem(scope, itemToFind);
     },
 
+    unselectItem: () => {
+      treeviewApiImpl.unselectItem(scope);
+    },
     //
     //
     //

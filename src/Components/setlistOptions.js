@@ -1,7 +1,10 @@
 import React from 'react'
 import PropTypes from 'prop-types';
 import { enableScroll, forceNoScroll } from './songdetailView';
-import { deleteRSSongList, createRSSongList, executeRawSql } from '../sqliteService';
+import {
+  deleteRSSongList, createRSSongList,
+  executeRawSql, getFolderSetlists,
+} from '../sqliteService';
 import { allTunings } from './songlistView';
 
 const Fragment = React.Fragment;
@@ -190,14 +193,15 @@ export default class SetlistOptions extends React.Component {
     super(props)
     this.state = {
       setlistName: '',
-      isGenerated: null,
-      isManual: null,
-      isRSSetlist: null,
+      isGenerated: false,
+      isManual: false,
+      isRSSetlist: false,
       isStarred: false,
       isFolder: false,
-      parentFolder: '',
       filters: [],
       numResults: 0,
+      allFolders: null,
+      selectedFolder: 'none',
     }
     //tuning
     this.gates = ["and", "or"]
@@ -312,12 +316,15 @@ export default class SetlistOptions extends React.Component {
 
   shouldComponentUpdate = async (nextprops, nextstate) => {
     if (nextprops !== this.props) {
+      const allFolders = await this.getAllFolders();
       this.setState({
         setlistName: unescape(nextprops.info.name),
         isGenerated: nextprops.info.is_generated === "true",
         isManual: nextprops.info.is_manual === "true",
         isRSSetlist: nextprops.info.is_rssetlist === "true",
         isStarred: nextprops.info.is_starred === "true",
+        allFolders,
+        selectedFolder: nextprops.info.parent_folder,
       })
       if (nextprops.info.is_manual === "true") {
         this.setState({
@@ -336,7 +343,7 @@ export default class SetlistOptions extends React.Component {
         }
         this.setState({
           numResults: 0,
-          filters: jsonObj,
+          filters: jsonObj === null ? [] : jsonObj,
         }, () => this.runQuery())
         // run viewsql and find results
       }
@@ -539,10 +546,13 @@ export default class SetlistOptions extends React.Component {
 
   saveOptions = async () => {
     console.log("save setlist: " + this.props.info.key);
+    const folder = this.state.selectedFolder === "none" ? "" : this.state.selectedFolder
     await createRSSongList(
-      this.props.info.key, this.state.setlistName, this.state.isGenerated,
-      this.state.isManual, JSON.stringify(this.state.filters), this.state.isRSSetlist,
-      this.state.isStarred, this.state.isFolder, this.state.parentFolder,
+      this.props.info.key, this.state.setlistName,
+      this.state.isGenerated, this.state.isManual,
+      JSON.stringify(this.state.filters), this.state.isRSSetlist,
+      this.state.isStarred, this.state.isFolder,
+      folder,
     );
     this.props.refreshTabs();
     this.props.fetchMeta();
@@ -593,6 +603,19 @@ export default class SetlistOptions extends React.Component {
     }
   }
 
+  getAllFolders = async () => {
+    const folder = await getFolderSetlists();
+    if (folder.length > 0) {
+      return folder.map((item) => {
+        return (
+          <option key={item.key} value={item.key}>{unescape(item.name)}
+          </option>
+        );
+      });
+    }
+    return null;
+  }
+
   render = () => {
     const modalinfostyle = "width-75-2"
     const buttonstyle = "extraPadding download"
@@ -639,7 +662,7 @@ export default class SetlistOptions extends React.Component {
                           onChange={this.handleManual}
                         />
                         <span className="manual" style={{ display: 'inline-flex' }}>
-                          <label style={{ paddingLeft: 34 + 'px' }} htmlFor="setlist_manual">Manual (Add Songs manually)</label>
+                          <label style={{ paddingLeft: 34 + 'px' }} htmlFor="setlist_manual">Manual - Add Songs manually</label>
                         </span>
                       </div>
                       <div>
@@ -651,9 +674,41 @@ export default class SetlistOptions extends React.Component {
                           onChange={this.handleGenerated}
                         />
                         <span className="generated" style={{ display: 'inline-flex' }}>
-                          <label style={{ paddingLeft: 34 + 'px' }} htmlFor="setlist_generated">Generated (Add Songs via filters)</label>
+                          <label style={{ paddingLeft: 34 + 'px' }} htmlFor="setlist_generated">Generated  - Add Songs via filters</label>
                         </span>
                       </div>
+                      <div>
+                        <input
+                          disabled
+                          type="radio"
+                          id="setlist_rs"
+                          name="setlist_rs"
+                          checked={this.state.isRSSetlist === true}
+                        />
+                        <span
+                          className="rs"
+                          style={{
+                            display: 'inline-flex',
+                            color: 'darkgray',
+                          }}>
+                          <label style={{ paddingLeft: 34 + 'px' }} htmlFor="setlist_rs">Rocksmith Setlist - Imported from game</label>
+                        </span>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr style={{ backgroundColor: 'inherit', border: 'none', color: 'black' }}>
+                    <td style={{ border: 'none', width: 20 + '%', borderRight: '1px solid' }}>Folder</td>
+                    <td style={{ border: 'none', width: 80 + '%', textAlign: 'left' }}>
+                      <select
+                        id="folder"
+                        defaultValue={this.state.selectedFolder}
+                        onChange={(e) => {
+                          this.setState({ selectedFolder: e.target.value })
+                        }
+                        }>
+                        <option value="none">None</option>
+                        {this.state.allFolders}
+                      </select>
                     </td>
                   </tr>
                 </tbody>

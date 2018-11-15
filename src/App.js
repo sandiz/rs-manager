@@ -2,13 +2,17 @@ import React, { Component } from 'react'
 import Sidebar from './Components/Sidebar'
 import PSARCView from './Components/psarcView'
 import SonglistView from './Components/songlistView'
+import FolderEditView from './Components/folderEditView'
 import DashboardView from './Components/dashboardView'
 import getProfileConfig, { getSteamIDConfig } from './configService';
 import SongAvailableView from './Components/songavailableView';
 import SetlistView from './Components/setlistView';
 import SettingsView from './Components/settingsView';
 import RSLiveView from './Components/rsliveView';
-import { getAllSetlist, initSongsOwnedDB, getStarredSetlists } from './sqliteService';
+import {
+  getAllSetlist, initSongsOwnedDB,
+  getStarredSetlists, getChildOfSetlistFolder,
+} from './sqliteService';
 import './css/App.css'
 import HelpView from './Components/HelpView';
 import { getState } from './stateService';
@@ -160,18 +164,30 @@ class App extends Component {
         )
         break;
       case "tab-setlist":
-        selectedTab = (
-          <SetlistView
-            currentTab={tab}
-            currentChildTab={child}
-            updateHeader={this.updateChildHeader}
-            resetHeader={this.resetHeader}
-            handleChange={this.updateProfile}
-            refreshTabs={this.refreshTabs}
-            saveSearch={this.saveSearchHistory}
-            getSearch={this.getSearchHistory}
-          />
-        )
+        if (child.isFolder === true) {
+          selectedTab = (
+            <FolderEditView
+              currentTab={tab}
+              refreshTabs={this.refreshTabs}
+              folder={child}
+              updateHeader={this.updateChildHeader}
+            />
+          )
+        }
+        else {
+          selectedTab = (
+            <SetlistView
+              currentTab={tab}
+              currentChildTab={child}
+              updateHeader={this.updateChildHeader}
+              resetHeader={this.resetHeader}
+              handleChange={this.updateProfile}
+              refreshTabs={this.refreshTabs}
+              saveSearch={this.saveSearchHistory}
+              getSearch={this.getSearchHistory}
+            />
+          )
+        }
         break;
       case "tab-songs":
         switch (child.id) {
@@ -250,7 +266,7 @@ class App extends Component {
     this.setState({ showSidebar: !this.state.showSidebar });
   }
 
-  createSetlistObject = async (setlist, state) => {
+  createSetlistObject = (setlist, state) => {
     const isFolder = setlist.is_folder === "true";
 
     let setlistObj = {
@@ -292,24 +308,26 @@ class App extends Component {
       const setlist = setlists[i];
       const isFolder = setlist.is_folder === "true";
       //eslint-disable-next-line
-      const setlistObj = await this.createSetlistObject(setlist, state)
-      if (isFolder && setlistObj.id === "folder_starred") {
+      const setlistObj = this.createSetlistObject(setlist, state)
+      if (isFolder) {
         setlistObj.children = [];
         //eslint-disable-next-line
-        const childItems = await getStarredSetlists();
+        const childItems = setlistObj.id === "folder_starred" ? await getStarredSetlists() : await getChildOfSetlistFolder(setlistObj.id);
+
         for (let j = 0; j < childItems.length; j += 1) {
           const setlistchild = childItems[j];
           //eslint-disable-next-line
-          setlistObj.children.push(await this.createSetlistObject(setlistchild, state));
+          setlistObj.children.push(this.createSetlistObject(setlistchild, state));
         }
       }
 
       tempChilds.push(setlistObj);
     }
     t2[2].children = tempChilds;
-    t2[2].children.unshift({ name: 'Create New Setlist...', id: 'add-setlist', isLeaf: true });
+    t2[2].children.unshift({ name: 'New Folder', id: 'add-setlist-folder', isLeaf: true });
+    t2[2].children.unshift({ name: 'New Setlist', id: 'add-setlist', isLeaf: true });
     this.setState({ TabsV2Data: t2 });
-    this.sidebarRef.current.refresh();
+    await this.sidebarRef.current.refresh();
   }
 
   openHelp = () => {

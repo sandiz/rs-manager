@@ -2,7 +2,6 @@
 @import './base-theme.scss';
 
 .deni-react-treeview-container.classic {
-  border-color: lighten($blue, 2%);
 
   .deni-react-treeview-item-container.classic {
     @include set-theme($blue);

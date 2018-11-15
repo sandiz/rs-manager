@@ -179,7 +179,7 @@ a[data-toggle="collapse"] {
     display: block;
     position: absolute;
     top: 50%;
-    right: 20px;
+    right: 12px;
     transform: translateY(-50%);
 }
 
@@ -453,6 +453,16 @@ tbody tr:hover {
 .modal-window>div {
     width: 720px;
     position: relative;
+    margin: 5% auto;
+    padding: 2rem;
+    background: azure;
+    color: #444;
+    border-radius: 20px;
+}
+
+.modal-folder-edit {
+    width: 60%;
+    height: 100%;
     margin: 5% auto;
     padding: 2rem;
     background: azure;
