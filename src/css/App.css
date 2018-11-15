@@ -175,12 +175,8 @@ a[data-toggle="collapse"] {
     position: relative;
 }
 
-.dropdown-toggle::after {
-    display: block;
-    position: absolute;
-    top: 50%;
-    right: 12px;
-    transform: translateY(-50%);
+a[data-toggle="expanded"] {
+    position: relative;
 }
 
 ul ul a {
