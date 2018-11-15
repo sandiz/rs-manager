@@ -1,5 +1,22 @@
 /* changing background-color, border-color, font-family, font size */
 
+.dropdown-toggle::after {
+    display: block;
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    transform: translateY(-50%);
+}
+
+.dropdown-toggle-collapse::after {
+    @extend .dropdown-toggle;
+    display: block;
+    position: absolute;
+    top: 50%;
+    right: 12px; //transform: translateY(-50%);
+    transform: rotate(-90deg);
+}
+
 .sidebar-scroll {
     overflow: auto;
     max-height: 40vh;
@@ -72,10 +89,10 @@
 .folder-item-expanded:hover .edit {
     @extend .sidebar-icon-bg;
     width: 24px;
-    background-size: 18px;
+    background-size: 14px;
     position: relative;
-    left: -27px;
-    top: 2px;
+    left: -23px;
+    top: 6px;
     background-image: url("../assets/tree-icons/edit.svg") !important;
     background-position-y: 0px;
     cursor: pointer;
@@ -84,10 +101,10 @@
 .folder-item:hover .edit {
     @extend .sidebar-icon-bg;
     width: 24px;
-    background-size: 18px;
+    background-size: 14px;
     position: relative;
-    left: -27px;
-    top: 2px;
+    left: -23px;
+    top: 6px;
     background-image: url("../assets/tree-icons/edit.svg") !important;
     background-position-y: 0px;
     cursor: pointer;

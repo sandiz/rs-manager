@@ -288,7 +288,7 @@ export default class Sidebar extends React.Component {
   onRenderItem = (item, treeview) => {
     let extraChildren = null;
     const isChildAndLeaf = item.isLeaf && treeview.api.getParentNode(item) !== null;
-    if (typeof item.children !== "undefined" && item.isFolder) {
+    if (typeof item.children !== "undefined" && (item.isFolder || item.children.length > 0)) {
       extraChildren = (
         <React.Fragment>
           {
@@ -297,7 +297,7 @@ export default class Sidebar extends React.Component {
           }
           {
             //eslint-disable-next-line
-            <a className="dropdown-toggle" data-toggle="collapse" />
+            <a className={item.expanded ? "dropdown-toggle" : "dropdown-toggle dropdown-toggle-collapse"} data-toggle="collapse" />
           }
         </React.Fragment>
       )
