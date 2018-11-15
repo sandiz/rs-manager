@@ -5,6 +5,7 @@ import {
   relinkSetlists, getAllSetlistNoFolder,
   getChildOfSetlistFolder, updateParentOfSetlist,
 } from '../sqliteService';
+import { getState, saveState } from '../stateService';
 
 export default class FolderEditView extends React.Component {
   constructor(props) {
@@ -99,6 +100,11 @@ export default class FolderEditView extends React.Component {
             await relinkSetlists(this.props.folder.id, "delete");
           }
           await deleteRSSongList(this.props.folder.id, false)
+          const state = await getState("sidebar");
+          if (this.props.folder.id in state) {
+            delete state[this.props.folder.id]
+            await saveState("sidebar", state);
+          }
           this.props.refreshTabs();
           this.props.updateHeader(this.props.currentTab.id,
             this.state.folder.id,
