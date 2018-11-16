@@ -150,6 +150,10 @@ export default class FolderEditView extends React.Component {
   getSetlistInput = () => {
     if (this.state.allsetlists.length > 0) {
       const checkboxes = this.state.allsetlists.map((item) => {
+        let setlistclassname = "new";
+        if (item.is_generated === "true") setlistclassname = "generated"
+        if (item.is_manual === "true") setlistclassname = "manual"
+        if (item.is_rssetlist === "true") setlistclassname = "rs"
         const checked = item.key in this.state.checkedsetlist
           ? this.state.checkedsetlist[item.key] : false;
         return (
@@ -163,10 +167,12 @@ export default class FolderEditView extends React.Component {
               style={{ fontSize: 14 + 'px' }}
               id={item.key}
             />
-            <span style={{ paddingLeft: 10 + 'px' }}>
-              <label htmlFor={item.key}>
-                {unescape(item.name)}
-              </label>
+            <span style={{ paddingLeft: 5 + 'px' }}>
+              <span className={setlistclassname} style={{ display: 'inline-flex' }}>
+                <label style={{ paddingLeft: 40 + 'px' }} htmlFor={item.key}>
+                  {unescape(item.name)}
+                </label>
+              </span>
               {
                 (item.parent_folder !== null && item.parent_folder.length > 0)
                   ? (
@@ -175,7 +181,7 @@ export default class FolderEditView extends React.Component {
                       color: 'darkgray',
                       marginLeft: 10 + 'px',
                     }}>
-                      &nbsp;current parent: {unescape(item.parent_folder_name)}
+                      &nbsp;Parent: {unescape(item.parent_folder_name)}
                     </span>
                   )
                   : null
