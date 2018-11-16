@@ -5,7 +5,7 @@ import { createRSSongList } from '../sqliteService';
 import { getShowPSStatsConfig } from '../configService';
 import { getState, saveState } from '../stateService';
 
-import("../css/Sidebar.scss")
+import("../css/Sidebar.css")
 
 export default class Sidebar extends React.Component {
   constructor(props) {
