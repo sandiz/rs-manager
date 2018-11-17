@@ -53,6 +53,7 @@ function createWindow() {
         c({ cancel: false, responseHeaders: d.responseHeaders });
     });
 
+
     // Create the Application's main menu
     var template = [{
         label: "About",
@@ -109,6 +110,12 @@ function createWindow() {
             },
             {
                 role: 'togglefullscreen'
+            },
+            {
+                label: 'Toggle Fullscreen (local)',
+                click(item, focusedWindow) {
+                    if (focusedWindow) focusedWindow.setSimpleFullScreen(!focusedWindow.isSimpleFullScreen());
+                }
             }
         ]
     },
