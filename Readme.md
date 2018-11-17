@@ -13,7 +13,7 @@
 Rocksmith's UI leaves a lot to be desired especially when you have a lot of songs in your collection.  Rocksmith Manager uses Rocksmith + Steam data to consolidate stats/mastery/dlc/setlists under one roof. It also tracks your live session, showing you your accuracy, notes hit/missed in realtime.
 
 ![Dashboard](https://github.com/sandiz/rs-manager/raw/master/screenshots/images/dashboard.png)
-![Rocksmith Live](https://github.com/sandiz/rs-manager/raw/master/screenshots/images/rs-live.png)
+![Rocksmith Live](https://raw.githubusercontent.com/sandiz/rs-manager/master/screenshots/images/mysetup.png)
 
 ## Usage
 - [Settings](#settings)
