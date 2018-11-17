@@ -1,4 +1,5 @@
 <p align="center">
+
 <img width=12.5% src="https://github.com/sandiz/rs-manager/blob/master/src/assets/icons/icon-1024x1024.png">
 </p>
 <p align="center">
