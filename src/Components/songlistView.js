@@ -904,6 +904,7 @@ export default class SonglistView extends React.Component {
             <option value="album">Album</option>
             <option value="cdlc">CDLC</option>
             <option value="odlc">ODLC</option>
+            <option value="id">SongID</option>
           </select>
         </div>
         <div className="centerButton list-unstyled">

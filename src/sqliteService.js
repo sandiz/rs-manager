@@ -447,6 +447,9 @@ export async function getSongsOwned(start = 0, count = 10, sortField = "mastery"
     case "artist":
       searchSql = `artist like '%${escape(search)}%'`
       break;
+    case "id":
+      searchSql = `id like '${search}'`
+      break;
     case "cdlc":
       searchSql += ` and is_cdlc = 'true'`
       break;
@@ -962,6 +965,13 @@ export async function getLastNSongs(type = "count", count = 3, infoID = "overall
             where is_cdlc='false' ${wheresql} 
             order by (count + sa_playcount) 
             desc limit ${count};`
+      break;
+    case "mastery":
+      sql = `select song, artist, album, mastery 
+            from songs_owned
+            where is_cdlc='false' ${wheresql} 
+            order by mastery desc
+            limit ${count};`
       break;
     case "recent":
       sql = `select song, artist, mastery, album
