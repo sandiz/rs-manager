@@ -398,6 +398,18 @@ export default class SongDetailView extends React.Component {
             >
               <div className="options-flex">
                 <div style={{ flexBasis: 100 + '%' }} className="options-flex-div">
+                  <div style={{ float: 'left' }}>SongID</div>
+                  <div style={{ float: 'right' }}>
+                    <span
+                      className="song-detail-option"
+                      style={{ userSelect: 'text' }}>
+                      {this.props.songID}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div className="options-flex" style={{ marginTop: 6 + 'px' }}>
+                <div style={{ flexBasis: 100 + '%' }} className="options-flex-div">
                   <div style={{ float: 'left' }}>Custom DLC</div>
                   <div style={{ float: 'right' }}>
                     <span
