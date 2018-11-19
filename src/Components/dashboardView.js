@@ -620,7 +620,7 @@ export default class DashboardView extends React.Component {
 
     const infoID = document.getElementById("info_path").value
     const top3Songs = await getLastNSongs("count", 3, infoID);
-    const recent3Songs = await getLastNSongs("recent", 3, infoID);
+    const recent3Songs = await getLastNSongs("mastery", 3, infoID);
     const sa3Songs = await getLastNSongs("sa", 3, infoID);
     const md3Songs = await getLastNSongs("md", 3, infoID);
     const all = {
