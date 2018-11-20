@@ -63,7 +63,7 @@ function createWindow() {
                     openAboutWindow({
                         icon_path: path.join(__dirname, "./assets/icons/icon-1024x1024.png"),
                         package_json_dir: path.join(__dirname, "../"),
-                        copyright: 'Copyright (c) 2015 sandic',
+                        copyright: 'Copyright (c) 2018 sandic',
                         homepage: 'https://github.com/sandiz/rs-manager',
                     });
                 }
@@ -112,7 +112,7 @@ function createWindow() {
                 role: 'togglefullscreen'
             },
             {
-                label: 'Toggle Fullscreen (local)',
+                label: 'Toggle Full Screen (local)',
                 click(item, focusedWindow) {
                     if (focusedWindow) focusedWindow.setSimpleFullScreen(!focusedWindow.isSimpleFullScreen());
                 }
