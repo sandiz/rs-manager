@@ -236,7 +236,8 @@ export function arrangmentFormatter(cell, row) {
   } = arrprop
   const ignoreProp = [
     "bonusArr", "pathBass", "pathLead", "pathRhythm",
-    "represent", "routeMask", "standardTuning",
+    "represent", "standardTuning",
+    "routeMask",
   ];
   let arrobj = null;
   const arrinfo = [represent, bonusArr, pathLead, pathRhythm, pathBass]
@@ -252,8 +253,26 @@ export function arrangmentFormatter(cell, row) {
   else if (arrinfo.equals([0, 1, 0, 0, 1])) { arrobj = <span key={row.id + "_ai"}>Bonus Bass</span> }
   else if (arrinfo.equals([0, 0, 0, 0, 1])) { arrobj = <span key={row.id + "_ai"}>Alternate Bass</span> }
 
+  let arrMismatch = false;
+  switch (cell) {
+    case "Lead":
+      if (arrprop.pathLead === 0) arrMismatch = true;
+      break;
+    case "Rhythm":
+      if (arrprop.pathRhythm === 0) arrMismatch = true;
+      break;
+    case "Bass":
+      if (arrprop.pathBass === 0) arrMismatch = true;
+      break;
+    default:
+      arrMismatch = false;
+      break;
+  }
+
+
   const isCDLC = row.is_cdlc === "true";
-  if (isCDLC) { arrobj = [arrobj, <span key={row.id + "_custom"}> (C)</span>] }
+  if (isCDLC) { arrobj = [arrobj, <span title="This is a custom dlc arrangement" key={row.id + "_custom"}> (C)</span>] }
+  if (arrMismatch) { arrobj = [arrobj, <span title="Conflicting fields found in psarc" key={row.id + "_mismatch"}>*</span>] }
   return (
     <div>
       <ReactTooltip
@@ -276,7 +295,7 @@ export function arrangmentFormatter(cell, row) {
             {
               Object.keys(arrprop).map((key, index) => {
                 const val = arrprop[key];
-                const properkey = key in techniqueNames ? techniqueNames[key] : ""
+                const properkey = key in techniqueNames ? techniqueNames[key] : key
                 if (val > 0 && ignoreProp.indexOf(key) === -1) {
                   return (
                     <tr className="row" key={key + row.id}>
@@ -292,9 +311,34 @@ export function arrangmentFormatter(cell, row) {
                 ? (
                   <tr className="row" key={"cdlc" + row.id}>
                     <td style={{ width: 100 + '%', textAlign: 'center' }}>
-                      Custom DLC
+                      (C)ustom DLC
                     </td>
                   </tr>
+                ) : null
+            }
+            {
+              arrMismatch
+                ? (
+                  <React.Fragment>
+                    <tr className="row conflicting-row" key={"cdlc" + row.id}>
+                      <td style={{
+                        width: 100 + '%',
+                        textAlign: 'center',
+                        color: 'red',
+                      }}>
+                        Conflicting Arrangement Info*
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style={{ width: 100 + '%', textAlign: 'center' }}>
+                        ArrangementName: {cell} <br /><br />
+                        BitMask: <br /><br />
+                        pathLead: {arrprop.pathLead} <br /><br />
+                        pathRhythm: {arrprop.pathRhythm} <br /><br />
+                        pathBass: {arrprop.pathBass} <br /><br />
+                      </td>
+                    </tr>
+                  </React.Fragment>
                 ) : null
             }
           </tbody>
