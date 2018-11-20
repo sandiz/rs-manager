@@ -849,6 +849,7 @@ hr {
     font-size: 17px !important;
     pointer-events: auto !important;
     opacity: 1 !important;
+    border-radius: 10px !important;
 }
 
 .tooltipClass:hover {
@@ -894,7 +895,7 @@ hr {
     border: 0px;
     background-color: unset !important;
     color: white !important;
-    margin: auto !important;
+    /*margin: auto !important; */
 }
 
 .pointer {
@@ -1166,4 +1167,8 @@ hr {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+}
+
+.conflicting-row {
+    margin-bottom: -12px !important;
 }
