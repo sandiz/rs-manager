@@ -810,6 +810,10 @@ hr {
     flex: 0 0 31% !important;
 }
 
+.col-lg-5 {
+    max-width: 38.4% !important;
+}
+
 .dblock {
     display: block;
 }
