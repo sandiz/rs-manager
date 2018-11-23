@@ -81,6 +81,7 @@ class App extends Component {
       selectedTab: null,
       readme: 'getting-started',
       showhelp: false,
+      readytorender: false,
     };
     this.songlistRef = null;
     //this.handleChange = this.handleChange.bind(this);
@@ -88,7 +89,7 @@ class App extends Component {
     this.sidebarRef = React.createRef();
   }
 
-  componentWillMount = async () => {
+  cwmasync = async () => {
     await initSongsOwnedDB("tab-dashboard", this.updateHeader);
     await this.updateProfile();
     await this.refreshTabs();
@@ -97,6 +98,13 @@ class App extends Component {
     //this.props.handleChange(TabsData[2], TabsData[2].child[0])
     //this.toggleActive(TabsData[2]);
     this.updateHeader("tab-dashboard", "Rocksmith 2014 Dashboard")
+    this.setState({ readytorender: true }, () => {
+      this.handleChange(this.state.TabsV2Data[0]);
+    });
+  }
+
+  componentWillMount = async () => {
+    this.cwmasync();
   }
 
   getSearchHistory = (key) => {
@@ -120,7 +128,7 @@ class App extends Component {
   handleChange = async (tab, child) => {
     const text = (tab == null) ? "" : tab.name
       + (child == null ? "" : ` >  ${child.name}`);
-
+    if (this.state.readytorender === false) return;
 
     let selectedTab = null;
     switch (tab.id) {

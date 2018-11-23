@@ -75,11 +75,15 @@ export default class DashboardView extends React.Component {
     }
   }
 
-  componentDidMount = async () => {
-    this.fetchStats();
-    this.fetchRandomStats();
-    this.fetchWeeklySpotlight();
+  cdmasync = async () => {
+    await this.fetchStats();
+    await this.fetchRandomStats();
+    await this.fetchWeeklySpotlight();
     this.props.handleChange();
+  }
+
+  componentDidMount = async () => {
+    this.cdmasync();
   }
 
   getStatsWidth = (input, min, max) => {
