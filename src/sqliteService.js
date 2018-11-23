@@ -93,6 +93,13 @@ export async function initSongsOwnedDB(updateTab = "", updateFunc = null) {
   altersql9 += "alter table setlist_meta add is_folder boolean default null;"
   altersql9 += "alter table setlist_meta add parent_folder char default null;"
 
+  let altersql10 = "";
+  altersql10 += "alter table songs_owned add path_lead boolean default null;"
+  altersql10 += "alter table songs_owned add path_rhythm boolean default null;"
+  altersql10 += "alter table songs_owned add path_bass boolean default null;"
+  altersql10 += "alter table songs_owned add bonus_arr boolean default null;"
+  altersql10 += "alter table songs_owned add represent boolean default null;"
+
   switch (version) {
     case 0: {
       // add score attack stats
@@ -172,6 +179,34 @@ export async function initSongsOwnedDB(updateTab = "", updateFunc = null) {
       await db.exec(altersql9)
       version += 1
       await setUserVersion(version);
+    case 10:
+      {
+        // create arr props
+        await db.exec(altersql10)
+        const all = await db.all("select rowid, arrangementProperties from songs_owned");
+        const promises = []
+        for (let i = 0; i < all.length; i += 1) {
+          const row = all[i]
+          const arrProp = JSON.parse(unescape(row.arrangementProperties));
+          const {
+            represent, bonusArr, pathLead, pathBass, pathRhythm,
+          } = arrProp
+
+          const stmt = `update songs_owned set
+            path_lead=${pathLead},
+            path_rhythm=${pathRhythm},
+            path_bass=${pathBass},
+            bonus_arr=${bonusArr},
+            represent=${represent}
+            where rowid=${row.rowid}`;
+          // eslint-disable-next-line
+          promises.push(db.exec(stmt));
+        }
+        if (updateFunc) updateFunc(updateTab, `Updating arrangement paths..`)
+        await Promise.all(promises)
+        version += 1
+        await setUserVersion(version);
+      }
     default:
       break;
   }
@@ -831,7 +866,7 @@ export async function getSongsFromGeneratedPlaylist(
   }
   return [];
 }
-export async function getSongsFromPlaylistDB(dbname, start = 0, count = 10, sortField = "mastery", sortOrder = "desc", search = "", searchField = "") {
+export async function getSongsFromPlaylistDB(dbname, start = 0, count = 10, sortField = "mastery", sortOrder = "desc", search = "", searchField = "", options = []) {
   // console.log("__db_call__: getSongsFromPlaylistDB");
   if (db == null) {
     const dbfilename = window.sqlitePath;
@@ -856,7 +891,23 @@ export async function getSongsFromPlaylistDB(dbname, start = 0, count = 10, sort
       break;
     default: break;
   }
+  let optionsSql = "";
+  if (options.length > 0) {
+    if (options.includes("pathLead")) {
+      optionsSql += `path_lead=1`
+    }
+    if (options.includes("pathRhythm")) {
+      optionsSql += (optionsSql.length > 0 ? " OR " : "") + (`path_rhythm=1`)
+    }
+    if (options.includes("pathBass")) {
+      optionsSql += (optionsSql.length > 0 ? " OR " : "") + (`path_bass=1`)
+    }
+  }
   if (search === "") {
+    let wheresql = "";
+    if (optionsSql.length > 0) {
+      wheresql = "WHERE " + optionsSql
+    }
     sql = `select c.acount as acount, c.songcount as songcount, *
           from songs_owned,  (
           SELECT count(*) as acount, count(distinct songkey) as songcount
@@ -864,10 +915,14 @@ export async function getSongsFromPlaylistDB(dbname, start = 0, count = 10, sort
             JOIN ${dbname} ON ${dbname}.uniqkey = songs_owned.uniqkey
           ) c 
           JOIN ${dbname} ON ${dbname}.uniqkey = songs_owned.uniqkey
+          ${wheresql}
           ORDER BY ${sortField} ${sortOrder} LIMIT ${start},${count}
           `;
   }
   else {
+    if (optionsSql.length > 0) {
+      searchSql = " AND " + optionsSql
+    }
     sql = `select c.acount as acount, c.songcount as songcount, *
           from songs_owned, (
           SELECT count(*) as acount, count(distinct songkey) as songcount
@@ -930,7 +985,6 @@ export async function addToFavorites(songkey) {
 
 export async function getRandomSongOwned() {
   //console.log("__db_call__: getRandomSongOwned");
-  await initSongsOwnedDB();
   const masteryT = await getMasteryThresholdConfig();
   const sql = `select * from songs_owned where mastery < '${masteryT}' order by random() limit 1;`
   const op = await db.get(sql);
@@ -1019,7 +1073,6 @@ export async function getLastNSongs(type = "count", count = 3, infoID = "overall
 }
 export async function getPathBreakdown(path = "lead") {
   //console.log("__db_call__: getRandomSongOwned");
-  await initSongsOwnedDB();
   const masteryT = await getMasteryThresholdConfig();
   const smsql = `
                select count(id) as count from songs_owned 

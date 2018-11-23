@@ -1,4 +1,5 @@
 import React from 'react'
+import Select from 'react-select';
 import PropTypes from 'prop-types';
 import {
     RemoteAll,
@@ -16,7 +17,38 @@ import getProfileConfig, { updateProfileConfig, getScoreAttackConfig } from '../
 import SetlistOptions from './setlistOptions';
 
 const { path } = window;
-
+const options = [
+    { value: 'pathLead', label: 'Lead' },
+    { value: 'pathRhythm', label: 'Rhythm' },
+    { value: 'pathBass', label: 'Bass' },
+];
+const customStyles = {
+    container: styles => ({
+        ...styles, display: 'inline-flex', marginTop: 12 + 'px',
+    }),
+    control: styles => ({
+        ...styles, backgroundColor: 'white', color: 'black', width: 255 + 'px',
+    }),
+    option: (styles, {
+        data, isDisabled, isFocused, isSelected,
+    }) => {
+        return {
+            ...styles,
+            color: 'black',
+        };
+    },
+    multiValue: (styles, { data }) => {
+        return {
+            ...styles,
+        };
+    },
+    multiValueLabel: (styles, { data }) => ({
+        ...styles,
+    }),
+    multiValueRemove: (styles, { data }) => ({
+        ...styles,
+    }),
+}
 export default class SetlistView extends React.Component {
     constructor(props) {
         super(props);
@@ -33,6 +65,7 @@ export default class SetlistView extends React.Component {
             showOptions: false,
             setlistMeta: {},
             isDeleted: false,
+            selectedPathOption: [],
         };
         this.search = null;
         this.columns = [
@@ -225,11 +258,6 @@ export default class SetlistView extends React.Component {
         this.lastsortorder = "desc"
         this.lastChildID = props.currentChildTab.id;
         this.fetchMeta();
-        this.handleTableChange("cdm", {
-            page: 1,
-            sizePerPage: this.state.sizePerPage,
-            filters: {},
-        })
     }
 
     shouldComponentUpdate = async (nextprops, nextstate) => {
@@ -296,6 +324,10 @@ export default class SetlistView extends React.Component {
         }, () => {
             this.getSearch();
         });
+    }
+
+    handlePathChange = (selectedPathOption) => {
+        this.setState({ selectedPathOption }, () => this.refreshView());
     }
 
     handleSearchChange = (e) => {
@@ -423,6 +455,7 @@ export default class SetlistView extends React.Component {
                 }
             }
         } else {
+            const pathOpts = this.state.selectedPathOption.map(x => x.value)
             output = await getSongsFromPlaylistDB(
                 this.lastChildID,
                 start,
@@ -431,6 +464,7 @@ export default class SetlistView extends React.Component {
                 sortOrder === null ? this.lastsortorder : sortOrder,
                 this.search ? this.search.value : "",
                 document.getElementById("search_field") ? document.getElementById("search_field").value : "",
+                pathOpts,
             )
         }
         if (sortField !== null && typeof sortField !== 'undefined') { this.lastsortfield = sortField; }
@@ -555,7 +589,18 @@ export default class SetlistView extends React.Component {
                                         <option value="album">Album</option>
                                         <option value="arrangement">Arrangement</option>
                                     </select>
-                                    <br /><br />
+                                    <br />
+                                    <Select
+                                        value={this.state.selectedPathOption}
+                                        onChange={this.handlePathChange}
+                                        options={options}
+                                        styles={customStyles}
+                                        isMulti
+                                        placeholder="Filter by path"
+                                        isSearchable={false}
+                                        isClearable={false}
+                                    />
+                                    <br />
                                 </div>
                             ) : null
                     }
