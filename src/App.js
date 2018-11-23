@@ -26,7 +26,7 @@ class App extends Component {
       currentTab: null,
       currentChildTab: null,
       showSidebar: true,
-      appTitle: '',
+      appTitle: 'Running Migrations, please wait...',
       currentProfile: '',
       currentCookie: '',
       TabsV2Data: [
