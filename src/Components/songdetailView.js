@@ -4,7 +4,8 @@ import Collapsible from 'react-collapsible';
 import DatePicker from 'react-datepicker';
 import moment from 'moment';
 import {
-  getAllSetlist, saveSongToSetlist, getSongByID, updateCDLCStat, updateSAFCStat,
+  getAllSetlist, saveSongToSetlist, getSongByID,
+  updateCDLCStat, updateSAFCStat, saveSongByIDToSetlist,
 } from '../sqliteService';
 import { getScoreAttackConfig } from '../configService';
 import { expandButton, collapseButton } from "./settingsView";
@@ -45,11 +46,13 @@ export default class SongDetailView extends React.Component {
       sa_fc_medium: null,
       sa_fc_hard: null,
       sa_fc_master: null,
+      showaddtosetlistoptions: false,
     }
     this.maxResults = 10;
     this.modal_div = null;
     this.ptplayer = null
     this.mvplayer = null
+    this.arrlistref = React.createRef();
   }
 
   shouldComponentUpdate = async (nextprops, nextstate) => {
@@ -151,9 +154,17 @@ export default class SongDetailView extends React.Component {
     enableScroll();
   }
 
-  addToSetlist = async (e) => {
-    const { song, artist } = this.props;
-    await saveSongToSetlist(this.state.currentSetlist, unescape(song), unescape(artist));
+  addToSetlist = async (addSongID = false) => {
+    if (addSongID) {
+      console.log("Saving id to setlist", this.props.songID, this.state.currentSetlist);
+      await saveSongByIDToSetlist(this.state.currentSetlist, this.props.songID);
+    }
+    else {
+      console.log("saving all arrangements to setlist", this.state.currentSetlist);
+      const { song, artist } = this.props;
+
+      await saveSongToSetlist(this.state.currentSetlist, unescape(song), unescape(artist));
+    }
   }
 
   saveSetlist = (e) => {
@@ -251,7 +262,9 @@ export default class SongDetailView extends React.Component {
     const mvstyle = "extraPadding download " + (!this.state.showMusicVideo ? "" : "isDisabled");
     const ptdivstyle = this.state.showPlaythrough ? "dblock" : "hidden";
     const mvdivstyle = this.state.showMusicVideo ? "dblock" : "hidden";
-    const selectsetliststyle = this.props.isGenerated || this.props.isRSSetlist ? "hidden" : "";
+    const selectsetliststyle = (this.props.isSongview ? "" : "hidden") + " " + (this.props.isGenerated || this.props.isRSSetlist ? "hidden" : "");
+    const addtosetliststyle = songlistanddashstyle + " " + (this.state.showaddtosetlistoptions ? "hidden" : "extraPadding download");
+    const setlistoptionstyle = this.state.showaddtosetlistoptions ? "inline" : "hidden";
     let showleftarrow = '';
     let showrightarrow = '';
     let yttitle = "";
@@ -366,7 +379,7 @@ export default class SongDetailView extends React.Component {
                         onClick={this.chooseMV}
                         className={mvstyle}>
                         Music Video
-                    </a>
+                      </a>
                       <a
                         onClick={async () => {
                           await this.props.removeFromSetlist();
@@ -374,12 +387,30 @@ export default class SongDetailView extends React.Component {
                         }}
                         className={setlistyle}>
                         Remove from Setlist
-                    </a>
+                      </a>
+                      <div className={setlistoptionstyle}>
+                        <a
+                          onClick={() => { this.addToSetlist(true); this.handleHide() }}
+                          style={{
+                            width: 14 + '%',
+                          }}
+                          className="extraPadding download">
+                          Add this arngmnt.
+                        </a>
+                        <a
+                          onClick={async () => { this.addToSetlist(); this.handleHide(); }}
+                          style={{
+                            width: 14 + '%',
+                          }}
+                          className="extraPadding download">
+                          Add all arngmnts.
+                        </a>
+                      </div>
                       <a
-                        onClick={async () => { this.addToSetlist(); this.handleHide(); }}
-                        className={songlistanddashstyle}>
+                        onClick={async () => { this.setState({ showaddtosetlistoptions: true }) }}
+                        className={addtosetliststyle}>
                         Add to Setlist
-                    </a>
+                      </a>
                       <select className={selectsetliststyle} onChange={this.saveSetlist} style={{ width: 21 + '%', margin: 12 + 'px' }}>
                         {this.state.setlists}
                       </select>
