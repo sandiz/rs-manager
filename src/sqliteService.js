@@ -956,7 +956,6 @@ export async function removeSongFromSetlistByUniqKey(dbname, uniq) {
   const sql = `DELETE FROM '${dbname}' where uniqkey='${uniq}';`
   await db.all(sql);
 }
-
 export async function saveSongToSetlist(setlist, song, artist) {
   // console.log("__db_call__: saveSongToSetlist");
   let sql = `select uniqkey from songs_owned where song like '%${escape(song)}%' and artist like '%${escape(artist)}%'`
@@ -978,14 +977,12 @@ export async function saveSongByIDToSetlist(setlist, id) {
     await db.run(sql2);
   }
 }
-
 export async function addToFavorites(songkey) {
   // console.log("__db_call__: addToFavorites");
   const sql = `replace into setlist_favorites (uniqkey) select uniqkey from songs_owned where songkey like '%${songkey}%'`
   const op = await db.run(sql)
   return op.changes;
 }
-
 export async function getRandomSongOwned() {
   //console.log("__db_call__: getRandomSongOwned");
   const masteryT = await getMasteryThresholdConfig();
