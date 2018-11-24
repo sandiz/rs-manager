@@ -11,7 +11,7 @@ import readProfile from '../steamprofileService';
 import {
     addToFavorites, initSetlistPlaylistDB, getSongsFromPlaylistDB,
     removeSongFromSetlist, updateMasteryandPlayed, initSongsOwnedDB,
-    getSetlistMetaInfo, getSongsFromGeneratedPlaylist,
+    getSetlistMetaInfo, getSongsFromGeneratedPlaylist, removeSongFromSetlistByUniqKey,
 } from '../sqliteService';
 import getProfileConfig, { updateProfileConfig, getScoreAttackConfig } from '../configService';
 import SetlistOptions from './setlistOptions';
@@ -66,6 +66,7 @@ export default class SetlistView extends React.Component {
             setlistMeta: {},
             isDeleted: false,
             selectedPathOption: [],
+            songData: {},
         };
         this.search = null;
         this.columns = [
@@ -251,6 +252,7 @@ export default class SetlistView extends React.Component {
                     showSong: row.song,
                     showArtist: row.artist,
                     showAlbum: row.album,
+                    songData: row,
                 })
             },
         };
@@ -537,6 +539,19 @@ export default class SetlistView extends React.Component {
         }
     }
 
+    removeFromSetlistByID = async (songData) => {
+        const uniq = songData.uniqkey;
+        console.log("removing ", uniq);
+        removeSongFromSetlistByUniqKey(this.lastChildID, uniq);
+        this.handleTableChange('filter', {
+            page: 1,
+            sizePerPage: this.state.sizePerPage,
+            filters: { search: this.search },
+            sortField: null,
+            sortOrder: null,
+        })
+    }
+
     removeFromSetlist = async () => {
         console.log("removing ", this.state.showSong, this.state.showArtist, this.state.showAlbum);
         await removeSongFromSetlist(
@@ -645,10 +660,12 @@ export default class SetlistView extends React.Component {
                         song={this.state.showSong}
                         artist={this.state.showArtist}
                         album={this.state.showAlbum}
+                        songData={this.state.songData}
                         showDetail={this.state.showDetail}
                         close={() => this.setState({ showDetail: false })}
                         isSetlist
                         removeFromSetlist={this.removeFromSetlist}
+                        removeFromSetlistByID={this.removeFromSetlistByID}
                         isGenerated={this.state.setlistMeta.is_generated === "true"}
                         isRSSetlist={this.state.setlistMeta.is_rssetlist === "true"}
                     />

@@ -952,15 +952,18 @@ export async function removeSongFromSetlist(dbname, song, artist, album) {
     await db.all(sql);
   }
 }
+export async function removeSongFromSetlistByUniqKey(dbname, uniq) {
+  const sql = `DELETE FROM '${dbname}' where uniqkey='${uniq}';`
+  await db.all(sql);
+}
+
 export async function saveSongToSetlist(setlist, song, artist) {
   // console.log("__db_call__: saveSongToSetlist");
   let sql = `select uniqkey from songs_owned where song like '%${escape(song)}%' and artist like '%${escape(artist)}%'`
   const op = await db.all(sql);
-  console.log(op)
   for (let i = 0; i < op.length; i += 1) {
     const uniq = op[i].uniqkey;
     sql = `replace into '${setlist}' values ('${uniq}')`;
-    console.log(sql)
     /* loop await */ //eslint-disable-next-line
     await db.run(sql)
   }
