@@ -688,12 +688,6 @@ export async function getAllSetlistNoFolder() {
     SELECT * from setlist_meta
     WHERE 
     (
-      /* filter starred setlist */
-      (is_starred is NOT NULL AND is_starred != 'true') 
-      OR 
-      (is_starred is NULL)
-    ) 
-    AND (
       /* filter setlist that has a parent */
        (is_folder is NOT NULL AND is_folder != 'true') 
       OR 

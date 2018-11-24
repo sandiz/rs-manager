@@ -181,7 +181,28 @@ export default class FolderEditView extends React.Component {
                       color: 'darkgray',
                       marginLeft: 10 + 'px',
                     }}>
-                      &nbsp;Parent: {unescape(item.parent_folder_name)}
+                      Parent: {unescape(item.parent_folder_name)}
+                    </span>
+                  )
+                  : null
+              }
+              {
+                item.is_starred !== null && item.is_starred === 'true'
+                  ? (
+                    <span style={{
+                      fontSize: 12 + 'px',
+                      color: 'darkgray',
+                      marginLeft: 10 + 'px',
+                    }}>
+                      {
+                        (item.parent_folder !== null && item.parent_folder.length > 0)
+                          ? (
+                            <span>
+                              |&nbsp;&nbsp;
+                            </span>
+                          ) : null
+                      }
+                      Starred
                     </span>
                   )
                   : null
