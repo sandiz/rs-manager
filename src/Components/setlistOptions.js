@@ -177,6 +177,12 @@ export function generateSql(filters, count = false) {
       case "sa_fc_master":
         sql += generateFCSql(filter);
         break;
+      case "path_lead":
+      case "path_rhythm":
+      case "path_bass":
+        if (filter.value) sql += `${filter.type} = 1 `;
+        else sql += `${filter.type} = 0 `;
+        break;
       default:
         break;
     }
@@ -309,6 +315,21 @@ export default class SetlistOptions extends React.Component {
       {
         type: "sa_fc_master",
         display: "FC (SA Master)",
+        cmp: ["is"],
+      },
+      {
+        type: "path_lead",
+        display: "Path: Lead",
+        cmp: ["is"],
+      },
+      {
+        type: "path_rhythm",
+        display: "Path: Rhythm",
+        cmp: ["is"],
+      },
+      {
+        type: "path_bass",
+        display: "Path: Bass",
         cmp: ["is"],
       },
     ];
@@ -469,6 +490,7 @@ export default class SetlistOptions extends React.Component {
     else if (
       filter.type === "is_cdlc" || filter.type === "capofret" || filter.type === "centoffset"
       || filter.type === "sa_fc_easy" || filter.type === "sa_fc_medium" || filter.type === "sa_fc_hard" || filter.type === "sa_fc_master"
+      || filter.type === "path_lead" || filter.type === "path_rhythm" || filter.type === "path_bass"
     ) {
       const defValue = filter.value;
       return (
