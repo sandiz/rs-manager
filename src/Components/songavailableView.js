@@ -182,6 +182,8 @@ export default class SongAvailableView extends React.Component {
           return {
             width: '15%',
             cursor: 'pointer',
+            backgroundColor: cell === "true" ? 'wheat' : 'inherit',
+            color: cell === "true" ? 'black' : 'inherit',
           };
         },
         sort: true,
@@ -481,7 +483,7 @@ export default class SongAvailableView extends React.Component {
       this.props.updateHeader(
         this.tabname,
         this.childtabname,
-        `Error fetching history, please check Steam Login Cookie in Settings!`,
+        `Error fetching history (session expired), please login with Steam again!`,
       );
       return;
     }
