@@ -371,6 +371,10 @@ class App extends Component {
     this.setState({ showhelp: true, readme })
   }
 
+  openChangelog = () => {
+    this.setState({ showhelp: true, readme: 'changelog' });
+  }
+
   closeHelp = () => {
     this.setState({ showhelp: false })
   }
@@ -395,6 +399,7 @@ class App extends Component {
             ytConnected={false}
             TabsV2Data={this.state.TabsV2Data}
             RefreshTabs={this.refreshTabs}
+            Changelog={this.openChangelog}
           />
           <div id="content">
             <nav className="navbar navbar-expand-lg navbar-light bg-light">
