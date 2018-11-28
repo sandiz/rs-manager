@@ -61,9 +61,14 @@ window.request = async function (uri, cookies, cookieurl, qs, form, method = "GE
         qs,
         form,
     };
-    console.log(options);
-    const d = await rp(options);
-    return d;
+    //console.log(options);
+    try {
+        const d = await rp(options);
+        return d;
+    }
+    catch (error) {
+        return "{\"html\": \"\"}";
+    }
 }
 
 
