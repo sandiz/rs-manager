@@ -101,7 +101,7 @@ export default class Sidebar extends React.Component {
     const json = await updateData.json();
     const currVersion = window.remote.app.getVersion();
     const serverVersion = "tag_name" in json ? json.tag_name : "";
-    const downloadUrl = "html_url" in json ? json.html_url : "";
+    //const downloadUrl = "html_url" in json ? json.html_url : "";
 
     let updateAvailable = false;
     if (serverVersion !== "") {
@@ -124,7 +124,7 @@ export default class Sidebar extends React.Component {
             }}
             className="ta-center"
           >
-            <a href="#" onClick={() => window.shell.openExternal(downloadUrl)}> New Version Available: {serverVersion}</a>
+            <a href="#" onClick={() => this.props.Changelog()}> New Version Available: {serverVersion}</a>
           </div>
         </div>
       )
@@ -452,6 +452,7 @@ Sidebar.propTypes = {
   TabsV2Data: PropTypes.array,
   //TabsData: PropTypes.array,
   RefreshTabs: PropTypes.func,
+  Changelog: PropTypes.func,
 }
 Sidebar.defaultProps = {
   currentProfile: '',
@@ -460,4 +461,5 @@ Sidebar.defaultProps = {
   TabsV2Data: [],
   //TabsData: [],
   RefreshTabs: () => { },
+  Changelog: () => { },
 }
