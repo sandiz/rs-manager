@@ -24,9 +24,7 @@ export default class StatsTableView extends React.Component {
                 <tr>
                   <td
                     className="iconPreview gp_fcs badgeText dashboardGP"
-                    title="Total Full Combos">
-                    FCs
-                </td>
+                    title="Total Full Combos" />
                   <td className="ta-left skinny">
                     <span>
                       <svg id="fcs_tier_1_svg" height="100%" width="100%" className="dashboardsvg">
@@ -41,9 +39,7 @@ export default class StatsTableView extends React.Component {
                 <tr>
                   <td
                     className="iconPreview gp_platinum badgeText dashboardGP"
-                    title="Total Platinum Badges">
-                    Plat
-                  </td>
+                    title="Total Platinum Badges" />
                   <td className="ta-left skinny">
                     <span>
                       <svg id="lead_tier_1_svg" height="100%" width="100%" className="dashboardsvg">
@@ -59,9 +55,7 @@ export default class StatsTableView extends React.Component {
                   <td
                     className="iconPreview gp_gold badgeText dashboardGP"
                     title="Total Gold Badges"
-                  >
-                    Gold
-                  </td>
+                  />
                   <td className="ta-left skinny">
                     <span>
                       <svg id="lead_tier_1_svg" height="100%" width="100%" className="dashboardsvg">
@@ -77,9 +71,7 @@ export default class StatsTableView extends React.Component {
                   <td
                     className="iconPreview gp_silver badgeText dashboardGP"
                     title="Total Silver Badges"
-                  >
-                    Silv
-                  </td>
+                  />
                   <td className="ta-left skinny">
                     <span>
                       <svg id="lead_tier_1_svg" height="100%" width="100%" className="dashboardsvg">
@@ -93,10 +85,8 @@ export default class StatsTableView extends React.Component {
                 </tr>
                 <tr>
                   <td
-                    className="iconPreview gp_bronze badgeText  GP"
-                    title="Total Bronze Badges">
-                    Brnz
-                </td>
+                    className="iconPreview gp_bronze badgeText dashboardGP"
+                    title="Total Bronze Badges" />
                   <td className="ta-left skinny">
                     <span>
                       <svg id="lead_tier_1_svg" height="100%" width="100%" className="dashboardsvg">
@@ -111,9 +101,7 @@ export default class StatsTableView extends React.Component {
                 <tr>
                   <td
                     className="iconPreview gp_failed badgeText dashboardGP"
-                    title="Total Failed">
-                    Fail
-                </td>
+                    title="Total Failed" />
                   <td className="ta-left skinny">
                     <span>
                       <svg id="lead_tier_1_svg" height="100%" width="100%" className="dashboardsvg">
