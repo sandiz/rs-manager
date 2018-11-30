@@ -420,6 +420,9 @@ export default async function updateSongsOwned(psarcResult, isCDLC = false) {
   const tuningWeight = Math.abs(tuningJSON.string0) + Math.abs(tuningJSON.string1)
     + Math.abs(tuningJSON.string2) + Math.abs(tuningJSON.string3)
     + Math.abs(tuningJSON.string4) + Math.abs(tuningJSON.string5)
+  const {
+    pathLead, pathRhythm, pathBass, bonusArr, represent,
+  } = JSON.parse(psarcResult.arrangementProperties);
   const notes = psarcResult.maxNotes;
   const tmpo = psarcResult.tempo;
   const length = psarcResult.songLength;
@@ -431,7 +434,7 @@ export default async function updateSongsOwned(psarcResult, isCDLC = false) {
     console.log(id, "ignored..");
     return;
   }
-
+  /* save some of the stats from before */
   sqlstr = `select mastery, count, is_cdlc from songs_owned where song='${song}' AND
   album='${album}' AND artist='${artist}' AND arrangement='${arrangement}'`;
   const op = await db.all(sqlstr);
@@ -449,9 +452,15 @@ export default async function updateSongsOwned(psarcResult, isCDLC = false) {
       '${dlc}','${sku}',${difficulty},'${dlckey}',
       '${songkey}','${id}', '${uniqkey}', '${lct}', '${mastery}','${count}', '${ap}', '${capo}','${cent}','${tuning}', '${length}', '${notes}', '${tmpo}', '${cdlc}')\
       ;`
-  const sqlstr2 = `update songs_owned set is_cdlc='${cdlc}', tuning_weight='${tuningWeight}' where id like '${id}';`;
-  //console.log(sqlstr2)
-  //});
+  const sqlstr2 = `update songs_owned set 
+    is_cdlc='${cdlc}', 
+    tuning_weight='${tuningWeight}',
+    path_lead=${pathLead},
+    path_rhythm=${pathRhythm},
+    path_bass=${pathBass},
+    bonus_arr=${bonusArr},
+    represent=${represent}
+    where id like '${id}';`;
   try {
     await db.run(sqlstr); // Run the query without returning anything
     await db.run(sqlstr2);

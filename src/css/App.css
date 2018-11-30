@@ -323,6 +323,16 @@ a {
     justify-content: center;
 }
 
+.justify-content-evenly {
+    justify-content: space-evenly;
+}
+
+.row2 {
+    display: flex;
+    margin-right: -8px;
+    margin-left: -8px;
+}
+
 .centerButton {
     margin: auto;
     padding: 10px;

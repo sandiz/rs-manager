@@ -204,10 +204,12 @@ export function badgeFormatter(cell, row) {
           </table>
         </ReactTooltip>
         <div data-tip data-for={row.id + "_badge"} data-class="tooltip-badge tooltipClass">
-          <div id={row.id + "_col"} className="row justify-content-md-center pointer">
+          <div id={row.id + "_col"} className="row2 justify-content-evenly pointer">
             {
               badgeClasses.map(([badgeCount, highScore, badgeType, badgeClass], index) => {
-                const divclass = badgeClassDefault + badgeClass;
+                let divclass = badgeClassDefault + badgeClass;
+                if (badgeClasses.length > 3) divclass += " gp_small";
+                else if (badgeClasses.length > 2) divclass += " gp_med";
                 return (
                   <div key={badgeClass} className={divclass} alt="" />
                 );
