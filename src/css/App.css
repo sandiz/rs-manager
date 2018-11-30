@@ -608,7 +608,7 @@ tbody tr:hover {
     width: 40px;
     height: 40px !important;
     background-size: 90% !important;
-    background-image: url("data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9JzQ1MScgd2lkdGg9JzQ1MScgIGZpbGw9IiNDRDdGMzIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHZlcnNpb249IjEuMSIgeD0iMHB4IiB5PSIwcHgiIHZpZXdCb3g9IjAgMCAxMDAgMTAwIiBlbmFibGUtYmFja2dyb3VuZD0ibmV3IDAgMCAxMDAgMTAwIiB4bWw6c3BhY2U9InByZXNlcnZlIj48cGF0aCBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjJweCIgZmlsbD0iI0NEN0YzMiIgZD0iTTUwLjUsMjMuNWMtMTgsMC0yNyw5LTI3LDE4YzAsMTgsMTgsNDUsMjcsNDVzMjctMjcsMjctNDVDNzcuNSwzMi41LDY4LjUsMjMuNSw1MC41LDIzLjV6Ij48L3BhdGg+PC9zdmc+");
+    background-image: url("../assets/badge-icons/gc_badgebronze.png");
 }
 
 .gp_failed {
@@ -616,43 +616,39 @@ tbody tr:hover {
     width: 40px;
     height: 40px !important;
     background-size: 90% !important;
-    background-image: url("data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9JzQ1MScgd2lkdGg9JzQ1MScgIGZpbGw9IiNDRDdGMzIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHZlcnNpb249IjEuMSIgeD0iMHB4IiB5PSIwcHgiIHZpZXdCb3g9IjAgMCAxMDAgMTAwIiBlbmFibGUtYmFja2dyb3VuZD0ibmV3IDAgMCAxMDAgMTAwIiB4bWw6c3BhY2U9InByZXNlcnZlIj48cGF0aCBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjJweCIgZmlsbD0iI2RjMzU0NSIgZD0iTTUwLjUsMjMuNWMtMTgsMC0yNyw5LTI3LDE4YzAsMTgsMTgsNDUsMjcsNDVzMjctMjcsMjctNDVDNzcuNSwzMi41LDY4LjUsMjMuNSw1MC41LDIzLjV6Ij48L3BhdGg+PC9zdmc+");
+    background-image: url("../assets/badge-icons/gc_badgefailed.png");
 }
 
 .gp_silver {
     margin: -8px;
     width: 40px;
     height: 40px !important;
-    ;
     background-size: 90% !important;
-    background-image: url("data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9JzQ1MScgd2lkdGg9JzQ1MScgIGZpbGw9IiNDMEMwQzAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHZlcnNpb249IjEuMSIgeD0iMHB4IiB5PSIwcHgiIHZpZXdCb3g9IjAgMCAxMDAgMTAwIiBlbmFibGUtYmFja2dyb3VuZD0ibmV3IDAgMCAxMDAgMTAwIiB4bWw6c3BhY2U9InByZXNlcnZlIj48cGF0aCBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjJweCIgZmlsbD0iI0MwQzBDMCIgZD0iTTUwLjUsMjMuNWMtMTgsMC0yNyw5LTI3LDE4YzAsMTgsMTgsNDUsMjcsNDVzMjctMjcsMjctNDVDNzcuNSwzMi41LDY4LjUsMjMuNSw1MC41LDIzLjV6Ij48L3BhdGg+PC9zdmc+");
+    background-image: url("../assets/badge-icons/gc_badgesilver.png");
 }
 
 .gp_gold {
     margin: -8px;
     width: 40px;
     height: 40px !important;
-    ;
     background-size: 90% !important;
-    background-image: url("data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9JzQ1MScgd2lkdGg9JzQ1MScgIGZpbGw9IiNDRDdGMzIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHZlcnNpb249IjEuMSIgeD0iMHB4IiB5PSIwcHgiIHZpZXdCb3g9IjAgMCAxMDAgMTAwIiBlbmFibGUtYmFja2dyb3VuZD0ibmV3IDAgMCAxMDAgMTAwIiB4bWw6c3BhY2U9InByZXNlcnZlIj4NCiAgPGRlZnM+DQogICAgICAgIDwhLS0gYSB0cmFuc3BhcmVudCBnbG93IHRoYXQgdGFrZXMgb24gdGhlIGNvbG91ciBvZiB0aGUgb2JqZWN0IGl0J3MgYXBwbGllZCB0byAtLT4NCiAgICAgICAgPGZpbHRlciBpZD0iZ2xvdyI+DQogICAgICAgICAgICA8ZmVHYXVzc2lhbkJsdXIgc3RkRGV2aWF0aW9uPSIyLjUiIHJlc3VsdD0iY29sb3JlZEJsdXIiLz4NCiAgICAgICAgICAgIDxmZU1lcmdlPg0KICAgICAgICAgICAgICAgIDxmZU1lcmdlTm9kZSBpbj0iY29sb3JlZEJsdXIiLz4NCiAgICAgICAgICAgICAgICA8ZmVNZXJnZU5vZGUgaW49IlNvdXJjZUdyYXBoaWMiLz4NCiAgICAgICAgICAgIDwvZmVNZXJnZT4NCiAgICAgICAgPC9maWx0ZXI+DQogICAgICAgIA0KICA8L2RlZnM+DQogIDxwYXRoIGZpbHRlcj0idXJsKCNnbG93KSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIycHgiIGZpbGw9IiNmZmQ3MDAiIGQ9Ik01MC41LDIzLjVjLTE4LDAtMjcsOS0yNywxOGMwLDE4LDE4LDQ1LDI3LDQ1czI3LTI3LDI3LTQ1Qzc3LjUsMzIuNSw2OC41LDIzLjUsNTAuNSwyMy41eiI+PC9wYXRoPg0KPC9zdmc+");
+    background-image: url("../assets/badge-icons/gc_badgegold.png");
 }
 
 .gp_platinum {
     margin: -8px;
     width: 40px;
     height: 40px !important;
-    ;
     background-size: 90% !important;
-    background-image: url("data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9JzQ1MScgd2lkdGg9JzQ1MScgIGZpbGw9IiNDRDdGMzIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHZlcnNpb249IjEuMSIgeD0iMHB4IiB5PSIwcHgiIHZpZXdCb3g9IjAgMCAxMDAgMTAwIiBlbmFibGUtYmFja2dyb3VuZD0ibmV3IDAgMCAxMDAgMTAwIiB4bWw6c3BhY2U9InByZXNlcnZlIj4NCiAgPGRlZnM+DQogICAgICAgIDwhLS0gYSB0cmFuc3BhcmVudCBnbG93IHRoYXQgdGFrZXMgb24gdGhlIGNvbG91ciBvZiB0aGUgb2JqZWN0IGl0J3MgYXBwbGllZCB0byAtLT4NCiAgICAgICAgPGZpbHRlciBpZD0iZ2xvdyI+DQogICAgICAgICAgICA8ZmVHYXVzc2lhbkJsdXIgc3RkRGV2aWF0aW9uPSIyLjUiIHJlc3VsdD0iY29sb3JlZEJsdXIiLz4NCiAgICAgICAgICAgIDxmZU1lcmdlPg0KICAgICAgICAgICAgICAgIDxmZU1lcmdlTm9kZSBpbj0iY29sb3JlZEJsdXIiLz4NCiAgICAgICAgICAgICAgICA8ZmVNZXJnZU5vZGUgaW49IlNvdXJjZUdyYXBoaWMiLz4NCiAgICAgICAgICAgIDwvZmVNZXJnZT4NCiAgICAgICAgPC9maWx0ZXI+DQogIDwvZGVmcz4NCiAgPHBhdGggZmlsdGVyPSJ1cmwoI2dsb3cpIiBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjJweCIgZmlsbD0iI2U1ZTRlMiIgZD0iTTUwLjUsMjMuNWMtMTgsMC0yNyw5LTI3LDE4YzAsMTgsMTgsNDUsMjcsNDVzMjctMjcsMjctNDVDNzcuNSwzMi41LDY4LjUsMjMuNSw1MC41LDIzLjV6Ij48L3BhdGg+DQo8L3N2Zz4=");
+    background-image: url("../assets/badge-icons/gc_badgediamond.png");
 }
 
 .gp_fcs {
     margin: -8px;
     width: 40px;
     height: 40px !important;
-    ;
     background-size: 90% !important;
-    background-image: url("data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9JzQ1MScgd2lkdGg9JzQ1MScgIGZpbGw9IiNDRDdGMzIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHZlcnNpb249IjEuMSIgeD0iMHB4IiB5PSIwcHgiIHZpZXdCb3g9IjAgMCAxMDAgMTAwIiBlbmFibGUtYmFja2dyb3VuZD0ibmV3IDAgMCAxMDAgMTAwIiB4bWw6c3BhY2U9InByZXNlcnZlIj4KICA8ZGVmcz4KICAgICAgICA8IS0tIGEgdHJhbnNwYXJlbnQgZ2xvdyB0aGF0IHRha2VzIG9uIHRoZSBjb2xvdXIgb2YgdGhlIG9iamVjdCBpdCdzIGFwcGxpZWQgdG8gLS0+CiAgICAgICAgPGZpbHRlciBpZD0iZ2xvdyI+CiAgICAgICAgICAgIDxmZUdhdXNzaWFuQmx1ciBzdGREZXZpYXRpb249IjIuNSIgcmVzdWx0PSJjb2xvcmVkQmx1ciIvPgogICAgICAgICAgICA8ZmVNZXJnZT4KICAgICAgICAgICAgICAgIDxmZU1lcmdlTm9kZSBpbj0iY29sb3JlZEJsdXIiLz4KICAgICAgICAgICAgICAgIDxmZU1lcmdlTm9kZSBpbj0iU291cmNlR3JhcGhpYyIvPgogICAgICAgICAgICA8L2ZlTWVyZ2U+CiAgICAgICAgPC9maWx0ZXI+CiAgPC9kZWZzPgogIDxwYXRoIGZpbHRlcj0idXJsKCNnbG93KSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIycHgiIGZpbGw9IiMxRTk2NjkiIGQ9Ik01MC41LDIzLjVjLTE4LDAtMjcsOS0yNywxOGMwLDE4LDE4LDQ1LDI3LDQ1czI3LTI3LDI3LTQ1Qzc3LjUsMzIuNSw2OC41LDIzLjUsNTAuNSwyMy41eiI+PC9wYXRoPgo8L3N2Zz4=");
+    background-image: url("../assets/badge-icons/gc_badgefcs.png");
 }
 
 .gp_icon_small {
@@ -675,7 +671,7 @@ tbody tr:hover {
 }
 
 .dashboardGP {
-    background-size: 100% !important;
+    background-size: 60% !important;
 }
 
 .iconPreview {
