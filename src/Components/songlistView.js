@@ -11,7 +11,10 @@ import {
   initSongsOwnedDB, addToFavorites, updateScoreAttackStats,
   removeFromSongsOwned, addToIgnoreArrangements,
 } from '../sqliteService';
-import getProfileConfig, { updateProfileConfig, getScoreAttackConfig } from '../configService';
+import getProfileConfig, {
+  updateProfileConfig, getScoreAttackConfig,
+  getDefaultSortFieldConfig, getDefaultSortOrderConfig,
+} from '../configService';
 import SongDetailView from './songdetailView';
 
 const { path } = window;
@@ -471,8 +474,8 @@ export default class SonglistView extends React.Component {
     };
     this.tabname = "tab-songs"
     this.childtabname = "songs-owned"
-    this.lastsortfield = "song";
-    this.lastsortorder = "asc";
+    this.lastsortfield = "mastery";
+    this.lastsortorder = "desc";
     this.search = "";
     this.columns = [
       {
@@ -678,10 +681,10 @@ export default class SonglistView extends React.Component {
     );
     const showSAStats = await getScoreAttackConfig();
     this.setState({ totalSize: so.count, showSAStats });
-
+    this.lastsortfield = await getDefaultSortFieldConfig();
+    this.lastsortorder = await getDefaultSortOrderConfig();
     const key = this.tabname + "-" + this.childtabname;
     const searchData = this.props.getSearch(key);
-
     if (searchData === null) {
       this.handleTableChange("cdm", {
         page: this.state.page,
@@ -903,8 +906,8 @@ export default class SonglistView extends React.Component {
     const output = await getSongsOwned(
       start,
       sizePerPage,
-      sortField === null ? this.lastsortfield : sortField,
-      sortOrder === null ? this.lastsortorder : sortOrder,
+      typeof sortField === 'undefined' ? this.lastsortfield : sortField,
+      typeof sortOrder === 'undefined' ? this.lastsortorder : sortOrder,
       this.search.value,
       document.getElementById("search_field") ? document.getElementById("search_field").value : "",
     )

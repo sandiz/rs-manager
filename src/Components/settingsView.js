@@ -7,7 +7,9 @@ import getProfileConfig, {
   getUseCDLCConfig, getScoreAttackDashboardConfig, updateScoreAttackDashboard,
   getSessionIDConfig, updateSessionIDConfig, getMasteryThresholdConfig,
   updateMasteryThreshold, getShowPSStatsConfig, updatePSStats,
-  updateSteamIDConfig, getSteamIDConfig, updateSteamAPIKey, getSteamAPIKeyConfig, updateConfig,
+  updateSteamIDConfig, getSteamIDConfig, updateSteamAPIKey,
+  getSteamAPIKeyConfig, updateConfig, getDefaultSortFieldConfig,
+  getDefaultSortOrderConfig, updateDefaultSortField, updateDefaultSortOrder,
 } from '../configService';
 import {
   resetDB, createRSSongList, addtoRSSongList, isTablePresent, deleteRSSongList,
@@ -83,6 +85,8 @@ export default class SettingsView extends React.Component {
       showPSStats: false,
       steamID: '',
       steamAPIKey: '',
+      sortField: 'mastery',
+      sortOrder: 'desc',
     };
     this.readConfigs();
     this.refreshSetlist();
@@ -264,6 +268,17 @@ export default class SettingsView extends React.Component {
     });
   }
 
+  resetSearchHistory = (o, p) => {
+    //reset search history
+    const key = "tab-songs-songs-owned";
+    const search = this.props.getSearch(key);
+    if (search !== null) {
+      search.sortfield = o;
+      search.sortorder = p;
+      this.props.saveSearch(key, search);
+    }
+  }
+
   readConfigs = async () => {
     const d = await getProfileConfig();
     const e = await getSteamLoginSecureCookie();
@@ -276,6 +291,8 @@ export default class SettingsView extends React.Component {
     const l = await getSteamIDConfig();
     const m = await getSteamAPIKeyConfig();
 
+    const o = await getDefaultSortFieldConfig();
+    const p = await getDefaultSortOrderConfig();
     this.setState({
       prfldb: d,
       steamLoginSecure: e,
@@ -287,6 +304,8 @@ export default class SettingsView extends React.Component {
       showPSStats: k,
       steamID: l,
       steamAPIKey: m,
+      sortField: o,
+      sortOrder: p,
     });
   }
 
@@ -304,6 +323,9 @@ export default class SettingsView extends React.Component {
     await updateScoreAttackDashboard(this.state.scoreAttackDashboard);
     await updateMasteryThreshold(this.state.masteryThreshold);
     await updateSteamAPIKey(this.state.steamAPIKey);
+    await updateDefaultSortField(this.state.sortField);
+    await updateDefaultSortOrder(this.state.sortOrder);
+    this.resetSearchHistory(this.state.sortField, this.state.sortOrder);
     this.props.handleChange();
     this.props.updateHeader(this.tabname, "Settings Saved!");
     document.getElementsByTagName("body")[0].scrollTop = 0;
@@ -677,6 +699,46 @@ export default class SettingsView extends React.Component {
                       </span>
                     </div>
                   </Fragment>
+                  <Fragment>
+                    <br />
+                    <span style={{ float: 'left' }}>
+                      <a>
+                        Default Sort Field/Order
+                      </a>
+                    </span>
+                    <span style={{
+                      float: 'right',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      width: 400 + 'px',
+                      textAlign: 'right',
+                    }}>
+                      <select
+                        onChange={e => this.setState({ sortField: e.target.value })}
+                        value={this.state.sortField}>
+                        <option value="song">Song</option>
+                        <option value="artist">Artist</option>
+                        <option value="album">Album</option>
+                        <option value="mastery">Mastery</option>
+                        <option value="tuning_weight">Tuning</option>
+                        <option value="count">Playcount</option>
+                        <option value="arrangement">Arrangement</option>
+                        <option value="sa_highest_badge">Highest Badge</option>
+                      </select>
+                      <select
+                        onChange={e => this.setState({ sortOrder: e.target.value })}
+                        value={this.state.sortOrder}>
+                        <option value="asc">Asc</option>
+                        <option value="desc">Desc</option>
+                      </select>
+                    </span>
+                    <br />
+                    <div className="">
+                      <span style={{ color: '#ccc' }}>
+                        Set default sorting field and order for Songs->Owned.
+                      </span>
+                    </div>
+                  </Fragment>
                 </Collapsible>
                 <br />
                 <Collapsible
@@ -757,6 +819,8 @@ SettingsView.propTypes = {
   updateHeader: PropTypes.func,
   //resetHeader: PropTypes.func,
   refreshTabs: PropTypes.func,
+  saveSearch: PropTypes.func,
+  getSearch: PropTypes.func,
 }
 SettingsView.defaultProps = {
   currentTab: null,
@@ -764,4 +828,6 @@ SettingsView.defaultProps = {
   updateHeader: () => { },
   //resetHeader: () => { },
   refreshTabs: () => { },
+  saveSearch: () => { },
+  getSearch: () => { },
 }
