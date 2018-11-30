@@ -25,6 +25,7 @@ function getDefaultSettings() {
   obj.dateSrc = "rs"
   obj.steamID = ""
   obj.steamAPIKey = ""
+  obj.defaultSortOrder = "mastery";
   return obj;
 }
 export async function getConfig(type) {
@@ -93,6 +94,12 @@ export async function updateDateSrc(current) {
 export async function updateSteamAPIKey(current) {
   await updateConfig("steamAPIKey", current);
 }
+export async function updateDefaultSortOrder(current) {
+  await updateConfig("defaultSortOrder", current);
+}
+export async function updateDefaultSortField(current) {
+  await updateConfig("defaultSortField", current);
+}
 
 export default async function getProfileConfig() {
   const d = await getConfig("prfldb");
@@ -149,5 +156,15 @@ export async function getSteamIDConfig() {
 export async function getSteamAPIKeyConfig() {
   const d = await getConfig("steamAPIKey");
   if (d === '') return ""; //default value
+  return d;
+}
+export async function getDefaultSortFieldConfig() {
+  const d = await getConfig("defaultSortField");
+  if (d === '') return "mastery"; //default value
+  return d;
+}
+export async function getDefaultSortOrderConfig() {
+  const d = await getConfig("defaultSortOrder");
+  if (d === '') return "desc"; //default value
   return d;
 }

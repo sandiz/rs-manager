@@ -160,6 +160,8 @@ class App extends Component {
             resetHeader={this.resetHeader}
             handleChange={this.updateProfile}
             refreshTabs={this.refreshTabs}
+            saveSearch={this.saveSearchHistory}
+            getSearch={this.getSearchHistory}
           />
         )
         break;

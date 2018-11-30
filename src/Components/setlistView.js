@@ -446,8 +446,8 @@ export default class SetlistView extends React.Component {
                 this.state.setlistMeta,
                 start,
                 sizePerPage,
-                sortField === null ? this.lastsortfield : sortField,
-                sortOrder === null ? this.lastsortorder : sortOrder,
+                typeof sortField === 'undefined' === null ? this.lastsortfield : sortField,
+                typeof sortOrder === 'undefined' === null ? this.lastsortorder : sortOrder,
             )
             if (joinedoutput.length > 0) {
                 output = joinedoutput[0]
