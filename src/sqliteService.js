@@ -480,7 +480,8 @@ export default async function updateSongsOwned(psarcResult, isCDLC = false) {
     console.log(psarcResult);
   }
 }
-export async function getSongsOwned(start = 0, count = 10, sortField = "mastery", sortOrder = "desc", search = "", searchField = "") {
+export async function getSongsOwned(start = 0, count = 10, sortField = "mastery",
+  sortOrder = "desc", search = "", searchField = "", sortOptions = []) {
   //  console.log("__db_call__: getSongsOwned");
   if (db == null) {
     const dbfilename = window.sqlitePath;
@@ -513,13 +514,20 @@ export async function getSongsOwned(start = 0, count = 10, sortField = "mastery"
       break;
     default: break;
   }
+
+  let orderSql = `ORDER BY ${sortField} ${sortOrder}`;
+  if (sortOptions.length > 0) {
+    const gsql = generateOrderSql(sortOptions, true);
+    if (gsql !== "") orderSql = gsql;
+  }
+
   if (search === "" && searchField !== "cdlc" && searchField !== "odlc") {
     sql = `select c.acount as acount, c.songcount as songcount, *
           from songs_owned,  (
           SELECT count(*) as acount, count(distinct songkey) as songcount
             FROM songs_owned
           ) c 
-          ORDER BY ${sortField} ${sortOrder} LIMIT ${start},${count}`;
+          ${orderSql} LIMIT ${start},${count}`;
   }
   else {
     sql = `select c.acount as acount, c.songcount as songcount, *
@@ -531,7 +539,7 @@ export async function getSongsOwned(start = 0, count = 10, sortField = "mastery"
           ) c 
           where
           ${searchSql}
-          ORDER BY ${sortField} ${sortOrder} LIMIT ${start},${count}`;
+          ${orderSql} LIMIT ${start},${count}`;
   }
   const output = await db.all(sql);
   return output
@@ -864,14 +872,17 @@ export async function getSongsFromGeneratedPlaylist(
   sortField = "mastery", sortOrder = "desc",
   sortOptions = [], /* higher weight */
 ) {
-  console.log(sortOptions);
   if (meta.view_sql.length > 0) {
     try {
       const jsonObj = JSON.parse(meta.view_sql)
       let sql = generateSql(jsonObj);
       const countsql = generateSql(jsonObj, true)
-      sql += ` ORDER BY ${sortField} ${sortOrder} LIMIT ${start},${count};`
-      console.log(sql)
+      let ordersql = ` ORDER BY ${sortField} ${sortOrder}`
+      if (sortOptions.length > 0) {
+        const gsql = generateOrderSql(sortOptions, true);
+        if (gsql !== "") ordersql = gsql;
+      }
+      sql += ` ${ordersql} LIMIT ${start},${count};`
       const output = await db.all(sql);
       const output2 = await db.get(countsql)
       return [output, output2];
@@ -884,7 +895,6 @@ export async function getSongsFromGeneratedPlaylist(
 }
 export async function getSongsFromPlaylistDB(dbname, start = 0, count = 10, sortField = "mastery", sortOrder = "desc", search = "", searchField = "", options = [], sortOptions = []) {
   // console.log("__db_call__: getSongsFromPlaylistDB");
-  console.log(sortOptions);
   if (db == null) {
     const dbfilename = window.sqlitePath;
     db = await window.sqlite.open(dbfilename);
@@ -921,10 +931,10 @@ export async function getSongsFromPlaylistDB(dbname, start = 0, count = 10, sort
     }
   }
 
-  let ordersql = `ORDER BY ${sortField} ${sortOrder}`;
+  let orderSql = `ORDER BY ${sortField} ${sortOrder}`;
   if (sortOptions.length > 0) {
     const gsql = generateOrderSql(sortOptions, true);
-    if (gsql !== "") ordersql = gsql;
+    if (gsql !== "") orderSql = gsql;
   }
 
   if (search === "") {
@@ -940,7 +950,7 @@ export async function getSongsFromPlaylistDB(dbname, start = 0, count = 10, sort
           ) c 
           JOIN ${dbname} ON ${dbname}.uniqkey = songs_owned.uniqkey
           ${wheresql}
-          ${ordersql} LIMIT ${start},${count}
+          ${orderSql} LIMIT ${start},${count}
           `;
   }
   else {
@@ -958,10 +968,10 @@ export async function getSongsFromPlaylistDB(dbname, start = 0, count = 10, sort
           JOIN ${dbname} ON ${dbname}.uniqkey = songs_owned.uniqkey
           where
           ${searchSql}
-          ${ordersql} LIMIT ${start},${count}
+          ${orderSql} LIMIT ${start},${count}
           `;
   }
-  console.log(sql)
+  //console.log(sql)
   const output = await db.all(sql);
   return output
 }

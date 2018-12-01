@@ -1,5 +1,6 @@
 import React from 'react'
 import Collapsible from 'react-collapsible';
+import CreatableSelect from "react-select/lib/Creatable";
 import PropTypes from 'prop-types';
 import getProfileConfig, {
   updateSteamLoginSecureCookie, getSteamLoginSecureCookie, updateProfileConfig,
@@ -8,13 +9,13 @@ import getProfileConfig, {
   getSessionIDConfig, updateSessionIDConfig, getMasteryThresholdConfig,
   updateMasteryThreshold, getShowPSStatsConfig, updatePSStats,
   updateSteamIDConfig, getSteamIDConfig, updateSteamAPIKey,
-  getSteamAPIKeyConfig, updateConfig, getDefaultSortFieldConfig,
-  getDefaultSortOrderConfig, updateDefaultSortField, updateDefaultSortOrder,
+  getSteamAPIKeyConfig, updateConfig, updateDefaultSortOption, getDefaultSortOptionConfig,
 } from '../configService';
 import {
   resetDB, createRSSongList, addtoRSSongList, isTablePresent, deleteRSSongList,
 } from '../sqliteService';
 import readProfile from '../steamprofileService';
+import { sortOrderCustomStyles, createOption } from './setlistOptions';
 
 const { remote } = window.require('electron')
 const Fragment = React.Fragment;
@@ -68,6 +69,7 @@ export const collapseButton = (text, size = 3) => {
     </div>
   );
 }
+export const defaultSortOption = [{ label: 'mastery-desc', value: 'mastery-desc' }]
 export default class SettingsView extends React.Component {
   constructor(props) {
     super(props);
@@ -85,11 +87,12 @@ export default class SettingsView extends React.Component {
       showPSStats: false,
       steamID: '',
       steamAPIKey: '',
-      sortField: 'mastery',
-      sortOrder: 'desc',
+      sortoptions: defaultSortOption,
     };
     this.readConfigs();
     this.refreshSetlist();
+    this.sortfieldref = React.createRef();
+    this.sortorderref = React.createRef();
   }
 
   generateSetlistOptions = () => {
@@ -279,9 +282,8 @@ export default class SettingsView extends React.Component {
     const k = await getShowPSStatsConfig();
     const l = await getSteamIDConfig();
     const m = await getSteamAPIKeyConfig();
+    const n = await getDefaultSortOptionConfig();
 
-    const o = await getDefaultSortFieldConfig();
-    const p = await getDefaultSortOrderConfig();
     this.setState({
       prfldb: d,
       steamLoginSecure: e,
@@ -293,8 +295,7 @@ export default class SettingsView extends React.Component {
       showPSStats: k,
       steamID: l,
       steamAPIKey: m,
-      sortField: o,
-      sortOrder: p,
+      sortoptions: n,
     });
   }
 
@@ -312,8 +313,7 @@ export default class SettingsView extends React.Component {
     await updateScoreAttackDashboard(this.state.scoreAttackDashboard);
     await updateMasteryThreshold(this.state.masteryThreshold);
     await updateSteamAPIKey(this.state.steamAPIKey);
-    await updateDefaultSortField(this.state.sortField);
-    await updateDefaultSortOrder(this.state.sortOrder);
+    await updateDefaultSortOption(this.state.sortoptions)
     this.props.handleChange();
     this.props.updateHeader(this.tabname, "Settings Saved!");
     document.getElementsByTagName("body")[0].scrollTop = 0;
@@ -389,6 +389,35 @@ export default class SettingsView extends React.Component {
     catch (e) {
       console.log("error with steam auth", e);
     }
+  }
+
+  addSortOption = async () => {
+    let existing = false;
+    const { sortoptions } = this.state;
+
+    for (let i = 0; i < sortoptions.length; i += 1) {
+      const option = sortoptions[i];
+      let [field, order] = option.value.split("-");
+      if (field === this.sortfieldref.current.value) {
+        existing = true;
+        order = this.sortorderref.current.value;
+        field = this.sortfieldref.current.value;
+        option.label = field + "-" + order;
+        option.value = field + "-" + order;
+        sortoptions[i] = option;
+        this.setState({ sortoptions });
+        return;
+      }
+    }
+    if (existing === false) {
+      const option = createOption(this.sortfieldref.current.value + "-" + this.sortorderref.current.value);
+      sortoptions.push(option);
+      this.setState({ sortoptions });
+    }
+  }
+
+  handleSortOrderChange = async (value, action) => {
+    this.setState({ sortoptions: value })
   }
 
   render = () => {
@@ -694,36 +723,57 @@ export default class SettingsView extends React.Component {
                         Default Sort Field/Order
                       </a>
                     </span>
-                    <span style={{
+                    <div style={{
                       float: 'right',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
-                      width: 400 + 'px',
-                      textAlign: 'right',
                     }}>
+                      <CreatableSelect
+                        components={{
+                          DropdownIndicator: null,
+                        }}
+                        styles={sortOrderCustomStyles}
+                        isClearable
+                        isMulti
+                        menuIsOpen={false}
+                        onChange={this.handleSortOrderChange}
+                        placeholder="Global Sort Order"
+                        value={this.state.sortoptions}
+                      />
                       <select
-                        onChange={e => this.setState({ sortField: e.target.value })}
-                        value={this.state.sortField}>
+                        ref={this.sortfieldref}
+                        style={{ marginLeft: 20 + 'px', width: 40 + '%' }}
+                        id="sortfield">
                         <option value="song">Song</option>
                         <option value="artist">Artist</option>
                         <option value="album">Album</option>
                         <option value="mastery">Mastery</option>
                         <option value="tuning_weight">Tuning</option>
                         <option value="count">Playcount</option>
+                        <option value="difficulty">Difficulty</option>
                         <option value="arrangement">Arrangement</option>
                         <option value="sa_highest_badge">Highest Badge</option>
                       </select>
                       <select
-                        onChange={e => this.setState({ sortOrder: e.target.value })}
-                        value={this.state.sortOrder}>
+                        ref={this.sortorderref}
+                        style={{ marginLeft: 16 + 'px', width: 20 + '%' }}
+                        id="sortorder">
                         <option value="asc">Asc</option>
                         <option value="desc">Desc</option>
                       </select>
-                    </span>
+                      <span
+                        onClick={this.addSortOption}
+                        style={{
+                          fontSize: 17 + 'px',
+                          marginLeft: 12 + 'px',
+                          borderBottom: '1px dotted',
+                          cursor: 'pointer',
+                        }}>Add</span>
+                    </div>
                     <br />
                     <div className="">
                       <span style={{ color: '#ccc' }}>
-                        Set default sorting field and order for Song and Setlists.
+                        Set default sorting field and order for Songs-&gt;Owned and Setlists.
                       </span>
                     </div>
                   </Fragment>
