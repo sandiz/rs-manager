@@ -49,6 +49,23 @@ const customStyles = {
         ...styles,
     }),
 }
+export const generateOrderSql = (sortOptions, withOrder = false) => {
+    //song asc, mastery desc
+    let ordersql = ""
+    for (let i = 0; i < sortOptions.length; i += 1) {
+        const option = sortOptions[i]
+        const [field, order] = option.value.split("-");
+        if (i === sortOptions.length - 1) {
+            ordersql += `${field} ${order} `
+        } else {
+            ordersql += `${field} ${order}, `
+        }
+    }
+    if (withOrder) {
+        ordersql = "ORDER BY " + ordersql;
+    }
+    return ordersql;
+}
 export default class SetlistView extends React.Component {
     constructor(props) {
         super(props);
@@ -256,8 +273,6 @@ export default class SetlistView extends React.Component {
                 })
             },
         };
-        this.lastsortfield = "mastery"
-        this.lastsortorder = "desc"
         this.lastChildID = props.currentChildTab.id;
         this.fetchMeta();
     }
@@ -288,8 +303,7 @@ export default class SetlistView extends React.Component {
                     page: 1,
                     sizePerPage: this.state.sizePerPage,
                     filters: { search: searchData.search },
-                    sortField: searchData.sortfield,
-                    sortOrder: searchData.sortorder,
+                    sortOptions: JSON.parse(this.state.setlistMeta.sort_options),
                 })
                 return;
             }
@@ -298,6 +312,7 @@ export default class SetlistView extends React.Component {
             page: this.state.page,
             sizePerPage: this.state.sizePerPage,
             filters: {},
+            sortOptions: JSON.parse(this.state.setlistMeta.sort_options),
         })
     }
 
@@ -308,8 +323,6 @@ export default class SetlistView extends React.Component {
                 tabname: this.tabname,
                 childtabname: this.lastChildID,
                 search: this.search.value,
-                sortfield: this.lastsortfield,
-                sortorder: this.lastsortorder,
             }
             const key = search.tabname + "-" + search.childtabname;
             this.props.saveSearch(key, search);
@@ -398,8 +411,9 @@ export default class SetlistView extends React.Component {
                     this.state.setlistMeta,
                     0,
                     this.state.sizePerPage,
-                    this.lastsortfield,
-                    this.lastsortorder,
+                    "",
+                    "",
+                    JSON.parse(this.state.setlistMeta.sort_options),
                 )
                 output = joinedoutput[0]
                 output[0].acount = joinedoutput[1].acount
@@ -409,11 +423,13 @@ export default class SetlistView extends React.Component {
                     this.lastChildID,
                     0,
                     this.state.sizePerPage,
-                    this.lastsortfield,
-                    this.lastsortorder,
+                    "",
+                    "",
                     this.search.value,
                     document.getElementById("search_field")
                         ? document.getElementById("search_field").value : "",
+                    [],
+                    JSON.parse(this.state.setlistMeta.sort_options),
                 )
             }
             this.setState({ songs: output, page: 1, totalSize: output[0].acount });
@@ -435,6 +451,7 @@ export default class SetlistView extends React.Component {
         sortOrder, // newest sort order
         filters, // an object which have current filter status per column
         data,
+        sortOptions,
     }) => {
         if (this.lastChildID === null) { return; }
         const isgen = this.state.setlistMeta.is_generated === "true";
@@ -446,8 +463,9 @@ export default class SetlistView extends React.Component {
                 this.state.setlistMeta,
                 start,
                 sizePerPage,
-                typeof sortField === 'undefined' === null ? this.lastsortfield : sortField,
-                typeof sortOrder === 'undefined' === null ? this.lastsortorder : sortOrder,
+                typeof sortField === 'undefined' === null ? "mastery" : sortField,
+                typeof sortOrder === 'undefined' === null ? "desc" : sortOrder,
+                sortOptions,
             )
             if (joinedoutput.length > 0) {
                 output = joinedoutput[0]
@@ -462,15 +480,14 @@ export default class SetlistView extends React.Component {
                 this.lastChildID,
                 start,
                 sizePerPage,
-                sortField === null ? this.lastsortfield : sortField,
-                sortOrder === null ? this.lastsortorder : sortOrder,
+                typeof sortField === 'undefined' === null ? "mastery" : sortField,
+                typeof sortOrder === 'undefined' === null ? "desc" : sortOrder,
                 this.search ? this.search.value : "",
                 document.getElementById("search_field") ? document.getElementById("search_field").value : "",
                 pathOpts,
+                sortOptions,
             )
         }
-        if (sortField !== null && typeof sortField !== 'undefined') { this.lastsortfield = sortField; }
-        if (sortOrder !== null && typeof sortField !== 'undefined') { this.lastsortorder = sortOrder; }
         if (output.length > 0) {
             this.props.updateHeader(
                 this.tabname,

@@ -697,8 +697,6 @@ export default class SonglistView extends React.Component {
         page: 1,
         sizePerPage: this.state.sizePerPage,
         filters: { search: searchData.search },
-        sortField: searchData.sortfield,
-        sortOrder: searchData.sortorder,
       })
     }
   }
@@ -708,8 +706,6 @@ export default class SonglistView extends React.Component {
       tabname: this.tabname,
       childtabname: this.childtabname,
       search: this.search.value,
-      sortfield: this.lastsortfield,
-      sortorder: this.lastsortorder,
     }
     const key = searchData.tabname + "-" + searchData.childtabname;
     this.props.saveSearch(key, searchData);

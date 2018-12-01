@@ -1,5 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types';
+import CreatableSelect from "react-select/lib/Creatable";
+
 import { enableScroll, forceNoScroll } from './songdetailView';
 import {
   deleteRSSongList, createRSSongList,
@@ -194,6 +196,40 @@ export function generateSql(filters, count = false) {
   return sql;
 }
 
+
+const createOption = label => ({
+  label,
+  value: label,
+});
+
+const customStyles = {
+  container: styles => ({
+    ...styles, marginLeft: 20 + 'px',
+  }),
+  control: styles => ({
+    ...styles, backgroundColor: 'white', color: 'black', width: 255 + 'px', fontSize: 15 + 'px',
+  }),
+  option: (styles, {
+    data, isDisabled, isFocused, isSelected,
+  }) => {
+    return {
+      ...styles,
+      color: 'black',
+    };
+  },
+  multiValue: (styles, { data }) => {
+    return {
+      ...styles,
+    };
+  },
+  multiValueLabel: (styles, { data }) => ({
+    ...styles,
+  }),
+  multiValueRemove: (styles, { data }) => ({
+    ...styles,
+  }),
+}
+const defaultSortOption = []
 export default class SetlistOptions extends React.Component {
   constructor(props) {
     super(props)
@@ -208,6 +244,7 @@ export default class SetlistOptions extends React.Component {
       numResults: 0,
       allFolders: null,
       selectedFolder: 'none',
+      sortoptions: defaultSortOption,
     }
     //tuning
     this.gates = ["and", "or"]
@@ -333,11 +370,14 @@ export default class SetlistOptions extends React.Component {
         cmp: ["is"],
       },
     ];
+    this.sortfieldref = React.createRef();
+    this.sortorderref = React.createRef();
   }
 
   shouldComponentUpdate = async (nextprops, nextstate) => {
     if (nextprops !== this.props) {
       const allFolders = await this.getAllFolders();
+      const sortoptions = JSON.parse(nextprops.info.sort_options);
       this.setState({
         setlistName: unescape(nextprops.info.name),
         isGenerated: nextprops.info.is_generated === "true",
@@ -346,6 +386,7 @@ export default class SetlistOptions extends React.Component {
         isStarred: nextprops.info.is_starred === "true",
         allFolders,
         selectedFolder: nextprops.info.parent_folder,
+        sortoptions,
       })
       if (nextprops.info.is_manual === "true") {
         this.setState({
@@ -569,12 +610,13 @@ export default class SetlistOptions extends React.Component {
   saveOptions = async () => {
     console.log("save setlist: " + this.props.info.key);
     const folder = this.state.selectedFolder === "none" ? "" : this.state.selectedFolder
+    const sortoptions = JSON.stringify(this.state.sortoptions);
     await createRSSongList(
       this.props.info.key, this.state.setlistName,
       this.state.isGenerated, this.state.isManual,
       JSON.stringify(this.state.filters), this.state.isRSSetlist,
       this.state.isStarred, this.state.isFolder,
-      folder,
+      folder, sortoptions,
     );
     this.props.refreshTabs();
     this.props.fetchMeta();
@@ -636,6 +678,35 @@ export default class SetlistOptions extends React.Component {
       });
     }
     return null;
+  }
+
+  addSortOption = async () => {
+    let existing = false;
+    const { sortoptions } = this.state;
+
+    for (let i = 0; i < sortoptions.length; i += 1) {
+      const option = sortoptions[i];
+      let [field, order] = option.value.split("-");
+      if (field === this.sortfieldref.current.value) {
+        existing = true;
+        order = this.sortorderref.current.value;
+        field = this.sortfieldref.current.value;
+        option.label = field + "-" + order;
+        option.value = field + "-" + order;
+        sortoptions[i] = option;
+        this.setState({ sortoptions });
+        return;
+      }
+    }
+    if (existing === false) {
+      const option = createOption(this.sortfieldref.current.value + "-" + this.sortorderref.current.value);
+      sortoptions.push(option);
+      this.setState({ sortoptions });
+    }
+  }
+
+  handleSortOrderChange = async (value, action) => {
+    this.setState({ sortoptions: value })
   }
 
   render = () => {
@@ -720,11 +791,15 @@ export default class SetlistOptions extends React.Component {
                       </div>
                     </td>
                   </tr>
+                </tbody>
+              </table>
+              <table style={{ width: 100 + '%' }}>
+                <tbody>
                   <tr style={{ backgroundColor: 'inherit', border: 'none', color: 'black' }}>
                     <td style={{ border: 'none', width: 20 + '%', borderRight: '1px solid' }}>Folder</td>
-                    <td style={{ border: 'none', width: 80 + '%', textAlign: 'left' }}>
+                    <td style={{ border: 'none', width: 30 + '%', textAlign: 'left' }}>
                       <select
-                        style={{ marginLeft: 30 + 'px', width: 40 + '%' }}
+                        style={{ marginLeft: 30 + 'px', width: 90 + '%' }}
                         id="folder"
                         defaultValue={this.state.selectedFolder}
                         onChange={(e) => {
@@ -734,6 +809,51 @@ export default class SetlistOptions extends React.Component {
                         <option value="none">None</option>
                         {this.state.allFolders}
                       </select>
+                    </td>
+                    <td style={{
+                      border: 'none', width: 16 + '%', borderRight: '1px solid', fontSize: 18 + 'px',
+                    }}>Default<br />Sort Order</td>
+                    <td style={{ border: 'none', width: 80 + '%', textAlign: 'left' }}>
+                      <CreatableSelect
+                        components={{
+                          DropdownIndicator: null,
+                        }}
+                        styles={customStyles}
+                        isClearable
+                        isMulti
+                        menuIsOpen={false}
+                        onChange={this.handleSortOrderChange}
+                        placeholder="Current Order: Global"
+                        value={this.state.sortoptions}
+                      />
+                      <select
+                        ref={this.sortfieldref}
+                        style={{ marginLeft: 20 + 'px', width: 40 + '%' }}
+                        id="sortfield">
+                        <option value="song">Song</option>
+                        <option value="artist">Artist</option>
+                        <option value="album">Album</option>
+                        <option value="mastery">Mastery</option>
+                        <option value="tuning_weight">Tuning</option>
+                        <option value="count">Playcount</option>
+                        <option value="arrangement">Arrangement</option>
+                        <option value="sa_highest_badge">Highest Badge</option>
+                      </select>
+                      <select
+                        ref={this.sortorderref}
+                        style={{ marginLeft: 16 + 'px', width: 20 + '%' }}
+                        id="sortorder">
+                        <option value="asc">Asc</option>
+                        <option value="desc">Desc</option>
+                      </select>
+                      <span
+                        onClick={this.addSortOption}
+                        style={{
+                          fontSize: 17 + 'px',
+                          marginLeft: 12 + 'px',
+                          borderBottom: '1px dotted',
+                          cursor: 'pointer',
+                        }}>Add</span>
                     </td>
                   </tr>
                 </tbody>
