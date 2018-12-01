@@ -735,7 +735,7 @@ export default class SettingsView extends React.Component {
                     <br />
                     <div className="">
                       <span style={{ color: '#ccc' }}>
-                        Set default sorting field and order for Songs->Owned.
+                        Set default sorting field and order for Song and Setlists.
                       </span>
                     </div>
                   </Fragment>
