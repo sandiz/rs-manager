@@ -197,12 +197,12 @@ export function generateSql(filters, count = false) {
 }
 
 
-const createOption = label => ({
+export const createOption = label => ({
   label,
   value: label,
 });
 
-const customStyles = {
+export const sortOrderCustomStyles = {
   container: styles => ({
     ...styles, marginLeft: 20 + 'px',
   }),
@@ -818,7 +818,7 @@ export default class SetlistOptions extends React.Component {
                         components={{
                           DropdownIndicator: null,
                         }}
-                        styles={customStyles}
+                        styles={sortOrderCustomStyles}
                         isClearable
                         isMulti
                         menuIsOpen={false}
@@ -836,6 +836,7 @@ export default class SetlistOptions extends React.Component {
                         <option value="mastery">Mastery</option>
                         <option value="tuning_weight">Tuning</option>
                         <option value="count">Playcount</option>
+                        <option value="difficulty">Difficulty</option>
                         <option value="arrangement">Arrangement</option>
                         <option value="sa_highest_badge">Highest Badge</option>
                       </select>

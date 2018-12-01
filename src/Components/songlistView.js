@@ -12,10 +12,10 @@ import {
   removeFromSongsOwned, addToIgnoreArrangements,
 } from '../sqliteService';
 import getProfileConfig, {
-  updateProfileConfig, getScoreAttackConfig,
-  getDefaultSortFieldConfig, getDefaultSortOrderConfig,
+  updateProfileConfig, getScoreAttackConfig, getDefaultSortOptionConfig,
 } from '../configService';
 import SongDetailView from './songdetailView';
+import { defaultSortOption } from './settingsView';
 
 const { path } = window;
 
@@ -471,11 +471,10 @@ export default class SonglistView extends React.Component {
       showSong: '',
       showArtist: '',
       showSAStats: true,
+      sortoptions: defaultSortOption,
     };
     this.tabname = "tab-songs"
     this.childtabname = "songs-owned"
-    this.lastsortfield = "mastery";
-    this.lastsortorder = "desc";
     this.search = "";
     this.columns = [
       {
@@ -680,9 +679,8 @@ export default class SonglistView extends React.Component {
       `Songs: ${so.songcount}, Arrangements: ${so.count}`,
     );
     const showSAStats = await getScoreAttackConfig();
-    this.setState({ totalSize: so.count, showSAStats });
-    this.lastsortfield = await getDefaultSortFieldConfig();
-    this.lastsortorder = await getDefaultSortOrderConfig();
+    const sortoptions = await getDefaultSortOptionConfig();
+    this.setState({ totalSize: so.count, showSAStats, sortoptions });
     const key = this.tabname + "-" + this.childtabname;
     const searchData = this.props.getSearch(key);
     if (searchData === null) {
@@ -813,10 +811,11 @@ export default class SonglistView extends React.Component {
       const output = await getSongsOwned(
         0,
         this.state.sizePerPage,
-        this.lastsortfield,
-        this.lastsortorder,
+        "",
+        "",
         this.search.value,
         document.getElementById("search_field") ? document.getElementById("search_field").value : "",
+        this.state.sortoptions,
       )
       this.setState({ songs: output, page: 1, totalSize: output[0].acount });
     }
@@ -902,13 +901,12 @@ export default class SonglistView extends React.Component {
     const output = await getSongsOwned(
       start,
       sizePerPage,
-      typeof sortField === 'undefined' ? this.lastsortfield : sortField,
-      typeof sortOrder === 'undefined' ? this.lastsortorder : sortOrder,
+      typeof sortField === 'undefined' ? "mastery" : sortField,
+      typeof sortOrder === 'undefined' ? "desc" : sortOrder,
       this.search.value,
       document.getElementById("search_field") ? document.getElementById("search_field").value : "",
+      this.state.sortoptions,
     )
-    if (sortField !== null && typeof sortField !== 'undefined') { this.lastsortfield = sortField; }
-    if (sortOrder !== null && typeof sortField !== 'undefined') { this.lastsortorder = sortOrder; }
     if (output.length > 0) {
       this.props.updateHeader(
         this.tabname,

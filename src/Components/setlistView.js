@@ -13,7 +13,7 @@ import {
     removeSongFromSetlist, updateMasteryandPlayed, initSongsOwnedDB,
     getSetlistMetaInfo, getSongsFromGeneratedPlaylist, removeSongFromSetlistByUniqKey,
 } from '../sqliteService';
-import getProfileConfig, { updateProfileConfig, getScoreAttackConfig } from '../configService';
+import getProfileConfig, { updateProfileConfig, getScoreAttackConfig, getDefaultSortOptionConfig } from '../configService';
 import SetlistOptions from './setlistOptions';
 
 const { path } = window;
@@ -292,7 +292,25 @@ export default class SetlistView extends React.Component {
         return true;
     }
 
-    getSearch = () => {
+    getSortOptions = async () => {
+        try {
+            let sortOptions = JSON.parse(this.state.setlistMeta.sort_options);
+            if (sortOptions.length > 0) {
+                return sortOptions;
+            }
+            else {
+                sortOptions = await getDefaultSortOptionConfig();
+                return sortOptions;
+            }
+        }
+        catch (e) {
+            console.log(e)
+        }
+        return []
+    }
+
+    getSearch = async () => {
+        const sortOptions = await this.getSortOptions();
         const isgen = this.state.setlistMeta.is_generated === "true";
         if (!isgen) {
             const key = this.tabname + "-" + this.lastChildID;
@@ -303,7 +321,7 @@ export default class SetlistView extends React.Component {
                     page: 1,
                     sizePerPage: this.state.sizePerPage,
                     filters: { search: searchData.search },
-                    sortOptions: JSON.parse(this.state.setlistMeta.sort_options),
+                    sortOptions,
                 })
                 return;
             }
@@ -312,7 +330,7 @@ export default class SetlistView extends React.Component {
             page: this.state.page,
             sizePerPage: this.state.sizePerPage,
             filters: {},
-            sortOptions: JSON.parse(this.state.setlistMeta.sort_options),
+            sortOptions,
         })
     }
 
@@ -350,8 +368,6 @@ export default class SetlistView extends React.Component {
             page: 1,
             sizePerPage: this.state.sizePerPage,
             filters: { search: e.target.value },
-            sortField: null,
-            sortOrder: null,
         })
     }
 
@@ -406,6 +422,7 @@ export default class SetlistView extends React.Component {
             );
             let output = []
             const isgen = this.state.setlistMeta.is_generated === "true";
+            const sortOptions = await this.getSortOptions();
             if (isgen) {
                 const joinedoutput = await getSongsFromGeneratedPlaylist(
                     this.state.setlistMeta,
@@ -413,7 +430,7 @@ export default class SetlistView extends React.Component {
                     this.state.sizePerPage,
                     "",
                     "",
-                    JSON.parse(this.state.setlistMeta.sort_options),
+                    sortOptions,
                 )
                 output = joinedoutput[0]
                 output[0].acount = joinedoutput[1].acount
@@ -429,7 +446,7 @@ export default class SetlistView extends React.Component {
                     document.getElementById("search_field")
                         ? document.getElementById("search_field").value : "",
                     [],
-                    JSON.parse(this.state.setlistMeta.sort_options),
+                    sortOptions,
                 )
             }
             this.setState({ songs: output, page: 1, totalSize: output[0].acount });

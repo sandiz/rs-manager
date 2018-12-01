@@ -1,3 +1,5 @@
+import { defaultSortOption } from "./Components/settingsView";
+
 export const writeFile = (filePath, data) => new Promise((resolve, reject) => {
   window.electronFS.writeFile(filePath, data, (err) => {
     if (err) reject(err);
@@ -25,7 +27,7 @@ function getDefaultSettings() {
   obj.dateSrc = "rs"
   obj.steamID = ""
   obj.steamAPIKey = ""
-  obj.defaultSortOrder = "mastery";
+  obj.defaultSortOption = defaultSortOption;
   return obj;
 }
 export async function getConfig(type) {
@@ -94,11 +96,8 @@ export async function updateDateSrc(current) {
 export async function updateSteamAPIKey(current) {
   await updateConfig("steamAPIKey", current);
 }
-export async function updateDefaultSortOrder(current) {
-  await updateConfig("defaultSortOrder", current);
-}
-export async function updateDefaultSortField(current) {
-  await updateConfig("defaultSortField", current);
+export async function updateDefaultSortOption(current) {
+  await updateConfig("defaultSortOption", current);
 }
 
 export default async function getProfileConfig() {
@@ -158,13 +157,8 @@ export async function getSteamAPIKeyConfig() {
   if (d === '') return ""; //default value
   return d;
 }
-export async function getDefaultSortFieldConfig() {
-  const d = await getConfig("defaultSortField");
-  if (d === '') return "mastery"; //default value
-  return d;
-}
-export async function getDefaultSortOrderConfig() {
-  const d = await getConfig("defaultSortOrder");
-  if (d === '') return "desc"; //default value
+export async function getDefaultSortOptionConfig() {
+  const d = await getConfig("defaultSortOption");
+  if (d === '') return defaultSortOption; //default value
   return d;
 }
