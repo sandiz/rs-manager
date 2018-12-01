@@ -679,8 +679,8 @@ export default class SonglistView extends React.Component {
       `Songs: ${so.songcount}, Arrangements: ${so.count}`,
     );
     const showSAStats = await getScoreAttackConfig();
-    const sortoptions = await getDefaultSortOptionConfig();
-    this.setState({ totalSize: so.count, showSAStats, sortoptions });
+    const sortOptions = await getDefaultSortOptionConfig();
+    this.setState({ totalSize: so.count, showSAStats, sortoptions: sortOptions });
     const key = this.tabname + "-" + this.childtabname;
     const searchData = this.props.getSearch(key);
     if (searchData === null) {
@@ -688,6 +688,7 @@ export default class SonglistView extends React.Component {
         page: this.state.page,
         sizePerPage: this.state.sizePerPage,
         filters: {},
+        sortOptions,
       })
     } else {
       this.search.value = searchData.search;
@@ -695,6 +696,7 @@ export default class SonglistView extends React.Component {
         page: 1,
         sizePerPage: this.state.sizePerPage,
         filters: { search: searchData.search },
+        sortOptions,
       })
     }
   }
@@ -895,6 +897,7 @@ export default class SonglistView extends React.Component {
     sortOrder, // newest sort order
     filters, // an object which have current filter status per column
     data,
+    sortOptions,
   }) => {
     const zeroIndexPage = page - 1
     const start = zeroIndexPage * sizePerPage;
@@ -905,7 +908,7 @@ export default class SonglistView extends React.Component {
       typeof sortOrder === 'undefined' ? "desc" : sortOrder,
       this.search.value,
       document.getElementById("search_field") ? document.getElementById("search_field").value : "",
-      this.state.sortoptions,
+      sortOptions,
     )
     if (output.length > 0) {
       this.props.updateHeader(
