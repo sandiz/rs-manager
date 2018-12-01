@@ -42,6 +42,7 @@ const child = spawn("yarn", [
     "--ignore=src/lib/deni-react-treeview/node_modules/",
     "--ignore=src/lib/deni-react-treeview/gh-pages/",
     "--ignore=src/lib/deni-react-treeview/src/",
+    "--ignore=.node_modules/.cache",
     extra_ignore.length > 0 ? `--ignore=${extra_ignore}` : ""
 ]);
 
