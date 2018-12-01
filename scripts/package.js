@@ -12,12 +12,12 @@ let extra_ignore = ""
 if (buildPlatform === "win") {
     platform = "win32";
     icon = "src/assets/icons/win/rs.ico"
-    extra_ignore = ""
+    extra_ignore = "node_modules/.cache"
 }
 else if (buildPlatform === "mac") {
     platform = "darwin"
     icon = "src/assets/icons/mac/mac.icns"
-    extra_ignore = ""
+    extra_ignore = ".node_modules/.cache"
 }
 else {
     console.log("Invalid buildPlatform, valid options: mac, win");
@@ -42,7 +42,6 @@ const child = spawn("yarn", [
     "--ignore=src/lib/deni-react-treeview/node_modules/",
     "--ignore=src/lib/deni-react-treeview/gh-pages/",
     "--ignore=src/lib/deni-react-treeview/src/",
-    "--ignore=.node_modules/.cache",
     extra_ignore.length > 0 ? `--ignore=${extra_ignore}` : ""
 ]);
 
