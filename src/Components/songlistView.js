@@ -471,7 +471,7 @@ export default class SonglistView extends React.Component {
       showSong: '',
       showArtist: '',
       showSAStats: true,
-      sortoptions: defaultSortOption,
+      sortOptions: defaultSortOption,
     };
     this.tabname = "tab-songs"
     this.childtabname = "songs-owned"
@@ -680,7 +680,7 @@ export default class SonglistView extends React.Component {
     );
     const showSAStats = await getScoreAttackConfig();
     const sortOptions = await getDefaultSortOptionConfig();
-    this.setState({ totalSize: so.count, showSAStats, sortoptions: sortOptions });
+    this.setState({ totalSize: so.count, showSAStats, sortOptions });
     const key = this.tabname + "-" + this.childtabname;
     const searchData = this.props.getSearch(key);
     if (searchData === null) {
@@ -817,7 +817,7 @@ export default class SonglistView extends React.Component {
         "",
         this.search.value,
         document.getElementById("search_field") ? document.getElementById("search_field").value : "",
-        this.state.sortoptions,
+        this.state.sortOptions,
       )
       this.setState({ songs: output, page: 1, totalSize: output[0].acount });
     }
