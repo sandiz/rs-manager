@@ -677,6 +677,7 @@ export default class SetlistOptions extends React.Component {
                     }}>
                       <div style={{ marginLeft: 30 + 'px' }}>
                         <input
+                          disabled={this.state.isRSSetlist === true}
                           type="radio"
                           id="setlist_manual"
                           name="setlist_manual"
@@ -689,6 +690,7 @@ export default class SetlistOptions extends React.Component {
                       </div>
                       <div style={{ marginLeft: 30 + 'px' }}>
                         <input
+                          disabled={this.state.isRSSetlist === true}
                           type="radio"
                           id="setlist_generated"
                           name="setlist_generated"
@@ -701,7 +703,7 @@ export default class SetlistOptions extends React.Component {
                       </div>
                       <div style={{ marginLeft: 30 + 'px' }}>
                         <input
-                          disabled
+                          readOnly
                           type="radio"
                           id="setlist_rs"
                           name="setlist_rs"

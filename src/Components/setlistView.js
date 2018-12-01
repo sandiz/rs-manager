@@ -572,7 +572,7 @@ export default class SetlistView extends React.Component {
     render = () => {
         const { songs, sizePerPage, page } = this.state;
         const choosepsarchstyle = "extraPadding download " + (this.state.totalSize <= 0 ? "isDisabled" : "");
-        const choosesettingsstyle = (this.lastChildID !== "setlist_favorites" && this.state.isDeleted === false && this.state.setlistMeta.is_rssetlist !== "true")
+        const choosesettingsstyle = (this.state.isDeleted === false)
             ? "extraPadding download" : "hidden"
         const setlistinitclass = this.state.showOptions ? "" : "hidden";
         return (
