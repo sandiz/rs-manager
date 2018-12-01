@@ -93,9 +93,11 @@ export default class Sidebar extends React.Component {
 
   componentDidMount = () => {
     this.checkForUpdate();
+    setInterval(() => this.checkForUpdate(), 60 * 1000); //check for update every 60 secs
   }
 
   checkForUpdate = async () => {
+    console.log("checking for update...");
     const updateUrl = "https://api.github.com/repos/sandiz/rs-manager/releases/latest";
     const updateData = await window.fetch(updateUrl);
     const json = await updateData.json();
