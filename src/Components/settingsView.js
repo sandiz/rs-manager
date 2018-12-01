@@ -313,7 +313,14 @@ export default class SettingsView extends React.Component {
     await updateScoreAttackDashboard(this.state.scoreAttackDashboard);
     await updateMasteryThreshold(this.state.masteryThreshold);
     await updateSteamAPIKey(this.state.steamAPIKey);
-    await updateDefaultSortOption(this.state.sortoptions)
+    if (this.state.sortoptions.length === 0) {
+      this.setState({ sortoptions: defaultSortOption }, async () => {
+        await updateDefaultSortOption(this.state.sortoptions)
+      })
+    }
+    else {
+      await updateDefaultSortOption(this.state.sortoptions)
+    }
     this.props.handleChange();
     this.props.updateHeader(this.tabname, "Settings Saved!");
     document.getElementsByTagName("body")[0].scrollTop = 0;
