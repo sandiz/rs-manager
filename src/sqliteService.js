@@ -1,5 +1,6 @@
 import { generateSql } from "./Components/setlistOptions";
 import { getMasteryThresholdConfig } from "./configService";
+import { generateOrderSql } from "./Components/setlistView";
 
 let db = null;
 export async function getUserVersion() {
@@ -99,6 +100,9 @@ export async function initSongsOwnedDB(updateTab = "", updateFunc = null) {
   altersql10 += "alter table songs_owned add path_bass boolean default null;"
   altersql10 += "alter table songs_owned add bonus_arr boolean default null;"
   altersql10 += "alter table songs_owned add represent boolean default null;"
+
+  let altersql11 = "";
+  altersql11 += "alter table setlist_meta add sort_options char default '[]';"
 
   switch (version) {
     case 0: {
@@ -207,13 +211,18 @@ export async function initSongsOwnedDB(updateTab = "", updateFunc = null) {
         version += 1
         await setUserVersion(version);
       }
+    case 11:
+      // add sort_optins to setlist_meta
+      await db.exec(altersql11)
+      version += 1
+      await setUserVersion(version);
     default:
       break;
   }
   const folderop = await db.get("select parent_folder from setlist_meta where key='setlist_favorites'");
   const name = (folderop.parent_folder === null || typeof folderop.parent_folder === 'undefined') ? null : `'${folderop.parent_folder}'`
-  await db.run(`REPLACE INTO setlist_meta VALUES('setlist_favorites','RS Favorites', 'true', 'false', '', 'true', 'false', 'false', ${name});`)
-  await db.run("REPLACE INTO setlist_meta VALUES('folder_starred','Starred', 'false', 'false', '', 'false', 'false', 'true', '');")
+  await db.run(`REPLACE INTO setlist_meta VALUES('setlist_favorites','RS Favorites', 'true', 'false', '', 'true', 'false', 'false', ${name}, '[]');`)
+  await db.run("REPLACE INTO setlist_meta VALUES('folder_starred','Starred', 'false', 'false', '', 'false', 'false', 'true', '', '[]');")
   await initSetlistPlaylistDB("setlist_favorites");
   if (updateFunc) updateFunc(updateTab, "Initialization complete.")
 }
@@ -778,7 +787,7 @@ export async function createRSSongList(
   isgenerated = false, ismanual = false,
   viewsql = "", isrscustom = false,
   isstarred = false, isfolder = false,
-  parentfolder = "",
+  parentfolder = "", sortoptions = "[]",
 ) {
   if (isfolder !== true) {
     await initSetlistPlaylistDB(tablename);
@@ -793,7 +802,8 @@ export async function createRSSongList(
     '${isrscustom}',
     '${isstarred}',
     '${isfolder}',
-    '${parentfolder}'
+    '${parentfolder}',
+    '${sortoptions}'
     );`
   await db.run(sql);
 }
@@ -852,13 +862,16 @@ export async function getSongsFromGeneratedPlaylist(
   meta,
   start = 0, count = 10,
   sortField = "mastery", sortOrder = "desc",
+  sortOptions = [], /* higher weight */
 ) {
+  console.log(sortOptions);
   if (meta.view_sql.length > 0) {
     try {
       const jsonObj = JSON.parse(meta.view_sql)
       let sql = generateSql(jsonObj);
       const countsql = generateSql(jsonObj, true)
       sql += ` ORDER BY ${sortField} ${sortOrder} LIMIT ${start},${count};`
+      console.log(sql)
       const output = await db.all(sql);
       const output2 = await db.get(countsql)
       return [output, output2];
@@ -869,8 +882,9 @@ export async function getSongsFromGeneratedPlaylist(
   }
   return [];
 }
-export async function getSongsFromPlaylistDB(dbname, start = 0, count = 10, sortField = "mastery", sortOrder = "desc", search = "", searchField = "", options = []) {
+export async function getSongsFromPlaylistDB(dbname, start = 0, count = 10, sortField = "mastery", sortOrder = "desc", search = "", searchField = "", options = [], sortOptions = []) {
   // console.log("__db_call__: getSongsFromPlaylistDB");
+  console.log(sortOptions);
   if (db == null) {
     const dbfilename = window.sqlitePath;
     db = await window.sqlite.open(dbfilename);
@@ -906,6 +920,13 @@ export async function getSongsFromPlaylistDB(dbname, start = 0, count = 10, sort
       optionsSql += (optionsSql.length > 0 ? " OR " : "") + (`path_bass=1`)
     }
   }
+
+  let ordersql = `ORDER BY ${sortField} ${sortOrder}`;
+  if (sortOptions.length > 0) {
+    const gsql = generateOrderSql(sortOptions, true);
+    if (gsql !== "") ordersql = gsql;
+  }
+
   if (search === "") {
     let wheresql = "";
     if (optionsSql.length > 0) {
@@ -919,7 +940,7 @@ export async function getSongsFromPlaylistDB(dbname, start = 0, count = 10, sort
           ) c 
           JOIN ${dbname} ON ${dbname}.uniqkey = songs_owned.uniqkey
           ${wheresql}
-          ORDER BY ${sortField} ${sortOrder} LIMIT ${start},${count}
+          ${ordersql} LIMIT ${start},${count}
           `;
   }
   else {
@@ -937,9 +958,10 @@ export async function getSongsFromPlaylistDB(dbname, start = 0, count = 10, sort
           JOIN ${dbname} ON ${dbname}.uniqkey = songs_owned.uniqkey
           where
           ${searchSql}
-          ORDER BY ${sortField} ${sortOrder} LIMIT ${start},${count}
+          ${ordersql} LIMIT ${start},${count}
           `;
   }
+  console.log(sql)
   const output = await db.all(sql);
   return output
 }

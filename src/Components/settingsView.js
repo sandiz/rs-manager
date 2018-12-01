@@ -268,17 +268,6 @@ export default class SettingsView extends React.Component {
     });
   }
 
-  resetSearchHistory = (o, p) => {
-    //reset search history
-    const key = "tab-songs-songs-owned";
-    const search = this.props.getSearch(key);
-    if (search !== null) {
-      search.sortfield = o;
-      search.sortorder = p;
-      this.props.saveSearch(key, search);
-    }
-  }
-
   readConfigs = async () => {
     const d = await getProfileConfig();
     const e = await getSteamLoginSecureCookie();
@@ -325,7 +314,6 @@ export default class SettingsView extends React.Component {
     await updateSteamAPIKey(this.state.steamAPIKey);
     await updateDefaultSortField(this.state.sortField);
     await updateDefaultSortOrder(this.state.sortOrder);
-    this.resetSearchHistory(this.state.sortField, this.state.sortOrder);
     this.props.handleChange();
     this.props.updateHeader(this.tabname, "Settings Saved!");
     document.getElementsByTagName("body")[0].scrollTop = 0;
@@ -819,8 +807,6 @@ SettingsView.propTypes = {
   updateHeader: PropTypes.func,
   //resetHeader: PropTypes.func,
   refreshTabs: PropTypes.func,
-  saveSearch: PropTypes.func,
-  getSearch: PropTypes.func,
 }
 SettingsView.defaultProps = {
   currentTab: null,
@@ -828,6 +814,4 @@ SettingsView.defaultProps = {
   updateHeader: () => { },
   //resetHeader: () => { },
   refreshTabs: () => { },
-  saveSearch: () => { },
-  getSearch: () => { },
 }
