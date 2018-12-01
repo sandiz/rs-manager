@@ -487,7 +487,6 @@ export async function getSongsOwned(start = 0, count = 10, sortField = "mastery"
     const dbfilename = window.sqlitePath;
     db = await window.sqlite.open(dbfilename);
   }
-  console.log(sortOptions)
   let sql;
   let searchSql = `( song like '%${escape(search)}%' or 
             artist like '%${escape(search)}%' or 
@@ -896,7 +895,6 @@ export async function getSongsFromGeneratedPlaylist(
 }
 export async function getSongsFromPlaylistDB(dbname, start = 0, count = 10, sortField = "mastery", sortOrder = "desc", search = "", searchField = "", options = [], sortOptions = []) {
   // console.log("__db_call__: getSongsFromPlaylistDB");
-  console.log(sortOptions);
   if (db == null) {
     const dbfilename = window.sqlitePath;
     db = await window.sqlite.open(dbfilename);
