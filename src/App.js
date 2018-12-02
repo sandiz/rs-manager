@@ -4,7 +4,7 @@ import PSARCView from './Components/psarcView'
 import SonglistView from './Components/songlistView'
 import FolderEditView from './Components/folderEditView'
 import DashboardView from './Components/dashboardView'
-import getProfileConfig, { getSteamIDConfig } from './configService';
+import getProfileConfig, { getSteamIDConfig, getShowSetlistOverlayAlwaysConfig } from './configService';
 import SongAvailableView from './Components/songavailableView';
 import SetlistView from './Components/setlistView';
 import SettingsView from './Components/settingsView';
@@ -127,11 +127,24 @@ class App extends Component {
     //this.refreshTabs();
   }
 
-  handleChange = async (tab, child) => {
+  handleChange = async (tab, child, dontcheckoverlay = false) => {
     const text = (tab == null) ? "" : tab.name
       + (child == null ? "" : ` >  ${child.name}`);
     if (this.state.readytorender === false) return;
 
+    let showModalStats = this.state.showModalStats;
+    if (child && !dontcheckoverlay) {
+      const folder = child.id.includes("folder");
+      const showconfig = await getShowSetlistOverlayAlwaysConfig();
+      if (showconfig && !folder) {
+        showModalStats = true;
+        this.switchNavbarColor("wheat")
+      }
+      else {
+        showModalStats = false;
+        this.switchNavbarColor("black")
+      }
+    }
     let selectedTab = null;
     switch (tab.id) {
       default:
@@ -197,7 +210,7 @@ class App extends Component {
               refreshTabs={this.refreshTabs}
               saveSearch={this.saveSearchHistory}
               getSearch={this.getSearchHistory}
-              showModalStats={this.state.showModalStats}
+              showModalStats={showModalStats}
             />
           )
         }
@@ -243,11 +256,15 @@ class App extends Component {
         )
         break;
     }
+
+    //check default show stat config
+
     this.setState({
       currentTab: tab,
       currentChildTab: child,
       appTitle: text,
       selectedTab,
+      showModalStats,
     });
   }
 
@@ -384,6 +401,10 @@ class App extends Component {
     this.setState({ showhelp: false })
   }
 
+  switchNavbarColor = (color) => {
+    this.navbarRef.current.style.color = color;
+  }
+
   render = () => {
     const len = this.state.currentProfile.length;
     let profile = len > 0
@@ -392,7 +413,12 @@ class App extends Component {
     const cookie = this.state.currentCookie.length > 0 ? this.state.currentCookie : "-";
     const showhelpstyle = "modal-window-help " + (this.state.showhelp ? "" : "hidden")
     const helpstyle = (this.state.currentTab !== null && (this.state.currentTab.id === "tab-settings" || this.state.currentTab.id === "tab-help")) ? "hidden" : ""
-    const showmstat = this.state.currentTab !== null && this.state.currentTab.id === "tab-setlist" ? "" : "hidden";
+    let showmstat = (this.state.currentTab !== null && this.state.currentTab.id === "tab-setlist") ? "" : "hidden";
+    if (this.state.currentChildTab !== null
+      && typeof this.state.currentChildTab !== 'undefined'
+      && this.state.currentChildTab.id.includes("folder")) {
+      showmstat = "hidden";
+    }
     return (
       <div className="App">
         <div className="wrapper">
@@ -453,13 +479,11 @@ class App extends Component {
                   onClick={() => {
                     const showModalStats = !this.state.showModalStats;
                     this.setState({ showModalStats }, () => {
-                      this.handleChange(this.state.currentTab, this.state.currentChildTab);
+                      this.handleChange(this.state.currentTab, this.state.currentChildTab, true);
                       if (this.state.showModalStats) {
-                        //this.navbarRef.current.style["z-index"] = 1000;
-                        this.navbarRef.current.style.color = "wheat";
+                        this.switchNavbarColor("wheat")
                       } else {
-                        //this.navbarRef.current.style["z-index"] = 0;
-                        this.navbarRef.current.style.color = "black";
+                        this.switchNavbarColor("black")
                       }
                     });
                   }}
