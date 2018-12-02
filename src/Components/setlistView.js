@@ -1,6 +1,7 @@
 import React from 'react'
 import Select from 'react-select';
 import PropTypes from 'prop-types';
+import StatsTableView from './statsTableView';
 import {
     RemoteAll,
     unescapeFormatter, difficultyFormatter, difficultyClass, round100Formatter,
@@ -13,7 +14,10 @@ import {
     removeSongFromSetlist, updateMasteryandPlayed, initSongsOwnedDB,
     getSetlistMetaInfo, getSongsFromGeneratedPlaylist, removeSongFromSetlistByUniqKey,
 } from '../sqliteService';
-import getProfileConfig, { updateProfileConfig, getScoreAttackConfig, getDefaultSortOptionConfig } from '../configService';
+import getProfileConfig, {
+    updateProfileConfig, getScoreAttackConfig,
+    getDefaultSortOptionConfig, getScoreAttackDashboardConfig,
+} from '../configService';
 import SetlistOptions from './setlistOptions';
 
 const { path } = window;
@@ -84,6 +88,24 @@ export default class SetlistView extends React.Component {
             isDeleted: false,
             selectedPathOption: [],
             songData: {},
+
+            scoreAttackDashboard: [false, false, false, false],
+            scdTrueLength: 0,
+            lead: [0, 0, 0, 0, 0, 0, 0, 0],
+            leadwidth: [0, 0, 0, 0, 0, 0, 0, 0],
+            rhythm: [0, 0, 0, 0, 0, 0, 0, 0],
+            rhythmwidth: [0, 0, 0, 0, 0, 0, 0, 0],
+            bass: [0, 0, 0, 0, 0, 0, 0, 0],
+            basswidth: [0, 0, 0, 0, 0, 0, 0, 0],
+
+            sahard: [0, 0, 0, 0, 0, 0, 0],
+            sahardwidth: [0, 0, 0, 0, 0, 0, 0],
+            samaster: [0, 0, 0, 0, 0, 0, 0],
+            samasterwidth: [0, 0, 0, 0, 0, 0, 0],
+            samedium: [0, 0, 0, 0, 0, 0, 0],
+            samediumwidth: [0, 0, 0, 0, 0, 0, 0],
+            saeasy: [0, 0, 0, 0, 0, 0, 0],
+            saeasywidth: [0, 0, 0, 0, 0, 0, 0],
         };
         this.search = null;
         this.columns = [
@@ -285,7 +307,10 @@ export default class SetlistView extends React.Component {
         const showSAStats = await getScoreAttackConfig();
         this.fetchMeta();
         this.setState({
-            showSAStats, page: 1, totalSize: 0, isDeleted: false,
+            showSAStats,
+            page: 1,
+            totalSize: 0,
+            isDeleted: false,
         }, () => {
 
         });
@@ -351,9 +376,17 @@ export default class SetlistView extends React.Component {
     fetchMeta = async () => {
         const metaInfo = await getSetlistMetaInfo(this.lastChildID);
         const showOptions = metaInfo.is_manual == null && metaInfo.is_generated == null;
+        const scoreAttackDashboard = await getScoreAttackDashboardConfig();
+        const scdTrueLength = scoreAttackDashboard.filter(x => x).length;
         //console.log("fetchMeta: ", metaInfo);
         this.setState({
-            showOptions, page: 1, totalSize: 0, songs: [], setlistMeta: metaInfo,
+            showOptions,
+            page: 1,
+            totalSize: 0,
+            songs: [],
+            setlistMeta: metaInfo,
+            scoreAttackDashboard,
+            scdTrueLength,
         }, () => {
             this.getSearch();
         });
@@ -609,6 +642,10 @@ export default class SetlistView extends React.Component {
         const choosesettingsstyle = (this.state.isDeleted === false)
             ? "extraPadding download" : "hidden"
         const setlistinitclass = this.state.showOptions ? "" : "hidden";
+        let sacolwidth = "col-sm-3";
+        if (this.state.scdTrueLength > 2) sacolwidth = "col-sm-2-2"
+        const scoreattackstyle = "col ta-center dashboard-bottom " + (this.state.showSAStats ? sacolwidth : "hidden");
+        const arrstyle = "col ta-center dashboard-bottom col-md-3";
         return (
             <div>
                 <div
@@ -676,6 +713,95 @@ export default class SetlistView extends React.Component {
                         Settings
                     </a>
                     <br />
+                </div>
+                <div className="modal-sa-stat" id="open-modal" style={{ opacity: 1 }}>
+                    <div>
+                        <div className="row justify-content-md-center" style={{}}>
+                            <div className={arrstyle}>
+                                <span style={{ fontSize: 17 + 'px' }}>Lead </span>
+                                <StatsTableView
+                                    total={this.state.lead[0]}
+                                    masteryTotals={this.state.lead.slice(1)}
+                                    masteryWidths={this.state.leadwidth.slice(1)}
+                                />
+                            </div>
+                            <div className={arrstyle}>
+                                <span style={{ fontSize: 17 + 'px' }}>Rhythm </span>
+                                <StatsTableView
+                                    total={this.state.rhythm[0]}
+                                    masteryTotals={this.state.rhythm.slice(1)}
+                                    masteryWidths={this.state.rhythmwidth.slice(1)}
+                                />
+                            </div>
+                            <div className={arrstyle}>
+                                <span style={{ fontSize: 17 + 'px' }}>Bass </span>
+                                <StatsTableView
+                                    total={this.state.bass[0]}
+                                    masteryTotals={this.state.bass.slice(1)}
+                                    masteryWidths={this.state.basswidth.slice(1)}
+                                />
+                            </div>
+                        </div>
+                        <div className="row justify-content-md-center dashboard-scoreattack" style={{ marginTop: -10 + 'px' }}>
+                            {
+                                this.state.scoreAttackDashboard[0] === true
+                                    ? (
+                                        <div className={scoreattackstyle}>
+                                            <span style={{ fontSize: 17 + 'px' }}>Score Attack - Easy</span>
+                                            <StatsTableView
+                                                scoreattack
+                                                total={this.state.satotal}
+                                                tierTotals={this.state.saeasy}
+                                                tierWidths={this.state.saeasywidth}
+                                            />
+                                        </div>
+                                    ) : null
+                            }
+                            {
+                                this.state.scoreAttackDashboard[1] === true
+                                    ? (
+                                        <div className={scoreattackstyle}>
+                                            <span style={{ fontSize: 17 + 'px' }}>Score Attack - Medium</span>
+                                            <StatsTableView
+                                                scoreattack
+                                                total={this.state.satotal}
+                                                tierTotals={this.state.samedium}
+                                                tierWidths={this.state.samediumwidth}
+                                            />
+                                        </div>
+                                    ) : null
+                            }
+                            {
+                                this.state.scoreAttackDashboard[2] === true
+                                    ? (
+                                        <div className={scoreattackstyle}>
+                                            <span style={{ fontSize: 17 + 'px' }}>Score Attack - Hard</span>
+                                            <StatsTableView
+                                                scoreattack
+                                                total={this.state.satotal}
+                                                tierTotals={this.state.sahard}
+                                                tierWidths={this.state.sahardwidth}
+                                            />
+                                        </div>
+                                    ) : null
+                            }
+                            {
+                                this.state.scoreAttackDashboard[3] === true
+                                    ? (
+                                        <div className={scoreattackstyle}>
+                                            <span style={{ fontSize: 17 + 'px' }}>Score Attack - Master</span>
+                                            <StatsTableView
+                                                scoreattack
+                                                total={this.state.satotal}
+                                                tierTotals={this.state.samaster}
+                                                tierWidths={this.state.samasterwidth}
+                                            />
+                                        </div>
+                                    ) : null
+                            }
+                        </div>
+                        <br />
+                    </div>
                 </div>
                 <div>
                     <RemoteAll
