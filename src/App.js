@@ -145,6 +145,9 @@ class App extends Component {
         this.switchNavbarColor("black")
       }
     }
+    else {
+      this.switchNavbarColor("black")
+    }
     let selectedTab = null;
     switch (tab.id) {
       default:
