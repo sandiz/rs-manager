@@ -544,14 +544,14 @@ export async function getSongsOwned(start = 0, count = 10, sortField = "mastery"
   const output = await db.all(sql);
   return output
 }
-export async function countSongsOwned(useCDLC = false) {
+export async function countSongsOwned(useCDLC = false, table = "songs_owned") {
   // console.log("__db_call__: countSongsOwned");
   const cdlcSql = useCDLC ? "" : "where is_cdlc = 'false'";
   if (db == null) {
     const dbfilename = window.sqlitePath;
     db = await window.sqlite.open(dbfilename);
   }
-  const sql = `select count(*) as count, count(distinct songkey) as songcount from songs_owned ${cdlcSql};`;
+  const sql = `select count(*) as count, count(distinct songkey) as songcount from ${table} ${cdlcSql};`;
   // console.log(sql);
   const output = await db.get(sql);
   return output
@@ -603,7 +603,7 @@ export async function resetDB(table = 'songs_owned') {
   const sql = `delete from ${table};`
   await db.exec(sql);
 }
-export async function getSAStats(type = "sa_badge_hard", fctype = "sa_fc_hard", useCDLC = false) {
+export async function getSAStats(type = "sa_badge_hard", fctype = "sa_fc_hard", useCDLC = false, table = "songs_owned") {
   const cdlcSql = useCDLC ? "" : "is_cdlc = 'false' AND";
   // console.log("__db_call__: getLeadStats");
   let badgeRating = 0;
@@ -615,17 +615,17 @@ export async function getSAStats(type = "sa_badge_hard", fctype = "sa_fc_hard", 
   const sqlstr = `select sa.count as satotal, \
   saplat.count as saplat, sagold.count as sagold, sasilver.count as sasilver,\
   sabronze.count as sabronze, safailed.count as safailed, safcs.count as safcs from \
-  (select count(*) as count from songs_owned where ${cdlcSql} ${fctype} is not null) safcs, \
-  (select count(*) as count from songs_owned where ${cdlcSql} sa_playcount > 0 AND ${type} > ${badgeRating}) sa, \
-  (select count(*) as count from songs_owned where ${cdlcSql} sa_playcount > 0 AND (${type} == ${badgeRating + 1})) safailed,
-  (select count(*) as count from songs_owned where ${cdlcSql} sa_playcount > 0 AND (${type} == ${badgeRating + 2})) sabronze, \
-  (select count(*) as count from songs_owned where ${cdlcSql} sa_playcount > 0 AND (${type} == ${badgeRating + 3})) sasilver, \
-  (select count(*) as count from songs_owned where ${cdlcSql} sa_playcount > 0 AND (${type} == ${badgeRating + 4})) sagold, \
-  (select count(*) as count from songs_owned where ${cdlcSql} ${fctype} is null AND sa_playcount > 0 AND (${type} == ${badgeRating + 5})) saplat;`
+  (select count(*) as count from ${table} where ${cdlcSql} ${fctype} is not null) safcs, \
+  (select count(*) as count from ${table} where ${cdlcSql} sa_playcount > 0 AND ${type} > ${badgeRating}) sa, \
+  (select count(*) as count from ${table} where ${cdlcSql} sa_playcount > 0 AND (${type} == ${badgeRating + 1})) safailed,
+  (select count(*) as count from ${table} where ${cdlcSql} sa_playcount > 0 AND (${type} == ${badgeRating + 2})) sabronze, \
+  (select count(*) as count from ${table} where ${cdlcSql} sa_playcount > 0 AND (${type} == ${badgeRating + 3})) sasilver, \
+  (select count(*) as count from ${table} where ${cdlcSql} sa_playcount > 0 AND (${type} == ${badgeRating + 4})) sagold, \
+  (select count(*) as count from ${table} where ${cdlcSql} ${fctype} is null AND sa_playcount > 0 AND (${type} == ${badgeRating + 5})) saplat;`
   const output = await db.get(sqlstr);
   return output;
 }
-export async function getLeadStats(useCDLC = false) {
+export async function getLeadStats(useCDLC = false, table = "songs_owned") {
   const cdlcSql = useCDLC ? "" : "is_cdlc = 'false' AND";
   // console.log("__db_call__: getLeadStats");
   //eslint-disable-next-line
@@ -637,18 +637,18 @@ export async function getLeadStats(useCDLC = false) {
   l5.count as l5, \
   l6.count as l6, \
   up.count as lup from \
-  (select count(*) as count from songs_owned where ${cdlcSql} arrangement like '%lead%')l, \
-  (select count(*) as count from songs_owned where ${cdlcSql} mastery >= 1 AND arrangement like '%lead%') l1, \
-  (select count(*) as count from songs_owned where ${cdlcSql} mastery >= .95 AND mastery < 1 AND arrangement like '%lead%') l2, \
-  (select count(*) as count from songs_owned where ${cdlcSql} mastery >= .90 AND mastery < .95 AND arrangement like '%lead%') l3, \
-  (select count(*) as count from songs_owned where ${cdlcSql} mastery >= .80 AND mastery < .90 AND arrangement like '%lead%') l4, \
-  (select count(*) as count from songs_owned where ${cdlcSql} mastery >= .70 AND mastery < .80 AND arrangement like '%lead%') l5, \
-  (select count(*) as count from songs_owned where ${cdlcSql} mastery >= .1 AND mastery < .70 AND arrangement like '%lead%') l6, \
-  (select count(*) as count from songs_owned where ${cdlcSql} mastery < .1 AND arrangement like '%lead%') up;`
+  (select count(*) as count from ${table} where ${cdlcSql} path_lead = 1)l, \
+  (select count(*) as count from ${table} where ${cdlcSql} mastery >= 1 AND path_lead = 1) l1, \
+  (select count(*) as count from ${table} where ${cdlcSql} mastery >= .95 AND mastery < 1 AND path_lead = 1) l2, \
+  (select count(*) as count from ${table} where ${cdlcSql} mastery >= .90 AND mastery < .95 AND path_lead = 1) l3, \
+  (select count(*) as count from ${table} where ${cdlcSql} mastery >= .80 AND mastery < .90 AND path_lead = 1) l4, \
+  (select count(*) as count from ${table} where ${cdlcSql} mastery >= .70 AND mastery < .80 AND path_lead = 1) l5, \
+  (select count(*) as count from ${table} where ${cdlcSql} mastery >= .1 AND mastery < .70 AND path_lead = 1) l6, \
+  (select count(*) as count from ${table} where ${cdlcSql} mastery < .1 AND path_lead = 1) up;`
   const output = await db.get(sqlstr);
   return output;
 }
-export async function getRhythmStats(useCDLC = false) {
+export async function getRhythmStats(useCDLC = false, table = "songs_owned") {
   const cdlcSql = useCDLC ? "" : "is_cdlc = 'false' AND";
   //console.log("__db_call__: getRhythmStats");
   //eslint-disable-next-line
@@ -660,18 +660,18 @@ export async function getRhythmStats(useCDLC = false) {
   l5.count as r5, \
   l6.count as r6, \
   up.count as rup from \
-  (select count(*) as count from songs_owned where ${cdlcSql} arrangement like '%rhythm%')l, \
-  (select count(*) as count from songs_owned where ${cdlcSql} mastery >= 1 AND arrangement like '%rhythm%') l1, \
-  (select count(*) as count from songs_owned where ${cdlcSql} mastery >= .95 AND mastery < 1 AND arrangement like '%rhythm%') l2, \
-  (select count(*) as count from songs_owned where ${cdlcSql} mastery >= .90 AND mastery < .95 AND arrangement like '%rhythm%') l3, \
-  (select count(*) as count from songs_owned where ${cdlcSql} mastery >= .80 AND mastery < .90 AND arrangement like '%rhythm%') l4, \
-  (select count(*) as count from songs_owned where ${cdlcSql} mastery >= .70 AND mastery < .80 AND arrangement like '%rhythm%') l5, \
-  (select count(*) as count from songs_owned where ${cdlcSql} mastery >= .1 AND mastery < .70 AND arrangement like '%rhythm%') l6, \
-  (select count(*) as count from songs_owned where ${cdlcSql} mastery < .1 AND arrangement like '%rhythm%') up;`
+  (select count(*) as count from ${table} where ${cdlcSql} path_rhythm = 1)l, \
+  (select count(*) as count from ${table} where ${cdlcSql} mastery >= 1 AND path_rhythm = 1) l1, \
+  (select count(*) as count from ${table} where ${cdlcSql} mastery >= .95 AND mastery < 1 AND path_rhythm = 1) l2, \
+  (select count(*) as count from ${table} where ${cdlcSql} mastery >= .90 AND mastery < .95 AND path_rhythm = 1) l3, \
+  (select count(*) as count from ${table} where ${cdlcSql} mastery >= .80 AND mastery < .90 AND path_rhythm = 1) l4, \
+  (select count(*) as count from ${table} where ${cdlcSql} mastery >= .70 AND mastery < .80 AND path_rhythm = 1) l5, \
+  (select count(*) as count from ${table} where ${cdlcSql} mastery >= .1 AND mastery < .70 AND path_rhythm = 1) l6, \
+  (select count(*) as count from ${table} where ${cdlcSql} mastery < .1 AND path_rhythm = 1) up;`
   const output = await db.get(sqlstr);
   return output;
 }
-export async function getBassStats(useCDLC = false) {
+export async function getBassStats(useCDLC = false, table = "songs_owned") {
   const cdlcSql = useCDLC ? "" : "is_cdlc = 'false' AND";
   // console.log("__db_call__: getBassStats");
   //eslint-disable-next-line
@@ -683,14 +683,14 @@ export async function getBassStats(useCDLC = false) {
   l5.count as b5, \
   l6.count as b6, \
   up.count as bup from \
-  (select count(*) as count from songs_owned where ${cdlcSql} arrangement like '%bass%')l, \
-  (select count(*) as count from songs_owned where ${cdlcSql} mastery >= 1 AND arrangement like '%bass%') l1, \
-  (select count(*) as count from songs_owned where ${cdlcSql} mastery >= .95 AND mastery < 1 AND arrangement like '%bass%') l2, \
-  (select count(*) as count from songs_owned where ${cdlcSql} mastery >= .90 AND mastery < .95 AND arrangement like '%bass%') l3, \
-  (select count(*) as count from songs_owned where ${cdlcSql} mastery >= .80 AND mastery < .90 AND arrangement like '%bass%') l4, \
-  (select count(*) as count from songs_owned where ${cdlcSql} mastery >= .70 AND mastery < .80 AND arrangement like '%bass%') l5, \
-  (select count(*) as count from songs_owned where ${cdlcSql} mastery >= .1 AND mastery < .70 AND arrangement like '%bass%') l6, \
-  (select count(*) as count from songs_owned where ${cdlcSql} mastery < .1 AND arrangement like '%bass%') up;`
+  (select count(*) as count from ${table} where ${cdlcSql} path_bass = 1)l, \
+  (select count(*) as count from ${table} where ${cdlcSql} mastery >= 1 AND path_bass = 1) l1, \
+  (select count(*) as count from ${table} where ${cdlcSql} mastery >= .95 AND mastery < 1 AND path_bass = 1) l2, \
+  (select count(*) as count from ${table} where ${cdlcSql} mastery >= .90 AND mastery < .95 AND path_bass = 1) l3, \
+  (select count(*) as count from ${table} where ${cdlcSql} mastery >= .80 AND mastery < .90 AND path_bass = 1) l4, \
+  (select count(*) as count from ${table} where ${cdlcSql} mastery >= .70 AND mastery < .80 AND path_bass = 1) l5, \
+  (select count(*) as count from ${table} where ${cdlcSql} mastery >= .1 AND mastery < .70 AND path_bass = 1) l6, \
+  (select count(*) as count from ${table} where ${cdlcSql} mastery < .1 AND path_bass = 1) up;`
   const output = await db.get(sqlstr);
   return output;
 }

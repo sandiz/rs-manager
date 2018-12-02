@@ -28,6 +28,7 @@ function getDefaultSettings() {
   obj.steamID = ""
   obj.steamAPIKey = ""
   obj.defaultSortOption = defaultSortOption;
+  obj.showSetlistOverlayAlways = false;
   return obj;
 }
 export async function getConfig(type) {
@@ -99,6 +100,9 @@ export async function updateSteamAPIKey(current) {
 export async function updateDefaultSortOption(current) {
   await updateConfig("defaultSortOption", current);
 }
+export async function updateShowSetlistOverlayAlways(current) {
+  await updateConfig("showSetlistOverlayAlways", current);
+}
 
 export default async function getProfileConfig() {
   const d = await getConfig("prfldb");
@@ -160,5 +164,10 @@ export async function getSteamAPIKeyConfig() {
 export async function getDefaultSortOptionConfig() {
   const d = await getConfig("defaultSortOption");
   if (d === '') return defaultSortOption; //default value
+  return d;
+}
+export async function getShowSetlistOverlayAlwaysConfig() {
+  const d = await getConfig("showSetlistOverlayAlways");
+  if (d === '') return false; //default value
   return d;
 }

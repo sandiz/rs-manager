@@ -1660,7 +1660,7 @@ var DeniReactTreeView = function (_React$Component) {
 DeniReactTreeView.defaultProps = _deniReactTreeview4.default.defaultProps;
 
 function _createComponentsChildren(treeview, parent, level, children) {
-  var style = level > 1 && parent.props.item && parent.props.item.expanded && children && children.length > 5 ? "sidebar-scroll" : null;
+  var style = level > 1 && parent.props.item && parent.props.item.expanded && children && children.length > 1 ? "sidebar-scroll" : null;
   return _react2.default.createElement(
     'div',
     { className: style },
