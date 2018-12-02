@@ -437,6 +437,21 @@ tbody tr:hover {
     pointer-events: none;
 }
 
+.modal-sa-stat {
+    position: fixed;
+    background-color: rgba(0, 0, 0, 0.5);
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 13.5%;
+    z-index: 999;
+    opacity: 0;
+    -webkit-transition: all 0.3s;
+    -moz-transition: all 0.3s;
+    transition: all 0.3s;
+    pointer-events: none;
+}
+
 .modal-window-help {
     position: fixed;
     background-color: rgba(0, 0, 0, 0.9);
@@ -458,6 +473,16 @@ tbody tr:hover {
 
 .modal-window>div {
     width: 720px;
+    position: relative;
+    margin: 5% auto;
+    padding: 2rem;
+    background: azure;
+    color: #444;
+    border-radius: 20px;
+}
+
+.modal-sa-stat>div {
+    width: 90%;
     position: relative;
     margin: 5% auto;
     padding: 2rem;
