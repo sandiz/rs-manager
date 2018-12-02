@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types';
-import StatsTableView from './statsTableView';
+import StatsTableView, { getStatsWidth } from './statsTableView';
 import getProfileConfig, {
   updateProfileConfig, getScoreAttackConfig, getUseCDLCConfig,
   getScoreAttackDashboardConfig, getDateFormatConfig,
@@ -84,12 +84,6 @@ export default class DashboardView extends React.Component {
 
   componentDidMount = async () => {
     this.cdmasync();
-  }
-
-  getStatsWidth = (input, min, max) => {
-    const w = ((input - min) * 100) / (max - min);
-    if (Number.isNaN(w)) { return 0; }
-    return w;
   }
 
   changeTimeFormat = async () => {
@@ -298,13 +292,13 @@ export default class DashboardView extends React.Component {
         ],
         leadwidth: [
           0,
-          this.getStatsWidth(leadStats.l1, 0, leadStats.l),
-          this.getStatsWidth(leadStats.l2, 0, leadStats.l),
-          this.getStatsWidth(leadStats.l3, 0, leadStats.l),
-          this.getStatsWidth(leadStats.l4, 0, leadStats.l),
-          this.getStatsWidth(leadStats.l5, 0, leadStats.l),
-          this.getStatsWidth(leadStats.l6, 0, leadStats.l),
-          this.getStatsWidth(lup, 0, leadStats.l),
+          getStatsWidth(leadStats.l1, 0, leadStats.l),
+          getStatsWidth(leadStats.l2, 0, leadStats.l),
+          getStatsWidth(leadStats.l3, 0, leadStats.l),
+          getStatsWidth(leadStats.l4, 0, leadStats.l),
+          getStatsWidth(leadStats.l5, 0, leadStats.l),
+          getStatsWidth(leadStats.l6, 0, leadStats.l),
+          getStatsWidth(lup, 0, leadStats.l),
         ],
 
         rhythm: [
@@ -315,13 +309,13 @@ export default class DashboardView extends React.Component {
         ],
         rhythmwidth: [
           0,
-          this.getStatsWidth(rhythmStats.r1, 0, rhythmStats.r),
-          this.getStatsWidth(rhythmStats.r2, 0, rhythmStats.r),
-          this.getStatsWidth(rhythmStats.r3, 0, rhythmStats.r),
-          this.getStatsWidth(rhythmStats.r4, 0, rhythmStats.r),
-          this.getStatsWidth(rhythmStats.r5, 0, rhythmStats.r),
-          this.getStatsWidth(rhythmStats.r6, 0, rhythmStats.r),
-          this.getStatsWidth(rup, 0, rhythmStats.r),
+          getStatsWidth(rhythmStats.r1, 0, rhythmStats.r),
+          getStatsWidth(rhythmStats.r2, 0, rhythmStats.r),
+          getStatsWidth(rhythmStats.r3, 0, rhythmStats.r),
+          getStatsWidth(rhythmStats.r4, 0, rhythmStats.r),
+          getStatsWidth(rhythmStats.r5, 0, rhythmStats.r),
+          getStatsWidth(rhythmStats.r6, 0, rhythmStats.r),
+          getStatsWidth(rup, 0, rhythmStats.r),
         ],
 
         bass: [
@@ -332,13 +326,13 @@ export default class DashboardView extends React.Component {
         ],
         basswidth: [
           0,
-          this.getStatsWidth(bassStats.b1, 0, bassStats.b),
-          this.getStatsWidth(bassStats.b2, 0, bassStats.b),
-          this.getStatsWidth(bassStats.b3, 0, bassStats.b),
-          this.getStatsWidth(bassStats.b4, 0, bassStats.b),
-          this.getStatsWidth(bassStats.b5, 0, bassStats.b),
-          this.getStatsWidth(bassStats.b6, 0, bassStats.b),
-          this.getStatsWidth(bup, 0, bassStats.b),
+          getStatsWidth(bassStats.b1, 0, bassStats.b),
+          getStatsWidth(bassStats.b2, 0, bassStats.b),
+          getStatsWidth(bassStats.b3, 0, bassStats.b),
+          getStatsWidth(bassStats.b4, 0, bassStats.b),
+          getStatsWidth(bassStats.b5, 0, bassStats.b),
+          getStatsWidth(bassStats.b6, 0, bassStats.b),
+          getStatsWidth(bup, 0, bassStats.b),
         ],
         satotal: songscount.count,
 
@@ -349,13 +343,13 @@ export default class DashboardView extends React.Component {
           saStats.safcs,
         ],
         sahardwidth: [
-          this.getStatsWidth(saStats.saplat, 0, songscount.count),
-          this.getStatsWidth(saStats.sagold, 0, songscount.count),
-          this.getStatsWidth(saStats.sasilver, 0, songscount.count),
-          this.getStatsWidth(saStats.sabronze, 0, songscount.count),
-          this.getStatsWidth(saStats.safailed, 0, songscount.count),
-          this.getStatsWidth(songscount.count - saStats.satotal, 0, songscount.count),
-          this.getStatsWidth(saStats.safcs, 0, songscount.count),
+          getStatsWidth(saStats.saplat, 0, songscount.count),
+          getStatsWidth(saStats.sagold, 0, songscount.count),
+          getStatsWidth(saStats.sasilver, 0, songscount.count),
+          getStatsWidth(saStats.sabronze, 0, songscount.count),
+          getStatsWidth(saStats.safailed, 0, songscount.count),
+          getStatsWidth(songscount.count - saStats.satotal, 0, songscount.count),
+          getStatsWidth(saStats.safcs, 0, songscount.count),
         ],
         /* master */
         samaster: [
@@ -364,13 +358,13 @@ export default class DashboardView extends React.Component {
           samStats.safcs,
         ],
         samasterwidth: [
-          this.getStatsWidth(samStats.saplat, 0, songscount.count),
-          this.getStatsWidth(samStats.sagold, 0, songscount.count),
-          this.getStatsWidth(samStats.sasilver, 0, songscount.count),
-          this.getStatsWidth(samStats.sabronze, 0, songscount.count),
-          this.getStatsWidth(samStats.safailed, 0, songscount.count),
-          this.getStatsWidth(songscount.count - samStats.satotal, 0, songscount.count),
-          this.getStatsWidth(samStats.safcs, 0, songscount.count),
+          getStatsWidth(samStats.saplat, 0, songscount.count),
+          getStatsWidth(samStats.sagold, 0, songscount.count),
+          getStatsWidth(samStats.sasilver, 0, songscount.count),
+          getStatsWidth(samStats.sabronze, 0, songscount.count),
+          getStatsWidth(samStats.safailed, 0, songscount.count),
+          getStatsWidth(songscount.count - samStats.satotal, 0, songscount.count),
+          getStatsWidth(samStats.safcs, 0, songscount.count),
         ],
         /* medium */
         samedium: [
@@ -379,13 +373,13 @@ export default class DashboardView extends React.Component {
           sameStats.safcs,
         ],
         samediumwidth: [
-          this.getStatsWidth(sameStats.saplat, 0, songscount.count),
-          this.getStatsWidth(sameStats.sagold, 0, songscount.count),
-          this.getStatsWidth(sameStats.sasilver, 0, songscount.count),
-          this.getStatsWidth(sameStats.sabronze, 0, songscount.count),
-          this.getStatsWidth(sameStats.safailed, 0, songscount.count),
-          this.getStatsWidth(songscount.count - sameStats.satotal, 0, songscount.count),
-          this.getStatsWidth(sameStats.safcs, 0, songscount.count),
+          getStatsWidth(sameStats.saplat, 0, songscount.count),
+          getStatsWidth(sameStats.sagold, 0, songscount.count),
+          getStatsWidth(sameStats.sasilver, 0, songscount.count),
+          getStatsWidth(sameStats.sabronze, 0, songscount.count),
+          getStatsWidth(sameStats.safailed, 0, songscount.count),
+          getStatsWidth(songscount.count - sameStats.satotal, 0, songscount.count),
+          getStatsWidth(sameStats.safcs, 0, songscount.count),
         ],
         /* easy */
         saeasy: [
@@ -394,13 +388,13 @@ export default class DashboardView extends React.Component {
           saeStats.safcs,
         ],
         saeasywidth: [
-          this.getStatsWidth(saeStats.saplat, 0, songscount.count),
-          this.getStatsWidth(saeStats.sagold, 0, songscount.count),
-          this.getStatsWidth(saeStats.sasilver, 0, songscount.count),
-          this.getStatsWidth(saeStats.sabronze, 0, songscount.count),
-          this.getStatsWidth(saeStats.safailed, 0, songscount.count),
-          this.getStatsWidth(songscount.count - saeStats.satotal, 0, songscount.count),
-          this.getStatsWidth(saeStats.safcs, 0, songscount.count),
+          getStatsWidth(saeStats.saplat, 0, songscount.count),
+          getStatsWidth(saeStats.sagold, 0, songscount.count),
+          getStatsWidth(saeStats.sasilver, 0, songscount.count),
+          getStatsWidth(saeStats.sabronze, 0, songscount.count),
+          getStatsWidth(saeStats.safailed, 0, songscount.count),
+          getStatsWidth(songscount.count - saeStats.satotal, 0, songscount.count),
+          getStatsWidth(saeStats.safcs, 0, songscount.count),
         ],
       })
       this.props.updateHeader(this.tabname, "Rocksmith 2014 Dashboard");

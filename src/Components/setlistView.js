@@ -1,6 +1,7 @@
 import React from 'react'
 import Select from 'react-select';
 import PropTypes from 'prop-types';
+import StatsTableView, { getStatsWidth } from './statsTableView';
 import {
     RemoteAll,
     unescapeFormatter, difficultyFormatter, difficultyClass, round100Formatter,
@@ -12,9 +13,14 @@ import {
     addToFavorites, initSetlistPlaylistDB, getSongsFromPlaylistDB,
     removeSongFromSetlist, updateMasteryandPlayed, initSongsOwnedDB,
     getSetlistMetaInfo, getSongsFromGeneratedPlaylist, removeSongFromSetlistByUniqKey,
+    executeRawSql, getLeadStats, getRhythmStats, getBassStats, countSongsOwned,
+    getSAStats,
 } from '../sqliteService';
-import getProfileConfig, { updateProfileConfig, getScoreAttackConfig, getDefaultSortOptionConfig } from '../configService';
-import SetlistOptions from './setlistOptions';
+import getProfileConfig, {
+    updateProfileConfig, getScoreAttackConfig,
+    getDefaultSortOptionConfig, getScoreAttackDashboardConfig,
+} from '../configService';
+import SetlistOptions, { generateSql } from './setlistOptions';
 
 const { path } = window;
 const options = [
@@ -84,6 +90,34 @@ export default class SetlistView extends React.Component {
             isDeleted: false,
             selectedPathOption: [],
             songData: {},
+
+            scoreAttackDashboard: [false, false, false, false],
+            scdTrueLength: 0,
+            lead: [0, 0, 0, 0, 0, 0, 0, 0],
+            leadwidth: [0, 0, 0, 0, 0, 0, 0, 0],
+            rhythm: [0, 0, 0, 0, 0, 0, 0, 0],
+            rhythmwidth: [0, 0, 0, 0, 0, 0, 0, 0],
+            bass: [0, 0, 0, 0, 0, 0, 0, 0],
+            basswidth: [0, 0, 0, 0, 0, 0, 0, 0],
+
+            sahard: [0, 0, 0, 0, 0, 0, 0],
+            sahardwidth: [0, 0, 0, 0, 0, 0, 0],
+            samaster: [0, 0, 0, 0, 0, 0, 0],
+            samasterwidth: [0, 0, 0, 0, 0, 0, 0],
+            samedium: [0, 0, 0, 0, 0, 0, 0],
+            samediumwidth: [0, 0, 0, 0, 0, 0, 0],
+            saeasy: [0, 0, 0, 0, 0, 0, 0],
+            saeasywidth: [0, 0, 0, 0, 0, 0, 0],
+
+            modal_no_lead: false,
+            modal_no_bass: false,
+            modal_no_rhythm: false,
+            modal_no_path_stats: false,
+            modal_no_sa_easy: false,
+            modal_no_sa_medium: false,
+            modal_no_sa_hard: false,
+            modal_no_sa_master: false,
+            modal_no_sa_stats: false,
         };
         this.search = null;
         this.columns = [
@@ -278,16 +312,18 @@ export default class SetlistView extends React.Component {
     }
 
     shouldComponentUpdate = async (nextprops, nextstate) => {
+        if (this.props === nextprops) { return false; }
         if (nextprops.currentChildTab === null) { return false; }
         if (this.lastChildID === nextprops.currentChildTab.id) { return false; }
         this.saveSearch();
+
         this.lastChildID = nextprops.currentChildTab.id;
         const showSAStats = await getScoreAttackConfig();
-        this.fetchMeta();
-        this.setState({
-            showSAStats, page: 1, totalSize: 0, isDeleted: false,
-        }, () => {
-
+        await this.fetchMeta({
+            showSAStats,
+            page: 1,
+            totalSize: 0,
+            isDeleted: false,
         });
         return true;
     }
@@ -348,15 +384,202 @@ export default class SetlistView extends React.Component {
         }
     }
 
-    fetchMeta = async () => {
+    fetchMeta = async (resetobj = {}) => {
         const metaInfo = await getSetlistMetaInfo(this.lastChildID);
         const showOptions = metaInfo.is_manual == null && metaInfo.is_generated == null;
+        const scoreAttackDashboard = await getScoreAttackDashboardConfig();
+        const scdTrueLength = scoreAttackDashboard.filter(x => x).length;
+        const stats = await this.generateStats(metaInfo);
         //console.log("fetchMeta: ", metaInfo);
         this.setState({
-            showOptions, page: 1, totalSize: 0, songs: [], setlistMeta: metaInfo,
+            showOptions,
+            page: 1,
+            totalSize: 0,
+            songs: [],
+            setlistMeta: metaInfo,
+            scoreAttackDashboard,
+            scdTrueLength,
+            ...stats,
+            ...resetobj,
         }, () => {
             this.getSearch();
         });
+    }
+
+    generateStats = async (meta) => {
+        let selectsql = "";
+        if (meta.is_generated === "true") {
+            const jsonObj = JSON.parse(meta.view_sql)
+            if (jsonObj.length === 0) {
+                console.log("no stats available");
+                return {};
+            }
+            selectsql = generateSql(jsonObj);
+        }
+        else {
+            selectsql = `select * from songs_owned where uniqkey in (select * from ${this.lastChildID});`
+        }
+        const viewname = "view_" + this.lastChildID
+        const viewsql = `CREATE TEMP VIEW IF NOT EXISTS ${viewname} AS ` + selectsql;
+        await executeRawSql(viewsql);
+        const leadStats = await getLeadStats(true, viewname)
+        const lup = leadStats.l - (leadStats.l1 + leadStats.l2 + leadStats.l3
+            + leadStats.l4 + leadStats.l5 + leadStats.l6)
+        const rhythmStats = await getRhythmStats(true, viewname);
+        const rup = rhythmStats.r - (rhythmStats.r1 + rhythmStats.r2 + rhythmStats.r3
+            + rhythmStats.r4 + rhythmStats.r5 + rhythmStats.r6)
+        const bassStats = await getBassStats(true, viewname);
+        const bup = bassStats.b - (bassStats.b1 + bassStats.b2 + bassStats.b3
+            + bassStats.b4 + bassStats.b5 + bassStats.b6)
+        const saStats = await getSAStats("sa_badge_hard", "sa_fc_hard", true, viewname);
+        const samStats = await getSAStats("sa_badge_master", "sa_fc_master", true, viewname)
+        const sameStats = await getSAStats("sa_badge_medium", "sa_fc_medium", true, viewname);
+        const saeStats = await getSAStats("sa_badge_easy", "sa_fc_easy", true, viewname);
+        const songscount = await countSongsOwned(true, viewname);
+        const nopathstats = ((leadStats.l === 0)
+            && (rhythmStats.r === 0)
+            && (bassStats.b === 0))
+        const nosaeasy = ((saeStats.saplat === 0)
+            && (saeStats.sagold === 0)
+            && (saeStats.sasilver === 0)
+            && (saeStats.sabronze === 0)
+            && (saeStats.safailed === 0))
+        const nosamedium = ((sameStats.saplat === 0)
+            && (sameStats.sagold === 0)
+            && (sameStats.sasilver === 0)
+            && (sameStats.sabronze === 0)
+            && (sameStats.safailed === 0))
+        const nosahard = ((saStats.saplat === 0)
+            && (saStats.sagold === 0)
+            && (saStats.sasilver === 0)
+            && (saStats.sabronze === 0)
+            && (saStats.safailed === 0))
+        const nosamaster = ((samStats.saplat === 0)
+            && (samStats.sagold === 0)
+            && (samStats.sasilver === 0)
+            && (samStats.sabronze === 0)
+            && (samStats.safailed === 0))
+        const nosastats = ((nosaeasy && nosamedium && nosahard && nosamaster))
+        return ({
+            modal_no_lead: leadStats.l === 0,
+            modal_no_rhythm: rhythmStats.r === 0,
+            modal_no_bass: bassStats.b === 0,
+            modal_no_path_stats: nopathstats,
+            modal_no_sa_easy: nosaeasy,
+            modal_no_sa_medium: nosamedium,
+            modal_no_sa_hard: nosahard,
+            modal_no_sa_master: nosamaster,
+            modal_no_sa_stats: nosastats,
+            lead: [
+                leadStats.l,
+                leadStats.l1, leadStats.l2, leadStats.l3,
+                leadStats.l4, leadStats.l5, leadStats.l6,
+                lup,
+            ],
+            leadwidth: [
+                0,
+                getStatsWidth(leadStats.l1, 0, leadStats.l),
+                getStatsWidth(leadStats.l2, 0, leadStats.l),
+                getStatsWidth(leadStats.l3, 0, leadStats.l),
+                getStatsWidth(leadStats.l4, 0, leadStats.l),
+                getStatsWidth(leadStats.l5, 0, leadStats.l),
+                getStatsWidth(leadStats.l6, 0, leadStats.l),
+                getStatsWidth(lup, 0, leadStats.l),
+            ],
+            rhythm: [
+                rhythmStats.r,
+                rhythmStats.r1, rhythmStats.r2, rhythmStats.r3,
+                rhythmStats.r4, rhythmStats.r5, rhythmStats.r6,
+                rup,
+            ],
+            rhythmwidth: [
+                0,
+                getStatsWidth(rhythmStats.r1, 0, rhythmStats.r),
+                getStatsWidth(rhythmStats.r2, 0, rhythmStats.r),
+                getStatsWidth(rhythmStats.r3, 0, rhythmStats.r),
+                getStatsWidth(rhythmStats.r4, 0, rhythmStats.r),
+                getStatsWidth(rhythmStats.r5, 0, rhythmStats.r),
+                getStatsWidth(rhythmStats.r6, 0, rhythmStats.r),
+                getStatsWidth(rup, 0, rhythmStats.r),
+            ],
+            bass: [
+                bassStats.b,
+                bassStats.b1, bassStats.b2, bassStats.b3,
+                bassStats.b4, bassStats.b5, bassStats.b6,
+                bup,
+            ],
+            basswidth: [
+                0,
+                getStatsWidth(bassStats.b1, 0, bassStats.b),
+                getStatsWidth(bassStats.b2, 0, bassStats.b),
+                getStatsWidth(bassStats.b3, 0, bassStats.b),
+                getStatsWidth(bassStats.b4, 0, bassStats.b),
+                getStatsWidth(bassStats.b5, 0, bassStats.b),
+                getStatsWidth(bassStats.b6, 0, bassStats.b),
+                getStatsWidth(bup, 0, bassStats.b),
+            ],
+            satotal: songscount.count,
+            /* hard */
+            sahard: [
+                saStats.saplat, saStats.sagold, saStats.sasilver,
+                saStats.sabronze, saStats.safailed, songscount.count - saStats.satotal,
+                saStats.safcs,
+            ],
+            sahardwidth: [
+                getStatsWidth(saStats.saplat, 0, songscount.count),
+                getStatsWidth(saStats.sagold, 0, songscount.count),
+                getStatsWidth(saStats.sasilver, 0, songscount.count),
+                getStatsWidth(saStats.sabronze, 0, songscount.count),
+                getStatsWidth(saStats.safailed, 0, songscount.count),
+                getStatsWidth(songscount.count - saStats.satotal, 0, songscount.count),
+                getStatsWidth(saStats.safcs, 0, songscount.count),
+            ],
+            /* master */
+            samaster: [
+                samStats.saplat, samStats.sagold, samStats.sasilver,
+                samStats.sabronze, samStats.safailed, songscount.count - samStats.satotal,
+                samStats.safcs,
+            ],
+            samasterwidth: [
+                getStatsWidth(samStats.saplat, 0, songscount.count),
+                getStatsWidth(samStats.sagold, 0, songscount.count),
+                getStatsWidth(samStats.sasilver, 0, songscount.count),
+                getStatsWidth(samStats.sabronze, 0, songscount.count),
+                getStatsWidth(samStats.safailed, 0, songscount.count),
+                getStatsWidth(songscount.count - samStats.satotal, 0, songscount.count),
+                getStatsWidth(samStats.safcs, 0, songscount.count),
+            ],
+            /* medium */
+            samedium: [
+                sameStats.saplat, sameStats.sagold, sameStats.sasilver,
+                sameStats.sabronze, sameStats.safailed, songscount.count - sameStats.satotal,
+                sameStats.safcs,
+            ],
+            samediumwidth: [
+                getStatsWidth(sameStats.saplat, 0, songscount.count),
+                getStatsWidth(sameStats.sagold, 0, songscount.count),
+                getStatsWidth(sameStats.sasilver, 0, songscount.count),
+                getStatsWidth(sameStats.sabronze, 0, songscount.count),
+                getStatsWidth(sameStats.safailed, 0, songscount.count),
+                getStatsWidth(songscount.count - sameStats.satotal, 0, songscount.count),
+                getStatsWidth(sameStats.safcs, 0, songscount.count),
+            ],
+            /* easy */
+            saeasy: [
+                saeStats.saplat, saeStats.sagold, saeStats.sasilver,
+                saeStats.sabronze, saeStats.safailed, songscount.count - saeStats.satotal,
+                saeStats.safcs,
+            ],
+            saeasywidth: [
+                getStatsWidth(saeStats.saplat, 0, songscount.count),
+                getStatsWidth(saeStats.sagold, 0, songscount.count),
+                getStatsWidth(saeStats.sasilver, 0, songscount.count),
+                getStatsWidth(saeStats.sabronze, 0, songscount.count),
+                getStatsWidth(saeStats.safailed, 0, songscount.count),
+                getStatsWidth(songscount.count - saeStats.satotal, 0, songscount.count),
+                getStatsWidth(saeStats.safcs, 0, songscount.count),
+            ],
+        })
     }
 
     handlePathChange = (selectedPathOption) => {
@@ -609,6 +832,14 @@ export default class SetlistView extends React.Component {
         const choosesettingsstyle = (this.state.isDeleted === false)
             ? "extraPadding download" : "hidden"
         const setlistinitclass = this.state.showOptions ? "" : "hidden";
+        let sacolwidth = "col-sm-3";
+        if (this.state.scdTrueLength > 2) sacolwidth = "col-sm-2-2"
+        const scoreattackstyle = "col ta-center dashboard-bottom " + (this.state.showSAStats ? sacolwidth : "hidden");
+        const arrstyle = "col ta-center dashboard-bottom col-md-3";
+        const modalstyle = {
+            opacity: this.props.showModalStats ? 1 : 0,
+            pointerEvents: this.props.showModalStats ? 'auto' : '',
+        }
         return (
             <div>
                 <div
@@ -677,6 +908,109 @@ export default class SetlistView extends React.Component {
                     </a>
                     <br />
                 </div>
+                <div className="modal-sa-stat" id="open-modal" style={modalstyle}>
+                    <div>
+                        <div className="row justify-content-md-center" style={{ marginTop: 10 + 'px' }}>
+                            <div style={{ color: 'white', display: this.state.modal_no_path_stats ? "block" : "none" }}>
+                                No Path Stats
+                            </div>
+                        </div>
+                        <div className="row justify-content-md-center" style={{ marginTop: 10 + 'px' }}>
+                            <div className={arrstyle} style={{ display: this.state.modal_no_lead ? "none" : "block" }}>
+                                <span style={{ fontSize: 17 + 'px' }}>Lead </span>
+                                <StatsTableView
+                                    total={this.state.lead[0]}
+                                    masteryTotals={this.state.lead.slice(1)}
+                                    masteryWidths={this.state.leadwidth.slice(1)}
+                                />
+                            </div>
+                            <div className={arrstyle} style={{ display: this.state.modal_no_rhythm ? "none" : "block" }}>
+                                <span style={{ fontSize: 17 + 'px' }}>Rhythm </span>
+                                <StatsTableView
+                                    total={this.state.rhythm[0]}
+                                    masteryTotals={this.state.rhythm.slice(1)}
+                                    masteryWidths={this.state.rhythmwidth.slice(1)}
+                                />
+                            </div>
+                            <div className={arrstyle} style={{ display: this.state.modal_no_bass ? "none" : "block" }}>
+                                <span style={{ fontSize: 17 + 'px' }}>Bass </span>
+                                <StatsTableView
+                                    total={this.state.bass[0]}
+                                    masteryTotals={this.state.bass.slice(1)}
+                                    masteryWidths={this.state.basswidth.slice(1)}
+                                />
+                            </div>
+                        </div>
+                        <div className="row justify-content-md-center" style={{ marginTop: 10 + 'px' }}>
+                            <div style={{ color: 'white', display: this.state.modal_no_sa_stats ? "block" : "none" }}>
+                                No Score Attack Stats
+                            </div>
+                        </div>
+                        <div className="row justify-content-md-center dashboard-scoreattack" style={{ marginTop: -10 + 'px' }}>
+                            {
+                                this.state.scoreAttackDashboard[0] === true
+                                    && this.state.modal_no_sa_easy === false
+                                    ? (
+                                        <div className={scoreattackstyle}>
+                                            <span style={{ fontSize: 17 + 'px' }}>Score Attack - Easy</span>
+                                            <StatsTableView
+                                                scoreattack
+                                                total={this.state.satotal}
+                                                tierTotals={this.state.saeasy}
+                                                tierWidths={this.state.saeasywidth}
+                                            />
+                                        </div>
+                                    ) : null
+                            }
+                            {
+                                this.state.scoreAttackDashboard[1] === true
+                                    && this.state.modal_no_sa_medium === false
+                                    ? (
+                                        <div className={scoreattackstyle}>
+                                            <span style={{ fontSize: 17 + 'px' }}>Score Attack - Medium</span>
+                                            <StatsTableView
+                                                scoreattack
+                                                total={this.state.satotal}
+                                                tierTotals={this.state.samedium}
+                                                tierWidths={this.state.samediumwidth}
+                                            />
+                                        </div>
+                                    ) : null
+                            }
+                            {
+                                this.state.scoreAttackDashboard[2] === true
+                                    && this.state.modal_no_sa_hard === false
+                                    ? (
+                                        <div className={scoreattackstyle}>
+                                            <span style={{ fontSize: 17 + 'px' }}>Score Attack - Hard</span>
+                                            <StatsTableView
+                                                scoreattack
+                                                total={this.state.satotal}
+                                                tierTotals={this.state.sahard}
+                                                tierWidths={this.state.sahardwidth}
+                                            />
+                                        </div>
+                                    ) : null
+                            }
+                            {
+                                this.state.scoreAttackDashboard[3] === true
+                                    && this.state.modal_no_sa_master === false
+                                    ? (
+                                        <div className={scoreattackstyle}>
+                                            <span style={{ fontSize: 17 + 'px' }}>Score Attack - Master</span>
+                                            <StatsTableView
+                                                scoreattack
+                                                total={this.state.satotal}
+                                                tierTotals={this.state.samaster}
+                                                tierWidths={this.state.samasterwidth}
+                                            />
+                                        </div>
+                                    ) : null
+                            }
+                        </div>
+                        <br />
+                    </div>
+                </div>
                 <div>
                     <RemoteAll
                         keyField="id"
@@ -740,6 +1074,7 @@ SetlistView.propTypes = {
     refreshTabs: PropTypes.func,
     saveSearch: PropTypes.func,
     getSearch: PropTypes.func,
+    showModalStats: PropTypes.bool,
 }
 SetlistView.defaultProps = {
     //currentTab: null,
@@ -750,4 +1085,5 @@ SetlistView.defaultProps = {
     refreshTabs: () => { },
     saveSearch: () => { },
     getSearch: () => { },
+    showModalStats: false,
 }
