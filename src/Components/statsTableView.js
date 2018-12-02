@@ -1,6 +1,12 @@
 import React from 'react'
 import PropTypes from 'prop-types';
 
+export const getStatsWidth = (input, min, max) => {
+  const w = ((input - min) * 100) / (max - min);
+  if (Number.isNaN(w)) { return 0; }
+  return w;
+}
+
 export default class StatsTableView extends React.Component {
   testFunction = () => {
     console.log("test");

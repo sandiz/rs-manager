@@ -9,7 +9,9 @@ import getProfileConfig, {
   getSessionIDConfig, updateSessionIDConfig, getMasteryThresholdConfig,
   updateMasteryThreshold, getShowPSStatsConfig, updatePSStats,
   updateSteamIDConfig, getSteamIDConfig, updateSteamAPIKey,
-  getSteamAPIKeyConfig, updateConfig, updateDefaultSortOption, getDefaultSortOptionConfig,
+  getSteamAPIKeyConfig, updateConfig, updateDefaultSortOption,
+  getDefaultSortOptionConfig, getShowSetlistOverlayAlwaysConfig,
+  updateShowSetlistOverlayAlways,
 } from '../configService';
 import {
   resetDB, createRSSongList, addtoRSSongList, isTablePresent, deleteRSSongList,
@@ -88,6 +90,7 @@ export default class SettingsView extends React.Component {
       steamID: '',
       steamAPIKey: '',
       sortoptions: defaultSortOption,
+      showSetlistOverlayAlways: false,
     };
     this.readConfigs();
     this.refreshSetlist();
@@ -239,6 +242,14 @@ export default class SettingsView extends React.Component {
     });
   }
 
+  handleCheckBasedSetting = (event, key) => {
+    const t = event.target;
+    const value = t.type === 'checkbox' ? t.checked : t.value;
+    const state = {}
+    state[key] = value
+    this.setState(state)
+  }
+
   handleShowPSStats = (event) => {
     const t = event.target;
     const value = t.type === 'checkbox' ? t.checked : t.value;
@@ -283,6 +294,7 @@ export default class SettingsView extends React.Component {
     const l = await getSteamIDConfig();
     const m = await getSteamAPIKeyConfig();
     const n = await getDefaultSortOptionConfig();
+    const o = await getShowSetlistOverlayAlwaysConfig();
 
     this.setState({
       prfldb: d,
@@ -296,6 +308,7 @@ export default class SettingsView extends React.Component {
       steamID: l,
       steamAPIKey: m,
       sortoptions: n,
+      showSetlistOverlayAlways: o,
     });
   }
 
@@ -321,6 +334,7 @@ export default class SettingsView extends React.Component {
     else {
       await updateDefaultSortOption(this.state.sortoptions)
     }
+    await updateShowSetlistOverlayAlways(this.state.showSetlistOverlayAlways)
     this.props.handleChange();
     this.props.updateHeader(this.tabname, "Settings Saved!");
     document.getElementsByTagName("body")[0].scrollTop = 0;
@@ -616,7 +630,7 @@ export default class SettingsView extends React.Component {
                   <br />
                   <div className="">
                     <span style={{ color: '#ccc' }}>
-                      Show selected score attack panes in Dashboard.
+                      Shows selected score attack panes in Dashboard.
                   </span>
                   </div>
                   <br />
@@ -781,6 +795,33 @@ export default class SettingsView extends React.Component {
                     <div className="">
                       <span style={{ color: '#ccc' }}>
                         Set default sorting field and order for Songs-&gt;Owned and Setlists.
+                      </span>
+                    </div>
+                  </Fragment>
+                  <Fragment>
+                    <br />
+                    <span style={{ float: 'left' }}>
+                      <a>
+                        Show Stats Overlay
+                      </a>
+                    </span>
+                    <span style={{
+                      float: 'right',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      width: 400 + 'px',
+                      textAlign: 'right',
+                      marginTop: 30 + 'px',
+                    }}>
+                      <input
+                        type="checkbox"
+                        checked={this.state.showSetlistOverlayAlways}
+                        onChange={event => this.handleCheckBasedSetting(event, "showSetlistOverlayAlways")} />
+                    </span>
+                    <br />
+                    <div className="">
+                      <span style={{ color: '#ccc' }}>
+                        Shows Stats Overlay by default when you switch setlists.
                       </span>
                     </div>
                   </Fragment>
