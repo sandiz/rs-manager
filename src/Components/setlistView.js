@@ -312,19 +312,18 @@ export default class SetlistView extends React.Component {
     }
 
     shouldComponentUpdate = async (nextprops, nextstate) => {
+        if (this.props === nextprops) { return false; }
         if (nextprops.currentChildTab === null) { return false; }
         if (this.lastChildID === nextprops.currentChildTab.id) { return false; }
         this.saveSearch();
+
         this.lastChildID = nextprops.currentChildTab.id;
         const showSAStats = await getScoreAttackConfig();
-        this.fetchMeta();
-        this.setState({
+        await this.fetchMeta({
             showSAStats,
             page: 1,
             totalSize: 0,
             isDeleted: false,
-        }, () => {
-
         });
         return true;
     }
@@ -385,11 +384,12 @@ export default class SetlistView extends React.Component {
         }
     }
 
-    fetchMeta = async () => {
+    fetchMeta = async (resetobj = {}) => {
         const metaInfo = await getSetlistMetaInfo(this.lastChildID);
         const showOptions = metaInfo.is_manual == null && metaInfo.is_generated == null;
         const scoreAttackDashboard = await getScoreAttackDashboardConfig();
         const scdTrueLength = scoreAttackDashboard.filter(x => x).length;
+        const stats = await this.generateStats(metaInfo);
         //console.log("fetchMeta: ", metaInfo);
         this.setState({
             showOptions,
@@ -399,19 +399,20 @@ export default class SetlistView extends React.Component {
             setlistMeta: metaInfo,
             scoreAttackDashboard,
             scdTrueLength,
+            ...stats,
+            ...resetobj,
         }, () => {
             this.getSearch();
-            this.generateStats();
         });
     }
 
-    generateStats = async () => {
+    generateStats = async (meta) => {
         let selectsql = "";
-        if (this.state.setlistMeta.is_generated === "true") {
-            const jsonObj = JSON.parse(this.state.setlistMeta.view_sql)
+        if (meta.is_generated === "true") {
+            const jsonObj = JSON.parse(meta.view_sql)
             if (jsonObj.length === 0) {
                 console.log("no stats available");
-                return;
+                return {};
             }
             selectsql = generateSql(jsonObj);
         }
@@ -459,7 +460,7 @@ export default class SetlistView extends React.Component {
             && (samStats.sabronze === 0)
             && (samStats.safailed === 0))
         const nosastats = ((nosaeasy && nosamedium && nosahard && nosamaster))
-        this.setState({
+        return ({
             modal_no_lead: leadStats.l === 0,
             modal_no_rhythm: rhythmStats.r === 0,
             modal_no_bass: bassStats.b === 0,
