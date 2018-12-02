@@ -82,11 +82,13 @@ class App extends Component {
       readme: 'getting-started',
       showhelp: false,
       readytorender: false,
+      showModalStats: false,
     };
     this.songlistRef = null;
     //this.handleChange = this.handleChange.bind(this);
     //this.selectedTab = null;
     this.sidebarRef = React.createRef();
+    this.navbarRef = React.createRef();
   }
 
   cwmasync = async () => {
@@ -195,6 +197,7 @@ class App extends Component {
               refreshTabs={this.refreshTabs}
               saveSearch={this.saveSearchHistory}
               getSearch={this.getSearchHistory}
+              showModalStats={this.state.showModalStats}
             />
           )
         }
@@ -389,6 +392,7 @@ class App extends Component {
     const cookie = this.state.currentCookie.length > 0 ? this.state.currentCookie : "-";
     const showhelpstyle = "modal-window-help " + (this.state.showhelp ? "" : "hidden")
     const helpstyle = (this.state.currentTab !== null && (this.state.currentTab.id === "tab-settings" || this.state.currentTab.id === "tab-help")) ? "hidden" : ""
+    const showmstat = this.state.currentTab !== null && this.state.currentTab.id === "tab-setlist" ? "" : "hidden";
     return (
       <div className="App">
         <div className="wrapper">
@@ -404,7 +408,7 @@ class App extends Component {
             Changelog={this.openChangelog}
           />
           <div id="content">
-            <nav className="navbar navbar-expand-lg navbar-light bg-light">
+            <nav ref={this.navbarRef} className="navbar navbar-expand-lg navbar-light bg-light">
               <div className="container-fluid">
                 <button
                   type="button"
@@ -445,6 +449,26 @@ class App extends Component {
                     </li>
                   </ul>
                 </div>
+                <a
+                  onClick={() => {
+                    const showModalStats = !this.state.showModalStats;
+                    this.setState({ showModalStats }, () => {
+                      this.handleChange(this.state.currentTab, this.state.currentChildTab);
+                      if (this.state.showModalStats) {
+                        //this.navbarRef.current.style["z-index"] = 1000;
+                        this.navbarRef.current.style.color = "wheat";
+                      } else {
+                        //this.navbarRef.current.style["z-index"] = 0;
+                        this.navbarRef.current.style.color = "black";
+                      }
+                    });
+                  }}
+                  className={showmstat}>
+                  <img
+                    alt="stat"
+                    style={{ width: 70 + '%' }}
+                    src="data:image/svg+xml;utf8;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pgo8IS0tIEdlbmVyYXRvcjogQWRvYmUgSWxsdXN0cmF0b3IgMTguMS4xLCBTVkcgRXhwb3J0IFBsdWctSW4gLiBTVkcgVmVyc2lvbjogNi4wMCBCdWlsZCAwKSAgLS0+CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0iQ2FwYV8xIiB4PSIwcHgiIHk9IjBweCIgdmlld0JveD0iMCAwIDM0NS41NzEgMzQ1LjU3MSIgc3R5bGU9ImVuYWJsZS1iYWNrZ3JvdW5kOm5ldyAwIDAgMzQ1LjU3MSAzNDUuNTcxOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSIgd2lkdGg9IjY0cHgiIGhlaWdodD0iNjRweCI+CjxnPgoJPHBhdGggZD0iTTMzMC4zNjUsNTguOTI5YzguODk3LTIuMzE1LDE0Ljg0Ni0xMy42OTQsMTQuODQ2LTI5LjI1QzM0NS4yMSwxMy4wMzgsMzI1LjY2OSwwLDMwMC43MjEsMEg0NC44NSAgIEMxOS45MDIsMCwwLjM2MSwxMy4wMzgsMC4zNjEsMjkuNjc5YzAsMTUuNTUsNS45NTUsMjYuOTM0LDE0Ljg0NiwyOS4yNWMxLjU5OSwzLjU1NiwzLjgxMywxMy4xNzUsMy44MTMsMjcuMDE4djEwMy4wNiAgIGMwLDEzLjgwNy0yLjIwMiwyMy40MTQtMy44MDEsMjYuOTk0Yy04LjY3NiwyLjExMi0xNC44NTgsMTIuMjA4LTE0Ljg1OCwyNS4xMjZjMCwxNC43OTIsMTguNzEyLDI1LjUzMiw0NC40ODksMjUuNTMyaDExMS44NDMgICB2MjYuNjM2Yy02LjAwMyw1LjY3NC05LjQ2OSwxMy41OTgtOS40NjksMjJjMCwxNi42OTUsMTMuNTgxLDMwLjI3NiwzMC4yNzYsMzAuMjc2YzE2LjY4OSwwLDMwLjI3LTEzLjU4MSwzMC4yNy0zMC4yNzYgICBjMC04LjkzMi0zLjcxMS0xNy4xMTktMTAuMTM4LTIyLjc2NHYtMjUuODY2aDEwMy4wOWMyNS43NzcsMCw0NC40ODktMTAuNzQsNDQuNDg5LTI1LjUzMmMwLTEyLjkxOC02LjE4OC0yMy4wMTQtMTQuODU4LTI1LjEyNiAgIGMtMS41OTMtMy41OC0zLjgwMS0xMy4xODctMy44MDEtMjYuOTk0Vjg1Ljk0N0MzMjYuNTUyLDcyLjEwNCwzMjguNzY2LDYyLjQ3OSwzMzAuMzY1LDU4LjkyOXogTTE4NC4wNjMsMzA0LjY5OCAgIGMzLjYzNCwyLjE5LDUuODA2LDYuMTUyLDUuODA2LDEwLjYwM2MwLDYuODI2LTUuNTQ5LDEyLjM3NS0xMi4zNjksMTIuMzc1Yy02LjgyNiwwLTEyLjM3NS01LjU0OS0xMi4zNzUtMTIuMzc1ICAgYzAtNC4xMTcsMi4wNDEtNy45NTQsNS4wMy05Ljk5NWw0LjQzOS0yLjU5NnYtMzYuMDUyaDUuMTM3djM1LjQyNUwxODQuMDYzLDMwNC42OTh6IE0zMjUuNTAyLDIzMy40MTIgICBjMC43MDQsMS4wNjIsMS44MTQsMy42OTMsMS44NDQsNy40NTNjLTAuODA2LDIuMTc4LTEwLjIxNSw3LjktMjYuNjI0LDcuOUg0NC44NWMtMTYuNDA5LDAtMjUuODE5LTUuNzIyLTI2LjU4OC03LjYzMiAgIGMwLTMuOTgsMS4xMS02LjY1MywxLjgwOC03LjcxNWMxNS4xNzQtMS43NDgsMTYuODUtMzEuNDI3LDE2Ljg1LTQ0LjQwNVY4NS45NDdjMC0xMi43OTktMS42MjktNDEuODM0LTE2LjIzLTQ0LjMxNiAgIGMtMC45MzEtMS42MDUtMi40MjktNS43MjItMi40MjktMTEuOTUyYzAtNC42OSwxMC42MDMtMTEuNzc5LDI2LjU4OC0xMS43NzloMjU1Ljg3N2MxNS45ODUsMCwyNi41ODgsNy4wODksMjYuNTg4LDExLjc3OSAgIGMwLDYuMjI5LTEuNDk4LDEwLjM0Ny0yLjQyOSwxMS45NTJjLTE0LjU5NSwyLjQ4Mi0xNi4yMywzMS41MTctMTYuMjMsNDQuMzE2djEwMy4wNiAgIEMzMDguNjUxLDIwMS45OSwzMTAuMzI4LDIzMS42NjQsMzI1LjUwMiwyMzMuNDEyeiIgZmlsbD0iIzAwMDAwMCIvPgoJPHBhdGggZD0iTTIyNC4xNzgsNjMuNDA0aC0xMDQuNDJjLTM3LjgzNiwwLTY4LjYxOSwzMC43ODMtNjguNjE5LDY4LjYxOXYxMS45MzQgICBjMCwzNy44MzYsMzAuNzgzLDY4LjYxOSw2OC42MTksNjguNjE5aDEwNC40MmMzNy44MzYsMCw2OC42MTktMzAuNzgzLDY4LjYxOS02OC42MTl2LTExLjkzNCAgIEMyOTIuNzk3LDk0LjE4NywyNjIuMDE0LDYzLjQwNCwyMjQuMTc4LDYzLjQwNHogTTI3NC44OTcsMTQzLjk1N2MwLDI3Ljk2Ny0yMi43NTIsNTAuNzE4LTUwLjcxOCw1MC43MThoLTEwNC40MiAgIGMtMjcuOTY3LDAtNTAuNzE4LTIyLjc1Mi01MC43MTgtNTAuNzE4di0xMS45MzRjMC0yNy45NjcsMjIuNzUyLTUwLjcxOCw1MC43MTgtNTAuNzE4aDEwNC40MiAgIGMyNy45NjcsMCw1MC43MTgsMjIuNzUyLDUwLjcxOCw1MC43MThWMTQzLjk1N3oiIGZpbGw9IiMwMDAwMDAiLz4KCTxwYXRoIGQ9Ik0yNDEuNjA3LDEwNi44ODVjLTQuMjY2LTIuNDg4LTkuNzUtMS4wMzgtMTIuMjM4LDMuMjM0bC0xMy45MjEsMjMuOTI3ICAgYy0wLjY5OCwxLjE5OS0yLjcyNyw0LjAzNC00LjQ4MSwzLjk1Yy0yLjIyNi0wLjA0Mi02LjIwNi0zLjA3My05LjY4NC05LjYxM2MtNS43Ny0xMC44NTQtMTQuMjE5LTE2LjkzNC0yMy44MDItMTcuMTI1ICAgYy05Ljc4Ni0wLjM0Ni0xOC44MDIsNS45MzctMjUuMTUsMTYuODE1Yy01LjcyMiw5LjgxLTExLjE4MiwxNC44NTctMTMuOTQ1LDE2LjUxNmMtOC40MDctNy4xNzItMjEuODc1LTYuOTEtMzEuMzQ0LDEuMDI2ICAgbC0xMS45MzQsMTBjLTMuNzg5LDMuMTc0LTQuMjg0LDguODE5LTEuMTEsMTIuNjA4YzEuNzY2LDIuMTEyLDQuMzA4LDMuMjA0LDYuODYyLDMuMjA0YzIuMDI5LDAsNC4wNjktMC42ODYsNS43NC0yLjA5NGwxMS45MzQtMTAgICBjMy4wMjUtMi41MzYsNi45NjMtMi41NzIsOC40NjctMC44ODljMy4wNDMsMy40MDEsNy4zMjcsNS4wMzYsMTEuOTgxLDQuNTM1YzEzLjE0NS0xLjMzMSwyNC41MjQtMTguNTQ1LDI4LjgwOC0yNS44ODQgICBjMi45My01LjAzNiw2LjItOC4wNTUsOS4zMzItNy45MzZjMi43MTUsMC4wNTQsNS44NDIsMi45MDYsOC4zNDgsNy42MzJjNi4zNTUsMTEuOTU4LDE1LjUyLDE4LjkyMSwyNS4xNDQsMTkuMTEyICAgYzguMjY0LDAuMTczLDE1LjM4OS00LjQwNCwyMC4yOTMtMTIuODQxbDEzLjkyMS0yMy45MjdDMjQ3LjMyNCwxMTQuODUsMjQ1Ljg4LDEwOS4zNzMsMjQxLjYwNywxMDYuODg1eiIgZmlsbD0iIzAwMDAwMCIvPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+Cjwvc3ZnPgo=" />
+                </a>
                 <a onClick={this.openHelp} className={helpstyle}>
                   <img
                     alt="help"
