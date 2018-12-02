@@ -646,6 +646,10 @@ export default class SetlistView extends React.Component {
         if (this.state.scdTrueLength > 2) sacolwidth = "col-sm-2-2"
         const scoreattackstyle = "col ta-center dashboard-bottom " + (this.state.showSAStats ? sacolwidth : "hidden");
         const arrstyle = "col ta-center dashboard-bottom col-md-3";
+        const modalstyle = {
+            opacity: this.props.showModalStats ? 1 : 0,
+            pointerEvents: this.props.showModalStats ? 'auto' : '',
+        }
         return (
             <div>
                 <div
@@ -714,9 +718,9 @@ export default class SetlistView extends React.Component {
                     </a>
                     <br />
                 </div>
-                <div className="modal-sa-stat" id="open-modal" style={{ opacity: 1 }}>
+                <div className="modal-sa-stat" id="open-modal" style={modalstyle}>
                     <div>
-                        <div className="row justify-content-md-center" style={{}}>
+                        <div className="row justify-content-md-center" style={{ marginTop: 10 + 'px' }}>
                             <div className={arrstyle}>
                                 <span style={{ fontSize: 17 + 'px' }}>Lead </span>
                                 <StatsTableView
@@ -866,6 +870,7 @@ SetlistView.propTypes = {
     refreshTabs: PropTypes.func,
     saveSearch: PropTypes.func,
     getSearch: PropTypes.func,
+    showModalStats: PropTypes.bool,
 }
 SetlistView.defaultProps = {
     //currentTab: null,
@@ -876,4 +881,5 @@ SetlistView.defaultProps = {
     refreshTabs: () => { },
     saveSearch: () => { },
     getSearch: () => { },
+    showModalStats: false,
 }
