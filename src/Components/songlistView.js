@@ -716,8 +716,6 @@ export default class SonglistView extends React.Component {
       page: 1,
       sizePerPage: this.state.sizePerPage,
       filters: { search: e.target.value },
-      sortField: null,
-      sortOrder: null,
     })
   }
 
