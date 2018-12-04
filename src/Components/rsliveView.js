@@ -217,7 +217,10 @@ export default class RSLiveView extends React.Component {
           };
         },
         sort: true,
-        formatter: unescapeFormatter,
+        formatter: (cell, row) => {
+          const ret = unescapeFormatter(cell, row);
+          return ret;
+        },
       },
       {
         dataField: "artist",
@@ -381,6 +384,17 @@ export default class RSLiveView extends React.Component {
         })
       },
     };
+    this.rowStyle = (row, rowIndex) => {
+      if (row.id === this.state.persistentID) {
+        return {
+          backgroundColor: 'azure',
+          color: 'black',
+        }
+      }
+      return {
+        color: 'inherit',
+      };
+    };
 
     this.fetchrstimer = null;
     this.lastalbumname = "";
@@ -453,10 +467,8 @@ export default class RSLiveView extends React.Component {
       && memoryReadout.persistentID.length > 0
       && memoryReadout.persistentID !== this.state.persistentID) {
       const skr = await getSongByID(memoryReadout.persistentID);
-      console.log(memoryReadout.persistentID);
       if (skr !== '') {
         this.persistenIDresults = skr;
-        console.log(skr.song, skr.arrangementName, skr.id, skr);
       }
       else {
         this.persistenIDresults = null;
@@ -1053,7 +1065,6 @@ export default class RSLiveView extends React.Component {
     const def = <div className="dashboard-path no_path"> No Path Information </div>;
     //const lead = <div className="dashboard-path path_lead" />
     if (this.persistenIDresults !== null) {
-      console.log("path_div", this.persistenIDresults);
       if (this.persistenIDresults.path_lead === 1) {
         return <div className="dashboard-path path_lead" />
       }
@@ -1262,6 +1273,7 @@ export default class RSLiveView extends React.Component {
             onTableChange={this.handleTableChange}
             columns={this.columns}
             rowEvents={this.rowEvents}
+            rowStyle={this.rowStyle}
             paginate={false}
           />
         </div>

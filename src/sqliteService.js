@@ -557,7 +557,7 @@ export async function countSongsOwned(useCDLC = false, table = "songs_owned") {
   return output
 }
 export async function getSongBySongKey(key, start = 0, count = 10, sortField = "mastery", sortOrder = "desc") {
-  // console.log("__db_call__: getSongByID");
+  //console.log("__db_call__: getSongBySongKey");
   if (db == null) {
     const dbfilename = window.sqlitePath;
     db = await window.sqlite.open(dbfilename);
