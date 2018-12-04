@@ -21,6 +21,7 @@ function createWindow() {
         y: mainWindowState.y,
         width: mainWindowState.width,
         height: mainWindowState.height,
+        show: false,
 
         icon: path.join(__dirname, "./icons/png/icon-1024x1024.png"),
         webPreferences: {
@@ -126,6 +127,9 @@ function createWindow() {
     mainWindow.on("closed", () => {
         mainWindow = null;
     });
+    mainWindow.once('ready-to-show', () => {
+        mainWindow.show()
+    })
 
 }
 

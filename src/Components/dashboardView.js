@@ -735,7 +735,17 @@ export default class DashboardView extends React.Component {
 
     //show
     const templateHtml = "file:///" + newFile
-    window.openInfographic(templateHtml);
+    const authWindow = await window.openInfographic(templateHtml);
+    authWindow.once('ready-to-show', () => {
+      authWindow.show()
+      /*authWindow.capturePage(async (img) => {
+        const filename = window.os.tmpdir() + "/infographic.png";
+        await writeFile(filename, img.toPNG());
+        console.log(img.getSize(), img.isEmpty());
+        console.log("saved to " + filename);
+      })*/
+    })
+
     this.props.updateHeader(
       this.tabname,
       `Rocksmith 2014 Dashboard`,

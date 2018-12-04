@@ -408,9 +408,8 @@ export default class RSLiveView extends React.Component {
   componentDidMount = async () => {
     await this.refreshRPTable();
     try {
-      const songData = await window.fetch("http://127.0.0.1:9938");
+      await window.fetch("http://127.0.0.1:9938");
       //if fetch works tracking is active , start sniffing
-      console.log(songData);
       this.setState({ tracking: true });
       this.fetchRSSniffer();
     }
