@@ -9,7 +9,7 @@ import {
 import SongDetailView from './songdetailView';
 import {
   getSongBySongKey, initSongsOwnedDB, updateMasteryandPlayed,
-  getSongsOwned, updateRecentlyPlayedSongs,
+  getSongsOwned, updateRecentlyPlayedSongs, getSongByID,
 } from '../sqliteService'
 import readProfile from '../steamprofileService';
 import getProfileConfig from '../configService';
@@ -36,6 +36,7 @@ export default class RSLiveView extends React.Component {
       timeCurrent: 0,
       tracking: false,
       songKey: '',
+      persistentID: '',
       accuracy: 0,
       currentStreak: 0,
       highestStreak: 0,
@@ -386,6 +387,7 @@ export default class RSLiveView extends React.Component {
     this.lastsongkey = "";
     this.lastsongdetail = null;
     this.songkeyresults = null;
+    this.persistenIDresults = null;
     this.albumarturl = "";
   }
 
@@ -446,6 +448,21 @@ export default class RSLiveView extends React.Component {
       const skr = await getSongBySongKey(memoryReadout.songID);
       if (skr.length > 0) this.songkeyresults = skr[0];
     }
+    // if persistentID is available use that result
+    if (memoryReadout
+      && memoryReadout.persistentID.length > 0
+      && memoryReadout.persistentID !== this.state.persistentID) {
+      const skr = await getSongByID(memoryReadout.persistentID);
+      console.log(memoryReadout.persistentID);
+      if (skr !== '') {
+        this.persistenIDresults = skr;
+        console.log(skr.song, skr.arrangementName, skr.id, skr);
+      }
+      else {
+        this.persistenIDresults = null;
+      }
+    }
+
     const song = songDetails ? songDetails.songName : (this.songkeyresults ? unescape(this.songkeyresults.song) : "");
     const artist = songDetails ? songDetails.artistName : (this.songkeyresults ? unescape(this.songkeyresults.artist) : "");
     const album = songDetails ? songDetails.albumName : (this.songkeyresults ? unescape(this.songkeyresults.album) : "");
@@ -463,6 +480,13 @@ export default class RSLiveView extends React.Component {
         console.log(e);
       }
     }
+    let totalNotes = 0;
+    if (this.persistenIDresults) {
+      totalNotes = this.persistenIDresults.maxNotes;
+    }
+    else if (memoryReadout && this.songkeyresults) {
+      totalNotes = this.songkeyresults.maxNotes;
+    }
 
     this.setState({
       accuracy,
@@ -470,7 +494,7 @@ export default class RSLiveView extends React.Component {
       artist,
       album,
       timeTotal,
-      totalNotes: memoryReadout && this.songkeyresults ? this.songkeyresults.maxNotes : 0,
+      totalNotes,
       timeCurrent: memoryReadout ? memoryReadout.songTimer : 0,
       songKey: memoryReadout ? memoryReadout.songID : "",
       currentStreak: memoryReadout ? memoryReadout.currentHitStreak : 0,
@@ -478,6 +502,7 @@ export default class RSLiveView extends React.Component {
       notesHit,
       notesMissed,
       albumArt: this.albumarturl,
+      persistentID: memoryReadout ? memoryReadout.persistentID : '',
     }, () => {
       if (memoryReadout && this.lastsongkey !== memoryReadout.songID) {
         this.refreshTable();
@@ -775,6 +800,7 @@ export default class RSLiveView extends React.Component {
         timeCurrent,
         timeTotal,
         songKey: '',
+        persistentID: '',
         accuracy: 0,
         currentStreak: 0,
         highestStreak: 0,
@@ -1023,6 +1049,24 @@ export default class RSLiveView extends React.Component {
     this.setState({ rpsrc: src }, () => this.refreshRPTable());
   }
 
+  getPathDiv = () => {
+    const def = <div className="dashboard-path no_path"> No Path Information </div>;
+    //const lead = <div className="dashboard-path path_lead" />
+    if (this.persistenIDresults !== null) {
+      console.log("path_div", this.persistenIDresults);
+      if (this.persistenIDresults.path_lead === 1) {
+        return <div className="dashboard-path path_lead" />
+      }
+      else if (this.persistenIDresults.path_rhythm === 1) {
+        return <div className="dashboard-path path_rhythm" />
+      }
+      else if (this.persistenIDresults.path_bass === 1) {
+        return <div className="dashboard-path path_bass" />
+      }
+    }
+    return def;
+  }
+
   render = () => {
     let { minutes, seconds } = getMinutesSecs(this.state.timeCurrent);
     const timeCurrent = `${minutes}:${seconds}`;
@@ -1087,6 +1131,7 @@ export default class RSLiveView extends React.Component {
         </div>
         <br />
         <div key="live-stats" className="row justify-content-md-center" style={{ marginTop: -30 + 'px' }}>
+          {this.getPathDiv()}
           <div className="col col-md-3 ta-center dashboard-top dashboard-rslive-song-details">
             <div>
               Live Stats
@@ -1220,7 +1265,7 @@ export default class RSLiveView extends React.Component {
             paginate={false}
           />
         </div>
-        <br /><br />
+        <br /> <br />
         <div>
           <h2 className="ta-left" style={{ color: 'wheat' }}>
             Recently Played -&nbsp;
