@@ -71,8 +71,8 @@ Rocksmith's UI leaves a lot to be desired especially when you have a lot of song
     - `yarn run package-win` for win builds
 
 ## Thanks
-   - [kokolihapihvi](https://github.com/kokolihapihvi/RockSniffer) for the awesome `RockSniffer` tool.
-   - [zorgiepoo](https://github.com/zorgiepoo/Bit-Slicer) for the awesome `Bit-Slicer` tool.
+   - [@kokolihapihvi](https://github.com/kokolihapihvi/RockSniffer) for the awesome `RockSniffer` tool.
+   - [@zorgiepoo](https://github.com/zorgiepoo/Bit-Slicer) for the awesome `Bit-Slicer` tool.
 
 ## Contributors
 
