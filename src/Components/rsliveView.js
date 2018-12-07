@@ -408,12 +408,19 @@ export default class RSLiveView extends React.Component {
     this.songkeyresults = null;
     this.persistenIDresults = null;
     this.albumarturl = "";
+    this.enablefakedata = true;
+    this.fakedata = JSON.parse(`{"success":false,"currentState":0,"memoryReadout":{"songTimer":4.362,"songID":"Gree21Gu",
+    "persistentID":"CE42CBABEC6ABBF296E89310F120DC0E","totalNotesHit":0,"currentHitStreak":0,
+    "highestHitStreak":0,"totalNotesMissed":0,"currentMissStreak":0,"mode":2,"gameState":"ScoreAttack_Pause",
+    "currentPerfectHitStreak":0,"totalPerfectHits":0,"currentLateHitStreak":0,"totalLateHits":0,
+    "perfectPhrases":0,"goodPhrases":0,"passedPhrases":0,"failedPhrases":0,"TotalNotes":0},
+    "songDetails":null,"albumCoverBase64":null,"Version":"0.1.4"}`);
   }
 
   componentDidMount = async () => {
     await this.refreshRPTable();
     try {
-      await window.fetch("http://127.0.0.1:9938");
+      if (!this.enablefakedata) await window.fetch("http://127.0.0.1:9938");
       //if fetch works tracking is active , start sniffing
       this.setState({ tracking: true });
       this.fetchRSSniffer();
@@ -471,6 +478,7 @@ export default class RSLiveView extends React.Component {
       && memoryReadout.persistentID.length > 0
       && memoryReadout.persistentID !== this.state.persistentID) {
       const skr = await getSongByID(memoryReadout.persistentID);
+      //get phrases from psarc
       if (skr !== '') {
         this.persistenIDresults = skr;
       }
@@ -753,6 +761,10 @@ export default class RSLiveView extends React.Component {
   fetchRSSniffer = async () => {
     this.fetchrstimer = setInterval(async () => {
       try {
+        if (this.enablefakedata) {
+          await this.parseSongResults(this.fakedata);
+          return;
+        }
         const songData = await window.fetch("http://127.0.0.1:9938");
         if (!songData) return;
         if (typeof songData === 'undefined') { return; }
