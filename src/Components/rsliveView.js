@@ -37,6 +37,7 @@ export default class RSLiveView extends React.Component {
       tracking: false,
       songKey: '',
       persistentID: '',
+      gameState: '',
       accuracy: 0,
       currentStreak: 0,
       highestStreak: 0,
@@ -499,6 +500,8 @@ export default class RSLiveView extends React.Component {
       totalNotes = this.songkeyresults.maxNotes;
     }
 
+    const gameState = memoryReadout ? memoryReadout.gameState : ""
+
     this.setState({
       accuracy,
       song,
@@ -514,6 +517,7 @@ export default class RSLiveView extends React.Component {
       notesMissed,
       albumArt: this.albumarturl,
       persistentID: memoryReadout ? memoryReadout.persistentID : '',
+      gameState,
     }, () => {
       if (memoryReadout && this.lastsongkey !== memoryReadout.songID) {
         this.refreshTable();
@@ -1144,7 +1148,7 @@ export default class RSLiveView extends React.Component {
           {this.getPathDiv()}
           <div className="col col-md-3 ta-center dashboard-top dashboard-rslive-song-details">
             <div>
-              Live Stats
+              {this.state.gameState !== "" ? <span>Game State: {this.state.gameState}</span> : <span>Live Stats</span>}
               <hr />
             </div>
             <div>
