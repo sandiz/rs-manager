@@ -183,7 +183,7 @@ export default class SongDetailView extends React.Component {
       //what props are currently passed to the parent component
     }
     const showsastats = await getScoreAttackConfig();
-    this.setState({ setlists: items, currentSetlist: output[0].key, showsastats });
+    this.setState({ setlists: items, currentSetlist: output.length > 0 ? output[0].key : '', showsastats });
     const songDetails = await getSongByID(this.props.songID);
     const isTrueSet = (songDetails.is_cdlc === 'true');
     this.setState({
@@ -265,7 +265,8 @@ export default class SongDetailView extends React.Component {
     const ptdivstyle = this.state.showPlaythrough ? "dblock" : "hidden";
     const mvdivstyle = this.state.showMusicVideo ? "dblock" : "hidden";
     const selectsetliststyle = (this.props.isSongview ? "" : "hidden") + " " + (this.props.isGenerated || this.props.isRSSetlist ? "hidden" : "");
-    const addtosetliststyle = songlistanddashstyle + " " + (this.state.showaddtosetlistoptions ? "hidden" : "extraPadding download");
+    let addtosetliststyle = songlistanddashstyle + " " + (this.state.showaddtosetlistoptions ? "hidden" : "extraPadding download");
+    if (this.state.setlists.length <= 0) addtosetliststyle += " isDisabled";
     const remfromsetliststyle = setlistyle + " " + (this.state.showremfromsetlistoptions ? "hidden" : "extraPadding download");
     const setlistoptionstyle = this.state.showaddtosetlistoptions ? "inline" : "hidden";
     const remfromsetlistoptionstyle = this.state.showremfromsetlistoptions ? "inline" : "hidden";
