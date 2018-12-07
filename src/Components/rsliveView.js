@@ -44,6 +44,10 @@ export default class RSLiveView extends React.Component {
       totalNotes: 0,
       notesHit: 0,
       notesMissed: 0,
+      perfectHits: 0,
+      lateHits: 0,
+      perfectPhrases: 0,
+      goodPhrases: 0,
       /* table state vars */
       songs: [],
       page: 1,
@@ -500,7 +504,11 @@ export default class RSLiveView extends React.Component {
       totalNotes = this.songkeyresults.maxNotes;
     }
 
-    const gameState = memoryReadout ? memoryReadout.gameState : ""
+    const gameState = memoryReadout ? memoryReadout.gameState : "";
+    const perfectHits = memoryReadout ? memoryReadout.totalPerfectHits : 0;
+    const lateHits = memoryReadout ? memoryReadout.totalLateHits : 0;
+    const perfectPhrases = memoryReadout ? memoryReadout.perfectPhrases : 0;
+    const goodPhrases = memoryReadout ? memoryReadout.goodPhrases : 0;
 
     this.setState({
       accuracy,
@@ -518,6 +526,10 @@ export default class RSLiveView extends React.Component {
       albumArt: this.albumarturl,
       persistentID: memoryReadout ? memoryReadout.persistentID : '',
       gameState,
+      perfectHits,
+      lateHits,
+      perfectPhrases,
+      goodPhrases,
     }, () => {
       if (memoryReadout && this.lastsongkey !== memoryReadout.songID) {
         this.refreshTable();
@@ -1105,6 +1117,8 @@ export default class RSLiveView extends React.Component {
       : "N/A";
     const buttonclass = "extraPadding download smallbutton ";//+ (this.state.win32 ? "" : "isDisabled");
     const updateMasteryclass = buttonclass + ((this.state.songKey.length <= 0) ? "isDisabled" : "");
+    const isscoreattack = this.state.gameState.toLowerCase().includes("scoreattack");
+    const livestatsstyle = isscoreattack ? " col col-md-4 ta-center dashboard-top dashboard-rslive-song-details-sa" : " col col-md-3 ta-center dashboard-top dashboard-rslive-song-details"
     return (
       <div className="container-fluid">
         <div className="ta-center">
@@ -1146,7 +1160,8 @@ export default class RSLiveView extends React.Component {
         <br />
         <div key="live-stats" className="row justify-content-md-center" style={{ marginTop: -30 + 'px' }}>
           {this.getPathDiv()}
-          <div className="col col-md-3 ta-center dashboard-top dashboard-rslive-song-details">
+          <div
+            className={livestatsstyle}>
             <div>
               {this.state.gameState !== "" ? <span>Game State: {this.state.gameState}</span> : <span>Live Stats</span>}
               <hr />
@@ -1213,6 +1228,42 @@ export default class RSLiveView extends React.Component {
                   </div>
                 </div>
               </div>
+              {
+                isscoreattack
+                  ? (
+                    <div className="flex-container" style={{ marginTop: 10 + 'px' }}>
+                      <div className="flex-div">
+                        Perfect Hits
+                        <hr />
+                        <div style={{ marginTop: -10 + 'px' }}>
+                          {this.animatedNumber(this.state.perfectHits)}
+                        </div>
+                      </div>
+                      <div className="flex-div">
+                        Late Hits
+                        <hr />
+                        <div style={{ marginTop: -10 + 'px' }}>
+                          {this.animatedNumber(this.state.lateHits)}
+                        </div>
+                      </div>
+                      <div className="flex-div">
+                        Perfect Phrases
+                       <hr />
+                        <div style={{ marginTop: -10 + 'px' }}>
+                          {this.animatedNumber(this.state.perfectPhrases)}
+                        </div>
+                      </div>
+                      <div className="flex-div">
+                        Good Phrases
+                        <hr />
+                        <div style={{ marginTop: -10 + 'px' }}>
+                          {this.animatedNumber(this.state.goodPhrases)}
+                        </div>
+                      </div>
+                    </div>
+                  )
+                  : null
+              }
             </div>
           </div>
           <div className="col col-lg-5 ta-center dashboard-top dashboard-rslive-song-details">

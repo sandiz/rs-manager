@@ -832,6 +832,14 @@ tbody tr:hover {
     margin-right: 20px !important;
 }
 
+.dashboard-rslive-song-details-sa {
+    margin: 24px auto !important;
+    height: 315px !important;
+    max-width: 719px !important;
+    margin-left: 20px !important;
+    margin-right: 20px !important;
+}
+
 .dashboard-header {
     margin: 24px auto !important;
     height: 140px !important;

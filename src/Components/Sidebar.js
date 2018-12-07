@@ -259,6 +259,9 @@ export default class Sidebar extends React.Component {
       this.editFolder(item, parent)
       return;
     }
+    else if (item.id === "folder_starred") {
+      return;
+    }
     if (typeof item.children !== "undefined") {
       if (item.children.length === 0) {
         this.props.handleChange(item, null);
