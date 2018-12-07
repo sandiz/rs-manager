@@ -220,7 +220,7 @@ export async function initSongsOwnedDB(updateTab = "", updateFunc = null) {
       break;
   }
   const folderop = await db.get("select parent_folder from setlist_meta where key='setlist_favorites'");
-  const name = (folderop.parent_folder === null || typeof folderop.parent_folder === 'undefined') ? null : `'${folderop.parent_folder}'`
+  const name = (typeof folderop === 'undefined' || folderop.parent_folder === null || typeof folderop.parent_folder === 'undefined') ? null : `'${folderop.parent_folder}'`
   await db.run(`REPLACE INTO setlist_meta VALUES('setlist_favorites','RS Favorites', 'true', 'false', '', 'true', 'false', 'false', ${name}, '[]');`)
   await db.run("REPLACE INTO setlist_meta VALUES('folder_starred','Starred', 'false', 'false', '', 'false', 'false', 'true', '', '[]');")
   await initSetlistPlaylistDB("setlist_favorites");
