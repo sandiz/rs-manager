@@ -408,7 +408,7 @@ export default class RSLiveView extends React.Component {
     this.songkeyresults = null;
     this.persistenIDresults = null;
     this.albumarturl = "";
-    this.enablefakedata = true;
+    this.enablefakedata = false;
     this.fakedata = JSON.parse(`{"success":false,"currentState":0,"memoryReadout":{"songTimer":4.362,"songID":"Gree21Gu",
     "persistentID":"CE42CBABEC6ABBF296E89310F120DC0E","totalNotesHit":0,"currentHitStreak":0,
     "highestHitStreak":0,"totalNotesMissed":0,"currentMissStreak":0,"mode":2,"gameState":"ScoreAttack_Pause",
