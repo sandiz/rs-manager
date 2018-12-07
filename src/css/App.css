@@ -668,13 +668,11 @@ tbody tr:hover {
     background-image: url("../assets/path-icons/pathlead.png");
     width: 100px;
     height: 100px;
-    position: fixed;
-    /*top: 18.5%;*/
-    margin-top: 5%;
-    left: 20%;
     box-shadow: 6px 9px 9px black;
     border-radius: 5px;
     border: 1px solid black;
+    margin-right: 0px;
+    margin-left: -100px;
 }
 
 .path_rhythm {
@@ -682,13 +680,11 @@ tbody tr:hover {
     background-image: url("../assets/path-icons/pathrhythm.png");
     width: 100px;
     height: 100px;
-    position: fixed;
-    /*top: 18.5%;*/
-    margin-top: 5%;
-    left: 20%;
     box-shadow: 6px 9px 9px black;
     border-radius: 5px;
     border: 1px solid black;
+    margin-right: 0px;
+    margin-left: -100px;
 }
 
 .path_bass {
@@ -696,13 +692,11 @@ tbody tr:hover {
     background-image: url("../assets/path-icons/pathbass.png");
     width: 100px;
     height: 100px;
-    position: fixed;
-    /*top: 18.5%;*/
-    margin-top: 5%;
-    left: 20%;
     box-shadow: 6px 9px 9px black;
     border-radius: 5px;
     border: 1px solid black;
+    margin-right: 0px;
+    margin-left: -100px;
 }
 
 .gp_bronze {
