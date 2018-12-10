@@ -1,6 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types';
 import AnimatedNumber from 'react-animated-number';
+import Highcharts from 'highcharts'
+import HighchartsReact from 'highcharts-react-official'
+
 import {
   RemoteAll,
   unescapeFormatter, difficultyFormatter, difficultyClass, round100Formatter,
@@ -13,8 +16,11 @@ import {
 } from '../sqliteService'
 import readProfile from '../steamprofileService';
 import getProfileConfig from '../configService';
+import { psarcToJSON } from '../psarcService';
 
 const albumArt = require('./../lib/album-art');
+
+require('highcharts/modules/variwide')(Highcharts)
 
 export function pad2(number) {
   return (number < 10 ? '0' : '') + number
@@ -198,6 +204,20 @@ export default class RSLiveView extends React.Component {
           formatter: badgeFormatter,
         },
       ],
+
+      /* chart data */
+      chartOptions: {
+        series: [{
+          data: [],
+        }],
+      },
+      phrases: [],
+      notesBucket: [{
+        notesHit: 0,
+        notesMissed: 0,
+        perfectHits: 0,
+      }],
+
     }
     this.tabname = 'tab-rslive';
     this.columns = [
@@ -451,6 +471,154 @@ export default class RSLiveView extends React.Component {
     );
   }
 
+  generatePhrases = (phrases) => {
+    //this.setState({ chartData: this.getChartData(true) })
+    let { chartOptions } = this.state;
+    phrases = JSON.parse(phrases);
+    phrases.sort((a, b) => {
+      return (a.StartTime > b.StartTime) ? 1 : ((b.StartTime > a.StartTime) ? -1 : 0);
+    });
+
+    chartOptions = {
+      credits: {
+        enabled: false,
+      },
+      chart: {
+        type: 'variwide',
+        height: 140,
+        backgroundColor: 'none',
+        style: {
+          font: 'Roboto Condensed',
+          color: "white",
+        },
+      },
+      xAxis: {
+        type: 'category',
+        labels: {
+          style: {
+            font: 'Roboto Condensed',
+            color: "white",
+          },
+        },
+        tickInterval: 1,
+        lineWidth: 1,
+        minorGridLineWidth: 0,
+        lineColor: '#EF7408',
+        minorTickLength: 0,
+        tickLength: 0,
+      },
+      yAxis: {
+        labels: {
+          enabled: false,
+        },
+        title: {
+          text: '',
+          reserveSpace: false,
+        },
+        min: 0,
+        max: 22,
+        tickInterval: 1,
+        lineWidth: 1,
+        minorGridLineWidth: 0,
+        lineColor: 'black',
+        minorTickLength: 0,
+        tickLength: 0,
+        gridLineColor: 'transparent',
+      },
+      title: {
+        text: '',
+        floating: true,
+      },
+      tooltip: {
+        enabled: false,
+      },
+      legend: {
+        enabled: false,
+      },
+      plotOptions: {
+        series: {
+          animation: false,
+        },
+        variwide: {
+          // stacking: 'normal',
+          grouping: false,
+          shadow: false,
+          borderWidth: 1,
+          borderColor: 'black',
+        },
+      },
+      series: [{
+        name: "A",
+        data: [],
+        //colorByPoint: true,
+        color: '#8900C2',
+        borderRadius: 3,
+        borderColor: 'black',
+        borderWidth: 1,
+      }, {
+        name: "B",
+        data: [],
+        pointPlacement: 0,
+        color: 'lightgreen', //2-rgb(200,247,73) 3-yellow
+      }],
+    }
+    let max = 0;
+    let i = 0
+    for (i = 0; i < phrases.length; i += 1) {
+      const phrase = phrases[i];
+      chartOptions.series[0].data.push({
+        x: i,
+        y: phrase.MaxDifficulty,
+        z: Math.round(phrase.EndTime - phrase.StartTime),
+      });
+
+      const defValue = 0;//phrase.MaxDifficulty / 2
+      chartOptions.series[1].data.push({
+        x: i,
+        y: defValue,
+        z: Math.round(phrase.EndTime - phrase.StartTime),
+      });
+
+      if (max < phrase.MaxDifficulty) max = phrase.MaxDifficulty;
+    }
+    const last = chartOptions.series[0].data[chartOptions.series[0].data.length - 1];
+    const first = chartOptions.series[0].data[0];
+    last.z = first.z;
+    this.setState({
+      chartOptions,
+      phrases,
+      notesBucket: [],
+    });
+  }
+
+  getBucketFromTime = (currtime, phrases) => {
+    for (let i = 0; i < phrases.length; i += 1) {
+      const phrase = phrases[i];
+      if (currtime >= phrase.StartTime && currtime < phrase.EndTime) return i;
+    }
+    return -1;
+  }
+
+  getNoteStats = (memoryReadout) => {
+    const {
+      notesBucket, phrases, chartOptions,
+    } = this.state;
+    const currtime = memoryReadout.songTimer;
+    const newBucket = this.getBucketFromTime(currtime, phrases);
+    console.log(currtime)
+    // highlight the bar thats being played
+    const seriesData = chartOptions.series[0].data;
+    for (let i = 0; i < seriesData.length; i += 1) {
+      if (i === newBucket) {
+        seriesData[i].color = "#A21ADB";
+      } else {
+        seriesData[i].color = "#8900C2";
+      }
+    }
+    //A21ADB:8900C2
+    return notesBucket;
+  }
+
   parseSongResults = async (songData) => {
     const { songDetails, memoryReadout } = songData;
     const tnh = memoryReadout ? memoryReadout.totalNotesHit : 0;
@@ -481,6 +649,11 @@ export default class RSLiveView extends React.Component {
       //get phrases from psarc
       if (skr !== '') {
         this.persistenIDresults = skr;
+        const filename = skr.uniqkey.split(".psarc_")[0]
+        const psarcObj = await psarcToJSON(unescape(filename) + ".psarc");
+        const arrangements = psarcObj.arrangements;
+        const arrangement = arrangements.filter(arr => arr.id === memoryReadout.persistentID)[0];
+        this.generatePhrases(arrangement.phraseIterations);
       }
       else {
         this.persistenIDresults = null;
@@ -517,7 +690,7 @@ export default class RSLiveView extends React.Component {
     const lateHits = memoryReadout ? memoryReadout.totalLateHits : 0;
     const perfectPhrases = memoryReadout ? memoryReadout.perfectPhrases : 0;
     const goodPhrases = memoryReadout ? memoryReadout.goodPhrases : 0;
-
+    const notesBucket = this.getNoteStats(memoryReadout);
     this.setState({
       accuracy,
       song,
@@ -538,6 +711,7 @@ export default class RSLiveView extends React.Component {
       lateHits,
       perfectPhrases,
       goodPhrases,
+      notesBucket,
     }, () => {
       if (memoryReadout && this.lastsongkey !== memoryReadout.songID) {
         this.refreshTable();
@@ -1130,7 +1304,8 @@ export default class RSLiveView extends React.Component {
     const buttonclass = "extraPadding download smallbutton ";//+ (this.state.win32 ? "" : "isDisabled");
     const updateMasteryclass = buttonclass + ((this.state.songKey.length <= 0) ? "isDisabled" : "");
     const isscoreattack = this.state.gameState.toLowerCase().includes("scoreattack");
-    const livestatsstyle = isscoreattack ? " col col-md-4 ta-center dashboard-top dashboard-rslive-song-details-sa" : " col col-md-3 ta-center dashboard-top dashboard-rslive-song-details"
+    const livestatsstyle = isscoreattack ? " col col-md-4 ta-center dashboard-top dashboard-rslive-song-details-sa" : " col col-md-3 ta-center dashboard-top dashboard-rslive-song-details";
+
     return (
       <div className="container-fluid">
         <div className="ta-center">
@@ -1329,6 +1504,18 @@ export default class RSLiveView extends React.Component {
             </div>
           </div>
         </div>
+        {
+          this.state.chartOptions.series[0].data.length > 0
+            ? (
+              <div id="barChart">
+                <HighchartsReact
+                  highcharts={Highcharts}
+                  options={this.state.chartOptions}
+                  id="barChart"
+                />
+              </div>
+            ) : null
+        }
         <div>
           <RemoteAll
             keyField="id"

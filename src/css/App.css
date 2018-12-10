@@ -834,7 +834,7 @@ tbody tr:hover {
 
 .dashboard-rslive-song-details-sa {
     margin: 24px auto !important;
-    height: 315px !important;
+    height: 308px !important;
     max-width: 719px !important;
     margin-left: 20px !important;
     margin-right: 20px !important;
@@ -1115,12 +1115,11 @@ hr {
     margin-bottom: 19px;
     padding-left: 10px;
     padding-right: 10px;
-    height: 300px !important;
 }
 
-.lineChart {
-    width: 1400px !important;
-    height: 300px !important;
+#barChart {
+    width: 1000px !important;
+    margin: auto;
 }
 
 .flex-container {

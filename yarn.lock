@@ -2413,7 +2413,7 @@ chardet@^0.7.0:
   resolved "https://registry.yarnpkg.com/chardet/-/chardet-0.7.0.tgz#90094849f0937f2eedc2425d0d28a9e5f0cbad9e"
   integrity sha512-mT8iDcrh03qDGRRmoA2hmBJnxpllMR+0/0qlzjqZES6NdiWDcZkCNAk4rPFZ9Q85r27unkiNNg8ZOiwZXBHwcA==
 
-chart.js@^2.6.0, chart.js@^2.7.2:
+chart.js@^2.6.0:
   version "2.7.2"
   resolved "https://registry.yarnpkg.com/chart.js/-/chart.js-2.7.2.tgz#3c9fde4dc5b95608211bdefeda7e5d33dffa5714"
   integrity sha512-90wl3V9xRZ8tnMvMlpcW+0Yg13BelsGS9P9t0ClaDxv/hdypHDr/YAGf+728m11P5ljwyB0ZHfPKCapZFqSqYA==
@@ -2443,11 +2443,6 @@ chartjs-plugin-zoom@^0.6.5:
   dependencies:
     chart.js "^2.6.0"
     hammerjs "^2.0.8"
-
-chartkick@^3.0.0:
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/chartkick/-/chartkick-3.0.1.tgz#f325041bfc15f5d18074d4803549efc3751ccd81"
-  integrity sha512-u9kOAq69BhIl7KZsU3+athnZUdXhivCQeYMoXWTRGZB6Rf17oaBO0LboK+s+yXJ12Uvw6Ua8ryf7Md7dOjpoaQ==
 
 check-types@^7.3.0:
   version "7.4.0"
@@ -5198,6 +5193,16 @@ hex-color-regex@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/hex-color-regex/-/hex-color-regex-1.1.0.tgz#4c06fccb4602fe2602b3c93df82d7e7dbf1a8a8e"
   integrity sha512-l9sfDFsuqtOqKDsQdqrMRk0U85RZc0RtOR9yPI7mRVOa4FsR/BVnZ0shmQRM96Ji99kYZP/7hn1cedc1+ApsTQ==
+
+highcharts-react-official@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/highcharts-react-official/-/highcharts-react-official-2.0.0.tgz#3e4a8a2cd9a894a55f72ff7967b6573e47ec30c1"
+  integrity sha512-pEf1HBCmkJlIY6lAkjKXjjxaqZWUwcNcKrEIM2CFhXtLcl5VntiSgiVXe/pkDXyZG94mM90c72Z+8rnJ8ua6Dw==
+
+highcharts@^6.2.0:
+  version "6.2.0"
+  resolved "https://registry.yarnpkg.com/highcharts/-/highcharts-6.2.0.tgz#2a6d04652eb43c66f462ca7e2d2808f1f2782b61"
+  integrity sha512-A4E89MA+kto8giic7zyLU6ZxfXnVeCUlKOyzFsah3+n4BROx4bgonl92KIBtwLud/mIWir8ahqhuhe2by9LakQ==
 
 hmac-drbg@^1.0.0:
   version "1.0.1"
@@ -9190,13 +9195,6 @@ react-bootstrap-table2-paginator@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/react-bootstrap-table2-paginator/-/react-bootstrap-table2-paginator-1.0.2.tgz#def484fa32989a400ae46defc01d5004739d26d2"
   integrity sha512-+JU4Ii0vmLsMO7hNVWYEFYHuqRWDTE0ShriIx3A0yikdpxKvTY8aEfPlN2/TMW8bgiwsSBylvVEoA62p6fvuUg==
-
-react-chartkick@^0.3.0:
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/react-chartkick/-/react-chartkick-0.3.0.tgz#692461eb808e18e7a2860129247476d55295e677"
-  integrity sha512-ZA0X8XUCPhEN/xbsLR+Xrs3hGpHCBscZZR7uwVCNDQWiEceKkTNY9W2ET8sx1beY2x0ixvNtBoc31InGfFIdQg==
-  dependencies:
-    chartkick "^3.0.0"
 
 react-collapsible@^2.3.1:
   version "2.3.1"
