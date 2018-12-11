@@ -1350,7 +1350,7 @@ export default class RSLiveView extends React.Component {
           <div
             className={livestatsstyle}>
             <div>
-              {this.state.gameState !== "" ? <span>Game State: {this.state.gameState}</span> : <span>Live Stats</span>}
+              {this.state.gameState !== "" ? <span>Game State: {this.state.gameState + " PID: " + this.state.persistentID}</span> : <span>Live Stats</span>}
               <hr />
             </div>
             <div>
