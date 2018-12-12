@@ -216,6 +216,7 @@ export default class RSLiveView extends React.Component {
         notesHit: 0,
         notesMissed: 0,
         perfectHits: 0,
+        lateHits: 0,
       }],
 
     }
@@ -435,6 +436,12 @@ export default class RSLiveView extends React.Component {
     "currentPerfectHitStreak":0,"totalPerfectHits":0,"currentLateHitStreak":0,"totalLateHits":0,
     "perfectPhrases":0,"goodPhrases":0,"passedPhrases":0,"failedPhrases":0,"TotalNotes":0},
     "songDetails":null,"albumCoverBase64":null,"Version":"0.1.4"}`);
+    this.lastSongData = {
+      notesHit: 0,
+      notesMissed: 0,
+      perfectHits: 0,
+      lateHits: 0,
+    }
   }
 
   componentDidMount = async () => {
@@ -516,7 +523,7 @@ export default class RSLiveView extends React.Component {
           reserveSpace: false,
         },
         min: 0,
-        max: 22,
+        max: 23,
         tickInterval: 1,
         lineWidth: 1,
         minorGridLineWidth: 0,
@@ -564,6 +571,13 @@ export default class RSLiveView extends React.Component {
     }
     let max = 0;
     let i = 0
+    const notesBucket = [];
+    const defaultNoteData = {
+      notesHit: 0,
+      notesMissed: 0,
+      perfectHits: 0,
+      lateHits: 0,
+    }
     for (i = 0; i < phrases.length; i += 1) {
       const phrase = phrases[i];
       chartOptions.series[0].data.push({
@@ -581,19 +595,30 @@ export default class RSLiveView extends React.Component {
         color: 'lightgreen',
       });
 
+      /* init note bucket */
+      notesBucket.push({
+        notesHit: 0,
+        notesMissed: 0,
+        perfectHits: 0,
+        lateHits: 0,
+      })
+
       if (max < phrase.MaxDifficulty) max = phrase.MaxDifficulty;
     }
+    /* copy first bar data to last to make it look even (silence) */
     let last = chartOptions.series[0].data[chartOptions.series[0].data.length - 1];
     let first = chartOptions.series[0].data[0];
     last.z = first.z;
+
     last = chartOptions.series[1].data[chartOptions.series[1].data.length - 1];
     first = chartOptions.series[1].data[0];
     last.z = first.z;
-
+    /* */
+    this.lastSongData = defaultNoteData;
     this.setState({
       chartOptions,
       phrases,
-      notesBucket: [],
+      notesBucket,
     });
   }
 
@@ -605,14 +630,65 @@ export default class RSLiveView extends React.Component {
     return -1;
   }
 
+  getUpdatedNoteBuckets = (bucketIdx, memoryReadout) => {
+    const notesBucket = this.state.notesBucket;
+
+    if (bucketIdx < 0 || bucketIdx >= notesBucket.length) return notesBucket;
+
+    const deltaNotesHit = memoryReadout.totalNotesHit - this.lastSongData.notesHit;
+    const deltaNotesMissed = memoryReadout.totalNotesMissed - this.lastSongData.notesMissed;
+    const deltaPerfects = memoryReadout.totalPerfectHits - this.lastSongData.perfectHits;
+    const deltaLates = memoryReadout.totalLateHits - this.lastSongData.lateHits;
+
+    //console.log("bucket", bucketIdx, "nh", notesBucket[bucketIdx].notesHit,
+    //  "nm", notesBucket[bucketIdx].notesMissed,
+    //  "ph", notesBucket[bucketIdx].perfectHits,
+    //  "lh", notesBucket[bucketIdx].lateHits);
+    notesBucket[bucketIdx].notesHit += deltaNotesHit;
+    notesBucket[bucketIdx].notesMissed += deltaNotesMissed;
+    notesBucket[bucketIdx].perfectHits += deltaPerfects;
+    notesBucket[bucketIdx].lateHits += deltaLates;
+
+    this.lastSongData.notesHit = memoryReadout.totalNotesHit;
+    this.lastSongData.notesMissed = memoryReadout.totalNotesMissed;
+    this.lastSongData.perfectHits = memoryReadout.totalPerfectHits;
+    this.lastSongData.lateHits = memoryReadout.totalLateHits;
+
+    return notesBucket;
+  }
+
   getNoteStats = (memoryReadout) => {
+    if (!memoryReadout) {
+      return { notesBucket: this.state.notesBucket, chartOptions: this.state.chartOptions }
+    }
     const {
-      notesBucket, phrases, chartOptions,
+      phrases, chartOptions,
     } = this.state;
     const currtime = memoryReadout.songTimer;
     const newBucket = this.getBucketFromTime(currtime, phrases);
-    //console.log(newBucket);
-    //console.log(currtime)
+    //TODO: if newBucket is less, reset the chart data series (y) and notesBucket dict {hp, mp...} 
+    let newNoteBuckets = this.state.notesBucket;
+    if (newBucket > 0 && newBucket < phrases.length) {
+      newNoteBuckets = this.getUpdatedNoteBuckets(newBucket, memoryReadout)
+      if (newNoteBuckets.length > 0) {
+        const newNoteBucketData = newNoteBuckets[newBucket];
+        const tnh = newNoteBucketData.notesHit + newNoteBucketData.notesMissed
+        const hp = ((newNoteBucketData.notesHit / tnh));
+        //const mp = ((newNoteBucketData.notesMissed / tnh));
+        const seriesData = chartOptions.series[0].data;
+        const hper = hp * seriesData[newBucket].y;
+        //const mper = mp * seriesData[newBucket].y;
+        const noteData = chartOptions.series[1].data;
+        noteData[newBucket].y = hper;
+
+        //console.log("nh", newNoteBucketData.notesHit,
+        //"nm", newNoteBucketData.notesMissed, "tnh", tnh);
+        //console.log("bucket", newBucket, "max",
+        // seriesData[newBucket].y, "hp", hp, "mp", mp, "hper", hper, "mper", mper);
+      }
+    }
+
+
     // highlight the bar thats being played
     const seriesData = chartOptions.series[0].data;
     for (let i = 0; i < seriesData.length; i += 1) {
@@ -622,8 +698,7 @@ export default class RSLiveView extends React.Component {
         seriesData[i].color = "#8900C2";
       }
     }
-    //A21ADB:8900C2
-    return { notesBucket, chartOptions };
+    return { notesBucket: newNoteBuckets, chartOptions };
   }
 
   parseSongResults = async (songData) => {
