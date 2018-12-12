@@ -551,7 +551,7 @@ export default class RSLiveView extends React.Component {
         name: "A",
         data: [],
         //colorByPoint: true,
-        color: '#8900C2',
+        //color: '#8900C2',
         borderRadius: 3,
         borderColor: 'black',
         borderWidth: 1,
@@ -570,6 +570,7 @@ export default class RSLiveView extends React.Component {
         x: i,
         y: phrase.MaxDifficulty,
         z: Math.round(phrase.EndTime - phrase.StartTime),
+        color: '#8900C2',
       });
 
       const defValue = 0;//phrase.MaxDifficulty / 2
@@ -577,13 +578,18 @@ export default class RSLiveView extends React.Component {
         x: i,
         y: defValue,
         z: Math.round(phrase.EndTime - phrase.StartTime),
+        color: 'lightgreen',
       });
 
       if (max < phrase.MaxDifficulty) max = phrase.MaxDifficulty;
     }
-    const last = chartOptions.series[0].data[chartOptions.series[0].data.length - 1];
-    const first = chartOptions.series[0].data[0];
+    let last = chartOptions.series[0].data[chartOptions.series[0].data.length - 1];
+    let first = chartOptions.series[0].data[0];
     last.z = first.z;
+    last = chartOptions.series[1].data[chartOptions.series[1].data.length - 1];
+    first = chartOptions.series[1].data[0];
+    last.z = first.z;
+
     this.setState({
       chartOptions,
       phrases,
@@ -605,18 +611,19 @@ export default class RSLiveView extends React.Component {
     } = this.state;
     const currtime = memoryReadout.songTimer;
     const newBucket = this.getBucketFromTime(currtime, phrases);
-    console.log(currtime)
+    //console.log(newBucket);
+    //console.log(currtime)
     // highlight the bar thats being played
     const seriesData = chartOptions.series[0].data;
     for (let i = 0; i < seriesData.length; i += 1) {
       if (i === newBucket) {
-        seriesData[i].color = "#A21ADB";
+        seriesData[i].color = "#c652f7";
       } else {
         seriesData[i].color = "#8900C2";
       }
     }
     //A21ADB:8900C2
-    return notesBucket;
+    return { notesBucket, chartOptions };
   }
 
   parseSongResults = async (songData) => {
@@ -690,7 +697,8 @@ export default class RSLiveView extends React.Component {
     const lateHits = memoryReadout ? memoryReadout.totalLateHits : 0;
     const perfectPhrases = memoryReadout ? memoryReadout.perfectPhrases : 0;
     const goodPhrases = memoryReadout ? memoryReadout.goodPhrases : 0;
-    const notesBucket = this.getNoteStats(memoryReadout);
+    const { notesBucket, chartOptions } = this.getNoteStats(memoryReadout);
+    //console.log(chartOptions);
     this.setState({
       accuracy,
       song,
@@ -712,6 +720,9 @@ export default class RSLiveView extends React.Component {
       perfectPhrases,
       goodPhrases,
       notesBucket,
+      chartOptions: {
+        series: chartOptions.series,
+      },
     }, () => {
       if (memoryReadout && this.lastsongkey !== memoryReadout.songID) {
         this.refreshTable();
@@ -1020,6 +1031,18 @@ export default class RSLiveView extends React.Component {
         totalNotes: 0,
         notesHit: 0,
         notesMissed: 0,
+        /* chart data */
+        chartOptions: {
+          series: [{
+            data: [],
+          }],
+        },
+        phrases: [],
+        notesBucket: [{
+          notesHit: 0,
+          notesMissed: 0,
+          perfectHits: 0,
+        }],
       });
       this.lastalbumname = "";
       this.lastsongkey = "";
@@ -1350,7 +1373,7 @@ export default class RSLiveView extends React.Component {
           <div
             className={livestatsstyle}>
             <div>
-              {this.state.gameState !== "" ? <span>Game State: {this.state.gameState + " PID: " + this.state.persistentID}</span> : <span>Live Stats</span>}
+              {this.state.gameState !== "" ? <span>GameState: {this.state.gameState + " - Note Stats: " + ((this.state.persistentID === '' || this.state.persistentID.includes("depedency")) ? "Inactive" : "Active")}</span> : <span>Live Stats</span>}
               <hr />
             </div>
             <div>
