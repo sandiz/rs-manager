@@ -441,6 +441,8 @@ export default class RSLiveView extends React.Component {
       notesMissed: 0,
       perfectHits: 0,
       lateHits: 0,
+      lastTimer: 0,
+      lastBucket: 0,
     }
   }
 
@@ -572,12 +574,6 @@ export default class RSLiveView extends React.Component {
     let max = 0;
     let i = 0
     const notesBucket = [];
-    const defaultNoteData = {
-      notesHit: 0,
-      notesMissed: 0,
-      perfectHits: 0,
-      lateHits: 0,
-    }
     for (i = 0; i < phrases.length; i += 1) {
       const phrase = phrases[i];
       chartOptions.series[0].data.push({
@@ -614,6 +610,12 @@ export default class RSLiveView extends React.Component {
     first = chartOptions.series[1].data[0];
     last.z = first.z;
     /* */
+    const defaultNoteData = {
+      notesHit: 0,
+      notesMissed: 0,
+      perfectHits: 0,
+      lateHits: 0,
+    }
     this.lastSongData = defaultNoteData;
     this.setState({
       chartOptions,
@@ -653,6 +655,8 @@ export default class RSLiveView extends React.Component {
     this.lastSongData.notesMissed = memoryReadout.totalNotesMissed;
     this.lastSongData.perfectHits = memoryReadout.totalPerfectHits;
     this.lastSongData.lateHits = memoryReadout.totalLateHits;
+    this.lastSongData.lastTimer = memoryReadout.songTimer;
+    this.lastSongData.lastBucket = bucketIdx;
 
     return notesBucket;
   }
@@ -666,7 +670,20 @@ export default class RSLiveView extends React.Component {
     } = this.state;
     const currtime = memoryReadout.songTimer;
     const newBucket = this.getBucketFromTime(currtime, phrases);
-    //TODO: if newBucket is less, reset the chart data series (y) and notesBucket dict {hp, mp...} 
+    const deltatime = currtime - this.lastSongData.lastTimer;
+    if (deltatime < 0.0) {
+      const oldBucket = this.getBucketFromTime(this.lastSongData.lastTimer, phrases);
+      const deltaB = newBucket - oldBucket;
+      if (deltaB < -1) {
+        console.log("detected rewind, generating phrases again");
+        this.lastSongData.lastBucket = newBucket;
+        this.lastSongData.lastTimer = currtime;
+        this.generatePhrases(JSON.stringify(phrases));
+        return { notesBucket: this.state.notesBucket, chartOptions: this.state.chartOptions }
+      }
+    }
+
+
     let newNoteBuckets = this.state.notesBucket;
     if (newBucket > 0 && newBucket < phrases.length) {
       newNoteBuckets = this.getUpdatedNoteBuckets(newBucket, memoryReadout)
