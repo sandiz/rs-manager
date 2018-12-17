@@ -3,9 +3,10 @@ import PropTypes from 'prop-types';
 import Collapsible from 'react-collapsible';
 import DatePicker from 'react-datepicker';
 import moment from 'moment';
+import Swal from 'sweetalert2'
 import {
   getAllSetlist, saveSongToSetlist, getSongByID,
-  updateCDLCStat, updateSAFCStat, saveSongByIDToSetlist,
+  updateCDLCStat, updateSAFCStat, saveSongByIDToSetlist, updateNotes, getNotes,
 } from '../sqliteService';
 import { getScoreAttackConfig } from '../configService';
 import { expandButton, collapseButton } from "./settingsView";
@@ -97,7 +98,6 @@ export default class SongDetailView extends React.Component {
         this.setState({
           ptresults: entries.items,
         }, () => {
-          console.log(this.state.ptresults)
           this.chooseVideo(divID, 0);
         });
         break;
@@ -105,7 +105,6 @@ export default class SongDetailView extends React.Component {
         this.setState({
           mvresults: entries.items,
         }, () => {
-          console.log(this.state.mvresults)
           this.chooseVideo(divID, 0);
         });
         break;
@@ -255,6 +254,27 @@ export default class SongDetailView extends React.Component {
       sa_fc_hard: songDetails.sa_fc_hard == null ? null : moment(songDetails.sa_fc_hard),
       sa_fc_master: songDetails.sa_fc_master == null ? null : moment(songDetails.sa_fc_master),
     })
+  }
+
+  showLocalNote = async () => {
+    const notes = await getNotes(this.props.songID)
+    const { value: text } = await Swal({
+      inputValue: unescape(notes.local_note),
+      input: 'textarea',
+      inputPlaceholder: 'Type your note here...',
+      showCancelButton: true,
+      animation: false,
+      confirmButtonClass: 'local-note-btn-class',
+    })
+    if (typeof text !== 'undefined' && this.props.songID.length > 0) {
+      await updateNotes(this.props.songID, text);
+      Swal({
+        text: 'Note Saved!',
+        //animation: false,
+        confirmButtonClass: 'local-note-btn-class',
+      })
+      await this.props.refreshView();
+    }
   }
 
   render = () => {
@@ -639,6 +659,16 @@ export default class SongDetailView extends React.Component {
                     style={{ width: 100 + '%' }}
                     className={songliststyle}
                     onClick={async () => {
+                      await this.showLocalNote();
+                    }}>
+                    <span>Add Note</span>
+                  </a>
+                </div>
+                <div style={{ marginRight: 30 + 'px' }} className="options-flex-div">
+                  <a
+                    style={{ width: 100 + '%' }}
+                    className={songliststyle}
+                    onClick={async () => {
                       await this.props.removeFromDB();
                       this.handleHide();
                     }}>
@@ -686,6 +716,7 @@ SongDetailView.propTypes = {
   isRSSetlist: PropTypes.bool,
   songData: PropTypes.object,
   removeFromSetlistByID: PropTypes.func,
+  refreshView: PropTypes.func,
 }
 SongDetailView.defaultProps = {
   showDetail: false,
@@ -707,4 +738,5 @@ SongDetailView.defaultProps = {
   isGenerated: false,
   isRSSetlist: false,
   songData: {},
+  refreshView: () => { },
 }

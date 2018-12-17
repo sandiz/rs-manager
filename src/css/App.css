@@ -1298,3 +1298,8 @@ hr {
     background-size: 23px;
     background-repeat: no-repeat;
 }
+
+.local-note-btn-class {
+    color: black !important;
+    background-color: wheat !important;
+}

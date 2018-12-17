@@ -104,6 +104,9 @@ export async function initSongsOwnedDB(updateTab = "", updateFunc = null) {
   let altersql11 = "";
   altersql11 += "alter table setlist_meta add sort_options char default '[]';"
 
+  let altersql12 = "";
+  altersql12 += "alter table songs_owned add local_note char default null"
+
   switch (version) {
     case 0: {
       // add score attack stats
@@ -216,6 +219,11 @@ export async function initSongsOwnedDB(updateTab = "", updateFunc = null) {
       await db.exec(altersql11)
       version += 1
       await setUserVersion(version);
+    case 12:
+      // add local_note
+      await db.exec(altersql12)
+      version += 1
+      await setUserVersion(version)
     default:
       break;
   }
@@ -347,6 +355,18 @@ export async function updateMasteryandPlayed(id, mastery, playedcount) {
   //await db.close();
   const op = await db.run("UPDATE songs_owned SET mastery=?,count=? where id=?", mastery, playedcount, id);
   return op.changes;
+}
+export async function updateNotes(id, note) {
+  // console.log("__db_call__: updateMasteryandPlayed");
+  //await db.close();
+  const op = await db.run("UPDATE songs_owned SET local_note=? where id=?", escape(note), id);
+  return op.changes;
+}
+export async function getNotes(id) {
+  // console.log("__db_call__: updateMasteryandPlayed");
+  //await db.close();
+  const op = await db.get("select local_note from  songs_owned where id=?", id);
+  return op;
 }
 export async function updateRecentlyPlayedSongs(id, date, type = "las" /* las or sa */) {
   // console.log("__db_call__: updateRecentlyPlayed");
@@ -482,7 +502,6 @@ export default async function updateSongsOwned(psarcResult, isCDLC = false) {
 }
 export async function getSongsOwned(start = 0, count = 10, sortField = "mastery",
   sortOrder = "desc", search = "", searchField = "", sortOptions = []) {
-  //  console.log("__db_call__: getSongsOwned");
   if (db == null) {
     const dbfilename = window.sqlitePath;
     db = await window.sqlite.open(dbfilename);

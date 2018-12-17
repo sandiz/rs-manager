@@ -81,8 +81,9 @@ export function unescapeFormatter(cell, row, rowIndex, extraData) {
     cell = cell.slice(0, 30) + "..."
   }
   let gnote = ""
-  const lnote = ""
+  let lnote = "";
   if (typeof extraData !== 'undefined') {
+    lnote = row.local_note ? row.local_note : "";
     if (row.id in extraData.globalNotes) {
       gnote = extraData.globalNotes[row.id];
       /*strip html*/
@@ -118,7 +119,27 @@ export function unescapeFormatter(cell, row, rowIndex, extraData) {
             elem.style.top = top + "px";
           }}
         >
-          {gnote}
+          {unescape(gnote)}
+        </ReactTooltip>
+        <ReactTooltip
+          id={row.id + "_ln"}
+          aria-haspopup="true"
+          place="right"
+          type="dark"
+          effect="solid"
+          className="tooltipClass"
+          afterShow={() => {
+            const elem = document.getElementById(row.id + "_ln");
+            const top = parseInt(elem.style.top, 10) + window.scrollY;
+            elem.style.top = top + "px";
+          }}
+        >
+          {
+            //eslint-disable-next-line
+            <div dangerouslySetInnerHTML={{
+              __html: unescape(lnote),
+            }} />
+          }
         </ReactTooltip>
         <div
           style={{
@@ -952,10 +973,13 @@ export default class SonglistView extends React.Component {
   }
 
   refreshView = async () => {
+    this.setState({ songs: [] });
+    const sortOptions = await getDefaultSortOptionConfig();
     this.handleTableChange("cdm", {
       page: this.state.page,
       sizePerPage: this.state.sizePerPage,
       filters: {},
+      sortOptions,
     })
   }
 
@@ -1063,6 +1087,7 @@ export default class SonglistView extends React.Component {
             isSongview
             isSetlist={false}
             songID={this.state.showSongID}
+            refreshView={this.refreshView}
           />
         </div>
       </div>
