@@ -239,6 +239,7 @@ async function processPSARC(psarcFile) {
         songDict.tempo = Object.prototype.hasOwnProperty.call(attr, "SongAverageTempo") ? Math.round(attr.SongAverageTempo) : 0;
         songDict.maxNotes = Object.prototype.hasOwnProperty.call(attr, "Score_MaxNotes") ? Math.round(attr.Score_MaxNotes) : 0;
         songDict.songLength = Object.prototype.hasOwnProperty.call(attr, "SongLength") ? Math.round(attr.SongLength) : 0;
+        songDict.phraseIterations = Object.prototype.hasOwnProperty.call(attr, "PhraseIterations") ? JSON.stringify(attr.PhraseIterations) : "";
         arrangements.push(songDict)
       }
     }

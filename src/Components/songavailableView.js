@@ -323,71 +323,81 @@ export default class SongAvailableView extends React.Component {
       this.childtabname,
       `Fetching Steam DLC Data...`,
     );
-    const c = await window.fetch("https://store.steampowered.com/api/appdetails/?appids=221680&cc=us&l=english&v=1");
-    const d = await c.json();
-    let e = d["221680"].data.dlc;
+    try {
+      const c = await window.fetch("https://store.steampowered.com/api/appdetails/?appids=221680&cc=us&l=english&v=1");
+      const d = await c.json();
+      let e = d["221680"].data.dlc;
 
-    const c1 = await window.fetch("https://store.steampowered.com/api/appdetails/?appids=205190&cc=us&l=english&v=1");
-    const d1 = await c1.json();
-    const e1 = d1["205190"].data.dlc;
+      const c1 = await window.fetch("https://store.steampowered.com/api/appdetails/?appids=205190&cc=us&l=english&v=1");
+      const d1 = await c1.json();
+      const e1 = d1["205190"].data.dlc;
 
-    e = e.concat(e1);
-    let newDLC = 0;
-    await initSongsAvailableDB();
-    let error = false;
-    for (let i = 0; i < e.length; i += 1) {
-      const dlc = e[i];
-      /* loop await */ // eslint-disable-next-line
-      if (await isDLCInDB(dlc)) {
-        console.log("skipping dlc with appid: " + dlc)
-        continue;
-      }
-      else {
-        let f = null;
-        try {
-          /* loop await */ // eslint-disable-next-line
-          f = await window.fetch(`https://store.steampowered.com/api/appdetails/?appids=${dlc}&cc=us&l=english&v=1`);
-          /* loop await */ // eslint-disable-next-line
-          const g = await f.json()
-          const h = replaceRocksmithTerms(decodeURIComponent(g[dlc].data.name))
-          const r = g[dlc].data.release_date.date
-          this.props.updateHeader(
-            this.tabname,
-            this.childtabname,
-            `Adding DLC AppID: ${dlc} Name: ${h}`,
-          );
-          /* loop await */ // eslint-disable-next-line
-          await addToSteamDLCCatalog(dlc, h, r);
-          newDLC += 1;
+      e = e.concat(e1);
+      let newDLC = 0;
+      await initSongsAvailableDB();
+      let error = false;
+      for (let i = 0; i < e.length; i += 1) {
+        const dlc = e[i];
+        /* loop await */ // eslint-disable-next-line
+        if (await isDLCInDB(dlc)) {
+          console.log("skipping dlc with appid: " + dlc)
+          continue;
         }
-        catch (ex) {
-          console.log(ex);
-          this.props.updateHeader(
-            this.tabname,
-            this.childtabname,
-            'Error: ' + f.status + " - " + f.statusText + " (try again in ~15 minutes)",
-          );
-          error = true;
-          break;
+        else {
+          let f = null;
+          try {
+            /* loop await */ // eslint-disable-next-line
+            f = await window.fetch(`https://store.steampowered.com/api/appdetails/?appids=${dlc}&cc=us&l=english&v=1`);
+            /* loop await */ // eslint-disable-next-line
+            const g = await f.json()
+            const h = replaceRocksmithTerms(decodeURIComponent(g[dlc].data.name))
+            const r = g[dlc].data.release_date.date
+            this.props.updateHeader(
+              this.tabname,
+              this.childtabname,
+              `Adding DLC AppID: ${dlc} Name: ${h}`,
+            );
+            /* loop await */ // eslint-disable-next-line
+            await addToSteamDLCCatalog(dlc, h, r);
+            newDLC += 1;
+          }
+          catch (ex) {
+            console.log(ex);
+            this.props.updateHeader(
+              this.tabname,
+              this.childtabname,
+              'Error: ' + f.status + " - " + f.statusText + " (try again in ~15 minutes)",
+            );
+            error = true;
+            break;
+          }
         }
       }
+      console.log(newDLC + " dlcs added");
+      if (!error) {
+        this.props.updateHeader(
+          this.tabname,
+          this.childtabname,
+          "New DLC Found: " + newDLC + ", Total DLC's " + e.length,
+        );
+      }
+      const output = await getDLCDetails(
+        0,
+        this.state.sizePerPage,
+        "release_date",
+        "desc",
+        this.search.value,
+      )
+      this.setState({ dlcs: output, page: 1, totalSize: output[0].acount });
     }
-    console.log(newDLC + " dlcs added");
-    if (!error) {
+    catch (e) {
+      console.log(e);
       this.props.updateHeader(
         this.tabname,
         this.childtabname,
-        "New DLC Found: " + newDLC + ", Total DLC's " + e.length,
+        `Failed to fetch data from Steam...`,
       );
     }
-    const output = await getDLCDetails(
-      0,
-      this.state.sizePerPage,
-      "release_date",
-      "desc",
-      this.search.value,
-    )
-    this.setState({ dlcs: output, page: 1, totalSize: output[0].acount });
   }
 
   updateAcquiredDates = async (tuples) => {
