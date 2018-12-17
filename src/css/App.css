@@ -639,6 +639,66 @@ tbody tr:hover {
     background-image: url("data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9JzIwMCcgd2lkdGg9JzIwMCcgIGZpbGw9IiMwMDAwMDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHZlcnNpb249IjEuMSIgeD0iMHB4IiB5PSIwcHgiIHZpZXdCb3g9IjAgMCA5MCA5MCIgZW5hYmxlLWJhY2tncm91bmQ9Im5ldyAwIDAgOTAgOTAiIHhtbDpzcGFjZT0icHJlc2VydmUiPjxwYXRoIGQ9Ik0yOC4xNTIsNjYuODM2YzAsMS4xMDUtMC44OTYsMi0yLDJoLTcuMzMzYy0xLjEwNCwwLTItMC44OTUtMi0yVjUzLjE4MmMwLTEuMTA1LDAuODk2LTIsMi0yaDcuMzMzYzEuMTA0LDAsMiwwLjg5NSwyLDIgIFY2Ni44MzZ6Ij48L3BhdGg+PHBhdGggZD0iTTQzLjE2LDY2LjgzNmMwLDEuMTA1LTAuODk2LDItMiwyaC03LjMzM2MtMS4xMDQsMC0yLTAuODk1LTItMlY0My4xNzVjMC0xLjEwNCwwLjg5Ni0yLDItMmg3LjMzM2MxLjEwNCwwLDIsMC44OTYsMiwyICBWNjYuODM2eiI+PC9wYXRoPjxnPjxwYXRoIGQ9Ik01OC4xNzEsNjYuODM2YzAsMS4xMDUtMC44OTYsMi0yLDJoLTcuMzM2Yy0xLjEwNCwwLTItMC44OTUtMi0yVjMzLjE2OWMwLTEuMTA0LDAuODk2LTIsMi0yaDcuMzM2YzEuMTA0LDAsMiwwLjg5NiwyLDIgICBWNjYuODM2eiI+PC9wYXRoPjwvZz48Zz48cGF0aCBkPSJNNzMuMTgyLDY2LjgzNmMwLDEuMTA1LTAuODk2LDItMiwyaC03LjMzNmMtMS4xMDQsMC0yLTAuODk1LTItMlYyMy4xNjRjMC0xLjEwNCwwLjg5Ni0yLDItMmg3LjMzNmMxLjEwNCwwLDIsMC44OTYsMiwyICAgVjY2LjgzNnoiPjwvcGF0aD48L2c+PC9zdmc+")
 }
 
+.dashboard-path {
+    background-color: rgba(231, 239, 242, .3);
+    ;
+    color: #252525;
+    border-radius: 5px;
+    padding: 10px;
+    margin: auto;
+    box-shadow: 5px 10px 5px black;
+    font-size: 17px;
+    /*filter: drop-shadow(0 0 0.10rem black);*/
+}
+
+.no_path {
+    text-align: center;
+    width: 100px;
+    height: 100px;
+    position: fixed;
+    margin-top: 5%;
+    left: 20%;
+    box-shadow: 6px 9px 9px black;
+    border-radius: 5px;
+    border: 1px solid black;
+}
+
+.path_lead {
+    background-size: 100% !important;
+    background-image: url("../assets/path-icons/pathlead.png");
+    width: 100px;
+    height: 100px;
+    box-shadow: 6px 9px 9px black;
+    border-radius: 5px;
+    border: 1px solid black;
+    margin-right: 0px;
+    margin-left: -100px;
+}
+
+.path_rhythm {
+    background-size: 100% !important;
+    background-image: url("../assets/path-icons/pathrhythm.png");
+    width: 100px;
+    height: 100px;
+    box-shadow: 6px 9px 9px black;
+    border-radius: 5px;
+    border: 1px solid black;
+    margin-right: 0px;
+    margin-left: -100px;
+}
+
+.path_bass {
+    background-size: 100% !important;
+    background-image: url("../assets/path-icons/pathbass.png");
+    width: 100px;
+    height: 100px;
+    box-shadow: 6px 9px 9px black;
+    border-radius: 5px;
+    border: 1px solid black;
+    margin-right: 0px;
+    margin-left: -100px;
+}
+
 .gp_bronze {
     margin: -8px;
     width: 40px;
@@ -767,6 +827,14 @@ tbody tr:hover {
 .dashboard-rslive-song-details {
     margin: 24px auto !important;
     height: 237px !important;
+    max-width: 719px !important;
+    margin-left: 20px !important;
+    margin-right: 20px !important;
+}
+
+.dashboard-rslive-song-details-sa {
+    margin: 24px auto !important;
+    height: 308px !important;
     max-width: 719px !important;
     margin-left: 20px !important;
     margin-right: 20px !important;
@@ -1047,12 +1115,11 @@ hr {
     margin-bottom: 19px;
     padding-left: 10px;
     padding-right: 10px;
-    height: 300px !important;
 }
 
-.lineChart {
-    width: 1400px !important;
-    height: 300px !important;
+#barChart {
+    width: 1000px !important;
+    margin: auto;
 }
 
 .flex-container {

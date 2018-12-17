@@ -735,7 +735,17 @@ export default class DashboardView extends React.Component {
 
     //show
     const templateHtml = "file:///" + newFile
-    window.openInfographic(templateHtml);
+    const authWindow = await window.openInfographic(templateHtml);
+    authWindow.once('ready-to-show', () => {
+      authWindow.show()
+      /*authWindow.capturePage(async (img) => {
+        const filename = window.os.tmpdir() + "/infographic.png";
+        await writeFile(filename, img.toPNG());
+        console.log(img.getSize(), img.isEmpty());
+        console.log("saved to " + filename);
+      })*/
+    })
+
     this.props.updateHeader(
       this.tabname,
       `Rocksmith 2014 Dashboard`,
@@ -892,26 +902,26 @@ export default class DashboardView extends React.Component {
               </div>
             </div>
             <div className="stat-container">
-              <div style={{ width: 30 + '%' }} className="ta-left">
+              <div style={{ width: 90 + '%' }} className="ta-left">
                 Max Consecutive Days
                 </div>
-              <div style={{ width: 30 + '%' }} className="ta-right">
+              <div style={{ width: 10 + '%' }} className="ta-right">
                 {this.state.maxConsecutiveDays}
               </div>
             </div>
             <div className="stat-container">
-              <div style={{ width: 30 + '%' }} className="ta-left">
+              <div style={{ width: 90 + '%' }} className="ta-left">
                 Longest Note Streak
                 </div>
-              <div style={{ width: 30 + '%' }} className="ta-right">
+              <div style={{ width: 10 + '%' }} className="ta-right">
                 {this.state.longestStreak}
               </div>
             </div>
             <div className="stat-container">
-              <div style={{ width: 30 + '%' }} className="ta-left">
+              <div style={{ width: 90 + '%' }} className="ta-left">
                 Highest Solo Accuracy
                 </div>
-              <div style={{ width: 70 + '%' }} className="ta-right">
+              <div style={{ width: 10 + '%' }} className="ta-right">
                 {this.state.highestSolo * 100}%
                 </div>
             </div>
@@ -922,18 +932,18 @@ export default class DashboardView extends React.Component {
                 <hr />
             </div>
             <div className="stat-container">
-              <div style={{ width: 30 + '%' }} className="ta-left">
+              <div style={{ width: 90 + '%' }} className="ta-left">
                 Songs Owned
                 </div>
-              <div style={{ width: 30 + '%' }} className="ta-right">
+              <div style={{ width: 10 + '%' }} className="ta-right">
                 {this.state.songsOwned}
               </div>
             </div>
             <div className="stat-container">
-              <div style={{ width: 30 + '%' }} className="ta-left">
+              <div style={{ width: 90 + '%' }} className="ta-left">
                 Songs Playthroughs
                 </div>
-              <div style={{ width: 30 + '%' }} className="ta-right">
+              <div style={{ width: 10 + '%' }} className="ta-right">
                 {this.state.songPlays}
               </div>
             </div>
@@ -941,15 +951,15 @@ export default class DashboardView extends React.Component {
               <div style={{ width: 30 + '%' }} className="ta-left">
                 Most Played Song
                 </div>
-              <div style={{ width: 60 + '%' }} className="ta-right">
+              <div style={{ width: 65 + '%' }} className="ta-right">
                 {this.state.mostPlayed}
               </div>
             </div>
             <div className="stat-container">
-              <div style={{ width: 50 + '%' }} className="ta-left">
+              <div style={{ width: 80 + '%' }} className="ta-left">
                 Arrangements Mastered
                 </div>
-              <div style={{ width: 30 + '%' }} className="ta-right">
+              <div style={{ width: 20 + '%' }} className="ta-right">
                 {this.state.arrMaster}
               </div>
             </div>

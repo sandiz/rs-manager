@@ -1,6 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types';
 import AnimatedNumber from 'react-animated-number';
+import Highcharts from 'highcharts'
+import HighchartsReact from 'highcharts-react-official'
+
 import {
   RemoteAll,
   unescapeFormatter, difficultyFormatter, difficultyClass, round100Formatter,
@@ -9,12 +12,15 @@ import {
 import SongDetailView from './songdetailView';
 import {
   getSongBySongKey, initSongsOwnedDB, updateMasteryandPlayed,
-  getSongsOwned, updateRecentlyPlayedSongs,
+  getSongsOwned, updateRecentlyPlayedSongs, getSongByID,
 } from '../sqliteService'
 import readProfile from '../steamprofileService';
 import getProfileConfig from '../configService';
+import { psarcToJSON } from '../psarcService';
 
 const albumArt = require('./../lib/album-art');
+
+require('highcharts/modules/variwide')(Highcharts)
 
 export function pad2(number) {
   return (number < 10 ? '0' : '') + number
@@ -36,12 +42,18 @@ export default class RSLiveView extends React.Component {
       timeCurrent: 0,
       tracking: false,
       songKey: '',
+      persistentID: '',
+      gameState: '',
       accuracy: 0,
       currentStreak: 0,
       highestStreak: 0,
       totalNotes: 0,
       notesHit: 0,
       notesMissed: 0,
+      perfectHits: 0,
+      lateHits: 0,
+      perfectPhrases: 0,
+      goodPhrases: 0,
       /* table state vars */
       songs: [],
       page: 1,
@@ -192,6 +204,21 @@ export default class RSLiveView extends React.Component {
           formatter: badgeFormatter,
         },
       ],
+
+      /* chart data */
+      chartOptions: {
+        series: [{
+          data: [],
+        }],
+      },
+      phrases: [],
+      notesBucket: [{
+        notesHit: 0,
+        notesMissed: 0,
+        perfectHits: 0,
+        lateHits: 0,
+      }],
+
     }
     this.tabname = 'tab-rslive';
     this.columns = [
@@ -216,7 +243,10 @@ export default class RSLiveView extends React.Component {
           };
         },
         sort: true,
-        formatter: unescapeFormatter,
+        formatter: (cell, row) => {
+          const ret = unescapeFormatter(cell, row);
+          return ret;
+        },
       },
       {
         dataField: "artist",
@@ -380,21 +410,47 @@ export default class RSLiveView extends React.Component {
         })
       },
     };
+    this.rowStyle = (row, rowIndex) => {
+      if (row.id === this.state.persistentID) {
+        return {
+          backgroundColor: 'azure',
+          color: 'black',
+        }
+      }
+      return {
+        color: 'inherit',
+      };
+    };
 
     this.fetchrstimer = null;
     this.lastalbumname = "";
     this.lastsongkey = "";
     this.lastsongdetail = null;
     this.songkeyresults = null;
+    this.persistenIDresults = null;
     this.albumarturl = "";
+    this.enablefakedata = false;
+    this.fakedata = JSON.parse(`{"success":false,"currentState":0,"memoryReadout":{"songTimer":4.362,"songID":"Gree21Gu",
+    "persistentID":"CE42CBABEC6ABBF296E89310F120DC0E","totalNotesHit":0,"currentHitStreak":0,
+    "highestHitStreak":0,"totalNotesMissed":0,"currentMissStreak":0,"mode":2,"gameState":"ScoreAttack_Pause",
+    "currentPerfectHitStreak":0,"totalPerfectHits":0,"currentLateHitStreak":0,"totalLateHits":0,
+    "perfectPhrases":0,"goodPhrases":0,"passedPhrases":0,"failedPhrases":0,"TotalNotes":0},
+    "songDetails":null,"albumCoverBase64":null,"Version":"0.1.4"}`);
+    this.lastSongData = {
+      notesHit: 0,
+      notesMissed: 0,
+      perfectHits: 0,
+      lateHits: 0,
+      lastTimer: 0,
+      lastBucket: 0,
+    }
   }
 
   componentDidMount = async () => {
     await this.refreshRPTable();
     try {
-      const songData = await window.fetch("http://127.0.0.1:9938");
+      if (!this.enablefakedata) await window.fetch("http://127.0.0.1:9938");
       //if fetch works tracking is active , start sniffing
-      console.log(songData);
       this.setState({ tracking: true });
       this.fetchRSSniffer();
     }
@@ -424,6 +480,244 @@ export default class RSLiveView extends React.Component {
     );
   }
 
+  generatePhrases = (phrases) => {
+    //this.setState({ chartData: this.getChartData(true) })
+    let { chartOptions } = this.state;
+    phrases = JSON.parse(phrases);
+    phrases.sort((a, b) => {
+      return (a.StartTime > b.StartTime) ? 1 : ((b.StartTime > a.StartTime) ? -1 : 0);
+    });
+
+    chartOptions = {
+      credits: {
+        enabled: false,
+      },
+      chart: {
+        type: 'variwide',
+        height: 140,
+        backgroundColor: 'none',
+        style: {
+          font: 'Roboto Condensed',
+          color: "white",
+        },
+      },
+      xAxis: {
+        type: 'category',
+        labels: {
+          style: {
+            font: 'Roboto Condensed',
+            color: "white",
+          },
+        },
+        tickInterval: 1,
+        lineWidth: 1,
+        minorGridLineWidth: 0,
+        lineColor: '#EF7408',
+        minorTickLength: 0,
+        tickLength: 0,
+      },
+      yAxis: {
+        labels: {
+          enabled: false,
+        },
+        title: {
+          text: '',
+          reserveSpace: false,
+        },
+        min: 0,
+        max: 23,
+        tickInterval: 1,
+        lineWidth: 1,
+        minorGridLineWidth: 0,
+        lineColor: 'black',
+        minorTickLength: 0,
+        tickLength: 0,
+        gridLineColor: 'transparent',
+      },
+      title: {
+        text: '',
+        floating: true,
+      },
+      tooltip: {
+        enabled: false,
+      },
+      legend: {
+        enabled: false,
+      },
+      plotOptions: {
+        series: {
+          animation: false,
+        },
+        variwide: {
+          // stacking: 'normal',
+          grouping: false,
+          shadow: false,
+          borderWidth: 1,
+          borderColor: 'black',
+        },
+      },
+      series: [{
+        name: "A",
+        data: [],
+        //colorByPoint: true,
+        //color: '#8900C2',
+        borderRadius: 3,
+        borderColor: 'black',
+        borderWidth: 1,
+      }, {
+        name: "B",
+        data: [],
+        pointPlacement: 0,
+        color: 'lightgreen', //2-rgb(200,247,73) 3-yellow
+      }],
+    }
+    let max = 0;
+    let i = 0
+    const notesBucket = [];
+    for (i = 0; i < phrases.length; i += 1) {
+      const phrase = phrases[i];
+      chartOptions.series[0].data.push({
+        x: i,
+        y: phrase.MaxDifficulty,
+        z: Math.round(phrase.EndTime - phrase.StartTime),
+        color: '#8900C2',
+      });
+
+      const defValue = 0;//phrase.MaxDifficulty / 2
+      chartOptions.series[1].data.push({
+        x: i,
+        y: defValue,
+        z: Math.round(phrase.EndTime - phrase.StartTime),
+        color: 'lightgreen',
+      });
+
+      /* init note bucket */
+      notesBucket.push({
+        notesHit: 0,
+        notesMissed: 0,
+        perfectHits: 0,
+        lateHits: 0,
+      })
+
+      if (max < phrase.MaxDifficulty) max = phrase.MaxDifficulty;
+    }
+    /* copy first bar data to last to make it look even (silence) */
+    let last = chartOptions.series[0].data[chartOptions.series[0].data.length - 1];
+    let first = chartOptions.series[0].data[0];
+    last.z = first.z;
+
+    last = chartOptions.series[1].data[chartOptions.series[1].data.length - 1];
+    first = chartOptions.series[1].data[0];
+    last.z = first.z;
+    /* */
+    const defaultNoteData = {
+      notesHit: 0,
+      notesMissed: 0,
+      perfectHits: 0,
+      lateHits: 0,
+    }
+    this.lastSongData = defaultNoteData;
+    this.setState({
+      chartOptions,
+      phrases,
+      notesBucket,
+    });
+  }
+
+  getBucketFromTime = (currtime, phrases) => {
+    for (let i = 0; i < phrases.length; i += 1) {
+      const phrase = phrases[i];
+      if (currtime >= phrase.StartTime && currtime < phrase.EndTime) return i;
+    }
+    return -1;
+  }
+
+  getUpdatedNoteBuckets = (bucketIdx, memoryReadout) => {
+    const notesBucket = this.state.notesBucket;
+
+    if (bucketIdx < 0 || bucketIdx >= notesBucket.length) return notesBucket;
+
+    const deltaNotesHit = memoryReadout.totalNotesHit - this.lastSongData.notesHit;
+    const deltaNotesMissed = memoryReadout.totalNotesMissed - this.lastSongData.notesMissed;
+    const deltaPerfects = memoryReadout.totalPerfectHits - this.lastSongData.perfectHits;
+    const deltaLates = memoryReadout.totalLateHits - this.lastSongData.lateHits;
+
+    //console.log("bucket", bucketIdx, "nh", notesBucket[bucketIdx].notesHit,
+    //  "nm", notesBucket[bucketIdx].notesMissed,
+    //  "ph", notesBucket[bucketIdx].perfectHits,
+    //  "lh", notesBucket[bucketIdx].lateHits);
+    notesBucket[bucketIdx].notesHit += deltaNotesHit;
+    notesBucket[bucketIdx].notesMissed += deltaNotesMissed;
+    notesBucket[bucketIdx].perfectHits += deltaPerfects;
+    notesBucket[bucketIdx].lateHits += deltaLates;
+
+    this.lastSongData.notesHit = memoryReadout.totalNotesHit;
+    this.lastSongData.notesMissed = memoryReadout.totalNotesMissed;
+    this.lastSongData.perfectHits = memoryReadout.totalPerfectHits;
+    this.lastSongData.lateHits = memoryReadout.totalLateHits;
+    this.lastSongData.lastTimer = memoryReadout.songTimer;
+    this.lastSongData.lastBucket = bucketIdx;
+
+    return notesBucket;
+  }
+
+  getNoteStats = (memoryReadout) => {
+    if (!memoryReadout) {
+      return { notesBucket: this.state.notesBucket, chartOptions: this.state.chartOptions }
+    }
+    const {
+      phrases, chartOptions,
+    } = this.state;
+    const currtime = memoryReadout.songTimer;
+    const newBucket = this.getBucketFromTime(currtime, phrases);
+    const deltatime = currtime - this.lastSongData.lastTimer;
+    if (deltatime < 0.0) {
+      const oldBucket = this.getBucketFromTime(this.lastSongData.lastTimer, phrases);
+      const deltaB = newBucket - oldBucket;
+      if (deltaB < -1) {
+        console.log("detected rewind, generating phrases again");
+        this.lastSongData.lastBucket = newBucket;
+        this.lastSongData.lastTimer = currtime;
+        this.generatePhrases(JSON.stringify(phrases));
+        return { notesBucket: this.state.notesBucket, chartOptions: this.state.chartOptions }
+      }
+    }
+
+
+    let newNoteBuckets = this.state.notesBucket;
+    if (newBucket > 0 && newBucket < phrases.length) {
+      newNoteBuckets = this.getUpdatedNoteBuckets(newBucket, memoryReadout)
+      if (newNoteBuckets.length > 0) {
+        const newNoteBucketData = newNoteBuckets[newBucket];
+        const tnh = newNoteBucketData.notesHit + newNoteBucketData.notesMissed
+        const hp = ((newNoteBucketData.notesHit / tnh));
+        //const mp = ((newNoteBucketData.notesMissed / tnh));
+        const seriesData = chartOptions.series[0].data;
+        const hper = hp * seriesData[newBucket].y;
+        //const mper = mp * seriesData[newBucket].y;
+        const noteData = chartOptions.series[1].data;
+        noteData[newBucket].y = hper;
+
+        //console.log("nh", newNoteBucketData.notesHit,
+        //"nm", newNoteBucketData.notesMissed, "tnh", tnh);
+        //console.log("bucket", newBucket, "max",
+        // seriesData[newBucket].y, "hp", hp, "mp", mp, "hper", hper, "mper", mper);
+      }
+    }
+
+
+    // highlight the bar thats being played
+    const seriesData = chartOptions.series[0].data;
+    for (let i = 0; i < seriesData.length; i += 1) {
+      if (i === newBucket) {
+        seriesData[i].color = "#c652f7";
+      } else {
+        seriesData[i].color = "#8900C2";
+      }
+    }
+    return { notesBucket: newNoteBuckets, chartOptions };
+  }
+
   parseSongResults = async (songData) => {
     const { songDetails, memoryReadout } = songData;
     const tnh = memoryReadout ? memoryReadout.totalNotesHit : 0;
@@ -446,6 +740,25 @@ export default class RSLiveView extends React.Component {
       const skr = await getSongBySongKey(memoryReadout.songID);
       if (skr.length > 0) this.songkeyresults = skr[0];
     }
+    // if persistentID is available use that result
+    if (memoryReadout
+      && memoryReadout.persistentID.length > 0
+      && memoryReadout.persistentID !== this.state.persistentID) {
+      const skr = await getSongByID(memoryReadout.persistentID);
+      //get phrases from psarc
+      if (skr !== '') {
+        this.persistenIDresults = skr;
+        const filename = skr.uniqkey.split(".psarc_")[0]
+        const psarcObj = await psarcToJSON(unescape(filename) + ".psarc");
+        const arrangements = psarcObj.arrangements;
+        const arrangement = arrangements.filter(arr => arr.id === memoryReadout.persistentID)[0];
+        this.generatePhrases(arrangement.phraseIterations);
+      }
+      else {
+        this.persistenIDresults = null;
+      }
+    }
+
     const song = songDetails ? songDetails.songName : (this.songkeyresults ? unescape(this.songkeyresults.song) : "");
     const artist = songDetails ? songDetails.artistName : (this.songkeyresults ? unescape(this.songkeyresults.artist) : "");
     const album = songDetails ? songDetails.albumName : (this.songkeyresults ? unescape(this.songkeyresults.album) : "");
@@ -463,14 +776,28 @@ export default class RSLiveView extends React.Component {
         console.log(e);
       }
     }
+    let totalNotes = 0;
+    if (this.persistenIDresults) {
+      totalNotes = this.persistenIDresults.maxNotes;
+    }
+    else if (memoryReadout && this.songkeyresults) {
+      totalNotes = this.songkeyresults.maxNotes;
+    }
 
+    const gameState = memoryReadout ? memoryReadout.gameState : "";
+    const perfectHits = memoryReadout ? memoryReadout.totalPerfectHits : 0;
+    const lateHits = memoryReadout ? memoryReadout.totalLateHits : 0;
+    const perfectPhrases = memoryReadout ? memoryReadout.perfectPhrases : 0;
+    const goodPhrases = memoryReadout ? memoryReadout.goodPhrases : 0;
+    const { notesBucket, chartOptions } = this.getNoteStats(memoryReadout);
+    //console.log(chartOptions);
     this.setState({
       accuracy,
       song,
       artist,
       album,
       timeTotal,
-      totalNotes: memoryReadout && this.songkeyresults ? this.songkeyresults.maxNotes : 0,
+      totalNotes,
       timeCurrent: memoryReadout ? memoryReadout.songTimer : 0,
       songKey: memoryReadout ? memoryReadout.songID : "",
       currentStreak: memoryReadout ? memoryReadout.currentHitStreak : 0,
@@ -478,6 +805,16 @@ export default class RSLiveView extends React.Component {
       notesHit,
       notesMissed,
       albumArt: this.albumarturl,
+      persistentID: memoryReadout ? memoryReadout.persistentID : '',
+      gameState,
+      perfectHits,
+      lateHits,
+      perfectPhrases,
+      goodPhrases,
+      notesBucket,
+      chartOptions: {
+        series: chartOptions.series,
+      },
     }, () => {
       if (memoryReadout && this.lastsongkey !== memoryReadout.songID) {
         this.refreshTable();
@@ -701,6 +1038,10 @@ export default class RSLiveView extends React.Component {
   fetchRSSniffer = async () => {
     this.fetchrstimer = setInterval(async () => {
       try {
+        if (this.enablefakedata) {
+          await this.parseSongResults(this.fakedata);
+          return;
+        }
         const songData = await window.fetch("http://127.0.0.1:9938");
         if (!songData) return;
         if (typeof songData === 'undefined') { return; }
@@ -775,12 +1116,25 @@ export default class RSLiveView extends React.Component {
         timeCurrent,
         timeTotal,
         songKey: '',
+        persistentID: '',
         accuracy: 0,
         currentStreak: 0,
         highestStreak: 0,
         totalNotes: 0,
         notesHit: 0,
         notesMissed: 0,
+        /* chart data */
+        chartOptions: {
+          series: [{
+            data: [],
+          }],
+        },
+        phrases: [],
+        notesBucket: [{
+          notesHit: 0,
+          notesMissed: 0,
+          perfectHits: 0,
+        }],
       });
       this.lastalbumname = "";
       this.lastsongkey = "";
@@ -1023,6 +1377,23 @@ export default class RSLiveView extends React.Component {
     this.setState({ rpsrc: src }, () => this.refreshRPTable());
   }
 
+  getPathDiv = () => {
+    const def = <div className="dashboard-path no_path"> No Path Information </div>;
+    //const lead = <div className="dashboard-path path_lead" />
+    if (this.persistenIDresults !== null) {
+      if (this.persistenIDresults.path_lead === 1) {
+        return <div className="dashboard-path path_lead" />
+      }
+      else if (this.persistenIDresults.path_rhythm === 1) {
+        return <div className="dashboard-path path_rhythm" />
+      }
+      else if (this.persistenIDresults.path_bass === 1) {
+        return <div className="dashboard-path path_bass" />
+      }
+    }
+    return def;
+  }
+
   render = () => {
     let { minutes, seconds } = getMinutesSecs(this.state.timeCurrent);
     const timeCurrent = `${minutes}:${seconds}`;
@@ -1047,6 +1418,9 @@ export default class RSLiveView extends React.Component {
       : "N/A";
     const buttonclass = "extraPadding download smallbutton ";//+ (this.state.win32 ? "" : "isDisabled");
     const updateMasteryclass = buttonclass + ((this.state.songKey.length <= 0) ? "isDisabled" : "");
+    const isscoreattack = this.state.gameState.toLowerCase().includes("scoreattack");
+    const livestatsstyle = isscoreattack ? " col col-md-4 ta-center dashboard-top dashboard-rslive-song-details-sa" : " col col-md-3 ta-center dashboard-top dashboard-rslive-song-details";
+
     return (
       <div className="container-fluid">
         <div className="ta-center">
@@ -1087,9 +1461,11 @@ export default class RSLiveView extends React.Component {
         </div>
         <br />
         <div key="live-stats" className="row justify-content-md-center" style={{ marginTop: -30 + 'px' }}>
-          <div className="col col-md-3 ta-center dashboard-top dashboard-rslive-song-details">
+          {this.getPathDiv()}
+          <div
+            className={livestatsstyle}>
             <div>
-              Live Stats
+              {this.state.gameState !== "" ? <span>GameState: {this.state.gameState + " - Note Stats: " + ((this.state.persistentID === '' || this.state.persistentID.includes("depedency")) ? "Inactive" : "Active")}</span> : <span>Live Stats</span>}
               <hr />
             </div>
             <div>
@@ -1154,6 +1530,42 @@ export default class RSLiveView extends React.Component {
                   </div>
                 </div>
               </div>
+              {
+                isscoreattack
+                  ? (
+                    <div className="flex-container" style={{ marginTop: 10 + 'px' }}>
+                      <div className="flex-div">
+                        Perfect Hits
+                        <hr />
+                        <div style={{ marginTop: -10 + 'px' }}>
+                          {this.animatedNumber(this.state.perfectHits)}
+                        </div>
+                      </div>
+                      <div className="flex-div">
+                        Late Hits
+                        <hr />
+                        <div style={{ marginTop: -10 + 'px' }}>
+                          {this.animatedNumber(this.state.lateHits)}
+                        </div>
+                      </div>
+                      <div className="flex-div">
+                        Perfect Phrases
+                       <hr />
+                        <div style={{ marginTop: -10 + 'px' }}>
+                          {this.animatedNumber(this.state.perfectPhrases)}
+                        </div>
+                      </div>
+                      <div className="flex-div">
+                        Good Phrases
+                        <hr />
+                        <div style={{ marginTop: -10 + 'px' }}>
+                          {this.animatedNumber(this.state.goodPhrases)}
+                        </div>
+                      </div>
+                    </div>
+                  )
+                  : null
+              }
             </div>
           </div>
           <div className="col col-lg-5 ta-center dashboard-top dashboard-rslive-song-details">
@@ -1207,6 +1619,18 @@ export default class RSLiveView extends React.Component {
             </div>
           </div>
         </div>
+        {
+          this.state.chartOptions.series[0].data.length > 0
+            ? (
+              <div id="barChart">
+                <HighchartsReact
+                  highcharts={Highcharts}
+                  options={this.state.chartOptions}
+                  id="barChart"
+                />
+              </div>
+            ) : null
+        }
         <div>
           <RemoteAll
             keyField="id"
@@ -1217,10 +1641,11 @@ export default class RSLiveView extends React.Component {
             onTableChange={this.handleTableChange}
             columns={this.columns}
             rowEvents={this.rowEvents}
+            rowStyle={this.rowStyle}
             paginate={false}
           />
         </div>
-        <br /><br />
+        <br /> <br />
         <div>
           <h2 className="ta-left" style={{ color: 'wheat' }}>
             Recently Played -&nbsp;

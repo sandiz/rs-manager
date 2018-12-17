@@ -79,7 +79,7 @@ export function unescapeFormatter(cell, row) {
   if (cell.length > 30) {
     cell = cell.slice(0, 30) + "..."
   }
-  return <span>{cell}</span>;
+  return <span key={row.id}>{cell}</span>;
 }
 export function difficultyFormatter(cell, row) {
   return (
@@ -419,6 +419,7 @@ export const RemoteAll = ({
   totalSize,
   rowEvents,
   paginate = true,
+  rowStyle,
 }) => (
     <div>
       <BootstrapTable
@@ -440,6 +441,7 @@ export const RemoteAll = ({
         bordered={false}
         rowEvents={rowEvents}
         noDataIndication="No Songs"
+        rowStyle={rowStyle}
       />
     </div>
   );
@@ -453,11 +455,13 @@ RemoteAll.propTypes = {
   keyField: PropTypes.string.isRequired,
   columns: PropTypes.array.isRequired,
   rowEvents: PropTypes.object,
+  rowStyle: PropTypes.func,
   paginate: PropTypes.bool,
 };
 RemoteAll.defaultProps = {
   paginate: true,
   rowEvents: {},
+  rowStyle: () => { },
 }
 export default class SonglistView extends React.Component {
   constructor(props) {
