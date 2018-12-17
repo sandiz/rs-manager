@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types';
 import moment from 'moment';
+import Swal from 'sweetalert2'
 
 const marked = require('marked');
 
@@ -113,8 +114,14 @@ export default class HelpView extends React.Component {
             })
           }
           else {
-            id = "getting-started";
-            data = await readFile(window.dirname + "/../help/getting-started.md");
+            //if rate limited open page in browser
+            const { value: text } = await Swal({
+              type: 'info',
+              text: 'Github is throttling requests from this ip address. Click Ok to open in browser',
+              showCancelButton: true,
+              confirmButtonClass: 'local-note-btn-class',
+            })
+            if (text) window.shell.openExternal("https://github.com/sandiz/rs-manager/releases")
           }
         }
         break;
