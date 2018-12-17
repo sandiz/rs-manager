@@ -93,7 +93,7 @@ export default class Sidebar extends React.Component {
 
   componentDidMount = () => {
     this.checkForUpdate();
-    setInterval(() => this.checkForUpdate(), 60 * 1000 * 5); //check for update every 60 * 5 secs
+    setInterval(() => this.checkForUpdate(), 60 * 1000 * 30); //check for update every 60 * 30 secs
   }
 
   checkForUpdate = async () => {
