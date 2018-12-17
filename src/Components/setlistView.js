@@ -143,6 +143,9 @@ export default class SetlistView extends React.Component {
                 },
                 sort: true,
                 formatter: unescapeFormatter,
+                formatExtraData: {
+                    globalNotes: this.props.globalNotes,
+                },
             },
             {
                 dataField: "artist",
@@ -1075,6 +1078,7 @@ SetlistView.propTypes = {
     saveSearch: PropTypes.func,
     getSearch: PropTypes.func,
     showModalStats: PropTypes.bool,
+    globalNotes: PropTypes.object,
 }
 SetlistView.defaultProps = {
     //currentTab: null,
@@ -1086,4 +1090,5 @@ SetlistView.defaultProps = {
     saveSearch: () => { },
     getSearch: () => { },
     showModalStats: false,
+    globalNotes: {},
 }

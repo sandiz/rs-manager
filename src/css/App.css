@@ -1286,3 +1286,9 @@ hr {
 .conflicting-row {
     margin-bottom: -12px !important;
 }
+
+.global-note {
+    background-image: url("../assets/tree-icons/global.svg") !important;
+    background-size: 23px;
+    background-repeat: no-repeat;
+}
