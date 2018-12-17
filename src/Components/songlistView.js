@@ -80,17 +80,18 @@ export function unescapeFormatter(cell, row, rowIndex, extraData) {
   if (cell.length > 30) {
     cell = cell.slice(0, 30) + "..."
   }
-  let note = ""
+  let gnote = ""
+  const lnote = ""
   if (typeof extraData !== 'undefined') {
     if (row.id in extraData.globalNotes) {
-      note = extraData.globalNotes[row.id];
+      gnote = extraData.globalNotes[row.id];
       /*strip html*/
       const div = document.createElement("div");
-      div.innerHTML = note;
-      note = div.textContent || div.innerText || "";
+      div.innerHTML = gnote;
+      gnote = div.textContent || div.innerText || "";
     }
   }
-  if (note === "") {
+  if (gnote === "" && lnote === "") {
     return <span key={row.id}>{cell}</span>;
   }
   else {
@@ -111,16 +112,39 @@ export function unescapeFormatter(cell, row, rowIndex, extraData) {
           type="dark"
           effect="solid"
           className="tooltipClass"
+          afterShow={() => {
+            const elem = document.getElementById(row.id + "_gn");
+            const top = parseInt(elem.style.top, 10) + window.scrollY;
+            elem.style.top = top + "px";
+          }}
         >
-          {note}
+          {gnote}
         </ReactTooltip>
         <div
           style={{
             position: 'relative',
             top: -6 + 'px',
-            left: 92 + '%',
+            left: gnote.length > 0 ? "-17px" : "0px",
             height: 100 + '%',
             width: 10 + '%',
+            float: 'right',
+            display: lnote.length > 0 ? "inherit" : "none",
+          }}
+          className="local-note"
+          data-tip
+          data-for={row.id + "_ln"}
+          data-class="tooltipClass"
+        />
+        <div
+          style={{
+            position: 'relative',
+            top: -6 + 'px',
+            //left: 92 + '%',
+            left: lnote.length > 0 ? "30px" : "0px",
+            height: 100 + '%',
+            width: 10 + '%',
+            float: 'right',
+            display: gnote.length > 0 ? "inherit" : "none",
           }}
           className="global-note"
           data-tip

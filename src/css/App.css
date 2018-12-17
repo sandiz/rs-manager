@@ -1292,3 +1292,9 @@ hr {
     background-size: 23px;
     background-repeat: no-repeat;
 }
+
+.local-note {
+    background-image: url("../assets/tree-icons/local.svg") !important;
+    background-size: 23px;
+    background-repeat: no-repeat;
+}
