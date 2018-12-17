@@ -40,7 +40,7 @@ export default class RSLiveView extends React.Component {
       albumArt: '',
       timeTotal: 0,
       timeCurrent: 0,
-      tracking: false,
+      tracking: 0, //0:inactive, 1:starting, 2:active
       songKey: '',
       persistentID: '',
       gameState: '',
@@ -451,7 +451,7 @@ export default class RSLiveView extends React.Component {
     try {
       if (!this.enablefakedata) await window.fetch("http://127.0.0.1:9938");
       //if fetch works tracking is active , start sniffing
-      this.setState({ tracking: true });
+      this.setState({ tracking: 2 });
       this.fetchRSSniffer();
     }
     catch (e) {
@@ -988,7 +988,7 @@ export default class RSLiveView extends React.Component {
     console.log("start tracking");
     const killcmd = await this.killPIDs(await this.findPID());
     console.log("kill command: " + killcmd);
-    this.setState({ tracking: true });
+    this.setState({ tracking: 1 });
     // spawn process
     let cwd = ""
     if (window.os.platform() === "win32") {
@@ -1028,6 +1028,7 @@ export default class RSLiveView extends React.Component {
         },
       );
     }
+    this.setState({ tracking: 2 });
     this.props.updateHeader(
       this.tabname,
       `Tracking: Active`,
@@ -1083,7 +1084,7 @@ export default class RSLiveView extends React.Component {
     console.log("stop tracking");
     const killcmd = await this.killPIDs(await this.findPID());
     console.log("kill command: " + killcmd);
-    this.setState({ tracking: false });
+    this.setState({ tracking: 0 });
     if (killcmd.includes("no pids")) {
       return;
     }
@@ -1108,7 +1109,7 @@ export default class RSLiveView extends React.Component {
       const timeTotal = 0;
       const timeCurrent = 0;
       this.setState({
-        tracking: false,
+        tracking: 0,
         song,
         artist,
         album,
@@ -1229,7 +1230,7 @@ export default class RSLiveView extends React.Component {
         this.tabname,
         `Stats maching songkey (${this.state.songKey}): ` + updatedRows,
       );
-      if (this.state.tracking) {
+      if (this.state.tracking === 2) {
         setTimeout(() => {
           this.props.updateHeader(
             this.tabname,
@@ -1299,7 +1300,7 @@ export default class RSLiveView extends React.Component {
         this.tabname,
         "Finished updating recently played songs: " + updatedRows,
       );
-      if (this.state.tracking) {
+      if (this.state.tracking === 2) {
         setTimeout(() => {
           this.props.updateHeader(
             this.tabname,
@@ -1420,7 +1421,37 @@ export default class RSLiveView extends React.Component {
     const updateMasteryclass = buttonclass + ((this.state.songKey.length <= 0) ? "isDisabled" : "");
     const isscoreattack = this.state.gameState.toLowerCase().includes("scoreattack");
     const livestatsstyle = isscoreattack ? " col col-md-4 ta-center dashboard-top dashboard-rslive-song-details-sa" : " col col-md-3 ta-center dashboard-top dashboard-rslive-song-details";
-
+    let trackingButton = null;
+    switch (this.state.tracking) {
+      default:
+      case 2:
+        trackingButton = (
+          <a
+            onClick={this.stopTracking}
+            className={buttonclass}>
+            Stop Tracking
+          </a>
+        );
+        break;
+      case 1:
+        trackingButton = (
+          <a
+            onClick={this.stopTracking}
+            className={buttonclass + " isDisabled"}>
+            Waiting for tracking...
+          </a>
+        );
+        break;
+      case 0:
+        trackingButton = (
+          <a
+            onClick={this.startTracking}
+            className={buttonclass}>
+            Start Tracking
+          </a>
+        )
+        break;
+    }
     return (
       <div className="container-fluid">
         <div className="ta-center">
@@ -1431,23 +1462,7 @@ export default class RSLiveView extends React.Component {
             className="extraPadding download smallbutton">
             steam://run/rocksmith
           </a>
-          {
-            this.state.tracking
-              ? (
-                <a
-                  onClick={this.stopTracking}
-                  className={buttonclass}>
-                  Stop Tracking
-                </a>
-              )
-              : (
-                <a
-                  onClick={this.startTracking}
-                  className={buttonclass}>
-                  Start Tracking
-                </a>
-              )
-          }
+          {trackingButton}
           <a
             onClick={this.updateMastery}
             className={updateMasteryclass}>
