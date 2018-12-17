@@ -18,6 +18,7 @@ import SongDetailView from './songdetailView';
 import { defaultSortOption } from './settingsView';
 
 const { path } = window;
+const Fragment = React.Fragment;
 
 export const allTunings = {
   "E Standard": [0, 0, 0, 0, 0, 0],
@@ -74,12 +75,61 @@ export function getBadgeName(num, retClass = false) {
     default: return '';
   }
 }
-export function unescapeFormatter(cell, row) {
+export function unescapeFormatter(cell, row, rowIndex, extraData) {
   cell = unescape(cell)
   if (cell.length > 30) {
     cell = cell.slice(0, 30) + "..."
   }
-  return <span key={row.id}>{cell}</span>;
+  let note = ""
+  if (typeof extraData !== 'undefined') {
+    if (row.id in extraData.globalNotes) {
+      note = extraData.globalNotes[row.id];
+      /*strip html*/
+      const div = document.createElement("div");
+      div.innerHTML = note;
+      note = div.textContent || div.innerText || "";
+    }
+  }
+  if (note === "") {
+    return <span key={row.id}>{cell}</span>;
+  }
+  else {
+    return (
+      <Fragment>
+        <div
+          style={{
+            position: 'relative',
+            top: 11 + 'px',
+          }}
+          key={row.id}>
+          {cell}
+        </div>
+        <ReactTooltip
+          id={row.id + "_gn"}
+          aria-haspopup="true"
+          place="right"
+          type="dark"
+          effect="solid"
+          className="tooltipClass"
+        >
+          {note}
+        </ReactTooltip>
+        <div
+          style={{
+            position: 'relative',
+            top: -6 + 'px',
+            left: 92 + '%',
+            height: 100 + '%',
+            width: 10 + '%',
+          }}
+          className="global-note"
+          data-tip
+          data-for={row.id + "_gn"}
+          data-class="tooltipClass"
+        />
+      </Fragment>
+    );
+  }
 }
 export function difficultyFormatter(cell, row) {
   return (
@@ -503,6 +553,9 @@ export default class SonglistView extends React.Component {
         },
         sort: true,
         formatter: unescapeFormatter,
+        formatExtraData: {
+          globalNotes: this.props.globalNotes,
+        },
       },
       {
         dataField: "artist",
@@ -998,6 +1051,7 @@ SonglistView.propTypes = {
   handleChange: PropTypes.func,
   saveSearch: PropTypes.func,
   getSearch: PropTypes.func,
+  globalNotes: PropTypes.object,
 }
 SonglistView.defaultProps = {
   updateHeader: () => { },
@@ -1005,4 +1059,5 @@ SonglistView.defaultProps = {
   handleChange: () => { },
   saveSearch: () => { },
   getSearch: () => { },
+  globalNotes: {},
 }

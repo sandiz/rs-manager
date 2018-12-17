@@ -17,6 +17,8 @@ import './css/App.css'
 import HelpView from './Components/HelpView';
 import { getState } from './stateService';
 
+const csvparse = require('csv-parse/lib/es5/sync');
+
 const { path } = window;
 
 class App extends Component {
@@ -83,6 +85,7 @@ class App extends Component {
       showhelp: false,
       readytorender: false,
       showModalStats: false,
+      globalNotes: {},
     };
     this.songlistRef = null;
     //this.handleChange = this.handleChange.bind(this);
@@ -95,6 +98,7 @@ class App extends Component {
     await initSongsOwnedDB("tab-dashboard", this.updateHeader);
     await this.updateProfile();
     await this.refreshTabs();
+    await this.getGlobalNotes();
     // default tabs on startup
     //sthis.handleChange(this.state.TabsData[0]);
     //this.props.handleChange(TabsData[2], TabsData[2].child[0])
@@ -107,6 +111,23 @@ class App extends Component {
 
   componentWillMount = async () => {
     this.cwmasync();
+  }
+
+  getGlobalNotes = async () => {
+    const url = "https://raw.githubusercontent.com/sandiz/rs-manager/master/songs_notes.csv";
+    try {
+      const csvData = await window.request(url);
+      const items = csvData.split("\n");
+      const di = {}
+      for (let i = 0; i < items.length; i += 1) {
+        const line = csvparse(items[i])[0];
+        di[line[0]] = line[1];
+      }
+      this.setState({ globalNotes: di });
+    }
+    catch (e) {
+      console.log(e);
+    }
   }
 
   getSearchHistory = (key) => {
@@ -214,6 +235,7 @@ class App extends Component {
               saveSearch={this.saveSearchHistory}
               getSearch={this.getSearchHistory}
               showModalStats={showModalStats}
+              globalNotes={this.state.globalNotes}
             />
           )
         }
@@ -229,6 +251,7 @@ class App extends Component {
                 handleChange={this.updateProfile}
                 saveSearch={this.saveSearchHistory}
                 getSearch={this.getSearchHistory}
+                globalNotes={this.state.globalNotes}
               />
             )
             break;
