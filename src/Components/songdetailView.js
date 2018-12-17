@@ -66,6 +66,7 @@ export default class SongDetailView extends React.Component {
       console.log("searching for ", ptsearchterm, mvsearchterm);
       this.getYoutubeResult(ptsearchterm, "div_playthrough");
       this.getYoutubeResult(mvsearchterm, "div_musicvideo");
+      document.addEventListener("keydown", this.onKeyUp, false);
       await this.generateSetlistOptions();
     }
     return nextprops.showDetail;
@@ -75,8 +76,10 @@ export default class SongDetailView extends React.Component {
     if (this.modal_div) { this.modal_div.scrollTop = 0 }
   }
 
-  onKeyUp = (e) => {
-    console.log(e.KeyCode);
+  onKeyUp = (event) => {
+    if (event.keyCode === 27) {
+      this.handleHide();
+    }
   }
 
   getYoutubeResult = async (searchterm, divID) => {
@@ -150,6 +153,7 @@ export default class SongDetailView extends React.Component {
   }
 
   handleHide = () => {
+    document.removeEventListener("keydown", this.onKeyUp, false);
     this.choosePlay();
     this.props.close();
     enableScroll();
