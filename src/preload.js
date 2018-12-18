@@ -27,6 +27,7 @@ const express = require('express')
 const openid = require('openid');
 const nodeUrl = require('url');
 const util = require('util')
+window.isDev = isDev;
 
 const exp = express()
 window.PROD_YT_PORT = 8000;
