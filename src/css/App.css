@@ -1120,6 +1120,7 @@ hr {
 #barChart {
     width: 1000px !important;
     margin: auto;
+    height: 140px;
 }
 
 .flex-container {

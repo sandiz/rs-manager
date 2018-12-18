@@ -207,8 +207,88 @@ export default class RSLiveView extends React.Component {
 
       /* chart data */
       chartOptions: {
+        credits: {
+          enabled: false,
+        },
+        chart: {
+          type: 'variwide',
+          height: 140,
+          backgroundColor: 'none',
+          style: {
+            font: 'Roboto Condensed',
+            color: "white",
+          },
+          animation: false,
+        },
+        xAxis: {
+          type: 'category',
+          labels: {
+            style: {
+              font: 'Roboto Condensed',
+              color: "white",
+            },
+          },
+          tickInterval: 1,
+          lineWidth: 1,
+          minorGridLineWidth: 0,
+          lineColor: '#EF7408',
+          minorTickLength: 0,
+          tickLength: 0,
+        },
+        yAxis: {
+          labels: {
+            enabled: false,
+          },
+          title: {
+            text: '',
+            reserveSpace: false,
+          },
+          min: 0,
+          max: 23,
+          tickInterval: 1,
+          lineWidth: 1,
+          minorGridLineWidth: 0,
+          lineColor: 'black',
+          minorTickLength: 0,
+          tickLength: 0,
+          gridLineColor: 'transparent',
+        },
+        title: {
+          text: '',
+          floating: true,
+        },
+        tooltip: {
+          enabled: false,
+        },
+        legend: {
+          enabled: false,
+        },
+        plotOptions: {
+          series: {
+            animation: false,
+          },
+          variwide: {
+            // stacking: 'normal',
+            grouping: false,
+            shadow: false,
+            borderWidth: 1,
+            borderColor: 'black',
+            animation: false,
+          },
+        },
         series: [{
+          name: "A",
+          data: [[0, 0, 5]],
+          //colorByPoint: true,
+          //color: '#8900C2',
+          borderRadius: 3,
+          borderColor: 'black',
+          borderWidth: 1,
+        }, {
+          name: "B",
           data: [],
+          pointPlacement: 0,
+          color: 'lightgreen', //2-rgb(200,247,73) 3-yellow
         }],
       },
       phrases: [],
@@ -218,7 +298,7 @@ export default class RSLiveView extends React.Component {
         perfectHits: 0,
         lateHits: 0,
       }],
-
+      trackingMode: 'hitp', //hitp, perp, hist, record
     }
     this.tabname = 'tab-rslive';
     this.columns = [
@@ -429,7 +509,7 @@ export default class RSLiveView extends React.Component {
     this.songkeyresults = null;
     this.persistenIDresults = null;
     this.albumarturl = "";
-    this.enablefakedata = false;
+    this.enablefakedata = true;
     this.fakedata = JSON.parse(`{"success":false,"currentState":0,"memoryReadout":{"songTimer":4.362,"songID":"Gree21Gu",
     "persistentID":"CE42CBABEC6ABBF296E89310F120DC0E","totalNotesHit":0,"currentHitStreak":0,
     "highestHitStreak":0,"totalNotesMissed":0,"currentMissStreak":0,"mode":2,"gameState":"ScoreAttack_Pause",
@@ -482,98 +562,17 @@ export default class RSLiveView extends React.Component {
 
   generatePhrases = (phrases) => {
     //this.setState({ chartData: this.getChartData(true) })
-    let { chartOptions } = this.state;
+    const { chartOptions } = this.state;
     phrases = JSON.parse(phrases);
     phrases.sort((a, b) => {
       return (a.StartTime > b.StartTime) ? 1 : ((b.StartTime > a.StartTime) ? -1 : 0);
     });
 
-    chartOptions = {
-      credits: {
-        enabled: false,
-      },
-      chart: {
-        type: 'variwide',
-        height: 140,
-        backgroundColor: 'none',
-        style: {
-          font: 'Roboto Condensed',
-          color: "white",
-        },
-      },
-      xAxis: {
-        type: 'category',
-        labels: {
-          style: {
-            font: 'Roboto Condensed',
-            color: "white",
-          },
-        },
-        tickInterval: 1,
-        lineWidth: 1,
-        minorGridLineWidth: 0,
-        lineColor: '#EF7408',
-        minorTickLength: 0,
-        tickLength: 0,
-      },
-      yAxis: {
-        labels: {
-          enabled: false,
-        },
-        title: {
-          text: '',
-          reserveSpace: false,
-        },
-        min: 0,
-        max: 23,
-        tickInterval: 1,
-        lineWidth: 1,
-        minorGridLineWidth: 0,
-        lineColor: 'black',
-        minorTickLength: 0,
-        tickLength: 0,
-        gridLineColor: 'transparent',
-      },
-      title: {
-        text: '',
-        floating: true,
-      },
-      tooltip: {
-        enabled: false,
-      },
-      legend: {
-        enabled: false,
-      },
-      plotOptions: {
-        series: {
-          animation: false,
-        },
-        variwide: {
-          // stacking: 'normal',
-          grouping: false,
-          shadow: false,
-          borderWidth: 1,
-          borderColor: 'black',
-        },
-      },
-      series: [{
-        name: "A",
-        data: [],
-        //colorByPoint: true,
-        //color: '#8900C2',
-        borderRadius: 3,
-        borderColor: 'black',
-        borderWidth: 1,
-      }, {
-        name: "B",
-        data: [],
-        pointPlacement: 0,
-        color: 'lightgreen', //2-rgb(200,247,73) 3-yellow
-      }],
-    }
     let max = 0;
     let i = 0
     const notesBucket = [];
+    chartOptions.series[0].data.length = 0
+    chartOptions.series[1].data.length = 0;
     for (i = 0; i < phrases.length; i += 1) {
       const phrase = phrases[i];
       chartOptions.series[0].data.push({
@@ -690,13 +689,20 @@ export default class RSLiveView extends React.Component {
       if (newNoteBuckets.length > 0) {
         const newNoteBucketData = newNoteBuckets[newBucket];
         const tnh = newNoteBucketData.notesHit + newNoteBucketData.notesMissed
-        const hp = ((newNoteBucketData.notesHit / tnh));
         //const mp = ((newNoteBucketData.notesMissed / tnh));
         const seriesData = chartOptions.series[0].data;
-        const hper = hp * seriesData[newBucket].y;
+        let per = 0
+        if (this.state.trackingMode === "hitp") {
+          const hp = ((newNoteBucketData.notesHit / tnh));
+          per = hp * seriesData[newBucket].y;
+        }
+        else if (this.state.trackingMode === "perp") {
+          const p = ((newNoteBucketData.perfectHits / tnh));
+          per = p * seriesData[newBucket].y;
+        }
         //const mper = mp * seriesData[newBucket].y;
         const noteData = chartOptions.series[1].data;
-        noteData[newBucket].y = hper;
+        noteData[newBucket].y = per;
 
         //console.log("nh", newNoteBucketData.notesHit,
         //"nm", newNoteBucketData.notesMissed, "tnh", tnh);
@@ -705,8 +711,6 @@ export default class RSLiveView extends React.Component {
       }
     }
 
-
-    // highlight the bar thats being played
     const seriesData = chartOptions.series[0].data;
     for (let i = 0; i < seriesData.length; i += 1) {
       if (i === newBucket) {
@@ -1127,7 +1131,7 @@ export default class RSLiveView extends React.Component {
         /* chart data */
         chartOptions: {
           series: [{
-            data: [],
+            data: [[0, 0, 5]],
           }],
         },
         phrases: [],
@@ -1635,16 +1639,37 @@ export default class RSLiveView extends React.Component {
           </div>
         </div>
         {
-          this.state.chartOptions.series[0].data.length > 0
-            ? (
-              <div id="barChart">
-                <HighchartsReact
-                  highcharts={Highcharts}
-                  options={this.state.chartOptions}
-                  id="barChart"
-                />
-              </div>
-            ) : null
+          //this.state.chartOptions.series[0].data.length > 0
+          //  ? (
+          <div>
+            <div style={{
+              float: 'left',
+              color: 'azure',
+              position: 'relative',
+              left: '5%',
+              top: '22px',
+            }}> Tracking Mode
+                <br />
+              <select
+                defaultValue={this.state.trackingMode}
+                style={{ marginLeft: '-13px', textAlignLast: 'center', width: '110%' }}
+                onChange={(e) => { this.setState({ trackingMode: e.target.value }) }}
+              >
+                <option value="hitp">Hit Percent</option>
+                <option disabled={!isscoreattack} value="perp">Perfect Percent</option>
+                <option value="hist">Progress History</option>
+                <option value="record">Recording</option>
+              </select>
+            </div>
+            <div id="barChart">
+              <HighchartsReact
+                highcharts={Highcharts}
+                options={this.state.chartOptions}
+                id="barChart"
+              />
+            </div>
+          </div>
+          //) : null
         }
         <div>
           <RemoteAll
