@@ -166,7 +166,7 @@ export default class PSARCView extends React.Component {
 
   openFileDialog = async () => {
     const files = remote.dialog.showOpenDialog({
-      properties: ["openFile"],
+      properties: ["openFile", "multiSelections"],
       filters: [
         { name: 'PSARC', extensions: ['psarc'] },
       ],
@@ -176,8 +176,10 @@ export default class PSARCView extends React.Component {
     }
     const results = [];
     const fs = remote.require("fs");
-    const statres = fs.statSync(files[0]);
-    results.push([files[0], statres]);
+    for (let i = 0; i < files.length; i += 1) {
+      const statres = fs.statSync(files[i]);
+      results.push([files[i], statres]);
+    }
     console.log("psarc found: " + results.length);
     if (results.length > 0) {
       this.setState({ processing: true });
@@ -323,7 +325,7 @@ export default class PSARCView extends React.Component {
           <a
             onClick={this.openFileDialog}
             className={choosepsarchstyle}>
-            Choose .psarc File
+            Choose .psarc File(s)
             </a>
           <a
             onClick={this.openDirDialog}
