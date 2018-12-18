@@ -39,6 +39,8 @@ export async function initSongsOwnedDB(updateTab = "", updateFunc = null) {
   await db.run(createTableSql);
   const createIgnoredIDSql = "create table if not exists ignored_arrangements (id char, constraint id_unique unique (id) )";
   await db.run(createIgnoredIDSql)
+  const createHistorySql = "create table if not exists history (id char, mastery float default 0, timestamp real, constraint id_unique unique(id))";
+  await db.run(createHistorySql)
   await initSetlistDB(); // init setlist db with songs db so all migrations can be in one place
   let version = await getUserVersion();
 
@@ -838,6 +840,16 @@ export async function addtoRSSongList(tablename, songkey) {
   const sql = `replace into '${tablename}' (uniqkey) select uniqkey from songs_owned where songkey like '%${songkey}%'`
   const op = await db.run(sql)
   return op.changes;
+}
+export async function saveHistory(id, mastery, timestamp) {
+  const sql = `replace into history VALUES('${id}', '${mastery}', '${timestamp}')`
+  const op = await db.run(sql)
+  return op.changes;
+}
+export async function getHistory(id, limit = 10) {
+  const sql = `select * from history where id='${id}' order by timestamp asc limit ${limit}`;
+  const op = await db.all(sql);
+  return op;
 }
 export async function deleteRSSongList(tablename, drop = true) {
   let sql = "";

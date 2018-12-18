@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import AnimatedNumber from 'react-animated-number';
 import Highcharts from 'highcharts'
 import HighchartsReact from 'highcharts-react-official'
+import moment from 'moment';
 
 import {
   RemoteAll,
@@ -13,6 +14,9 @@ import SongDetailView from './songdetailView';
 import {
   getSongBySongKey, initSongsOwnedDB, updateMasteryandPlayed,
   getSongsOwned, updateRecentlyPlayedSongs, getSongByID,
+  updateScoreAttackStats,
+  saveHistory,
+  getHistory,
 } from '../sqliteService'
 import readProfile from '../steamprofileService';
 import getProfileConfig from '../configService';
@@ -319,18 +323,23 @@ export default class RSLiveView extends React.Component {
           lineColor: '#EF7408',
           minorTickLength: 0,
           tickLength: 0,
+          min: 0,
+          minRange: 10,
         },
         yAxis: {
           labels: {
-            enabled: false,
+            style: {
+              font: 'Roboto Condensed',
+              color: "white",
+            },
           },
           title: {
             text: '',
             reserveSpace: false,
           },
           min: 0,
-          max: 23,
-          tickInterval: 1,
+          max: 110,
+          tickInterval: 10,
           lineWidth: 1,
           minorGridLineWidth: 0,
           lineColor: 'black',
@@ -343,7 +352,7 @@ export default class RSLiveView extends React.Component {
           floating: true,
         },
         tooltip: {
-          enabled: false,
+          enabled: true,
         },
         legend: {
           enabled: false,
@@ -359,6 +368,7 @@ export default class RSLiveView extends React.Component {
             borderWidth: 1,
             borderColor: 'black',
             animation: false,
+            pointWidth: 30,
           },
         },
         series: [{
@@ -594,7 +604,7 @@ export default class RSLiveView extends React.Component {
     this.songkeyresults = null;
     this.persistenIDresults = null;
     this.albumarturl = "";
-    this.enablefakedata = true;
+    this.enablefakedata = false;
     this.fakedata = JSON.parse(`{"success":false,"currentState":0,"memoryReadout":{"songTimer":4.362,"songID":"Gree21Gu",
     "persistentID":"CE42CBABEC6ABBF296E89310F120DC0E","totalNotesHit":0,"currentHitStreak":0,
     "highestHitStreak":0,"totalNotesMissed":0,"currentMissStreak":0,"mode":2,"gameState":"LearnASong_Pause",
@@ -653,6 +663,7 @@ export default class RSLiveView extends React.Component {
       return (a.StartTime > b.StartTime) ? 1 : ((b.StartTime > a.StartTime) ? -1 : 0);
     });
 
+    /* phrase data for hitp/perp trackingMode*/
     let max = 0;
     let i = 0
     const notesBucket = [];
@@ -693,6 +704,7 @@ export default class RSLiveView extends React.Component {
     last = chartOptions.series[1].data[chartOptions.series[1].data.length - 1];
     first = chartOptions.series[1].data[0];
     last.z = first.z;
+
     /* */
     const defaultNoteData = {
       notesHit: 0,
@@ -910,6 +922,37 @@ export default class RSLiveView extends React.Component {
         this.lastsongkey = memoryReadout.songID;
       }
     });
+  }
+
+  handleTracking = async () => {
+    if (this.state.trackingMode === "hist") {
+      const op = await getSongByID(this.state.persistentID);
+      const mastery = (op.mastery * 100).toFixed(2);
+      const series = this.state.histChartOptions.series;
+      series[0].data.length = 0;
+      series[0].data.push({
+        y: parseFloat(mastery),
+        name: "Best",
+        color: "lightgreen",
+      });
+      //read all history from history db
+      const history = await getHistory(this.state.persistentID);
+      for (let i = 0; i < history.length; i += 1) {
+        const hist = history[i]
+        const masteryLast = (hist.mastery * 100).toFixed(2);
+        series[0].data.push({
+          y: parseFloat(masteryLast),
+          name: i === history.length - 1 ? "Last" : moment(hist.timestamp).fromNow().toString(),
+          color: "#8900C2",
+        });
+      }
+      //add to chart
+      this.setState({
+        histChartOptions: {
+          series,
+        },
+      })
+    }
   }
 
   refreshRPTable = async () => {
@@ -1197,6 +1240,9 @@ export default class RSLiveView extends React.Component {
       const aart = "";
       const timeTotal = 0;
       const timeCurrent = 0;
+      this.state.chartOptions.series[0].data.length = 0;
+      this.state.chartOptions.series[1].data.length = 0;
+      this.state.histChartOptions.series[0].data.length = 0;
       this.setState({
         tracking: 0,
         song,
@@ -1217,6 +1263,11 @@ export default class RSLiveView extends React.Component {
         chartOptions: {
           series: [{
             data: [[0, 0, 5]],
+          }],
+        },
+        histChartOptions: {
+          series: [{
+            data: [[0, 0]],
           }],
         },
         phrases: [],
@@ -1270,10 +1321,16 @@ export default class RSLiveView extends React.Component {
         const stat = stats[keys[i]];
         const mastery = stat.MasteryPeak;
         const played = stat.PlayedCount;
+        const masteryLast = stat.MasteryLast;
+        const dateLAS = stat.DateLAS;
+        const dateLASts = moment(dateLAS).unix();
+        //console.log(masteryLast, dateLASts);
         this.props.updateHeader(
           this.tabname,
           `Updating Stat for SongID:  ${keys[i]} (${i}/${keys.length})`,
         );
+        /*loop await */ // eslint-disable-next-line
+        await saveHistory(keys[i], masteryLast, dateLASts);
         /*loop await */ // eslint-disable-next-line
         const rows = await updateMasteryandPlayed(keys[i], mastery, played);
         if (rows === 0) {
@@ -1326,6 +1383,7 @@ export default class RSLiveView extends React.Component {
             "Tracking: Active",
           );
         }, 5000);
+        this.handleTracking();
       }
 
       // refresh view
@@ -1738,7 +1796,9 @@ export default class RSLiveView extends React.Component {
             <select
               defaultValue={this.state.trackingMode}
               style={{ marginLeft: '-13px', textAlignLast: 'center', width: '110%' }}
-              onChange={(e) => { this.setState({ trackingMode: e.target.value }) }}
+              onChange={(e) => {
+                this.setState({ trackingMode: e.target.value }, () => this.handleTracking())
+              }}
             >
               <option value="hitp">Hit Percent</option>
               <option disabled={!isscoreattack} value="perp">Perfect Percent</option>
