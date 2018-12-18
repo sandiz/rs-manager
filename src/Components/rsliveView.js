@@ -291,6 +291,91 @@ export default class RSLiveView extends React.Component {
           color: 'lightgreen', //2-rgb(200,247,73) 3-yellow
         }],
       },
+      histChartOptions: {
+        credits: {
+          enabled: false,
+        },
+        chart: {
+          type: 'column',
+          height: 140,
+          backgroundColor: 'none',
+          style: {
+            font: 'Roboto Condensed',
+            color: "white",
+          },
+          animation: false,
+        },
+        xAxis: {
+          type: 'category',
+          labels: {
+            style: {
+              font: 'Roboto Condensed',
+              color: "white",
+            },
+          },
+          tickInterval: 1,
+          lineWidth: 1,
+          minorGridLineWidth: 0,
+          lineColor: '#EF7408',
+          minorTickLength: 0,
+          tickLength: 0,
+        },
+        yAxis: {
+          labels: {
+            enabled: false,
+          },
+          title: {
+            text: '',
+            reserveSpace: false,
+          },
+          min: 0,
+          max: 23,
+          tickInterval: 1,
+          lineWidth: 1,
+          minorGridLineWidth: 0,
+          lineColor: 'black',
+          minorTickLength: 0,
+          tickLength: 0,
+          gridLineColor: 'transparent',
+        },
+        title: {
+          text: '',
+          floating: true,
+        },
+        tooltip: {
+          enabled: false,
+        },
+        legend: {
+          enabled: false,
+        },
+        plotOptions: {
+          series: {
+            animation: false,
+          },
+          column: {
+            // stacking: 'normal',
+            grouping: false,
+            shadow: false,
+            borderWidth: 1,
+            borderColor: 'black',
+            animation: false,
+          },
+        },
+        series: [{
+          name: "A",
+          data: [[0, 0, 5]],
+          //colorByPoint: true,
+          //color: '#8900C2',
+          borderRadius: 3,
+          borderColor: 'black',
+          borderWidth: 1,
+        }, {
+          name: "B",
+          data: [],
+          pointPlacement: 0,
+          color: 'lightgreen', //2-rgb(200,247,73) 3-yellow
+        }],
+      },
       phrases: [],
       notesBucket: [{
         notesHit: 0,
@@ -512,7 +597,7 @@ export default class RSLiveView extends React.Component {
     this.enablefakedata = true;
     this.fakedata = JSON.parse(`{"success":false,"currentState":0,"memoryReadout":{"songTimer":4.362,"songID":"Gree21Gu",
     "persistentID":"CE42CBABEC6ABBF296E89310F120DC0E","totalNotesHit":0,"currentHitStreak":0,
-    "highestHitStreak":0,"totalNotesMissed":0,"currentMissStreak":0,"mode":2,"gameState":"ScoreAttack_Pause",
+    "highestHitStreak":0,"totalNotesMissed":0,"currentMissStreak":0,"mode":2,"gameState":"LearnASong_Pause",
     "currentPerfectHitStreak":0,"totalPerfectHits":0,"currentLateHitStreak":0,"totalLateHits":0,
     "perfectPhrases":0,"goodPhrases":0,"passedPhrases":0,"failedPhrases":0,"TotalNotes":0},
     "songDetails":null,"albumCoverBase64":null,"Version":"0.1.4"}`);
@@ -1425,6 +1510,9 @@ export default class RSLiveView extends React.Component {
     const updateMasteryclass = buttonclass + ((this.state.songKey.length <= 0) ? "isDisabled" : "");
     const isscoreattack = this.state.gameState.toLowerCase().includes("scoreattack");
     const livestatsstyle = isscoreattack ? " col col-md-4 ta-center dashboard-top dashboard-rslive-song-details-sa" : " col col-md-3 ta-center dashboard-top dashboard-rslive-song-details";
+    const ispercent = this.state.trackingMode === "hitp" || this.state.trackingMode === "perp";
+    const ishistory = this.state.trackingMode === "hist"
+    const isrecord = this.state.trackingMode === "record"
     let trackingButton = null;
     switch (this.state.tracking) {
       default:
@@ -1638,39 +1726,50 @@ export default class RSLiveView extends React.Component {
             </div>
           </div>
         </div>
-        {
-          //this.state.chartOptions.series[0].data.length > 0
-          //  ? (
-          <div>
-            <div style={{
-              float: 'left',
-              color: 'azure',
-              position: 'relative',
-              left: '5%',
-              top: '22px',
-            }}> Tracking Mode
+        <div>
+          <div style={{
+            float: 'left',
+            color: 'azure',
+            position: 'relative',
+            left: '5%',
+            top: '22px',
+          }}> Tracking Mode
                 <br />
-              <select
-                defaultValue={this.state.trackingMode}
-                style={{ marginLeft: '-13px', textAlignLast: 'center', width: '110%' }}
-                onChange={(e) => { this.setState({ trackingMode: e.target.value }) }}
-              >
-                <option value="hitp">Hit Percent</option>
-                <option disabled={!isscoreattack} value="perp">Perfect Percent</option>
-                <option value="hist">Progress History</option>
-                <option value="record">Recording</option>
-              </select>
-            </div>
-            <div id="barChart">
+            <select
+              defaultValue={this.state.trackingMode}
+              style={{ marginLeft: '-13px', textAlignLast: 'center', width: '110%' }}
+              onChange={(e) => { this.setState({ trackingMode: e.target.value }) }}
+            >
+              <option value="hitp">Hit Percent</option>
+              <option disabled={!isscoreattack} value="perp">Perfect Percent</option>
+              <option value="hist">Progress History</option>
+              <option value="record">Recording</option>
+            </select>
+          </div>
+          {
+            <div id="barChart" style={{ display: ispercent ? "" : "none" }}>
               <HighchartsReact
                 highcharts={Highcharts}
                 options={this.state.chartOptions}
                 id="barChart"
               />
             </div>
-          </div>
-          //) : null
-        }
+          }
+          {
+            <div id="barChart" style={{ display: ishistory ? "" : "none" }}>
+              <HighchartsReact
+                highcharts={Highcharts}
+                options={this.state.histChartOptions}
+                id="barChart"
+              />
+            </div>
+          }
+          {
+            <div id="barChart" style={{ display: isrecord ? "" : "none" }}>
+              Recording Controls go here
+            </div>
+          }
+        </div>
         <div>
           <RemoteAll
             keyField="id"
