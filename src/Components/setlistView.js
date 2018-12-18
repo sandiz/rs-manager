@@ -423,9 +423,13 @@ export default class SetlistView extends React.Component {
             selectsql = `select * from songs_owned where uniqkey in (select * from ${this.lastChildID});`
         }
         const viewname = "view_" + this.lastChildID
+        const dropsql = `DROP VIEW IF EXISTS ${viewname}`
+        await executeRawSql(dropsql);
         const viewsql = `CREATE TEMP VIEW IF NOT EXISTS ${viewname} AS ` + selectsql;
         await executeRawSql(viewsql);
+        console.log(viewsql)
         const leadStats = await getLeadStats(true, viewname)
+        console.log(leadStats)
         const lup = leadStats.l - (leadStats.l1 + leadStats.l2 + leadStats.l3
             + leadStats.l4 + leadStats.l5 + leadStats.l6)
         const rhythmStats = await getRhythmStats(true, viewname);
