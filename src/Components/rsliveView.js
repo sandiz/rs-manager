@@ -407,7 +407,6 @@ export default class RSLiveView extends React.Component {
         lateHits: 0,
       }],
       trackingMode: 'hitp', //hitp, perp, hist, record
-      recording: 0, //stopped, wait, started
     }
     this.tabname = 'tab-rslive';
     this.columns = [
@@ -633,9 +632,6 @@ export default class RSLiveView extends React.Component {
       lastTimer: 0,
       lastBucket: 0,
     }
-    this.recordTitleRef = React.createRef();
-    this.recordTimer = null;
-    this.lastRecordedFile = "";
   }
 
   componentDidMount = async () => {
@@ -654,7 +650,6 @@ export default class RSLiveView extends React.Component {
   componentWillUnmount = async () => {
     //this.stopTracking(false);
     if (this.fetchrstimer) clearInterval(this.fetchrstimer);
-    window.libRecord.stopRecording(); //stop recording if necessary
   }
 
   animatedNumber = (number) => {
@@ -1562,48 +1557,6 @@ export default class RSLiveView extends React.Component {
     return def;
   }
 
-  handleRecord = () => {
-    if (this.state.recording === 0) {
-      //start recording
-      this.setState({ recording: 1 });
-      const rsDevice = window.libRecord.startRecording((err) => {
-        this.recordTitleRef.current.innerHTML = "Internal error while recording";
-        console.log(err)
-        this.failedRecording();
-      });
-      if (rsDevice.index !== -1) {
-        this.lastRecordedFile = rsDevice.fileName;
-        this.recordTitleRef.current.innerHTML = "Recording.. File: " + window.path.basename(rsDevice.fileName);
-        this.setState({ recording: 2 });
-        this.recordTimer = setInterval(async () => {
-          if (rsDevice.index !== -1) {
-            window.electronFS.stat(rsDevice.fileName, (err, stats) => {
-              const size = (stats.size / 1024 / 1024).toFixed(2);
-              this.recordTitleRef.current.innerHTML = `Recording.. File:  ${window.path.basename(rsDevice.fileName)}  Size: ${size}mb`;
-            })
-          }
-        }, 1000);
-      }
-      else {
-        this.recordTitleRef.current.innerHTML = "Failed to start recording.. Rocksmith Guitar USB Adapter not found!";
-      }
-    }
-    else {
-      //stop recording
-      this.failedRecording();
-    }
-  }
-
-  failedRecording = () => {
-    if (this.recordTimer != null) {
-      clearInterval(this.recordTimer)
-    }
-    this.setState({ recording: 1 })
-    window.libRecord.stopRecording();
-    this.setState({ recording: 0 })
-    this.recordTitleRef.current.innerHTML = `Finished Recording.. File: <a style="border-bottom: 1px solid white" onclick="javascript: window.shell.showItemInFolder('${this.lastRecordedFile}')" href='#'>${window.path.basename(this.lastRecordedFile)}</a>`;
-  }
-
   render = () => {
     let { minutes, seconds } = getMinutesSecs(this.state.timeCurrent);
     const timeCurrent = `${minutes}:${seconds}`;
@@ -1663,19 +1616,6 @@ export default class RSLiveView extends React.Component {
             Start Tracking
           </a>
         )
-        break;
-    }
-    let recordText = ""
-    switch (this.state.recording) {
-      default:
-      case 0:
-        recordText = "Record RAW Audio"
-        break;
-      case 1:
-        recordText = "Please Wait.."
-        break;
-      case 2:
-        recordText = "Stop Recording"
         break;
     }
     return (
@@ -1903,16 +1843,8 @@ export default class RSLiveView extends React.Component {
             </div>
           }
           {
-            <div id="barChart" style={{ display: isrecord ? "" : "none", textAlign: 'center' }}>
-              <div style={{ position: 'relative', top: '12%' }}>
-                <span ref={this.recordTitleRef} style={{ color: 'azure' }}>Not Recording...</span>
-                <br />
-                <a
-                  onClick={this.handleRecord}
-                  className={buttonclass}>
-                  {recordText}
-                </a>
-              </div>
+            <div id="barChart" style={{ display: isrecord ? "" : "none" }}>
+              Recording Controls go here
             </div>
           }
         </div>
