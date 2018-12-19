@@ -369,6 +369,19 @@ export default class RSLiveView extends React.Component {
             borderColor: 'black',
             animation: false,
             pointWidth: 30,
+            dataLabels: {
+              enabled: true,
+              crop: false,
+              overflow: 'none',
+              borderColor: 'black',
+              borderWidth: 0,
+              sahdow: false,
+              color: 'azure',
+              style: {
+                fontWeight: 'normal',
+                textOutline: "none",
+              },
+            },
           },
         },
         series: [{
@@ -928,6 +941,7 @@ export default class RSLiveView extends React.Component {
   handleTracking = async () => {
     if (this.state.trackingMode === "hist") {
       const op = await getSongByID(this.state.persistentID);
+      //console.log(op.mastery)
       const mastery = (op.mastery * 100).toFixed(2);
       const series = this.state.histChartOptions.series;
       series[0].data.length = 0;
@@ -944,7 +958,7 @@ export default class RSLiveView extends React.Component {
         const floatMastery = parseFloat(masteryLast)
         series[0].data.push({
           y: floatMastery,
-          name: i === history.length - 1 ? "Last" : moment(hist.timestamp * 1000).fromNow().toString(),
+          name: i === history.length - 1 ? "Last" : moment(hist.timestamp * 1000).format("M/D LT"),
           color: floatMastery >= 100 ? "lightgreen" : "#8900C2",
         });
       }
@@ -1328,7 +1342,7 @@ export default class RSLiveView extends React.Component {
           this.tabname,
           `Updating Stat for SongID:  ${keys[i]} (${i}/${keys.length})`,
         );
-        console.log(masteryLast, dateLAS);
+        //console.log(masteryLast, dateLAS);
         /*loop await */ // eslint-disable-next-line
         await saveHistory(keys[i], masteryLast, dateLASts);
         /*loop await */ // eslint-disable-next-line
