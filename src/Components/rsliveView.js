@@ -1295,6 +1295,7 @@ export default class RSLiveView extends React.Component {
       this.lastsongdetail = null;
       this.songkeyresults = null;
       this.albumarturl = "";
+      this.persistenIDresults = null;
       this.refreshTable();
     }
     this.props.resetHeader(this.tabname);
