@@ -1821,7 +1821,6 @@ export default class RSLiveView extends React.Component {
               <option value="hitp">Hit Percent</option>
               <option disabled={!isscoreattack} value="perp">Perfect Percent</option>
               <option value="hist">Progress History</option>
-              <option value="record">Recording</option>
             </select>
           </div>
           {
