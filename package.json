@@ -25,7 +25,6 @@
     "line-by-line": "^0.1.6",
     "marked": "^0.5.1",
     "moment": "^2.22.2",
-    "naudiodon": "^0.4.7",
     "object-assign": "4.1.1",
     "openid": "^2.0.6",
     "pidusage": "^2.0.17",
@@ -49,7 +48,6 @@
     "steam-webapi": "^0.6.5",
     "sudo-prompt": "^8.2.3",
     "sweetalert2": "^7.32.4",
-    "wav": "^1.0.2",
     "whatwg-fetch": "^3.0.0"
   },
   "scripts": {
@@ -61,7 +59,7 @@
     "react-start": "react-app-rewired start",
     "pack": "build --dir",
     "dist": "npm run build && build",
-    "postinstall": "electron-rebuild  -f -w sqlite3,naudiodon && patch-package",
+    "postinstall": "electron-rebuild  -f -w  sqlite3 && patch-package",
     "package-mac": "node scripts/package.js mac",
     "package-win": "node scripts/package.js win",
     "contributors:add": "all-contributors add",
