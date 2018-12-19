@@ -39,7 +39,7 @@ export async function initSongsOwnedDB(updateTab = "", updateFunc = null) {
   await db.run(createTableSql);
   const createIgnoredIDSql = "create table if not exists ignored_arrangements (id char, constraint id_unique unique (id) )";
   await db.run(createIgnoredIDSql)
-  const createHistorySql = "create table if not exists history (id char, mastery float default 0, timestamp real, constraint id_unique unique(id))";
+  const createHistorySql = "create table if not exists history (id char, mastery float default 0, timestamp real, constraint ts_unique unique(timestamp))";
   await db.run(createHistorySql)
   await initSetlistDB(); // init setlist db with songs db so all migrations can be in one place
   let version = await getUserVersion();

@@ -854,6 +854,7 @@ export default class RSLiveView extends React.Component {
         const arrangements = psarcObj.arrangements;
         const arrangement = arrangements.filter(arr => arr.id === memoryReadout.persistentID)[0];
         this.generatePhrases(arrangement.phraseIterations);
+        this.handleTracking();
       }
       else {
         this.persistenIDresults = null;
@@ -940,10 +941,11 @@ export default class RSLiveView extends React.Component {
       for (let i = 0; i < history.length; i += 1) {
         const hist = history[i]
         const masteryLast = (hist.mastery * 100).toFixed(2);
+        const floatMastery = parseFloat(masteryLast)
         series[0].data.push({
-          y: parseFloat(masteryLast),
-          name: i === history.length - 1 ? "Last" : moment(hist.timestamp).fromNow().toString(),
-          color: "#8900C2",
+          y: floatMastery,
+          name: i === history.length - 1 ? "Last" : moment(hist.timestamp * 1000).fromNow().toString(),
+          color: floatMastery >= 100 ? "lightgreen" : "#8900C2",
         });
       }
       //add to chart
@@ -1329,6 +1331,7 @@ export default class RSLiveView extends React.Component {
           this.tabname,
           `Updating Stat for SongID:  ${keys[i]} (${i}/${keys.length})`,
         );
+        console.log(masteryLast, dateLAS);
         /*loop await */ // eslint-disable-next-line
         await saveHistory(keys[i], masteryLast, dateLASts);
         /*loop await */ // eslint-disable-next-line
@@ -1616,7 +1619,7 @@ export default class RSLiveView extends React.Component {
           <a
             onClick={this.updateMastery}
             className={updateMasteryclass}>
-            Update Mastery
+            Update Mastery/History
           </a>
           <a
             onClick={this.updateRecentlyPlayed}
