@@ -37,7 +37,7 @@ function startRecording(errcb) {
     const ts = new Date().getTime();
     const file = os.tmpdir() + "/rocksmith_raw_" + ts + ".wav";
     rsDevice.fileName = file;
-    ws = new FileWriter(file, {
+    writestream = new FileWriter(file, {
         sampleRate: 48000,
         channels: 1,
         bitDepth: 8,
