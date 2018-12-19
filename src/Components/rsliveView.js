@@ -1242,9 +1242,6 @@ export default class RSLiveView extends React.Component {
       const aart = "";
       const timeTotal = 0;
       const timeCurrent = 0;
-      this.state.chartOptions.series[0].data.length = 0;
-      this.state.chartOptions.series[1].data.length = 0;
-      this.state.histChartOptions.series[0].data.length = 0;
       this.setState({
         tracking: 0,
         song,
@@ -1575,6 +1572,7 @@ export default class RSLiveView extends React.Component {
     const ishistory = this.state.trackingMode === "hist"
     const isrecord = this.state.trackingMode === "record"
     let trackingButton = null;
+    const gameState = this.state.gameState === "" ? "Invalid" : this.state.gameState;
     switch (this.state.tracking) {
       default:
       case 2:
@@ -1633,7 +1631,9 @@ export default class RSLiveView extends React.Component {
           <div
             className={livestatsstyle}>
             <div>
-              {this.state.gameState !== "" ? <span>GameState: {this.state.gameState + " - Note Stats: " + ((this.state.persistentID === '' || this.state.persistentID.includes("depedency")) ? "Inactive" : "Active")}</span> : <span>Live Stats</span>}
+              <span>
+                GameState: {gameState + " <> Note Stats: " + ((this.state.persistentID === '' || this.state.persistentID.includes("depedency")) ? "Inactive" : "Active")}
+              </span>
               <hr />
             </div>
             <div>
