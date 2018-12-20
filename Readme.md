@@ -59,7 +59,10 @@ Rocksmith's UI leaves a lot to be desired especially when you have a lot of song
 
 
 ## TODO
-- generate youtube playlist of current view
+1. [Mac] Find Pointer to Game State + PersistentID (instead of scanning)
+2. [Win] Find Pointer to PersistentID (instead of scanning)
+3. [Win] https://github.com/hiitiger/gelectron exploration (steam type overlay)
+
 
 ## Development
 - Instructions for dev
