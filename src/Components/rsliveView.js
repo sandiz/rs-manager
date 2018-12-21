@@ -1562,7 +1562,7 @@ export default class RSLiveView extends React.Component {
     return def;
   }
 
-  handleRecord = () => {
+  handleRecord = async () => {
     if (this.state.recording === 0) {
       //start recording
       this.setState({ recording: 1 });
@@ -1586,6 +1586,7 @@ export default class RSLiveView extends React.Component {
       }
       else {
         this.recordTitleRef.current.innerHTML = "Failed to start recording.. Rocksmith Guitar USB Adapter not found!";
+        this.failedRecording(true);
       }
     }
     else {
@@ -1594,14 +1595,16 @@ export default class RSLiveView extends React.Component {
     }
   }
 
-  failedRecording = () => {
+  failedRecording = (nodevice = false) => {
     if (this.recordTimer != null) {
       clearInterval(this.recordTimer)
     }
     this.setState({ recording: 1 })
     window.libRecord.stopRecording();
     this.setState({ recording: 0 })
-    this.recordTitleRef.current.innerHTML = `Finished Recording.. File: <a style="border-bottom: 1px solid white" onclick="javascript: window.shell.showItemInFolder('${this.lastRecordedFile}')" href='#'>${window.path.basename(this.lastRecordedFile)}</a>`;
+    if (!nodevice) {
+      this.recordTitleRef.current.innerHTML = `Finished Recording.. File: <a style="border-bottom: 1px solid white" onclick="javascript: window.shell.showItemInFolder('${this.lastRecordedFile}')" href='#'>${window.path.basename(this.lastRecordedFile)}</a>`;
+    }
   }
 
   render = () => {
@@ -1869,8 +1872,8 @@ export default class RSLiveView extends React.Component {
             position: 'relative',
             left: '5%',
             top: '22px',
-          }}> Tracking Mode
-                <br />
+          }}> Tracking Mode<sup>BETA</sup>
+            <br />
             <select
               defaultValue={this.state.trackingMode}
               style={{ marginLeft: '-13px', textAlignLast: 'center', width: '110%' }}
@@ -1881,6 +1884,7 @@ export default class RSLiveView extends React.Component {
               <option value="hitp">Hit Percent</option>
               <option disabled={!isscoreattack} value="perp">Perfect Percent</option>
               <option value="hist">Progress History</option>
+              <option value="record">Record Audio</option>
             </select>
           </div>
           {

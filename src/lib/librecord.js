@@ -1,6 +1,7 @@
-var fs = require('fs');
 var portAudio = require('naudiodon');
-var os = require("os");
+const { pipeline } = require('stream');
+var MemoryStream = require('memorystream');
+
 var FileWriter = require('wav').FileWriter;
 
 let ai = null;
@@ -17,6 +18,7 @@ function startRecording(errcb) {
     }
     for (let i = 0; i < devices.length; i += 1) {
         const device = devices[i]
+        console.log(device);
         if (device.name === "Rocksmith USB Guitar Adapter") {
             rsDevice.index = device.id;
             rsDevice.name = device.name;
@@ -28,25 +30,48 @@ function startRecording(errcb) {
     if (rsDevice.index === -1) {
         return rsDevice;
     }
+
+    const ts = new Date().getTime();
+    const dirs = remote.dialog.showOpenDialog({
+        properties: ["openDirectory"],
+        title: "Choose directory to save to..",
+    });
+    const results = dirs[0];
+    const file = results + "/rocksmith_raw_" + ts + ".wav";
+    rsDevice.fileName = file;
+
+    pipeline(
+        aiStream(rsDevice),
+        new MemoryStream(),
+        writeStream(file),
+        (err) => {
+            if (err) {
+                console.log(err);
+                errcb(err);
+            }
+        }
+    );
+    ai.start();
+    return rsDevice;
+}
+
+function aiStream(rsDevice) {
     ai = new portAudio.AudioInput({
         channelCount: rsDevice.maxInputChannels,
-        sampleFormat: portAudio.SampleFormat8Bit,
+        sampleFormat: portAudio.SampleFormat16Bit,
         sampleRate: rsDevice.defaultSampleRate,
         deviceId: rsDevice.index,
     });
-    const ts = new Date().getTime();
-    const file = os.tmpdir() + "/rocksmith_raw_" + ts + ".wav";
-    rsDevice.fileName = file;
+    return ai;
+}
+
+function writeStream(file, ) {
     writestream = new FileWriter(file, {
         sampleRate: 48000,
         channels: 1,
-        bitDepth: 8,
+        bitDepth: 16,
     });
-
-    ai.on('error', err => errcb(err));
-    ai.pipe(ws);
-    ai.start()
-    return rsDevice;
+    return writestream;
 }
 
 function stopRecording() {
