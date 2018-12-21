@@ -14,6 +14,7 @@ window.prompt = require('electron-prompt');
 window.findProcess = require('find-process');
 window.processPSARC = require("./lib/libpsarc").processPSARC
 window.extractFile = require("./lib/libpsarc").extractFile
+window.libRecord = require("./lib/librecord");
 window.sudo = require('sudo-prompt');
 window.exec = require('child_process').exec;
 window.linereader = require('line-by-line');
