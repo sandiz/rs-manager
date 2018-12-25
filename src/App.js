@@ -16,6 +16,7 @@ import {
 import './css/App.css'
 import HelpView from './Components/HelpView';
 import { getState } from './stateService';
+import { enableScroll, forceNoScroll } from './Components/songdetailView';
 
 const csvparse = require('csv-parse/lib/es5/sync');
 
@@ -417,6 +418,7 @@ class App extends Component {
         break;
     }
     this.setState({ showhelp: true, readme })
+    forceNoScroll();
   }
 
   openChangelog = () => {
@@ -425,6 +427,7 @@ class App extends Component {
 
   closeHelp = () => {
     this.setState({ showhelp: false })
+    enableScroll();
   }
 
   switchNavbarColor = (color) => {
@@ -531,7 +534,7 @@ class App extends Component {
               {this.state.selectedTab}
             </div>
             <div ref={(ref) => { this.modal_div = ref }} id="open-modal" style={{ opacity: 1, pointerEvents: "auto" }} className={showhelpstyle}>
-              <div id="" className="width-75">
+              <div id="modal-info" className="width-75">
                 <HelpView
                   updateHeader={this.updateHeader}
                   popupMode
