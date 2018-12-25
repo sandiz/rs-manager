@@ -142,6 +142,7 @@ export default class HelpView extends React.Component {
     const showprev = this.state.totalIndex > 0 && this.state.currentIndex > 0 ? "" : "isDisabled";
     const shownext = this.state.totalIndex > 0 && this.state.currentIndex < this.state.totalIndex - 1 ? "" : "isDisabled";
     const relesever = this.state.currentIndex < this.state.changelog.length ? this.state.changelog[this.state.currentIndex].tag_name : ""
+    const htmlurl = this.state.currentIndex < this.state.changelog.length ? this.state.changelog[this.state.currentIndex].html_url : ""
     const releasename = this.state.currentIndex < this.state.changelog.length ? this.state.changelog[this.state.currentIndex].name : ""
     const publishedate = this.state.currentIndex < this.state.changelog.length ? this.state.changelog[this.state.currentIndex].published_at : ""
     const dllink = this.state.currentIndex < this.state.changelog.length ? this.state.changelog[this.state.currentIndex].assets[0].browser_download_url : ""
@@ -258,7 +259,9 @@ export default class HelpView extends React.Component {
                 fontSize: 20 + 'px',
               }}>
                 <div>
-                  {relesever} ({releasename}) {this.state.currentIndex === 0 ? "(LATEST)" : ""}
+                  <a href="#" onClick={() => window.shell.openExternal(htmlurl)}>
+                    {relesever} ({releasename}) {this.state.currentIndex === 0 ? "(LATEST)" : ""}
+                  </a>
                 </div>
                 <br />
                 <div
