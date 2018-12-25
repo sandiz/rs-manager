@@ -17,9 +17,9 @@ export function forceNoScroll() {
   document.getElementsByTagName("html")[0].scrollTop = 0;
 
   document.getElementsByTagName("body")[0].style.height = "100%";
-  //document.getElementsByTagName("body")[0].style.overflow = "hidden";
+  document.getElementsByTagName("body")[0].style.overflow = "hidden";
   document.getElementsByTagName("html")[0].style.height = "100%";
-  //document.getElementsByTagName("html")[0].style.overflow = "hidden";
+  document.getElementsByTagName("html")[0].style.overflow = "hidden";
 }
 export function enableScroll() {
   document.getElementsByTagName("body")[0].style.height = "100%";

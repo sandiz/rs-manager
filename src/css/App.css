@@ -521,8 +521,8 @@ tbody tr:hover {
 .modal-window-help>div {
     width: 720px;
     position: relative;
-    margin: 1% auto;
-    padding: 2rem;
+    margin: 5% auto;
+    height: initial !important;
 }
 
 .width-75 {

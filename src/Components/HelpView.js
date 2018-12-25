@@ -152,9 +152,9 @@ export default class HelpView extends React.Component {
 
     const body = this.state.currentIndex < this.state.changelog.length ? this.state.changelog[this.state.currentIndex].body : ""
     return (
-      <div className="container-fluid">
-        <div className="row justify-content-lg-center">
-          <div className="col col-lg-10 settings ta-center" style={{ backgroundColor: bgColor, height: 880 + 'px' }}>
+      <div className="">
+        <div className=" justify-content-lg-center">
+          <div className="col  settings ta-center" style={{ backgroundColor: bgColor }}>
             {
               (
                 <div>
