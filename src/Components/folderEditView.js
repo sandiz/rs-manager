@@ -222,7 +222,7 @@ export default class FolderEditView extends React.Component {
     return (
       <div className="container-fluid modal-folder-edit" style={{ opacity: 1, pointerEvents: "auto" }}>
         <div className="row justify-content-lg-center">
-          <div id="modal-info" className="width-75">
+          <div id="modal-info" className="width-75" style={{ boxShadow: 'none' }}>
             <br />
             <div style={{ textAlign: 'center' }}>
               <h4 style={{ fontSize: 150 + "%", fontWeight: 'bold', marginTop: -25 + 'px' }}>
