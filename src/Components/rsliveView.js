@@ -19,7 +19,7 @@ import {
   getHistory,
 } from '../sqliteService'
 import readProfile from '../steamprofileService';
-import getProfileConfig from '../configService';
+import getProfileConfig, { readFile, writeFile } from '../configService';
 import { psarcToJSON } from '../psarcService';
 
 const albumArt = require('./../lib/album-art');
@@ -1566,11 +1566,35 @@ export default class RSLiveView extends React.Component {
     if (this.state.recording === 0) {
       //start recording
       this.setState({ recording: 1 });
-      const rsDevice = window.libRecord.startRecording((err) => {
-        this.recordTitleRef.current.innerHTML = "Internal error while recording";
-        console.log(err)
-        this.failedRecording();
-      });
+      const startTime = getMinutesSecs(this.state.timeCurrent);
+      const rsDevice = window.libRecord.startRecording(
+        (err) => {
+          this.recordTitleRef.current.innerHTML = "Internal error while recording";
+          console.log(err)
+          this.failedRecording();
+        }, async (filename) => {
+          console.log("recording finished..", filename);
+          const data = await readFile(filename);
+          const wav = new window.WaveFile(data);
+          const song = this.state.song.length > 0 ? this.state.song : "-"
+          const endTime = getMinutesSecs(this.state.timeCurrent);
+          let path = "-";
+          if (this.persistenIDresults !== null) {
+            if (this.persistenIDresults.path_lead === 1) path = "Lead"
+            else if (this.persistenIDresults.path_rhythm === 1) path = "Rhythm"
+            else if (this.persistenIDresults.path_bass === 1) path = "Bass"
+          }
+
+          let metadata = `RSLive Raw Record, Song: ${song} Arrangement: ${path}`;
+          if (startTime) metadata += ` StartTime: ${startTime.minutes}:${startTime.seconds}`
+          if (endTime) metadata += ` EndTIme: ${endTime.minutes}:${endTime.seconds}`
+
+          wav.setTag("ICMT", metadata)
+          await writeFile(filename, wav.toBuffer());
+          console.log(metadata)
+          //write metadata here
+        },
+      );
       if (rsDevice.index !== -1) {
         this.lastRecordedFile = rsDevice.fileName;
         this.recordTitleRef.current.innerHTML = "Recording.. File: " + window.path.basename(rsDevice.fileName);

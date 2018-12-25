@@ -51,6 +51,7 @@
     "sudo-prompt": "^8.2.3",
     "sweetalert2": "^7.32.4",
     "wav": "^1.0.2",
+    "wavefile": "^8.4.4",
     "whatwg-fetch": "^3.0.0"
   },
   "scripts": {
