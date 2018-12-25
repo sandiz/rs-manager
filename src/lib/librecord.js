@@ -6,7 +6,7 @@ var FileWriter = require('wav').FileWriter;
 
 let ai = null;
 let writestream = null;
-function startRecording(errcb) {
+function startRecording(errcb, fincb) {
     if (ai != null) ai.quit();
     const devices = portAudio.getDevices();
     const rsDevice = {
@@ -48,6 +48,9 @@ function startRecording(errcb) {
             if (err) {
                 console.log(err);
                 errcb(err);
+            }
+            else {
+                fincb(file);
             }
         }
     );

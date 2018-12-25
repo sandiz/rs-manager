@@ -20,6 +20,8 @@ window.exec = require('child_process').exec;
 window.linereader = require('line-by-line');
 window.shortid = require('shortid');
 window.pidusage = require('pidusage');
+window.WaveFile = require('wavefile');
+
 
 
 const rp = require('request-promise');
