@@ -33,9 +33,15 @@ function startRecording(errcb, fincb) {
 
     const ts = new Date().getTime();
     const dirs = remote.dialog.showOpenDialog({
-        properties: ["openDirectory"],
-        title: "Choose directory to save to..",
+        properties: ["openDirectory", "createDirectory"],
+        message: "Choose directory to save the recording to..",
+        title: "Choose directory to save the recording to..",
+        buttonLabel: "Save"
     });
+    if (!dirs) {
+        rsDevice.index = -2;
+        return rsDevice;
+    }
     const results = dirs[0];
     const file = results + "/rocksmith_raw_" + ts + ".wav";
     rsDevice.fileName = file;
