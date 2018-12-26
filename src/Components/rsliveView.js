@@ -1592,7 +1592,7 @@ export default class RSLiveView extends React.Component {
           wav.setTag("ICMT", metadata)
           await writeFile(filename, wav.toBuffer());
           const dir = filename.replace(/\\/g, '\\\\');
-          console.log(dir, metadata)
+          //console.log(dir, metadata)
 
           this.recordTitleRef.current.innerHTML = `Finished Recording.. File: 
           <a style="border-bottom: 1px solid white" onclick='javascript: window.shell.showItemInFolder("${dir}")' href='#'>
