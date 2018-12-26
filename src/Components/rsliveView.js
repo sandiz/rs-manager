@@ -1591,7 +1591,12 @@ export default class RSLiveView extends React.Component {
 
           wav.setTag("ICMT", metadata)
           await writeFile(filename, wav.toBuffer());
-          console.log(metadata)
+          const dir = filename.replace(/\\/g, '\\\\');
+          console.log(dir, metadata)
+
+          this.recordTitleRef.current.innerHTML = `Finished Recording.. File: 
+          <a style="border-bottom: 1px solid white" onclick='javascript: window.shell.showItemInFolder("${dir}")' href='#'>
+          ${window.path.basename(filename)}</a>`;
           //write metadata here
         },
       );
@@ -1634,9 +1639,6 @@ export default class RSLiveView extends React.Component {
     this.setState({ recording: 1 })
     window.libRecord.stopRecording();
     this.setState({ recording: 0 })
-    if (!nodevice) {
-      this.recordTitleRef.current.innerHTML = `Finished Recording.. File: <a style="border-bottom: 1px solid white" onclick="javascript: window.shell.showItemInFolder('${this.lastRecordedFile}')" href='#'>${window.path.basename(this.lastRecordedFile)}</a>`;
-    }
   }
 
   render = () => {

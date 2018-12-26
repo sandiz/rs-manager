@@ -1,5 +1,5 @@
 
-import { writeFile } from './configService'
+//import { writeFile } from './configService'
 //const jspack = require("./jspack");
 const aesjs = require('aes-js');
 const zlib = require('zlib')
@@ -31,9 +31,9 @@ export default async function readProfile(prfldb) {
   //console.log(Buffer.from(keya).toString('hex'));
   try {
     const rawjson = await unzip(decrypted);
-    if (window.isDev) {
-      await writeFile("/tmp/player_data.json", rawjson)
-    }
+    //if (window.isDev) {
+    //  await writeFile("/tmp/player_data.json", rawjson)
+    //}
     const jsonobj = JSON.parse(new TextDecoder("utf-8").decode(rawjson.slice(0, rawjson.length - 1)))
     return jsonobj;
   }
