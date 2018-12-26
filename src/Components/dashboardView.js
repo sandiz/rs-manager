@@ -227,6 +227,7 @@ export default class DashboardView extends React.Component {
     }
     if (prfldb.length > 0) {
       const steamProfile = await readProfile(prfldb);
+      if (!steamProfile) return;
       const stats = steamProfile.Stats;
       await updateProfileConfig(prfldb);
       this.props.handleChange();

@@ -19,7 +19,11 @@ function startRecording(errcb, fincb) {
     for (let i = 0; i < devices.length; i += 1) {
         const device = devices[i]
         console.log(device);
-        if (device.name === "Rocksmith USB Guitar Adapter") {
+        if (device.name.includes("Rocksmith USB Guitar Adapter")) {
+            if (window.os.platform() === 'win32' && !device.hostAPIName.toLowerCase().includes("wasapi")) {
+                continue;
+            }
+            console.log("chosen", device);
             rsDevice.index = device.id;
             rsDevice.name = device.name;
             rsDevice.maxInputChannels = device.maxInputChannels;
@@ -43,7 +47,7 @@ function startRecording(errcb, fincb) {
         return rsDevice;
     }
     const results = dirs[0];
-    const file = results + "/rocksmith_raw_" + ts + ".wav";
+    const file = window.path.join(results, "/rocksmith_raw_" + ts + ".wav");
     rsDevice.fileName = file;
 
     pipeline(
