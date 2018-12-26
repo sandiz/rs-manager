@@ -1595,7 +1595,7 @@ export default class RSLiveView extends React.Component {
           //write metadata here
         },
       );
-      if (rsDevice.index !== -1) {
+      if (rsDevice.index > 0) {
         this.lastRecordedFile = rsDevice.fileName;
         this.recordTitleRef.current.innerHTML = "Recording.. File: " + window.path.basename(rsDevice.fileName);
         this.setState({ recording: 2 });
@@ -1609,7 +1609,15 @@ export default class RSLiveView extends React.Component {
         }, 1000);
       }
       else {
-        this.recordTitleRef.current.innerHTML = "Failed to start recording.. Rocksmith Guitar USB Adapter not found!";
+        switch (rsDevice.index) {
+          default:
+          case -1:
+            this.recordTitleRef.current.innerHTML = "Failed to start recording.. Rocksmith Guitar USB Adapter not found!";
+            break;
+          case -2:
+            this.recordTitleRef.current.innerHTML = "Error opening directory!";
+            break;
+        }
         this.failedRecording(true);
       }
     }
