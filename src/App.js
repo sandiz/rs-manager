@@ -122,7 +122,7 @@ class App extends Component {
       const di = {}
       for (let i = 0; i < items.length; i += 1) {
         const line = csvparse(items[i])[0];
-        di[line[0]] = line[1];
+        di[line[0]] = line[1].replace(/NEWLINE/gi, "\n");
       }
       this.setState({ globalNotes: di });
     }
