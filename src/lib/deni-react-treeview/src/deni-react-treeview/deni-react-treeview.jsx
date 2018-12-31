@@ -62,7 +62,7 @@ class DeniReactTreeView extends React.Component {
 DeniReactTreeView.defaultProps = treeviewProps.defaultProps;
 
 function _createComponentsChildren(treeview, parent, level, children) {
-  const style = level > 1 &&
+  const style = level == 2 &&
     parent.props.item && parent.props.item.expanded
     && children && children.length >= 1 ? "sidebar-scroll" : null;
   return (
