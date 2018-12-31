@@ -368,8 +368,8 @@ export default class Sidebar extends React.Component {
         break;
     }
     return (
-      <div className={level3class}>
-        <span className={childclass}>{item.name}</span>
+      <div className={level3class} title={item.name}>
+        <span className={childclass} title={item.name}>{item.name}</span>
         {extraChildren}
       </div>
     )
