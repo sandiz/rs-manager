@@ -7426,10 +7426,9 @@ natural-compare@^1.4.0:
   resolved "https://registry.yarnpkg.com/natural-compare/-/natural-compare-1.4.0.tgz#4abebfeed7541f2c27acfb29bdbbd15c8d5ba4f7"
   integrity sha1-Sr6/7tdUHywnrPspvbvRXI1bpPc=
 
-naudiodon@^0.4.7:
+"naudiodon@https://github.com/Streampunk/naudiodon":
   version "0.4.7"
-  resolved "https://registry.yarnpkg.com/naudiodon/-/naudiodon-0.4.7.tgz#c0b5ef1f5bb55e311321fb26e2624857d1d90afa"
-  integrity sha512-5DX9d6tnXnbhbSAf9p10L3oBL/qSc5yH64H3mA1t07GuHmqkd8wBBV2xD9Kuqn5JuEwZv/wKpbNX4Lr/3T/Gkw==
+  resolved "https://github.com/Streampunk/naudiodon#41b3795ae4a05a76c97eca7e845ce1912925df77"
   dependencies:
     bindings "^1.3.0"
     nan "^2.10.0"
