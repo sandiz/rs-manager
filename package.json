@@ -26,7 +26,7 @@
     "marked": "^0.5.1",
     "memorystream": "^0.3.1",
     "moment": "^2.22.2",
-    "naudiodon": "^0.4.7",
+    "naudiodon": "https://github.com/Streampunk/naudiodon",
     "object-assign": "4.1.1",
     "openid": "^2.0.6",
     "pidusage": "^2.0.17",
