@@ -54,4 +54,19 @@ child.stderr.on('data', (data) => {
 });
 child.on('close', (code) => {
     console.log(`child process exited with code ${code}`);
+    postbuild();
 });
+
+function postbuild() {
+    if (buildPlatform === "mac") {
+        process.chdir("release-builds/Rocksmith\ Manager-darwin-x64/Rocksmith\ Manager.app/Contents/Resources/app/");
+        console.log("Running postbuild mac..");
+        //console.log(process.cwd());
+        spawn("install_name_tool", [
+            "-change",
+            "@rpath/libportaudio.dylib",
+            "node_modules/naudiodon/build/Release/libportaudio.dylib",
+            "node_modules/naudiodon/build/Release/naudiodon.node"
+        ]);
+    }
+}

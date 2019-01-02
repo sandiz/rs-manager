@@ -14,7 +14,9 @@ window.prompt = require('electron-prompt');
 window.findProcess = require('find-process');
 window.processPSARC = require("./lib/libpsarc").processPSARC
 window.extractFile = require("./lib/libpsarc").extractFile
+process.chdir(__dirname + "/../") //change directory so that naudiodon can pick up portaudio dylib
 window.libRecord = require("./lib/librecord");
+process.chdir(__dirname)
 window.sudo = require('sudo-prompt');
 window.exec = require('child_process').exec;
 window.linereader = require('line-by-line');
