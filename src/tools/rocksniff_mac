@@ -1,0 +1,33 @@
+#! /usr/bin/env bash
+#set -x
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+# Run a command in the background.
+_evalBg() {
+  eval "$@" &>/dev/null &disown;
+}
+
+rocksniff_off() {
+  pids=$(rocksniff_pids)
+  if [ -n "$pids" ]; then
+    kill -9 $pids
+  fi
+}
+
+rocksniff_pids() {
+  ps aux | grep RockSniffer.exe | grep -v grep | awk '{print $2}'
+}
+
+rocksniff_on() {
+  rocksniff_off
+  cd $DIR/RockSniffer
+  cmd='/Library/Frameworks/Mono.framework/Commands/mono "RockSniffer.exe"'
+  _evalBg "${cmd}";
+}
+
+case $1 in
+   "on") rocksniff_on &;;
+   "off") rocksniff_off;;
+   "pids") echo $(rocksniff_pids);;
+   *) echo "invalid usage!" && exit 1;;
+esac

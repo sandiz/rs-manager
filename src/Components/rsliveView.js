@@ -1139,12 +1139,12 @@ export default class RSLiveView extends React.Component {
 
   startTracking = async () => {
     console.log("start tracking");
-    const killcmd = await this.killPIDs(await this.findPID());
-    console.log("kill command: " + killcmd);
     this.setState({ tracking: 1 });
     // spawn process
     let cwd = ""
     if (window.os.platform() === "win32") {
+      const killcmd = await this.killPIDs(await this.findPID());
+      console.log("kill command: " + killcmd);
       cwd = window.dirname + "\\tools\\RockSniffer\\";
       this.rssniffer = `${killcmd} && cd ${cwd} && RockSniffer.exe`;
       window.process.chdir(cwd);
@@ -1167,10 +1167,9 @@ export default class RSLiveView extends React.Component {
         );
         return;
       }
-      cwd = window.dirname + "/tools/RockSniffer/"
-      this.rssniffer = `bash -c "${killcmd}; cd '${cwd}'; /Library/Frameworks/Mono.framework/Commands/mono RockSniffer.exe"`
+      cwd = window.dirname + "/tools/"
+      this.rssniffer = `bash -c "./rocksniff_mac on"`
       window.process.chdir(cwd);
-      console.log(this.rssniffer);
       const options = { name: 'RockSniffer', cwd };
       window.sudo.exec(
         this.rssniffer,
@@ -1227,7 +1226,7 @@ export default class RSLiveView extends React.Component {
         }
         return taskcmd;
       }
-      return "kill -9 " + pidarr.join(" ");
+      return `bash -c "./tools/rocksniff_mac off"`; // investigate why is chdir to tools not working
     }
     return "echo 'no pids'"
   }
@@ -1241,15 +1240,16 @@ export default class RSLiveView extends React.Component {
     if (killcmd.includes("no pids")) {
       return;
     }
-    this.rskiller = killcmd;
-    const options = { name: 'Kill RockSniffer' };
+    const rskiller = killcmd;
+    const cwd = window.dirname + "/tools/"
+    const options = { name: 'RockSniffer', cwd };
     const exec = window.os.platform() === "win32" ? window.exec : window.sudo.exec;
     exec(
-      this.rskiller,
+      rskiller,
       options,
       (error, stdout, stderr) => {
         if (error) { console.log("stop-track-stderr: " + error) }
-        if (stdout) { console.log('stoptrackstdout: ' + stdout) }
+        if (stdout) { console.log('stop-track-stdout: ' + stdout) }
       },
     );
     window.process.chdir(window.dirname);
