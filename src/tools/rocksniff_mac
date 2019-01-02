@@ -20,7 +20,7 @@ rocksniff_pids() {
 
 rocksniff_on() {
   rocksniff_off
-  cd $DIR/RockSniffer
+  cd "$DIR/RockSniffer"
   cmd='/Library/Frameworks/Mono.framework/Commands/mono "RockSniffer.exe"'
   _evalBg "${cmd}";
 }
