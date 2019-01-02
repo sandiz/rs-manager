@@ -29,6 +29,7 @@ function getDefaultSettings() {
   obj.steamAPIKey = ""
   obj.defaultSortOption = defaultSortOption;
   obj.showSetlistOverlayAlways = false;
+  obj.isSudoWhitelisted = false;
   return obj;
 }
 export async function getConfig(type) {
@@ -103,6 +104,9 @@ export async function updateDefaultSortOption(current) {
 export async function updateShowSetlistOverlayAlways(current) {
   await updateConfig("showSetlistOverlayAlways", current);
 }
+export async function updateIsSudoWhitelisted(current) {
+  await updateConfig("isSudoWhitelisted", current);
+}
 
 export default async function getProfileConfig() {
   const d = await getConfig("prfldb");
@@ -169,5 +173,10 @@ export async function getDefaultSortOptionConfig() {
 export async function getShowSetlistOverlayAlwaysConfig() {
   const d = await getConfig("showSetlistOverlayAlways");
   if (d === '') return false; //default value
+  return d;
+}
+export async function getIsSudoWhitelistedConfig() {
+  const d = await getConfig("isSudoWhitelisted");
+  if (d === '') return false; //default value;
   return d;
 }

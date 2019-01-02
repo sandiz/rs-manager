@@ -12,6 +12,8 @@ import getProfileConfig, {
   getSteamAPIKeyConfig, updateConfig, updateDefaultSortOption,
   getDefaultSortOptionConfig, getShowSetlistOverlayAlwaysConfig,
   updateShowSetlistOverlayAlways,
+  getIsSudoWhitelistedConfig,
+  updateIsSudoWhitelisted,
 } from '../configService';
 import {
   resetDB, createRSSongList, addtoRSSongList, isTablePresent, deleteRSSongList,
@@ -91,6 +93,7 @@ export default class SettingsView extends React.Component {
       steamAPIKey: '',
       sortoptions: defaultSortOption,
       showSetlistOverlayAlways: false,
+      isSudoWhitelisted: false,
     };
     this.readConfigs();
     this.refreshSetlist();
@@ -295,6 +298,7 @@ export default class SettingsView extends React.Component {
     const m = await getSteamAPIKeyConfig();
     const n = await getDefaultSortOptionConfig();
     const o = await getShowSetlistOverlayAlwaysConfig();
+    const p = await getIsSudoWhitelistedConfig();
 
     this.setState({
       prfldb: d,
@@ -309,6 +313,7 @@ export default class SettingsView extends React.Component {
       steamAPIKey: m,
       sortoptions: n,
       showSetlistOverlayAlways: o,
+      isSudoWhitelisted: p,
     });
   }
 
@@ -335,6 +340,7 @@ export default class SettingsView extends React.Component {
       await updateDefaultSortOption(this.state.sortoptions)
     }
     await updateShowSetlistOverlayAlways(this.state.showSetlistOverlayAlways)
+    await updateIsSudoWhitelisted(this.state.isSudoWhitelisted)
     this.props.handleChange();
     this.props.updateHeader(this.tabname, "Settings Saved!");
     document.getElementsByTagName("body")[0].scrollTop = 0;
@@ -825,6 +831,40 @@ export default class SettingsView extends React.Component {
                       </span>
                     </div>
                   </Fragment>
+                  {
+                    window.os.platform() === "darwin" ? (<Fragment>
+                      <br />
+                      <span style={{ float: 'left' }}>
+                        <a>
+                          Passwordless Rocksmith Live
+                      </a>
+                      </span>
+                      <span style={{
+                        float: 'right',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        width: 400 + 'px',
+                        textAlign: 'right',
+                        marginTop: 30 + 'px',
+                      }}>
+                        <input
+                          type="checkbox"
+                          checked={this.state.isSudoWhitelisted}
+                          onChange={event => this.handleCheckBasedSetting(event, "isSudoWhitelisted")} />
+                      </span>
+                      <br />
+                      <div className="">
+                        <span style={{ color: '#ccc' }}>
+                          Create a file in /etc/sudoers.d/ with the values<br />
+                          {
+                            //eslint-disable-next-line
+                            <span>%staff ALL=(ALL) NOPASSWD:&lt;path to Rocksmith Manager.app&gt;/Contents/Resources/app/src/tools/rocksniff_mac</span>
+                          }
+                        </span>
+                      </div>
+                    </Fragment>
+                    ) : null
+                  }
                 </Collapsible>
                 <br />
                 <Collapsible
