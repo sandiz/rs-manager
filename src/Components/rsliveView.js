@@ -19,7 +19,7 @@ import {
   getHistory,
 } from '../sqliteService'
 import readProfile from '../steamprofileService';
-import getProfileConfig, { readFile, writeFile } from '../configService';
+import getProfileConfig, { readFile, writeFile, getIsSudoWhitelistedConfig } from '../configService';
 import { psarcToJSON } from '../psarcService';
 
 const albumArt = require('./../lib/album-art');
@@ -408,6 +408,7 @@ export default class RSLiveView extends React.Component {
       }],
       trackingMode: 'hitp', //hitp, perp, hist, record
       recording: 0, //stopped, wait, started
+      isSudoWhitelisted: false,
     }
     this.tabname = 'tab-rslive';
     this.columns = [
@@ -649,6 +650,9 @@ export default class RSLiveView extends React.Component {
     catch (e) {
       //tracking is not active
     }
+    const isSudoWhitelisted = await getIsSudoWhitelistedConfig();
+    console.log("is sudo whitelisted", isSudoWhitelisted);
+    this.setState({ isSudoWhitelisted });
   }
 
   componentWillUnmount = async () => {
@@ -1171,12 +1175,14 @@ export default class RSLiveView extends React.Component {
       this.rssniffer = `bash -c "./rocksniff_mac on"`
       window.process.chdir(cwd);
       const options = { name: 'RockSniffer', cwd };
-      window.sudo.exec(
+      const exec = this.state.isSudoWhitelisted ? window.exec : window.sudo.exec;
+      exec(
         this.rssniffer,
         options,
         (error, stdout, stderr) => {
           if (error) { console.log("start-track-stderr: " + error) }
           if (stdout) { console.log('start-track-stdout: ' + stdout); }
+          window.process.chdir(window.dirname);
         },
       );
     }
@@ -1226,7 +1232,7 @@ export default class RSLiveView extends React.Component {
         }
         return taskcmd;
       }
-      return `bash -c "./tools/rocksniff_mac off"`; // investigate why is chdir to tools not working
+      return `bash -c "./rocksniff_mac off"` // investigate why is chdir to tools not working
     }
     return "echo 'no pids'"
   }
@@ -1242,17 +1248,18 @@ export default class RSLiveView extends React.Component {
     }
     const rskiller = killcmd;
     const cwd = window.dirname + "/tools/"
+    window.process.chdir(cwd);
     const options = { name: 'RockSniffer', cwd };
-    const exec = window.os.platform() === "win32" ? window.exec : window.sudo.exec;
+    const exec = window.os.platform() === "win32" || this.state.isSudoWhitelisted ? window.exec : window.sudo.exec;
     exec(
       rskiller,
       options,
       (error, stdout, stderr) => {
         if (error) { console.log("stop-track-stderr: " + error) }
         if (stdout) { console.log('stop-track-stdout: ' + stdout) }
+        window.process.chdir(window.dirname);
       },
     );
-    window.process.chdir(window.dirname);
     //reset all values
     if (reset) {
       const artist = '';
