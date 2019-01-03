@@ -66,41 +66,41 @@ export default class HelpView extends React.Component {
 
   changeTo = async (id) => {
     this.imagerenderer(100);
-    let string = ""
     let data = null;
+    const base = "https://raw.githubusercontent.com/sandiz/rs-manager/master/"
     switch (id) {
       case "dashboard":
-        data = await readFile(window.dirname + "/../help/dashboard.md");
+        data = await window.request(base + "/help/dashboard.md");
         break;
       case "songs-owned":
-        data = await readFile(window.dirname + "/../help/songs.owned.md");
+        data = await window.request(base + "/help/songs.owned.md");
         break;
       case "dlc-catalog":
-        data = await readFile(window.dirname + "/../help/dlc.catalog.md");
+        data = await window.request(base + "/help/dlc.catalog.md");
         break;
       case "setlists":
-        data = await readFile(window.dirname + "/../help/setlists.md");
+        data = await window.request(base + "/help/setlists.md");
         break;
       case "setlist-option":
-        data = await readFile(window.dirname + "/../help/setlist.options.md");
+        data = await window.request(base + "/help/setlist.options.md");
         break;
       case "rs-live":
-        data = await readFile(window.dirname + "/../help/rs.live.md");
+        data = await window.request(base + "/help/rs.live.md");
         break;
       case "psarc-explorer":
-        data = await readFile(window.dirname + "/../help/psarc.md");
+        data = await window.request(base + "/help/psarc.md");
         break;
       case "song-details":
-        data = await readFile(window.dirname + "/../help/song.details.md");
+        data = await window.request(base + "/help/song.details.md");
         break;
       case "settings":
-        data = await readFile(window.dirname + "/../help/settings.md");
+        data = await window.request(base + "/help/settings.md");
         break;
       case "getting-started":
-        data = await readFile(window.dirname + "/../help/getting-started.md");
+        data = await window.request(base + "/help/getting-started.md");
         break;
       case "tracking-options":
-        data = await readFile(window.dirname + "/../help/tracking.options.md");
+        data = await window.request(window.dirname + "/help/tracking.options.md");
         break;
       case "changelog":
         {
@@ -133,8 +133,7 @@ export default class HelpView extends React.Component {
         break;
     }
     if (data != null) {
-      string = new TextDecoder("utf-8").decode(data);
-      this.setState({ fileData: string, defaultReadme: id });
+      this.setState({ fileData: data, defaultReadme: id });
     }
   }
 
@@ -251,7 +250,7 @@ export default class HelpView extends React.Component {
                       borderBottom: this.state.defaultReadme === "tracking-options" ? "1px solid" : "none",
                     }}
                     href="#"
-                    onClick={() => this.changeTo('tracking-options')}>Tracking Options</a>&nbsp;
+                    onClick={() => this.changeTo('tracking-options')}>Tracking Modes</a>&nbsp;
                     | {
                     this.props.popupMode
                       ? (
