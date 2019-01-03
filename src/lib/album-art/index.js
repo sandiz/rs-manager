@@ -29,15 +29,19 @@
     // Public Key on purpose
     const apiKey = '4cb074e4b8ec4ee9ad3eb37d6f7eb240'
     const sizes = ['small', 'medium', 'large', 'extralarge', 'mega']
-    const method = (opts.album === null) ? 'artist' : 'album'
+    let method = "artist";
+    if (opts.track) method = "track";
+    else if (opts.album) method = "album";
     const url = 'https://ws.audioscrobbler.com'
       + encodeURI('/2.0/?format=json&api_key='
         + apiKey
         + '&method=' + method
         + '.getinfo&artist='
         + artist
-        + (opts.album !== null ? '&album=' + opts.album : ''))
-    console.log(url)
+        + (opts.album ? '&album=' + opts.album : '')
+        + (opts.track ? '&track=' + opts.track : ''))
+    //console.log(artist, opts, method);
+    //console.log(url)
     const response = fetch(url, {
       method: 'GET',
     })
@@ -56,7 +60,13 @@
           // Get largest image, 'mega'
           const i = json[method].image.length - 2
           output = json[method].image[i]['#text']
-        } else {
+        }
+        else if (method === "track" && json[method] && json[method].album.image) {
+          // Get largest image, 'mega'
+          const i = json[method].album.image.length - 2
+          output = json[method].album.image[i]['#text']
+        }
+        else {
           // No image art found
           return Promise.reject(new Error('No results found'))
         }

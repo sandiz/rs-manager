@@ -72,6 +72,10 @@ export default class DashboardView extends React.Component {
       saeasy: [0, 0, 0, 0, 0, 0, 0],
       saeasywidth: [0, 0, 0, 0, 0, 0, 0],
       genInfoState: "default", // default,showoptions, generating
+
+      coverlas: 'https://raw.githubusercontent.com/sandiz/rs-manager/master/screenshots/nothumb.jpg',
+      coverreddit: 'https://raw.githubusercontent.com/sandiz/rs-manager/master/screenshots/nothumb.jpg',
+      coversteam: 'https://raw.githubusercontent.com/sandiz/rs-manager/master/screenshots/nothumb.jpg',
     }
   }
 
@@ -415,6 +419,10 @@ export default class DashboardView extends React.Component {
         randomarr: unescape(rsong.arrangement),
         randommastery: mastery,
       })
+      setTimeout(async () => {
+        const url = await this.fetchCover(this.state.randomartist, this.state.randomalbum);
+        this.setState({ coverlas: url });
+      }, 1000);
     }
     if (changepack) {
       const rpack = await getRandomSongAvailable();
@@ -423,6 +431,11 @@ export default class DashboardView extends React.Component {
         randompackappid: unescape(rpack.appid),
         randompack: replaceRocksmithTerms(unescape(rpack.name)),
       });
+      setTimeout(async () => {
+        const [artist, title] = this.state.randompack.split(" - ");
+        const url = await this.fetchCover(artist ? artist.trim() : "", title ? title.trim() : "", false);
+        this.setState({ coversteam: url });
+      }, 1000)
     }
   }
 
@@ -439,7 +452,11 @@ export default class DashboardView extends React.Component {
         weekly.url = post.url;
       }
     }
-    this.setState({ weeklysongspotlight: weekly });
+    const title = weekly.title.split("by");
+    const artist = title[1] ? unescape(title[1]).trim() : ""
+    const track = title[0] ? unescape(title[0]).trim() : ""
+    const url = await this.fetchCover(artist, track, false); //use trackname
+    this.setState({ weeklysongspotlight: weekly, coverreddit: url });
   }
 
   updateRecentlyPlayed = async () => {
@@ -593,6 +610,34 @@ export default class DashboardView extends React.Component {
     this.setState({ genInfoState: "showoptions" });
   }
 
+  fetchCover = async (artist, albumortrack, usealbum = true) => {
+    const a1 = artist.split("feat.")[0].trim();
+    let url = "https://raw.githubusercontent.com/sandiz/rs-manager/master/screenshots/nothumb.jpg";
+    const options = {
+      size: 'large',
+    }
+    if (usealbum) options.album = albumortrack
+    else options.track = albumortrack
+    url = await albumArt(
+      a1,
+      options,
+    );
+    //console.log("first search result: " + url);
+    if (url.toString().toLowerCase().includes("error:")) {
+      //eslint-disable-next-line
+      url = await albumArt(
+        a1,
+        { size: 'large' },
+      );
+      //console.log("second search result: " + url);
+    }
+    if (!url.toString().includes("http")) {
+      url = "https://raw.githubusercontent.com/sandiz/rs-manager/master/screenshots/nothumb.jpg";
+    }
+    //console.log("---")
+    return url;
+  }
+
   generateStats = async () => {
     this.setState({ genInfoState: "generating" });
     this.props.updateHeader(
@@ -644,22 +689,8 @@ export default class DashboardView extends React.Component {
         const root = keys[k];
         j = i % 3;
 
-        const a1 = lartist.split("feat.")[0].trim();
         //eslint-disable-next-line
-        let url = await albumArt(
-          a1,
-          { album, size: 'large' },
-        );
-        if (url.toString().toLowerCase().includes("error:")) {
-          //eslint-disable-next-line
-          url = await albumArt(
-            a1,
-            { size: 'large' },
-          );
-        }
-        if (!url.toString().includes("http")) {
-          url = "https://rootzwiki.com/uploads/monthly_03_2012/post-50649-0-21085700-1331079268_thumb.jpg";
-        }
+        const url = await this.fetchCover(lartist, album);
         if (root === "SA") {
           let badge = "gp_failed";
           let name = "easy";
@@ -828,12 +859,19 @@ export default class DashboardView extends React.Component {
               <hr />
             </div>
             <div style={{ marginTop: -6 + 'px' }}>
-              <span style={{ fontSize: 26 + 'px' }}>
+              <div>
+                <img
+                  alt="albumcover"
+                  src={this.state.coversteam}
+                  className="albumcover"
+                />
+              </div>
+              <div style={{ fontSize: 25 + 'px', textAlign: 'left' }} title={this.state.randompack}>
                 <a
                   onClick={() => { this.setState({ showsongpackpreview: true }) }}>
-                  {this.state.randompack.length > 48 ? this.state.randompack.slice(0, 48) + "..." : this.state.randompack}
+                  {this.state.randompack.length > 35 ? this.state.randompack.slice(0, 35) + "..." : this.state.randompack}
                 </a>
-              </span>
+              </div>
               <br />
             </div>
           </div>
@@ -846,14 +884,21 @@ export default class DashboardView extends React.Component {
               <hr />
             </div>
             <div style={{ marginTop: -6 + 'px' }}>
-              <span style={{ fontSize: 26 + 'px' }}>
+              <div>
+                <img
+                  alt="albumcover"
+                  src={this.state.coverreddit}
+                  className="albumcover"
+                />
+              </div>
+              <div style={{ fontSize: 25 + 'px', textAlign: 'left' }} title={this.state.weeklysongspotlight.title}>
                 <a
                   onClick={() => {
                     this.setState({ showweekly: true, showsongpackpreview: true })
                   }}>
-                  {this.state.weeklysongspotlight.title}
+                  {this.state.weeklysongspotlight.title.length > 40 ? this.state.weeklysongspotlight.title.slice(0, 40) + "..." : this.state.weeklysongspotlight.title}
                 </a>
-              </span>
+              </div>
               <br />
             </div>
           </div>
@@ -862,26 +907,47 @@ export default class DashboardView extends React.Component {
               <a onClick={() => this.fetchRandomStats(true, false)}> Random Learn a Song</a>
               <hr />
             </div>
-            <div style={{ marginTop: -10 + 'px' }}>
-              <span
+            <div style={{ marginTop: -6 + 'px' }}>
+              <div>
+                <img
+                  alt="albumcover"
+                  src={this.state.coverlas}
+                  className="albumcover"
+                />
+              </div>
+              <div
                 style={{
-                  width: 100 + '%',
+                  width: 73 + '%',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
                   whiteSpace: 'nowrap',
-                  fontSize: 30 + 'px',
+                  fontSize: 26 + 'px',
                   display: 'inline-block',
-                }}><a
-                  onClick={() => { this.setState({ showsongpreview: true }) }}>
+                  textAlign: 'left',
+                }}
+                title={this.state.randomsong}
+              ><a
+                onClick={() => { this.setState({ showsongpreview: true }) }}>
                   {this.state.randomsong}
                 </a>
-              </span>
+              </div>
               <br />
-              <span><a
-                onClick={() => { this.setState({ showsongpreview: true }) }}>
-                {this.state.randomartist} | {this.state.randomarr} | {this.state.randommastery} %
+              <div
+                style={{
+                  width: 73 + '%',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  display: 'inline-block',
+                  textAlign: 'left',
+                }}
+                title={`${this.state.randomartist} | ${this.state.randomarr} | ${this.state.randommastery}% `}
+              >
+                <a
+                  onClick={() => { this.setState({ showsongpreview: true }) }}>
+                  {this.state.randomartist} | {this.state.randomarr} | {this.state.randommastery} %
                 </a>
-              </span>
+              </div>
             </div>
           </div>
         </div>

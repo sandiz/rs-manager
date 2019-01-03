@@ -1059,7 +1059,7 @@ export async function getRandomSongOwned() {
 export async function getRandomSongAvailable() {
   //console.log("__db_call__: getRandomSongAvailable");
   await initSongsAvailableDB();
-  const sql = "select * from songs_available where name not like '%Song%20Pack%' and owned='false' order by random() limit 1;"
+  const sql = "select * from songs_available where name not like '%Song Pack%' and owned='false' order by random() limit 1;"
   const op = await db.get(sql);
   return op;
 }
