@@ -99,6 +99,9 @@ export default class HelpView extends React.Component {
       case "getting-started":
         data = await readFile(window.dirname + "/../help/getting-started.md");
         break;
+      case "tracking-options":
+        data = await readFile(window.dirname + "/../help/tracking.options.md");
+        break;
       case "changelog":
         {
           this.imagerenderer(75);
@@ -241,6 +244,14 @@ export default class HelpView extends React.Component {
                     }}
                     href="#"
                     onClick={() => this.changeTo('rs-live')}>Rocksmith Live</a>&nbsp;
+                    |  <a
+                    style={{
+                      color: 'blue',
+                      fontWeight: this.state.defaultReadme === "tracking-options" ? "bolder" : "normal",
+                      borderBottom: this.state.defaultReadme === "tracking-options" ? "1px solid" : "none",
+                    }}
+                    href="#"
+                    onClick={() => this.changeTo('tracking-options')}>Tracking Options</a>&nbsp;
                     | {
                     this.props.popupMode
                       ? (
