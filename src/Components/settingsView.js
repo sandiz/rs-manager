@@ -855,10 +855,11 @@ export default class SettingsView extends React.Component {
                       <br />
                       <div className="">
                         <span style={{ color: '#ccc' }}>
-                          Create a file in /etc/sudoers.d/ with the values<br />
+                          if true, you&#39;ll have to create a file
+                          in /etc/sudoers.d/ with the values<br />
                           {
                             //eslint-disable-next-line
-                            <span>%staff ALL=(ALL) NOPASSWD:&lt;path to Rocksmith Manager.app&gt;/Contents/Resources/app/src/tools/rocksniff_mac</span>
+                            <span style={{ userSelect: 'text' }}>%staff ALL=(ALL) NOPASSWD:&lt;path to Rocksmith Manager.app&gt;/Contents/Resources/app/src/tools/rocksniff_mac</span>
                           }
                         </span>
                       </div>
