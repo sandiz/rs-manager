@@ -12,3 +12,6 @@
 
 #### Button: Update Recently Played
  - Lists songs that you played recently, clicking on dotted text switches between `learn-a-song`/`score attack`
+
+#### Tracking Options
+ - See Help->Tracking Options
