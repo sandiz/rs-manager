@@ -6,12 +6,6 @@ import Swal from 'sweetalert2'
 const marked = require('marked');
 
 
-const readFile = filePath => new Promise((resolve, reject) => {
-  window.electronFS.readFile(filePath, (err, data) => {
-    if (err) reject(err);
-    else resolve(data);
-  });
-});
 export default class HelpView extends React.Component {
   constructor(props) {
     super(props)
@@ -100,7 +94,7 @@ export default class HelpView extends React.Component {
         data = await window.request(base + "/help/getting-started.md");
         break;
       case "tracking-options":
-        data = await window.request(window.dirname + "/help/tracking.options.md");
+        data = await window.request(base + "/help/tracking.options.md");
         break;
       case "changelog":
         {

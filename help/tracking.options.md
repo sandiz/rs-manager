@@ -8,7 +8,9 @@
     <img width="80%" src="https://raw.githubusercontent.com/sandiz/rs-manager/master/screenshots/images/hit-percent-chart-guitar.png">
 
 
- - ##### Perfect Percent (Windows Only)
+ - ##### Perfect Percent (Windows Only) - In Score Attack mode, tracks the % of perfect notes hit (green) on a per phrase level (purple)
+
+     <img width="80%" src="https://raw.githubusercontent.com/sandiz/rs-manager/master/screenshots/images/hit-percent-chart-bass.png">
 
  - ##### Progress History - Track your improvement over time (Best - Green, Last Ten - Purple)
 
