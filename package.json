@@ -2,7 +2,7 @@
   "name": "rs-manager",
   "description": "Manage Rocksmith playlists, songs, stats and dlc's",
   "author": "SandiC",
-  "version": "1.7.4",
+  "version": "1.8.0",
   "license": "GPL-3.0",
   "private": true,
   "dependencies": {
