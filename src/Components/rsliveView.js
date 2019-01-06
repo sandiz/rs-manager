@@ -636,7 +636,7 @@ export default class RSLiveView extends React.Component {
     }
     this.recordTitleRef = React.createRef();
     this.recordTimer = null;
-    this.lastRecordedFile = "";
+    this.lastUpdateTS = new Date();
   }
 
   componentDidMount = async () => {
@@ -1206,6 +1206,15 @@ export default class RSLiveView extends React.Component {
         if (typeof songData === 'undefined') { return; }
         const jsonObj = await songData.json();
         await this.parseSongResults(jsonObj);
+        const currDate = new Date();
+        const seconds = (currDate.getTime() - this.lastUpdateTS.getTime()) / 1000;
+        if (seconds >= 15) {
+          this.lastUpdateTS = new Date();
+          if (this.state.songKey.length > 0) {
+            await this.updateMastery();
+            //console.log("Updated Mastery for ", this.state.songKey);
+          }
+        }
       }
       catch (e) {
         console.log(e);
@@ -1334,71 +1343,71 @@ export default class RSLiveView extends React.Component {
       const sastats = steamProfile.SongsSA;
       await initSongsOwnedDB();
       const output = await getSongBySongKey(this.state.songKey);
-      if (output.length === 0) { return; }
-      let keys = Object.keys(stats);
       let updatedRows = 0;
-      const ids = []
-      output.forEach((element) => {
-        ids.push(element.id);
-      });
-      //find mastery stats
-      for (let i = 0; i < keys.length; i += 1) {
-        if (!ids.includes(keys[i])) { continue; }
-        const stat = stats[keys[i]];
-        const mastery = stat.MasteryPeak;
-        const played = stat.PlayedCount;
-        const masteryLast = stat.MasteryLast;
-        const dateLAS = stat.DateLAS;
-        const dateLASts = moment(dateLAS).unix();
-        //console.log(masteryLast, dateLASts);
-        this.props.updateHeader(
-          this.tabname,
-          `Updating Stat for SongID:  ${keys[i]} (${i}/${keys.length})`,
-        );
-        //console.log(masteryLast, dateLAS);
-        /*loop await */ // eslint-disable-next-line
-        await saveHistory(keys[i], masteryLast, dateLASts);
-        /*loop await */ // eslint-disable-next-line
-        const rows = await updateMasteryandPlayed(keys[i], mastery, played);
-        if (rows === 0) {
-          console.log("Missing ID: " + keys[i]);
+      if (output.length > 0) {
+        let keys = Object.keys(stats);
+        const ids = []
+        output.forEach((element) => {
+          ids.push(element.id);
+        });
+        //find mastery stats
+        for (let i = 0; i < keys.length; i += 1) {
+          if (!ids.includes(keys[i])) { continue; }
+          const stat = stats[keys[i]];
+          const mastery = stat.MasteryPeak;
+          const played = stat.PlayedCount;
+          const masteryLast = stat.MasteryLast;
+          const dateLAS = stat.DateLAS;
+          const dateLASts = moment(dateLAS).unix();
+          //console.log(masteryLast, dateLASts);
+          this.props.updateHeader(
+            this.tabname,
+            `Updating Stat for SongID:  ${keys[i]} (${i}/${keys.length})`,
+          );
+          //console.log(masteryLast, dateLAS);
+          /*loop await */ // eslint-disable-next-line
+          await saveHistory(keys[i], masteryLast, dateLASts);
+          /*loop await */ // eslint-disable-next-line
+          const rows = await updateMasteryandPlayed(keys[i], mastery, played);
+          if (rows === 0) {
+            console.log("Missing ID: " + keys[i]);
+          }
+          updatedRows += rows;
         }
-        updatedRows += rows;
+        //find score attack stats
+        keys = Object.keys(sastats);
+        for (let i = 0; i < keys.length; i += 1) {
+          if (!ids.includes(keys[i])) { continue; }
+          const stat = sastats[keys[i]];
+          let highestBadge = 0;
+          if (stat.Badges.Easy > 0) {
+            stat.Badges.Easy += 10;
+            highestBadge = stat.Badges.Easy;
+          }
+          if (stat.Badges.Medium > 0) {
+            stat.Badges.Medium += 20;
+            highestBadge = stat.Badges.Medium;
+          }
+          if (stat.Badges.Hard > 0) {
+            stat.Badges.Hard += 30;
+            highestBadge = stat.Badges.Hard;
+          }
+          if (stat.Badges.Master > 0) {
+            stat.Badges.Master += 40;
+            highestBadge = stat.Badges.Master;
+          }
+          this.props.updateHeader(
+            this.tabname,
+            `Updating Stat for SongID:  ${keys[i]} (${i}/${keys.length})`,
+          );
+          /* loop await */ // eslint-disable-next-line
+          const rows = await updateScoreAttackStats(stat, highestBadge, keys[i]);
+          if (rows === 0) {
+            console.log("Missing ID: " + keys[i]);
+          }
+          updatedRows += rows;
+        }
       }
-      //find score attack stats
-      keys = Object.keys(sastats);
-      for (let i = 0; i < keys.length; i += 1) {
-        if (!ids.includes(keys[i])) { continue; }
-        const stat = sastats[keys[i]];
-        let highestBadge = 0;
-        if (stat.Badges.Easy > 0) {
-          stat.Badges.Easy += 10;
-          highestBadge = stat.Badges.Easy;
-        }
-        if (stat.Badges.Medium > 0) {
-          stat.Badges.Medium += 20;
-          highestBadge = stat.Badges.Medium;
-        }
-        if (stat.Badges.Hard > 0) {
-          stat.Badges.Hard += 30;
-          highestBadge = stat.Badges.Hard;
-        }
-        if (stat.Badges.Master > 0) {
-          stat.Badges.Master += 40;
-          highestBadge = stat.Badges.Master;
-        }
-        this.props.updateHeader(
-          this.tabname,
-          `Updating Stat for SongID:  ${keys[i]} (${i}/${keys.length})`,
-        );
-        /* loop await */ // eslint-disable-next-line
-        const rows = await updateScoreAttackStats(stat, highestBadge, keys[i]);
-        if (rows === 0) {
-          console.log("Missing ID: " + keys[i]);
-        }
-        updatedRows += rows;
-      }
-
       this.props.updateHeader(
         this.tabname,
         `Stats maching songkey (${this.state.songKey}): ` + updatedRows,
@@ -1608,7 +1617,6 @@ export default class RSLiveView extends React.Component {
         },
       );
       if (rsDevice.index > 0) {
-        this.lastRecordedFile = rsDevice.fileName;
         this.recordTitleRef.current.innerHTML = "Recording.. File: " + window.path.basename(rsDevice.fileName);
         this.setState({ recording: 2 });
         this.recordTimer = setInterval(async () => {
