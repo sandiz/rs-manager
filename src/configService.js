@@ -30,6 +30,7 @@ function getDefaultSettings() {
   obj.defaultSortOption = defaultSortOption;
   obj.showSetlistOverlayAlways = false;
   obj.isSudoWhitelisted = false;
+  obj.currentZoomFactor = 1;
   return obj;
 }
 export async function getConfig(type) {
@@ -107,6 +108,9 @@ export async function updateShowSetlistOverlayAlways(current) {
 export async function updateIsSudoWhitelisted(current) {
   await updateConfig("isSudoWhitelisted", current);
 }
+export async function updateCurrentZoomFactor(current) {
+  await updateConfig("currentZoomFactor", current);
+}
 
 export default async function getProfileConfig() {
   const d = await getConfig("prfldb");
@@ -178,5 +182,10 @@ export async function getShowSetlistOverlayAlwaysConfig() {
 export async function getIsSudoWhitelistedConfig() {
   const d = await getConfig("isSudoWhitelisted");
   if (d === '') return false; //default value;
+  return d;
+}
+export async function getCurrentZoomFactorConfig() {
+  const d = await getConfig("currentZoomFactor");
+  if (d === '') return 1; //default value;
   return d;
 }

@@ -14,6 +14,8 @@ import getProfileConfig, {
   updateShowSetlistOverlayAlways,
   getIsSudoWhitelistedConfig,
   updateIsSudoWhitelisted,
+  getCurrentZoomFactorConfig,
+  updateCurrentZoomFactor,
 } from '../configService';
 import {
   resetDB, createRSSongList, addtoRSSongList, isTablePresent, deleteRSSongList,
@@ -94,6 +96,7 @@ export default class SettingsView extends React.Component {
       sortoptions: defaultSortOption,
       showSetlistOverlayAlways: false,
       isSudoWhitelisted: false,
+      currentZoomFactor: 1,
     };
     this.readConfigs();
     this.refreshSetlist();
@@ -299,7 +302,7 @@ export default class SettingsView extends React.Component {
     const n = await getDefaultSortOptionConfig();
     const o = await getShowSetlistOverlayAlwaysConfig();
     const p = await getIsSudoWhitelistedConfig();
-
+    const q = await getCurrentZoomFactorConfig();
     this.setState({
       prfldb: d,
       steamLoginSecure: e,
@@ -314,6 +317,7 @@ export default class SettingsView extends React.Component {
       sortoptions: n,
       showSetlistOverlayAlways: o,
       isSudoWhitelisted: p,
+      currentZoomFactor: q,
     });
   }
 
@@ -341,6 +345,13 @@ export default class SettingsView extends React.Component {
     }
     await updateShowSetlistOverlayAlways(this.state.showSetlistOverlayAlways)
     await updateIsSudoWhitelisted(this.state.isSudoWhitelisted)
+    const flt = parseFloat(this.state.currentZoomFactor);
+    if (flt > 0 && flt <= 1) {
+      this.setState({ currentZoomFactor: flt });
+      await updateCurrentZoomFactor(flt);
+      console.log("setting zoom factor to", flt);
+      window.webFrame.setZoomFactor(flt);
+    }
     this.props.handleChange();
     this.props.updateHeader(this.tabname, "Settings Saved!");
     document.getElementsByTagName("body")[0].scrollTop = 0;
@@ -866,6 +877,33 @@ export default class SettingsView extends React.Component {
                     </Fragment>
                     ) : null
                   }
+                  <Fragment>
+                    <br />
+                    <span style={{ float: 'left' }}>
+                      <a>
+                        Zoom Level
+                      </a>
+                    </span>
+                    <span style={{
+                      float: 'right',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      width: 400 + 'px',
+                      textAlign: 'right',
+                      marginTop: 30 + 'px',
+                    }}>
+                      <input
+                        style={{ textAlign: 'center', width: 15 + '%' }}
+                        value={this.state.currentZoomFactor}
+                        onChange={event => this.handleTextBasedSetting(event, "currentZoomFactor")} />
+                    </span>
+                    <br />
+                    <div className="">
+                      <span style={{ color: '#ccc' }}>
+                        Set the current zoom level Range: 0.0 - 1.0 (default: 1.0)
+                      </span>
+                    </div>
+                  </Fragment>
                 </Collapsible>
                 <br />
                 <Collapsible

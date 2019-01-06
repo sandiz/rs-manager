@@ -4,7 +4,7 @@ import PSARCView from './Components/psarcView'
 import SonglistView from './Components/songlistView'
 import FolderEditView from './Components/folderEditView'
 import DashboardView from './Components/dashboardView'
-import getProfileConfig, { getSteamIDConfig, getShowSetlistOverlayAlwaysConfig } from './configService';
+import getProfileConfig, { getSteamIDConfig, getShowSetlistOverlayAlwaysConfig, getCurrentZoomFactorConfig } from './configService';
 import SongAvailableView from './Components/songavailableView';
 import SetlistView from './Components/setlistView';
 import SettingsView from './Components/settingsView';
@@ -112,6 +112,10 @@ class App extends Component {
 
   componentWillMount = async () => {
     this.cwmasync();
+    const zoomF = await getCurrentZoomFactorConfig();
+    if (parseFloat(zoomF)) {
+      window.webFrame.setZoomFactor(zoomF);
+    }
   }
 
   getGlobalNotes = async () => {
