@@ -15,20 +15,20 @@ Rocksmith's UI leaves a lot to be desired especially when you have a lot of song
 ![Dashboard](https://github.com/sandiz/rs-manager/raw/master/screenshots/images/dashboard.png)
 ![RSLive - Phrases](https://raw.githubusercontent.com/sandiz/rs-manager/master/screenshots/images/rslive-phrases.png)
 
-## Usage
-- [Settings](#settings)
-    - Use the settings view to link your Rocksmith and Steam Profile
-- [PSARC Explorer](#psarc-explorer)
-    - Choose Steam/SteamApps/common/Rocksmith2014/ as your `psarc` folder to generate a list of all songs you own. Once the scan is complete, click the `Update Songs Owned` button. The Songs->Owned section will be populated with all the info extracted from the psarc files. (Use this to also keep your song collection up to date after you buy new songs froms Steam)
-- [Songs Owned](#songs-owned)
-    - Songs->Owned section should now list songs that you own. You can use basic operations like search, sort, filter as well as view YouTube vidoes of your songs or add them to setlists. If you linked your Rocksmith profile in [Settings](#settings) you can Update RS Favorites/Mastery by clicking the appropriate button
-- [RS Catalog](#songs-available)
-    - This section should already be populated with all the dlc's released so far. You can use the options in this view to keep the list up to date as well as retreive metadata from steam about ownership/acquire date. (requires steam profile to be linked in Settings)
-- [Setlist](#setlist)
-    - This section is used to create custom setlists from your songs library. There are two types of setlists, [Manual](#setlist-custom) setlist where you add songs manually from the library and [Generated](#generated-setlist) setlist where you use filters to select songs from the library.
-- [Rocksmith Live](#rocksmith-live)
-    - Rocksmith Live tracks your current live rocksmith session, showing accuracy, hit/miss streaks
-    and other song info. (Needs mono and elevated privileges on macOS)
+## Features
+ - Stats
+    - High level mastery/completion/score attack [stats](#stats) of your entire collection / setlists
+    - Low level stats ( [mastery](#songs-owned), [progress history](#progress-history))
+ - Steam
+    - steam integration (dlc catalog + purchased [stats](#songs-available))
+    - sort by acquired date
+ - Realtime
+    - [track](#percent) note hit on a per phrase level
+    - [track](#percent-sa) perfect hits on a per phrase level (score attack)
+    - [record](#record) raw audio
+ - Setlists
+    - unlimited setlists to sort your collection
+    - supports manual, filter based and rocksmith in-game song lists
 
 ## Screenshots
 ### Stats - Learn a song and Score Attacks stats
@@ -37,6 +37,13 @@ Rocksmith's UI leaves a lot to be desired especially when you have a lot of song
 ![Songs Owned](https://github.com/sandiz/rs-manager/raw/master/screenshots/images/songs.owned.png)
 ### Rocksmith Live - Rocksmith Live stats like accuracy, streaks, hits and misses
 ![Rocksmith Live](https://github.com/sandiz/rs-manager/raw/master/screenshots/images/rs-live.png)
+### Progress History
+![Progress History](https://github.com/sandiz/rs-manager/raw/master/screenshots/images/progress-history.png)
+### Hit/Perfect Tracking
+![Percent](https://github.com/sandiz/rs-manager/raw/master/screenshots/images/hit-percent-chart-guitar.png)
+![Percent SA](https://github.com/sandiz/rs-manager/raw/master/screenshots/images/perfect-percent-chart-guitar.png)
+### Record Audio
+![Record](https://github.com/sandiz/rs-manager/raw/master/screenshots/images/raw-record-finish.png)
 ### Songs Available - Catalog of all steam DLC released
 ![Songs Available](https://github.com/sandiz/rs-manager/raw/master/screenshots/images/songs.available.png)
 ### Song Preview - YouTube preview for song selected and other options
