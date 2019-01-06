@@ -16,8 +16,7 @@
 
      <img width="80%" src="https://raw.githubusercontent.com/sandiz/rs-manager/master/screenshots/images/progress-history.png">
 
-     Press "Update Mastery/History" after every playthrough to save it as history
-
+    Progress History and Mastery are automatically updated while you are in a song every 15 seconds.
 
 - ##### Record Audio - Record WAV Audio of your playing 
 
@@ -26,6 +25,16 @@
      <img width="80%" src="https://raw.githubusercontent.com/sandiz/rs-manager/master/screenshots/images/raw-record-metadata.png">
 
     WAV file saved has the above metadata automatically added. Requires Rocksmith USB Guitar Adapter. 
+
+    More Info on how to enrich the input from @justinaiken
+    > what s/w would you recommend for this 
+    
+    - [BiasFX](https://www.positivegrid.com/bias-fx/) (often has a free version with a couple of amps)
+    - [Amplitube](https://www.ikmultimedia.com/products/amplitubecs/)
+    - [Revalver](https://revalver.peavey.com/)
+
+    Or you could use a DAW to reroute it through something like an AxeFX, Line6 gear, or even physical tube amps.. 
+    
 
 - ##### Notes about BETA
    
