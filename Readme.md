@@ -31,9 +31,9 @@ Rocksmith's UI leaves a lot to be desired especially when you have a lot of song
     - supports manual, filter based and rocksmith in-game song lists
 
 ## Screenshots
-### Stats - Learn a song and Score Attacks stats
+### Stats
 ![Stats](https://github.com/sandiz/rs-manager/raw/master/screenshots/images/dashboard.stats.png)
-### Songs Owned - All the songs imported via psarc explorer
+### Songs Owned
 ![Songs Owned](https://github.com/sandiz/rs-manager/raw/master/screenshots/images/songs.owned.png)
 ### Rocksmith Live - Rocksmith Live stats like accuracy, streaks, hits and misses
 ![Rocksmith Live](https://github.com/sandiz/rs-manager/raw/master/screenshots/images/rs-live.png)
@@ -44,7 +44,7 @@ Rocksmith's UI leaves a lot to be desired especially when you have a lot of song
 ![Percent SA](https://github.com/sandiz/rs-manager/raw/master/screenshots/images/perfect-percent-chart-guitar.png)
 ### Record Audio
 ![Record](https://github.com/sandiz/rs-manager/raw/master/screenshots/images/raw-record-finish.png)
-### Songs Available - Catalog of all steam DLC released
+### Songs Available
 ![Songs Available](https://github.com/sandiz/rs-manager/raw/master/screenshots/images/songs.available.png)
 ### Song Preview - YouTube preview for song selected and other options
 ![Songs Available](https://github.com/sandiz/rs-manager/raw/master/screenshots/images/songPreview.png)
