@@ -679,6 +679,30 @@ tbody tr:hover {
     border: 1px solid black;
 }
 
+.da-lead {
+    background-size: 27% !important;
+    background-image: url("../assets/path-icons/pathlead.png");
+    background-repeat: no-repeat;
+    background-position-x: center;
+    background-position-y: 49%;
+}
+
+.da-rhythm {
+    background-size: 27% !important;
+    background-image: url("../assets/path-icons/pathrhythm.png");
+    background-repeat: no-repeat;
+    background-position-x: center;
+    background-position-y: 49%;
+}
+
+.da-bass {
+    background-size: 27% !important;
+    background-image: url("../assets/path-icons/pathbass.png");
+    background-repeat: no-repeat;
+    background-position-x: center;
+    background-position-y: 49%;
+}
+
 .path_lead {
     background-size: 100% !important;
     background-image: url("../assets/path-icons/pathlead.png");
@@ -828,7 +852,11 @@ tbody tr:hover {
 }
 
 .header-top {
-    top: 45px;
+    top: 36px;
+}
+
+.header-sa-top {
+    top: 42px;
 }
 
 .stat-container {
