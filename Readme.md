@@ -33,6 +33,7 @@ Rocksmith's UI leaves a lot to be desired especially when you have a lot of song
 ## Screenshots
 ### Stats
 ![Stats](https://github.com/sandiz/rs-manager/raw/master/screenshots/images/dashboard.stats.png)
+![Stats](https://github.com/sandiz/rs-manager/raw/master/screenshots/images/dashboard.stats-2.png)
 ### Songs Owned
 ![Songs Owned](https://github.com/sandiz/rs-manager/raw/master/screenshots/images/songs.owned.png)
 ### Rocksmith Live - Rocksmith Live stats like accuracy, streaks, hits and misses
