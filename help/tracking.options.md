@@ -26,16 +26,6 @@
 
     WAV file saved has the above metadata automatically added. Requires Rocksmith USB Guitar Adapter. 
 
-    More Info on how to enrich the input from @justinaiken
-    > what s/w would you recommend for this 
-    
-    - [BiasFX](https://www.positivegrid.com/bias-fx/) (often has a free version with a couple of amps)
-    - [Amplitube](https://www.ikmultimedia.com/products/amplitubecs/)
-    - [Revalver](https://revalver.peavey.com/)
-
-    Or you could use a DAW to reroute it through something like an AxeFX, Line6 gear, or even physical tube amps.. 
-    
-
 - ##### Notes about BETA
    
     The hit and perfect percent tracking capabilities are in beta. If things are working correctly, the Note Stats 
