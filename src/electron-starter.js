@@ -1,5 +1,5 @@
 const electron = require("electron");
-var { app, BrowserWindow, Menu } = electron;
+var { app, BrowserWindow, Menu, webFrame } = electron;
 const path = require("path");
 const url = require("url");
 const isDev = require('electron-is-dev');
@@ -8,7 +8,7 @@ const openAboutWindow = require('about-window').default;
 
 let mainWindow;
 
-function createWindow() {
+async function createWindow() {
     // Load the previous state with fallback to defaults
     let mainWindowState = windowStateKeeper({
         defaultWidth: 1750,
