@@ -1172,7 +1172,12 @@ export default class RSLiveView extends React.Component {
         return;
       }
       cwd = window.dirname + "/tools/"
-      this.rssniffer = `bash -c "./rocksniff_mac on"`
+      if (this.state.isSudoWhitelisted) {
+        this.rssniffer = `bash -c "sudo ./rocksniff_mac on"`
+      }
+      else {
+        this.rssniffer = `bash -c "./rocksniff_mac on"`
+      }
       window.process.chdir(cwd);
       const options = { name: 'RockSniffer', cwd };
       const exec = this.state.isSudoWhitelisted ? window.exec : window.sudo.exec;
@@ -1241,7 +1246,12 @@ export default class RSLiveView extends React.Component {
         }
         return taskcmd;
       }
-      return `bash -c "./rocksniff_mac off"` // investigate why is chdir to tools not working
+      if (this.state.isSudoWhitelisted) {
+        return `bash -c "sudo ./rocksniff_mac off"` // investigate why is chdir to tools not working
+      }
+      else {
+        return `bash -c "./rocksniff_mac off"` // investigate why is chdir to tools not working
+      }
     }
     return "echo 'no pids'"
   }
