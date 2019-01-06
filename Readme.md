@@ -23,8 +23,8 @@ Rocksmith's UI leaves a lot to be desired especially when you have a lot of song
     - steam integration (dlc catalog + purchased [stats](#songs-available))
     - sort by acquired date
  - Realtime
-    - [track](#hit-percent) note hit on a per phrase level
-    - [track](#perfect-percent) perfect hits on a per phrase level (score attack)
+    - [track](#hit-tracking) note hit on a per phrase level
+    - [track](#perfect-tracking) perfect hits on a per phrase level (score attack)
     - [record](#record-audio) raw audio
  - Setlists
     - unlimited setlists to sort your collection
@@ -41,7 +41,7 @@ Rocksmith's UI leaves a lot to be desired especially when you have a lot of song
 ![Progress History](https://github.com/sandiz/rs-manager/raw/master/screenshots/images/progress-history.png)
 ### Hit Tracking
 ![Percent](https://github.com/sandiz/rs-manager/raw/master/screenshots/images/hit-percent-chart-guitar.png)
-### Hit Tracking
+### Perfect Tracking
 ![Percent](https://github.com/sandiz/rs-manager/raw/master/screenshots/images/perfect-percent-chart-guitar.png)
 ### Record Audio
 ![Record](https://github.com/sandiz/rs-manager/raw/master/screenshots/images/raw-record-finish.png)
