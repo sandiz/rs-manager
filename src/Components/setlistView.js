@@ -922,28 +922,31 @@ export default class SetlistView extends React.Component {
                         </div>
                         <div className="row justify-content-md-center" style={{ marginTop: 10 + 'px' }}>
                             <div className={arrstyle} style={{ display: this.state.modal_no_lead ? "none" : "block" }}>
-                                <span style={{ fontSize: 17 + 'px' }}>Lead </span>
-                                <StatsTableView
-                                    total={this.state.lead[0]}
-                                    masteryTotals={this.state.lead.slice(1)}
-                                    masteryWidths={this.state.leadwidth.slice(1)}
-                                />
+                                <div className="da-lead">
+                                    <StatsTableView
+                                        total={this.state.lead[0]}
+                                        masteryTotals={this.state.lead.slice(1)}
+                                        masteryWidths={this.state.leadwidth.slice(1)}
+                                    />
+                                </div>
                             </div>
                             <div className={arrstyle} style={{ display: this.state.modal_no_rhythm ? "none" : "block" }}>
-                                <span style={{ fontSize: 17 + 'px' }}>Rhythm </span>
-                                <StatsTableView
-                                    total={this.state.rhythm[0]}
-                                    masteryTotals={this.state.rhythm.slice(1)}
-                                    masteryWidths={this.state.rhythmwidth.slice(1)}
-                                />
+                                <div className="da-rhythm">
+                                    <StatsTableView
+                                        total={this.state.rhythm[0]}
+                                        masteryTotals={this.state.rhythm.slice(1)}
+                                        masteryWidths={this.state.rhythmwidth.slice(1)}
+                                    />
+                                </div>
                             </div>
                             <div className={arrstyle} style={{ display: this.state.modal_no_bass ? "none" : "block" }}>
-                                <span style={{ fontSize: 17 + 'px' }}>Bass </span>
-                                <StatsTableView
-                                    total={this.state.bass[0]}
-                                    masteryTotals={this.state.bass.slice(1)}
-                                    masteryWidths={this.state.basswidth.slice(1)}
-                                />
+                                <div className="da-bass">
+                                    <StatsTableView
+                                        total={this.state.bass[0]}
+                                        masteryTotals={this.state.bass.slice(1)}
+                                        masteryWidths={this.state.basswidth.slice(1)}
+                                    />
+                                </div>
                             </div>
                         </div>
                         <div className="row justify-content-md-center" style={{ marginTop: 10 + 'px' }}>

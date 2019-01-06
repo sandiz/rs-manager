@@ -14,7 +14,7 @@ export default class StatsTableView extends React.Component {
 
   render = () => {
     return (
-      <table style={{ width: 100 + '%', marginTop: 7 + 'px' }}>
+      <table style={{ width: 100 + '%', marginTop: this.props.scoreattack ? 3 : 21 + 'px' }}>
         {
           this.props.scoreattack
             ? (
@@ -22,7 +22,7 @@ export default class StatsTableView extends React.Component {
                 <tr>
                   <td>Total</td>
                   <td className="">
-                    <span id="lead_total" className="ta-right right-align header-top">
+                    <span id="lead_total" className="ta-right right-align header-sa-top">
                       {this.props.total}
                     </span>
                   </td>
