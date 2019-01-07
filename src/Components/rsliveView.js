@@ -1216,7 +1216,7 @@ export default class RSLiveView extends React.Component {
         if (seconds >= 15) {
           this.lastUpdateTS = new Date();
           if (this.state.songKey.length > 0) {
-            //await this.updateMastery();
+            await this.updateMastery();
             //console.log("Updated Mastery for ", this.state.songKey);
           }
         }
