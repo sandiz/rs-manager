@@ -141,7 +141,7 @@ export function unescapeFormatter(cell, row, rowIndex, extraData) {
         >
           {
             //eslint-disable-next-line
-            <div dangerouslySetInnerHTML={{
+            <div style={{ marginTop: 5 + 'px', textAlign: 'left' }} dangerouslySetInnerHTML={{
               __html: unescape(lnote),
             }} />
           }
