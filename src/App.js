@@ -113,7 +113,7 @@ class App extends Component {
   componentWillMount = async () => {
     this.cwmasync();
     const zoomF = await getCurrentZoomFactorConfig();
-    if (parseFloat(zoomF)) {
+    if (!Number.isNaN(parseFloat(zoomF))) {
       window.webFrame.setZoomFactor(zoomF);
     }
   }

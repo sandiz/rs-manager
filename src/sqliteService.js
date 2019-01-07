@@ -109,6 +109,15 @@ export async function initSongsOwnedDB(updateTab = "", updateFunc = null) {
   let altersql12 = "";
   altersql12 += "alter table songs_owned add local_note char default null"
 
+  let altersql13 = "";
+  altersql13 += "delete from history where mastery == 'undefined'";
+
+  let altersql14 = "";
+  altersql14 += ` DROP TABLE IF EXISTS duplicate_table; CREATE TABLE duplicate_table as SELECT DISTINCT * FROM history GROUP BY id,mastery HAVING COUNT(id) > 1;`
+  altersql14 += ` DELETE FROM history WHERE (id, mastery) IN (SELECT id,mastery FROM duplicate_table);`
+  altersql14 += `INSERT INTO history SELECT * FROM duplicate_table; DROP TABLE duplicate_table;`
+
+
   switch (version) {
     case 0: {
       // add score attack stats
@@ -224,6 +233,14 @@ export async function initSongsOwnedDB(updateTab = "", updateFunc = null) {
     case 12:
       // add local_note
       await db.exec(altersql12)
+      version += 1
+      await setUserVersion(version)
+    case 13:
+      // delete bad entries from history
+      // remove all entries with undefined in mastery
+      await db.exec(altersql13);
+      // remove duplicate rows
+      await db.exec(altersql14);
       version += 1
       await setUserVersion(version)
     default:
@@ -842,12 +859,16 @@ export async function addtoRSSongList(tablename, songkey) {
   return op.changes;
 }
 export async function saveHistory(id, mastery, timestamp) {
-  const sql = `replace into history VALUES('${id}', '${mastery}', '${timestamp}')`
-  const op = await db.run(sql)
-  return op.changes;
+  const flt = parseFloat(mastery);
+  if (!Number.isNaN(flt) && flt > 0) {
+    const sql = `replace into history VALUES('${id}', '${flt}', '${timestamp}')`
+    const op = await db.run(sql)
+    return op.changes;
+  }
+  return 0;
 }
 export async function getHistory(id, limit = 10) {
-  const sql = `select * from history where id='${id}' order by timestamp asc limit ${limit}`;
+  const sql = `select * from history where id='${id}' group by mastery order by timestamp asc limit ${limit}`;
   const op = await db.all(sql);
   return op;
 }
