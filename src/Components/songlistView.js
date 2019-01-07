@@ -89,7 +89,7 @@ export function unescapeFormatter(cell, row, rowIndex, extraData) {
       /*strip html*/
       const div = document.createElement("div");
       div.innerHTML = gnote;
-      gnote = div.textContent || div.innerText || "";
+      gnote = div.innerHTML;
     }
   }
   if (gnote === "" && lnote === "") {
@@ -119,7 +119,12 @@ export function unescapeFormatter(cell, row, rowIndex, extraData) {
             elem.style.top = top + "px";
           }}
         >
-          {unescape(gnote)}
+          {
+            //eslint-disable-next-line
+            <div style={{ marginTop: 5 + 'px', textAlign: 'left' }} dangerouslySetInnerHTML={{
+              __html: gnote,
+            }} />
+          }
         </ReactTooltip>
         <ReactTooltip
           id={row.id + "_ln"}
