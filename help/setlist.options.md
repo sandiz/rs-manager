@@ -25,9 +25,9 @@
        * FC Easy/Medium/Hard/Master: expected true/false
        * Local notes: any string
  - Comparator:
-    * (>=, <=, >, <, =) - number comparision
+    * (>=, <=, >, <, =) - number comparison
     * is/is not - true or false
-    * like/not like - string comparision
+    * like/not like - string comparison
  - Value
     * -- user input -- goes here 
  - Logic Chain: 
