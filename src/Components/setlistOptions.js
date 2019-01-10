@@ -135,6 +135,7 @@ export function generateSql(filters, count = false) {
       case "artist":
       case "album":
       case "song":
+      case "local_note":
       case "arrangement":
         sql += `${filter.type} ${filter.cmp} '%${escape(filter.value)}%' `;
         break;
@@ -368,6 +369,11 @@ export default class SetlistOptions extends React.Component {
         type: "path_bass",
         display: "Path: Bass",
         cmp: ["is"],
+      },
+      {
+        type: "local_note",
+        display: "Local Notes",
+        cmp: ["like", "not like"],
       },
     ];
     this.sortfieldref = React.createRef();
