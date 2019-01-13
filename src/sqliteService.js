@@ -41,6 +41,8 @@ export async function initSongsOwnedDB(updateTab = "", updateFunc = null) {
   await db.run(createIgnoredIDSql)
   const createHistorySql = "create table if not exists history (id char, mastery float default 0, timestamp real, constraint ts_unique unique(timestamp))";
   await db.run(createHistorySql)
+  const createDLCTagsSql = "create table if not exists dlc_tags (appid char, tag char, primary key(appid, tag));";
+  await db.run(createDLCTagsSql)
   await initSetlistDB(); // init setlist db with songs db so all migrations can be in one place
   let version = await getUserVersion();
 
@@ -116,7 +118,6 @@ export async function initSongsOwnedDB(updateTab = "", updateFunc = null) {
   altersql14 += ` DROP TABLE IF EXISTS duplicate_table; CREATE TABLE duplicate_table as SELECT DISTINCT * FROM history GROUP BY id,mastery HAVING COUNT(id) > 1;`
   altersql14 += ` DELETE FROM history WHERE (id, mastery) IN (SELECT id,mastery FROM duplicate_table);`
   altersql14 += `INSERT INTO history SELECT * FROM duplicate_table; DROP TABLE duplicate_table;`
-
 
   switch (version) {
     case 0: {
@@ -297,7 +298,8 @@ export async function getDLCDetails(start = 0, count = 10, sortField = "release_
     allownedstring = `and owned='${owned}'`
   }
   if (search === "") {
-    sql = `select c.acount as acount,d.nopackcount as nopackcount, appid, name, acquired_date, release_date, owned
+    sql = `select c.acount as acount,d.nopackcount as nopackcount, appid, name, acquired_date, release_date, owned,
+           group_concat(dlc_tags.tag) as tags
            from songs_available,  (
            SELECT count(*) as acount
             FROM songs_available
@@ -307,11 +309,14 @@ export async function getDLCDetails(start = 0, count = 10, sortField = "release_
             FROM songs_available
             where name NOT like '%${"Song Pack"}%' ${allownedstring}
           ) d
+          LEFT JOIN dlc_tags using (appid) group by appid
           ${ownedstring}
           ORDER BY ${sortField} ${sortOrder} LIMIT ${start},${count}`;
   }
   else {
-    sql = `select c.acount as acount, d.nopackcount as nopackcount, appid, name, acquired_date, release_date, owned from songs_available, (
+    sql = `select c.acount as acount, d.nopackcount as nopackcount, appid, name, acquired_date, release_date, owned,
+          group_concat(dlc_tags.tag) as tags
+          from songs_available, (
           SELECT count(*) as acount 
             FROM songs_available
             where (name like '%${search}%' or appid like '%${search}%')
@@ -321,6 +326,7 @@ export async function getDLCDetails(start = 0, count = 10, sortField = "release_
             FROM songs_available
             where (name NOT like '%${"Song Pack"}%' AND name like '%${search}%' or appid like '%${search}%') ${allownedstring}
           ) d
+          LEFT JOIN dlc_tags using (appid) group by appid
           where (name like '%${search}%' or appid like '%${search}%') ${allownedstring}
           ORDER BY ${sortField} ${sortOrder} LIMIT ${start},${count}`;
   }
@@ -338,6 +344,21 @@ export async function isDLCInDB(dlc) {
     return false;
   }
   return true;
+}
+export async function getAllTags(appid) {
+  const sql = `select tag from dlc_tags where appid = '${appid}';`
+  const op = await db.all(sql);
+  return op;
+}
+export async function getUntaggedDLC() {
+  const sql = "select * from songs_available where appid not in (select distinct appid from dlc_tags) and name not like '%song pack%';";
+  const op = await db.all(sql);
+  return op;
+}
+export async function addTag(appid, tag) {
+  const sql = `replace into dlc_tags values('${appid}','${tag.toLowerCase()}')`
+  const op = await db.run(sql);
+  return op;
 }
 export async function isSongIDIgnored(songid) {
   //  console.log("__db_call__: isDLCInDB");

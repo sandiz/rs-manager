@@ -1,3 +1,4 @@
+
 //import { writeFile } from './configService';
 
 //import { writeFile } from './configService'
@@ -94,4 +95,49 @@ export async function getOwnedHistory(cookie, cookieSess) {
     console.log(error)
     return [];
   }
+}
+export async function getTrackTags(artist, title) {
+  //simple o-b-fus-cation
+  const p = "a2V5PWxSbktOaUh4UUFpc1d2VGpOT01oJnNlY3JldD1kYWV6VVhlaktwZlBGbkxtZVNIYVdvQmFEb0t0Y05zTg";
+  const url = `https://api.discogs.com/database/search?title=${escape(title)}&artist=${escape(artist)}&per_page=3&page=1&${atob(p)}`;
+  //console.log("searching for", artist, title);
+  //console.log(url);
+  const headers = new Headers({
+    "User-Agent": "rs-manager",
+  });
+  const d = await window.fetch(url, {
+    method: 'GET',
+    headers,
+  });
+  const text = await d.text();
+  if (d.status === 429) {
+    console.log("timeout", text);
+    return "timeout";
+  }
+  try {
+    const e = JSON.parse(unescape(text));
+    if (e.results && e.results.length > 0) {
+      const masterURL = e.results[0].master_url;
+      //console.log("master_url", masterURL);
+      if (masterURL != null) {
+        const master = masterURL + `?${atob(p)}`;
+        const f = await window.fetch(master);
+        const g = await f.json();
+        const s = g.styles ? g.styles : [];
+        const gen = g.genres ? g.genres : [];
+        return s.concat(gen);
+      }
+      else {
+        const res = e.results[0];
+        const s = res.style ? res.style : [];
+        const gen = res.genre ? res.genre : [];
+        return s.concat(gen);
+      }
+    }
+  }
+  catch (ex) {
+    console.log(ex);
+    console.log(text);
+  }
+  return null;
 }
