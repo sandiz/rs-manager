@@ -7,10 +7,10 @@ import 'react-datepicker/dist/react-datepicker.css';
 import {
   initSongsAvailableDB, isDLCInDB, addToSteamDLCCatalog, getDLCDetails,
   countSongsAvailable, updateOwnedInDB, updateAcquiredDate,
-  getAppID, countAppID, updateAcquiredDateByAppID,
+  getAppID, countAppID, updateAcquiredDateByAppID, getUntaggedDLC, addTag,
 } from '../sqliteService';
 import { RemoteAll } from './songlistView';
-import { getOwnedPackages, getOwnedHistory } from '../steamprofileService';
+import { getOwnedPackages, getOwnedHistory, getTrackTags } from '../steamprofileService';
 import SongDetailView from './songdetailView';
 import { getSteamLoginSecureCookie, getSessionIDConfig } from '../configService'
 
@@ -60,6 +60,7 @@ export default class SongAvailableView extends React.Component {
       randompackappid: '',
       randompack: '',
       showsongpackpreview: false,
+      fetchingTags: false,
     }
     this.search = "";
     this.rowEvents = {
@@ -97,7 +98,36 @@ export default class SongAvailableView extends React.Component {
         },
         formatter: (cell, row) => {
           cell = replaceRocksmithTerms(unescape(cell))
-          return <span>{cell}</span>
+          //const tags = await getAllTags(row.appid);
+          //console.log(tags);
+          //console.log(row.tags);
+          const tags = [];
+          if (row.tags) {
+            const splittags = row.tags.split(",");
+            for (let i = 0; i < splittags.length; i += 1) {
+              const tag = splittags[i];
+              tags.push(<a
+                key={tag}
+                className="badge badge-dark"
+                style={{
+                  color: 'white',
+                  marginRight: 5 + 'px',
+                }}
+              > {tag} </a>)
+            }
+          }
+          return (
+            <div>
+              <span style={{
+                float: 'left',
+                marginTop: 4 + 'px',
+                marginLeft: 2 + 'px',
+              }}> {cell} </span>
+              <span style={{
+                float: 'right',
+              }}> {tags} </span>
+            </div>
+          );
         },
         sort: true,
       },
@@ -472,6 +502,78 @@ export default class SongAvailableView extends React.Component {
     })
   }
 
+  sleep = (ms) => {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  updateSongTags = async () => {
+    //read
+    const dlcs = await getUntaggedDLC();
+    this.setState({ fetchingTags: true }, () => this.fetchTags(dlcs));
+  }
+
+  resetHeader = (msg) => {
+    this.props.updateHeader(
+      this.tabname,
+      this.childtabname,
+      msg,
+    );
+  }
+
+  fetchTags = async (dlcs) => {
+    this.resetHeader("Fetching tags...");
+    let timedout = false;
+    for (let i = 0; i < dlcs.length; i += 1) {
+      if (this.state.fetchingTags === false) { this.resetHeader(""); return; }
+      if (timedout) {
+        console.log("max dlcs fetched");
+        let time = 60;
+        //sleep for 1 minute
+        do {
+          if (this.state.fetchingTags === false) { this.resetHeader(""); return; }
+          this.resetHeader(
+            `Sleeping for ${time} secs to avoid rate limiting... (${i + 1}/${dlcs.length})`,
+          );
+          //eslint-disable-next-line
+          await this.sleep(1000);
+          time -= 1;
+        } while (time > 0);
+        timedout = false;
+      }
+      const dlc = dlcs[i];
+      const [artist, title] = dlc.name.split(" - ");
+      if (artist && title) {
+        //eslint-disable-next-line
+        const tags = await getTrackTags(artist.trim(), title.trim());
+        if (Array.isArray(tags)) {
+          console.log(artist, title, tags);
+          for (let k = 0; k < tags.length; k += 1
+          ) {
+            if (tags[k] && tags[k].length > 0) {
+              //eslint-disable-next-line
+              await addTag(dlc.appid, tags[k]);
+            }
+          }
+          this.resetHeader(
+            `Found tags for ${artist} - ${title} (${i + 1}/${dlcs.length})`,
+          );
+        }
+        else if (tags === "timeout") {
+          timedout = true;
+          continue;
+        }
+        else {
+          console.log("no tags found for ", artist, "-", title);
+        }
+      }
+      else {
+        console.log("invalid artist/title", artist, title);
+      }
+    }
+    this.resetHeader("Finished tagging...");
+    this.setState({ fetchingTags: false });
+  }
+
   updateOwnedStatus = async () => {
     const cookie = await getSteamLoginSecureCookie();
     const cookieSess = await getSessionIDConfig();
@@ -626,15 +728,36 @@ export default class SongAvailableView extends React.Component {
         </div>
         <div className="centerButton list-unstyled">
           <a
+            style={{ width: 15 + '%' }}
             onClick={this.updateSteamDLCCatalog}
             className="extraPadding download">
             Update Rocksmith DLC Catalog
           </a>
           <a
+            style={{ width: 15 + '%' }}
             onClick={this.updateOwnedStatus}
             className={ownedstyle}>
             Update Owned/Acquired Date
           </a>
+          {
+            !this.state.fetchingTags
+              ? (
+                <a
+                  style={{ width: 10 + '%' }}
+                  onClick={this.updateSongTags}
+                  className="extraPadding download">
+                  Update Song Tags
+                </a>
+              )
+              : (
+                <a
+                  style={{ width: 10 + '%' }}
+                  onClick={() => this.setState({ fetchingTags: false })}
+                  className="extraPadding download">
+                  Cancel fetch...
+                </a>
+              )
+          }
         </div>
         <div>
           <RemoteAll
