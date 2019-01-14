@@ -96,10 +96,39 @@ export async function getOwnedHistory(cookie, cookieSess) {
     return [];
   }
 }
-export async function getTrackTags(artist, title) {
+export async function getTrackTags(artist, title, trackonly = false) {
   //simple o-b-fus-cation
   const p = "a2V5PWxSbktOaUh4UUFpc1d2VGpOT01oJnNlY3JldD1kYWV6VVhlaktwZlBGbkxtZVNIYVdvQmFEb0t0Y05zTg";
-  const url = `https://api.discogs.com/database/search?title=${escape(title)}&artist=${escape(artist)}&per_page=3&page=1&${atob(p)}`;
+  const artistMappings = {
+    Motörhead: "Motorhead",
+    Queensrÿche: "Queensryche",
+    "Mötley Crüe": "Motley Crue",
+    "Thirty Seconds to Mars": "30 Seconds to Mars",
+    "Panic! At The Disco": "Panic At The Disco",
+    "Against Me!": "Against Me",
+    "The Pixies": "Pixies",
+    "Slash featuring Myles Kennedy and The Conspirators": "Myles Kennedy",
+    "Slash featuring Myles Kennedy": "Myles Kennedy",
+    "Queen and David Bowie": "Queen",
+    "Santana Feat Rob Thomas": "Santana",
+    "B. B. King": "BB King",
+    "Albert King with Stevie Ray Vaughan": "Albert King",
+    "Brad Paisley ft. Alison Krauss": "Brad Paisley",
+    "The Outlaws": "Outlaws",
+    "Ghost B.C.": "Ghost",
+  };
+  const akeys = Object.keys(artistMappings);
+  if (akeys.includes(artist)) {
+    artist = artistMappings[artist];
+    console.log("using normalized artist name, ", artist);
+  }
+  let url = "";
+  if (trackonly) {
+    url = `https://api.discogs.com/database/search?track=${escape(title)}&per_page=3&page=1&${atob(p)}`;
+  }
+  else {
+    url = `https://api.discogs.com/database/search?track=${escape(title)}&artist=${escape(artist)}&per_page=3&page=1&${atob(p)}`;
+  }
   //console.log("searching for", artist, title);
   //console.log(url);
   const headers = new Headers({
@@ -116,22 +145,34 @@ export async function getTrackTags(artist, title) {
   }
   try {
     const e = JSON.parse(unescape(text));
-    if (e.results && e.results.length > 0) {
-      const masterURL = e.results[0].master_url;
-      //console.log("master_url", masterURL);
-      if (masterURL != null) {
-        const master = masterURL + `?${atob(p)}`;
-        const f = await window.fetch(master);
-        const g = await f.json();
-        const s = g.styles ? g.styles : [];
-        const gen = g.genres ? g.genres : [];
-        return s.concat(gen);
+    if (e.results) {
+      if (e.results.length > 0) {
+        const masterURL = e.results[0].master_url;
+        //console.log("master_url", masterURL);
+        if (masterURL != null) {
+          const master = masterURL + `?${atob(p)}`;
+          const f = await window.fetch(master);
+          const g = await f.json();
+          const s = g.styles ? g.styles : [];
+          const gen = g.genres ? g.genres : [];
+          const concat = s.concat(gen);
+          const unique = [...new Set(concat)];
+          return unique;
+        }
+        else {
+          const res = e.results[0];
+          const s = res.style ? res.style : [];
+          const gen = res.genre ? res.genre : [];
+          const concat = s.concat(gen);
+          const unique = [...new Set(concat)];
+          return unique;
+        }
       }
       else {
-        const res = e.results[0];
-        const s = res.style ? res.style : [];
-        const gen = res.genre ? res.genre : [];
-        return s.concat(gen);
+        if (!trackonly) {
+          const res = await getTrackTags(artist, title, true);
+          return res;
+        }
       }
     }
   }
