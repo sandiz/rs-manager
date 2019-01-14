@@ -671,12 +671,13 @@ tbody tr:hover {
     text-align: center;
     width: 100px;
     height: 100px;
-    position: fixed;
+    position: relative;
     margin-top: 5%;
-    left: 20%;
     box-shadow: 6px 9px 9px black;
     border-radius: 5px;
     border: 1px solid black;
+    margin-left: 0px;
+    margin-right: 0px;
 }
 
 .da-lead {
