@@ -314,51 +314,50 @@ export async function getDLCDetails(start = 0, count = 10, sortField = "release_
     andOwnedString = ` AND ${combinedOwnedTagString}`
   }
 
-
   if (search === "") {
-    sql = `select c.acount as acount,d.nopackcount as nopackcount, appid, name, acquired_date, release_date, owned,
-           group_concat(dlc_tags.tag, '|') as tags
-           from songs_available,  (
-           SELECT count(*) as acount
-            FROM songs_available
-            LEFT JOIN dlc_tags using (appid) 
-            ${whereOwnedString}
-          ) c , (
-           SELECT count(*) as nopackcount
-            FROM songs_available
-            LEFT JOIN dlc_tags using (appid) 
-            where name NOT like '%${"Song Pack"}%' ${andOwnedString}
-          ) d
+    sql = `
+          CREATE VIEW IF NOT EXISTS tmp_song_av AS
+          SELECT appid, name, acquired_date, release_date, owned,
+          group_concat(dlc_tags.tag, '|') as tags
+          FROM songs_available
           LEFT JOIN dlc_tags using (appid) 
           ${whereOwnedString}
           GROUP by appid
-          ORDER BY ${sortField} ${sortOrder} LIMIT ${start},${count}`;
+          ORDER BY ${sortField} ${sortOrder} 
+          `;
   }
   else {
-    sql = `select c.acount as acount, d.nopackcount as nopackcount, appid, name, acquired_date, release_date, owned,
+    sql = `
+          CREATE VIEW IF NOT EXISTS tmp_song_av AS
+          SELECT appid, name, acquired_date, release_date, owned,
           group_concat(dlc_tags.tag, '|') as tags
-          from songs_available, (
-          SELECT count(*) as acount 
-            FROM songs_available
-            LEFT JOIN dlc_tags using (appid) 
-            where (name like '%${search}%' or appid like '%${search}%')
-            ${andOwnedString}
-          ) c , (
-           SELECT count(*) as nopackcount
-            FROM songs_available
-            LEFT JOIN dlc_tags using (appid) 
-            where (name NOT like '%${"Song Pack"}%' AND name like '%${search}%' or appid like '%${search}%') 
-            ${andOwnedString}
-          ) d
+          FROM songs_available
           LEFT JOIN dlc_tags using (appid) 
           WHERE (name like '%${search}%' or appid like '%${search}%' ) 
           ${andOwnedString}
           GROUP by appid
-          ORDER BY ${sortField} ${sortOrder} LIMIT ${start},${count}`;
+          ORDER BY ${sortField} ${sortOrder} 
+          `;
   }
-  //console.log(sql);
-  const output = await db.all(sql);
-  return output
+  await db.run(sql);
+  const limitsql = `select * from tmp_song_av LIMIT ${start},${count};`
+  const countsql = "select count(*) as count from tmp_song_av;"
+  const countnopacksql = "select count(*) as count from tmp_song_av where name not like '%Song Pack%';"
+
+  const output = await db.all(limitsql)
+  const rows = await db.get(countsql)
+  const rowsnopack = await db.get(countnopacksql)
+
+  const dropsql = "DROP VIEW IF EXISTS tmp_song_av";
+  db.run(dropsql);
+
+  const obj = {
+    output,
+    rows: rows.count,
+    rowsnopack: rowsnopack.count,
+  }
+  console.log(obj);
+  return obj;
 }
 export async function isDLCInDB(dlc) {
   //  console.log("__db_call__: isDLCInDB");

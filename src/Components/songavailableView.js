@@ -463,14 +463,15 @@ export default class SongAvailableView extends React.Component {
           "New DLC Found: " + newDLC + ", Total DLC's " + e.length,
         );
       }
-      const output = await getDLCDetails(
+      const results = await getDLCDetails(
         0,
         this.state.sizePerPage,
         "release_date",
         "desc",
         this.search.value,
       )
-      this.setState({ dlcs: output, page: 1, totalSize: output[0].acount });
+      const { output, rows } = results;
+      this.setState({ dlcs: output, page: 1, totalSize: rows });
     }
     catch (e) {
       console.log(e);
@@ -725,14 +726,15 @@ export default class SongAvailableView extends React.Component {
         `Checking for Package/App ID: ${pid}`,
       );
     }
-    const output = await getDLCDetails(
+    const results = await getDLCDetails(
       0,
       this.state.sizePerPage,
       "release_date",
       "desc",
       this.search.value,
     )
-    this.setState({ dlcs: output, page: 1, totalSize: output[0].acount });
+    const { output, rows } = results;
+    this.setState({ dlcs: output, page: 1, totalSize: rows });
     this.handleTableChange("cdm", {
       page: this.state.page,
       sizePerPage: this.state.sizePerPage,
@@ -788,7 +790,7 @@ export default class SongAvailableView extends React.Component {
   }) => {
     const zeroIndexPage = page - 1
     const start = zeroIndexPage * sizePerPage;
-    const output = await getDLCDetails(
+    const results = await getDLCDetails(
       start,
       sizePerPage,
       sortField === null ? "release_date" : sortField,
@@ -798,13 +800,14 @@ export default class SongAvailableView extends React.Component {
       (this.search.value === "owned") ? 'true' : this.search.value === 'available' ? 'false' : owned,
       this.state.selectedTags,
     )
+    const { output, rows, rowsnopack } = results;
     if (output.length > 0) {
       this.props.updateHeader(
         this.tabname,
         this.childtabname,
-        `DLC's: ${output[0].acount} Excluding SongPacks: ${output[0].nopackcount}`,
+        `DLC's: ${rows} Excluding SongPacks: ${rowsnopack}`,
       );
-      this.setState({ dlcs: output, page, totalSize: output[0].acount });
+      this.setState({ dlcs: output, page, totalSize: rows });
     }
     else {
       this.props.updateHeader(
