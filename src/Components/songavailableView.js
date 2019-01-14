@@ -79,6 +79,23 @@ export function replaceRocksmithTerms(str) {
     .replace(/["']/g, '')
     .trim());
 }
+export async function tagOptions(inputValue) {
+  return new Promise(async (resolve, reject) => {
+    let tags = await getAllDistinctTags();
+    let ft = [];
+    if (inputValue) {
+      tags = tags.filter(i => i.tag.toLowerCase().includes(inputValue.toLowerCase()));
+    }
+    ft = tags.map((x) => {
+      const obj = {
+        value: x.tag,
+        label: x.tag,
+      }
+      return obj;
+    });
+    resolve(ft);
+  });
+}
 export default class SongAvailableView extends React.Component {
   constructor(props) {
     super(props);
@@ -799,24 +816,6 @@ export default class SongAvailableView extends React.Component {
     }
   }
 
-  tagOptions = async (inputValue) => {
-    return new Promise(async (resolve, reject) => {
-      let tags = await getAllDistinctTags();
-      let ft = [];
-      if (inputValue) {
-        tags = tags.filter(i => i.tag.toLowerCase().includes(inputValue.toLowerCase()));
-      }
-      ft = tags.map((x) => {
-        const obj = {
-          value: x.tag,
-          label: x.tag,
-        }
-        return obj;
-      });
-      resolve(ft);
-    });
-  }
-
   handleTagsChange = (newValue) => {
     const tags = newValue.map(i => i.value);
     this.setState({ selectedTags: tags }, () => this.refreshTable());
@@ -845,7 +844,7 @@ export default class SongAvailableView extends React.Component {
               cacheOptions
               defaultOptions
               styles={customStyles}
-              loadOptions={this.tagOptions}
+              loadOptions={tagOptions}
               placeholder="Filter by genre"
             />
           </div>
@@ -902,7 +901,7 @@ export default class SongAvailableView extends React.Component {
             artist=""
             album=""
             showDetail={this.state.showsongpackpreview}
-            close={() => this.setState({ showsongpackpreview: false })}
+            close={() => this.setState({ showsongpackpreview: false }, () => this.refreshTable())}
             isSongpack
             dlcappid={this.state.randompackappid}
             isSetlist={false}

@@ -4,13 +4,15 @@ import Collapsible from 'react-collapsible';
 import DatePicker from 'react-datepicker';
 import moment from 'moment';
 import Swal from 'sweetalert2'
+import AsyncSelect from 'react-select/lib/Async';
 import {
   getAllSetlist, saveSongToSetlist, getSongByID,
-  updateCDLCStat, updateSAFCStat, saveSongByIDToSetlist, updateNotes, getNotes,
+  updateCDLCStat, updateSAFCStat, saveSongByIDToSetlist,
+  updateNotes, getNotes, getAllTags, executeRawSql, addTag,
 } from '../sqliteService';
 import { getScoreAttackConfig } from '../configService';
 import { expandButton, collapseButton } from "./settingsView";
-import { DateAcquiredInput } from './songavailableView';
+import { DateAcquiredInput, tagOptions } from './songavailableView';
 
 export function forceNoScroll() {
   document.getElementsByTagName("body")[0].scrollTop = 0;
@@ -26,6 +28,36 @@ export function enableScroll() {
   document.getElementsByTagName("body")[0].style.overflow = "inherit";
   document.getElementsByTagName("html")[0].style.height = "100%";
   document.getElementsByTagName("html")[0].style.overflow = "inherit";
+}
+const customStyles = {
+  container: styles => ({
+    ...styles, display: 'flex', marginTop: -8 + 'px', marginBottom: 5 + 'px',
+  }),
+  control: styles => ({
+    ...styles, backgroundColor: 'white', color: 'black', width: 50 + '%', left: 25 + '%',
+  }),
+  option: (styles, {
+    data, isDisabled, isFocused, isSelected,
+  }) => {
+    return {
+      ...styles,
+      color: 'black',
+    };
+  },
+  multiValue: (styles, { data }) => {
+    return {
+      ...styles,
+    };
+  },
+  multiValueLabel: (styles, { data }) => ({
+    ...styles,
+  }),
+  multiValueRemove: (styles, { data }) => ({
+    ...styles,
+  }),
+  menu: styles => ({
+    ...styles, width: 50 + '%', left: 25 + '%',
+  }),
 }
 export default class SongDetailView extends React.Component {
   constructor(props) {
@@ -49,6 +81,7 @@ export default class SongDetailView extends React.Component {
       sa_fc_master: null,
       showaddtosetlistoptions: false,
       showremfromsetlistoptions: false,
+      tags: [],
     }
     this.maxResults = 10;
     this.modal_div = null;
@@ -189,12 +222,21 @@ export default class SongDetailView extends React.Component {
     this.setState({ setlists: items, currentSetlist: output.length > 0 ? output[0].key : '', showsastats });
     const songDetails = await getSongByID(this.props.songID);
     const isTrueSet = (songDetails.is_cdlc === 'true');
+    const tags = await getAllTags(this.props.dlcappid)
+    const ft = tags.map((x) => {
+      const obj = {
+        value: x.tag,
+        label: x.tag,
+      }
+      return obj;
+    });
     this.setState({
       is_cdlc: isTrueSet,
       sa_fc_easy: songDetails.sa_fc_easy == null ? null : moment(songDetails.sa_fc_easy),
       sa_fc_medium: songDetails.sa_fc_medium == null ? null : moment(songDetails.sa_fc_medium),
       sa_fc_hard: songDetails.sa_fc_hard == null ? null : moment(songDetails.sa_fc_hard),
       sa_fc_master: songDetails.sa_fc_master == null ? null : moment(songDetails.sa_fc_master),
+      tags: ft,
     })
   }
 
@@ -275,6 +317,16 @@ export default class SongDetailView extends React.Component {
       })
       await this.props.refreshView();
     }
+  }
+
+  handleTagsChange = async (newValue) => {
+    //const tags = newValue.map(i => i.value);
+    await executeRawSql(`delete from dlc_tags where appid='${this.props.dlcappid}'`)
+    for (let i = 0; i < newValue.length; i += 1) {
+      //eslint-disable-next-line
+      await addTag(this.props.dlcappid, newValue[i].value);
+    }
+    this.setState({ tags: newValue });
   }
 
   render = () => {
@@ -690,6 +742,23 @@ export default class SongDetailView extends React.Component {
               </div>
             </Collapsible>
           </div>
+          {
+            this.props.isSongpack
+              ? (
+                <AsyncSelect
+                  value={this.state.tags}
+                  styles={customStyles}
+                  isMulti
+                  placeholder="Genres..."
+                  isSearchable={false}
+                  isClearable={false}
+                  cacheOptions
+                  defaultOptions
+                  loadOptions={tagOptions}
+                  onChange={this.handleTagsChange}
+                />
+              ) : null
+          }
         </div>
       </div>
     );
