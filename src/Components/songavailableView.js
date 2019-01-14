@@ -147,7 +147,7 @@ export default class SongAvailableView extends React.Component {
                   marginRight: 5 + 'px',
                 }}
               > {tag} </a>)
-              if (i >= 5 && i % 5 === 0) { tags.push(<React.Fragment key={"fr" + i}><br /><br /></React.Fragment>) }
+              if (i >= 5 && splittags.length > 6 && i % 5 === 0) { tags.push(<React.Fragment key={"fr" + i}><br /><br /></React.Fragment>) }
             }
           }
           return (
