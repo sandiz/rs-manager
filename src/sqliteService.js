@@ -282,35 +282,56 @@ export async function addToSteamDLCCatalog(dlc, name, releaseDate, dontparseDate
   //console.log(sqlstr);
   await db.run(sqlstr); // Run the query without returning anything
 }
-export async function getDLCDetails(start = 0, count = 10, sortField = "release_date", sortOrder = "desc", search = "", owned = "") {
+export async function getDLCDetails(start = 0, count = 10, sortField = "release_date", sortOrder = "desc", search = "", owned = "", tags = []) {
   // console.log("__db_call__: getDLCDetails");
-  if (db == null) {
-    const dbfilename = window.sqlitePath;
-    db = await window.sqlite.open(dbfilename);
-  }
   let sql;
-  let ownedstring = "";
-  if (owned !== "") {
-    ownedstring = `where owned='${owned}'`
+  let tagstring = "";
+  if (tags.length > 0) {
+    let joinedtags = "";
+    for (let i = 0; i < tags.length; i += 1) {
+      joinedtags += `'${tags[i]}'`;
+      if (i < tags.length - 1) {
+        joinedtags += ","
+      }
+    }
+    tagstring = `tag in (${joinedtags})`
   }
-  let allownedstring = "";
-  if (owned !== "") {
-    allownedstring = `and owned='${owned}'`
+  let whereOwnedString = "";
+  let andOwnedString = "";
+
+  let combinedOwnedTagString = "";
+  if (owned !== "" || tags.length > 0) {
+    if (owned !== "") {
+      combinedOwnedTagString += `owned = '${owned}'`
+      if (tags.length > 0) {
+        combinedOwnedTagString += " AND "
+      }
+    }
+    if (tags.length > 0) {
+      combinedOwnedTagString += `${tagstring}`
+    }
+    whereOwnedString = ` WHERE ${combinedOwnedTagString}`
+    andOwnedString = ` AND ${combinedOwnedTagString}`
   }
+
+
   if (search === "") {
     sql = `select c.acount as acount,d.nopackcount as nopackcount, appid, name, acquired_date, release_date, owned,
            group_concat(dlc_tags.tag, '|') as tags
            from songs_available,  (
            SELECT count(*) as acount
             FROM songs_available
-            ${ownedstring}
+            LEFT JOIN dlc_tags using (appid) 
+            ${whereOwnedString}
           ) c , (
            SELECT count(*) as nopackcount
             FROM songs_available
-            where name NOT like '%${"Song Pack"}%' ${allownedstring}
+            LEFT JOIN dlc_tags using (appid) 
+            where name NOT like '%${"Song Pack"}%' ${andOwnedString}
           ) d
           LEFT JOIN dlc_tags using (appid) 
-          ${ownedstring} group by appid
+          ${whereOwnedString}
+          GROUP by appid
           ORDER BY ${sortField} ${sortOrder} LIMIT ${start},${count}`;
   }
   else {
@@ -319,17 +340,23 @@ export async function getDLCDetails(start = 0, count = 10, sortField = "release_
           from songs_available, (
           SELECT count(*) as acount 
             FROM songs_available
+            LEFT JOIN dlc_tags using (appid) 
             where (name like '%${search}%' or appid like '%${search}%')
-            ${allownedstring}
+            ${andOwnedString}
           ) c , (
            SELECT count(*) as nopackcount
             FROM songs_available
-            where (name NOT like '%${"Song Pack"}%' AND name like '%${search}%' or appid like '%${search}%') ${allownedstring}
+            LEFT JOIN dlc_tags using (appid) 
+            where (name NOT like '%${"Song Pack"}%' AND name like '%${search}%' or appid like '%${search}%') 
+            ${andOwnedString}
           ) d
           LEFT JOIN dlc_tags using (appid) 
-          where (name like '%${search}%' or appid like '%${search}%') ${allownedstring} group by appid
+          WHERE (name like '%${search}%' or appid like '%${search}%' ) 
+          ${andOwnedString}
+          GROUP by appid
           ORDER BY ${sortField} ${sortOrder} LIMIT ${start},${count}`;
   }
+  //console.log(sql);
   const output = await db.all(sql);
   return output
 }
@@ -347,6 +374,11 @@ export async function isDLCInDB(dlc) {
 }
 export async function getAllTags(appid) {
   const sql = `select distinct tag from dlc_tags where appid = '${appid}';`
+  const op = await db.all(sql);
+  return op;
+}
+export async function getAllDistinctTags() {
+  const sql = `select distinct tag from dlc_tags;`
   const op = await db.all(sql);
   return op;
 }

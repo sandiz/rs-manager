@@ -2,13 +2,14 @@ import React from 'react'
 import PropTypes from 'prop-types';
 import DatePicker from 'react-datepicker';
 import moment from 'moment';
+import AsyncSelect from 'react-select/lib/Async';
 import 'react-datepicker/dist/react-datepicker.css';
 
 import {
   initSongsAvailableDB, isDLCInDB, addToSteamDLCCatalog, getDLCDetails,
   countSongsAvailable, updateOwnedInDB, updateAcquiredDate,
   getAppID, countAppID, updateAcquiredDateByAppID,
-  getUntaggedDLC, addTag, getTagsCount, executeRawSql,
+  getUntaggedDLC, addTag, getTagsCount, executeRawSql, getAllDistinctTags,
 } from '../sqliteService';
 import { RemoteAll } from './songlistView';
 import { getOwnedPackages, getOwnedHistory, getTrackTags } from '../steamprofileService';
@@ -17,6 +18,36 @@ import { getSteamLoginSecureCookie, getSessionIDConfig } from '../configService'
 
 const parse = require('csv-parse/lib/es5/sync');
 
+const customStyles = {
+  container: styles => ({
+    ...styles, display: 'flex', marginTop: -8 + 'px', marginBottom: 5 + 'px',
+  }),
+  control: styles => ({
+    ...styles, backgroundColor: 'white', color: 'black', width: 25 + '%', left: 35 + '%',
+  }),
+  option: (styles, {
+    data, isDisabled, isFocused, isSelected,
+  }) => {
+    return {
+      ...styles,
+      color: 'black',
+    };
+  },
+  multiValue: (styles, { data }) => {
+    return {
+      ...styles,
+    };
+  },
+  multiValueLabel: (styles, { data }) => ({
+    ...styles,
+  }),
+  multiValueRemove: (styles, { data }) => ({
+    ...styles,
+  }),
+  menu: styles => ({
+    ...styles, width: 25 + '%', left: 35 + '%',
+  }),
+}
 
 export function decodeEntity(str) {
   const elem = document.createElement('textarea');
@@ -62,6 +93,7 @@ export default class SongAvailableView extends React.Component {
       randompack: '',
       showsongpackpreview: false,
       fetchingTags: false,
+      selectedTags: [],
     }
     this.search = "";
     this.rowEvents = {
@@ -747,6 +779,7 @@ export default class SongAvailableView extends React.Component {
       (owned === true || owned === false
         || this.search.value === "owned" || this.search.value === "available") ? "" : this.search.value,
       (this.search.value === "owned") ? 'true' : this.search.value === 'available' ? 'false' : owned,
+      this.state.selectedTags,
     )
     if (output.length > 0) {
       this.props.updateHeader(
@@ -766,6 +799,29 @@ export default class SongAvailableView extends React.Component {
     }
   }
 
+  tagOptions = async (inputValue) => {
+    return new Promise(async (resolve, reject) => {
+      let tags = await getAllDistinctTags();
+      let ft = [];
+      if (inputValue) {
+        tags = tags.filter(i => i.tag.toLowerCase().includes(inputValue.toLowerCase()));
+      }
+      ft = tags.map((x) => {
+        const obj = {
+          value: x.tag,
+          label: x.tag,
+        }
+        return obj;
+      });
+      resolve(ft);
+    });
+  }
+
+  handleTagsChange = (newValue) => {
+    const tags = newValue.map(i => i.value);
+    this.setState({ selectedTags: tags }, () => this.refreshTable());
+  }
+
   render = () => {
     const ownedstyle = "extraPadding download " + (this.state.dlcs.length > 0 ? " " : "hidden");
     const { dlcs, sizePerPage, page } = this.state;
@@ -782,6 +838,17 @@ export default class SongAvailableView extends React.Component {
           />
         </div>
         <div className="centerButton list-unstyled">
+          <div>
+            <AsyncSelect
+              onChange={this.handleTagsChange}
+              isMulti
+              cacheOptions
+              defaultOptions
+              styles={customStyles}
+              loadOptions={this.tagOptions}
+              placeholder="Filter by genre"
+            />
+          </div>
           <a
             style={{ width: 15 + '%' }}
             onClick={this.updateSteamDLCCatalog}
