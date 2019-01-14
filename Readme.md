@@ -22,6 +22,7 @@ Rocksmith's UI leaves a lot to be desired especially when you have a lot of song
  - Steam
     - steam integration (dlc catalog + purchased [stats](#songs-available))
     - sort by acquired date
+    - discover similar dlcs (genre based)
  - Realtime
     - [track](#hit-tracking) note hit on a per phrase level
     - [track](#perfect-tracking) perfect hits on a per phrase level (score attack)
