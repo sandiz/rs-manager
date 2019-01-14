@@ -299,7 +299,7 @@ export async function getDLCDetails(start = 0, count = 10, sortField = "release_
   }
   if (search === "") {
     sql = `select c.acount as acount,d.nopackcount as nopackcount, appid, name, acquired_date, release_date, owned,
-           group_concat(dlc_tags.tag) as tags
+           group_concat(dlc_tags.tag, '|') as tags
            from songs_available,  (
            SELECT count(*) as acount
             FROM songs_available
@@ -309,13 +309,13 @@ export async function getDLCDetails(start = 0, count = 10, sortField = "release_
             FROM songs_available
             where name NOT like '%${"Song Pack"}%' ${allownedstring}
           ) d
-          LEFT JOIN dlc_tags using (appid) group by appid
-          ${ownedstring}
+          LEFT JOIN dlc_tags using (appid) 
+          ${ownedstring} group by appid
           ORDER BY ${sortField} ${sortOrder} LIMIT ${start},${count}`;
   }
   else {
     sql = `select c.acount as acount, d.nopackcount as nopackcount, appid, name, acquired_date, release_date, owned,
-          group_concat(dlc_tags.tag) as tags
+          group_concat(dlc_tags.tag, '|') as tags
           from songs_available, (
           SELECT count(*) as acount 
             FROM songs_available
@@ -326,8 +326,8 @@ export async function getDLCDetails(start = 0, count = 10, sortField = "release_
             FROM songs_available
             where (name NOT like '%${"Song Pack"}%' AND name like '%${search}%' or appid like '%${search}%') ${allownedstring}
           ) d
-          LEFT JOIN dlc_tags using (appid) group by appid
-          where (name like '%${search}%' or appid like '%${search}%') ${allownedstring}
+          LEFT JOIN dlc_tags using (appid) 
+          where (name like '%${search}%' or appid like '%${search}%') ${allownedstring} group by appid
           ORDER BY ${sortField} ${sortOrder} LIMIT ${start},${count}`;
   }
   const output = await db.all(sql);
@@ -346,9 +346,14 @@ export async function isDLCInDB(dlc) {
   return true;
 }
 export async function getAllTags(appid) {
-  const sql = `select tag from dlc_tags where appid = '${appid}';`
+  const sql = `select distinct tag from dlc_tags where appid = '${appid}';`
   const op = await db.all(sql);
   return op;
+}
+export async function getTagsCount() {
+  const sql = `select count(*) as count from dlc_tags;`
+  const op = await db.get(sql);
+  return op.count;
 }
 export async function getUntaggedDLC() {
   const sql = "select * from songs_available where appid not in (select distinct appid from dlc_tags) and name not like '%song pack%';";

@@ -7,7 +7,8 @@ import 'react-datepicker/dist/react-datepicker.css';
 import {
   initSongsAvailableDB, isDLCInDB, addToSteamDLCCatalog, getDLCDetails,
   countSongsAvailable, updateOwnedInDB, updateAcquiredDate,
-  getAppID, countAppID, updateAcquiredDateByAppID, getUntaggedDLC, addTag,
+  getAppID, countAppID, updateAcquiredDateByAppID,
+  getUntaggedDLC, addTag, getTagsCount, executeRawSql,
 } from '../sqliteService';
 import { RemoteAll } from './songlistView';
 import { getOwnedPackages, getOwnedHistory, getTrackTags } from '../steamprofileService';
@@ -103,17 +104,18 @@ export default class SongAvailableView extends React.Component {
           //console.log(row.tags);
           const tags = [];
           if (row.tags) {
-            const splittags = row.tags.split(",");
+            const splittags = row.tags.split("|");
             for (let i = 0; i < splittags.length; i += 1) {
               const tag = splittags[i];
               tags.push(<a
                 key={tag}
                 className="badge badge-dark"
                 style={{
-                  color: 'white',
+                  color: 'wheat',
                   marginRight: 5 + 'px',
                 }}
               > {tag} </a>)
+              if (i >= 5 && i % 5 === 0) { tags.push(<React.Fragment key={"fr" + i}><br /><br /></React.Fragment>) }
             }
           }
           return (
@@ -124,6 +126,7 @@ export default class SongAvailableView extends React.Component {
                 marginLeft: 2 + 'px',
               }}> {cell} </span>
               <span style={{
+                textAlign: 'right',
                 float: 'right',
               }}> {tags} </span>
             </div>
@@ -508,8 +511,7 @@ export default class SongAvailableView extends React.Component {
 
   updateSongTags = async () => {
     //read
-    const dlcs = await getUntaggedDLC();
-    this.setState({ fetchingTags: true }, () => this.fetchTags(dlcs));
+    this.setState({ fetchingTags: true }, () => this.fetchTags());
   }
 
   resetHeader = (msg) => {
@@ -520,7 +522,60 @@ export default class SongAvailableView extends React.Component {
     );
   }
 
-  fetchTags = async (dlcs) => {
+  csvToTagsDB = async () => {
+    return new Promise(async (resolve, reject) => {
+      await executeRawSql("begin transaction;");
+      const lr = new window.linereader(window.dirname + "/../dlc_tags_steam.csv");
+      lr.on('error', async (err) => {
+        console.log(err);
+        await executeRawSql("commit;");
+        reject(err);
+      });
+
+      lr.on('line', async (line) => {
+        // pause emitting of lines...
+        lr.pause();
+
+        const items = parse(line)[0];
+        const appid = items[0]
+        const tag = items[1]
+        this.resetHeader(
+          "Updating from offline copy, Appid: " + appid,
+        )
+        await addTag(appid, tag);
+        lr.resume();
+      });
+
+      lr.on('end', async () => {
+        // All lines are read, file is closed now.
+        await executeRawSql("commit;");
+        resolve();
+      });
+    })
+  }
+
+  refreshTable = () => {
+    this.setState({ dlcs: [], page: 1, totalSize: 0 }, () => {
+      this.handleTableChange('filter', {
+        page: 1,
+        sizePerPage: this.state.sizePerPage,
+        filters: { search: "" },
+        sortField: "release_date",
+        sortOrder: "desc",
+        owned: "",
+      });
+    });
+  }
+
+  fetchTags = async () => {
+    const tagsCount = await getTagsCount();
+    if (tagsCount === 0) {
+      this.resetHeader("Updating from offline copy...");
+      await this.csvToTagsDB();
+      this.setState();
+      await this.refreshTable();
+    }
+    const dlcs = await getUntaggedDLC();
     this.resetHeader("Fetching tags...");
     let timedout = false;
     for (let i = 0; i < dlcs.length; i += 1) {
@@ -571,7 +626,7 @@ export default class SongAvailableView extends React.Component {
       }
     }
     this.resetHeader("Finished tagging...");
-    this.setState({ fetchingTags: false });
+    this.setState({ fetchingTags: false }, () => this.refreshTable());
   }
 
   updateOwnedStatus = async () => {
@@ -752,7 +807,9 @@ export default class SongAvailableView extends React.Component {
               : (
                 <a
                   style={{ width: 10 + '%' }}
-                  onClick={() => this.setState({ fetchingTags: false })}
+                  onClick={() => {
+                    this.setState({ fetchingTags: false }, () => this.refreshTable());
+                  }}
                   className="extraPadding download">
                   Cancel fetch...
                 </a>
