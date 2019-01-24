@@ -472,6 +472,7 @@ export default class SongAvailableView extends React.Component {
       )
       const { output, rows } = results;
       this.setState({ dlcs: output, page: 1, totalSize: rows });
+      this.updateSongTags();
     }
     catch (e) {
       console.log(e);
@@ -863,27 +864,6 @@ export default class SongAvailableView extends React.Component {
             className={ownedstyle}>
             Update Owned/Acquired Date
           </a>
-          {
-            !this.state.fetchingTags
-              ? (
-                <a
-                  style={{ width: 10 + '%' }}
-                  onClick={this.updateSongTags}
-                  className="extraPadding download">
-                  Update Song Tags
-                </a>
-              )
-              : (
-                <a
-                  style={{ width: 10 + '%' }}
-                  onClick={() => {
-                    this.setState({ fetchingTags: false }, () => this.refreshTable());
-                  }}
-                  className="extraPadding download">
-                  Cancel fetch...
-                </a>
-              )
-          }
         </div>
         <div>
           <RemoteAll
