@@ -150,7 +150,7 @@ export function generateSql(filters, count = false) {
         break;
       case "centoffset":
         if (filter.value) sql += `${filter.type} == 0 `;
-        else sql += `${filter.type} > 0 `;
+        else sql += `${filter.type} != 0 `;
         break;
       case "capofret":
         if (filter.value) sql += `${filter.type} > 0 `;
