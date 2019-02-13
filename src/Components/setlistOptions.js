@@ -248,7 +248,7 @@ export default class SetlistOptions extends React.Component {
       sortoptions: defaultSortOption,
     }
     //tuning
-    this.gates = ["and", "or"]
+    this.gates = ["and", "or", "and (", "or (", ")", ") and", ") or"]
     this.fields = [
       {
         type: "artist",
