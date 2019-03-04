@@ -25,6 +25,7 @@
     "line-by-line": "^0.1.6",
     "marked": "^0.5.1",
     "memorystream": "^0.3.1",
+    "merge": "^1.2.1",
     "moment": "^2.22.2",
     "naudiodon": "https://github.com/Streampunk/naudiodon",
     "node-abi": "^2.7.0",
@@ -53,6 +54,7 @@
     "sweetalert2": "^7.32.4",
     "wav": "^1.0.2",
     "wavefile": "^8.4.4",
+    "webpack-dev-server": "^3.1.1",
     "whatwg-fetch": "^3.0.0"
   },
   "scripts": {
