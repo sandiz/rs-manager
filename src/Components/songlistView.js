@@ -478,7 +478,7 @@ export function tuningFormatter(cell, row) {
       let offset = ""
       const freq = (concertpitch * (2.0 ** (row.centoffset / 1200.0)))
       if (freq !== (concertpitch)) {
-        offset = `(${Math.floor(freq)} Hz)`
+        offset = ` (${Math.floor(freq)} Hz)`
       }
       let suffix = "";
       if (row.capofret !== 0 && row.capofret !== "" && row.capofret !== "0") {
@@ -497,7 +497,29 @@ export function tuningFormatter(cell, row) {
             break;
         }
       }
-      return <span title={cell}>{tuningkeys[i]}<span className={suffix === "" ? "hidden" : ""}>(Capo: {row.capofret}<sup>{suffix})</sup></span> {offset}</span>
+      return (
+        <Fragment>
+          <ReactTooltip
+            id={row.id + "_tuning"}
+            aria-haspopup="true"
+            place="right"
+            type="dark"
+            effect="solid"
+            className="tooltipClass">
+            Cent Offset: {row.centoffset}
+          </ReactTooltip>
+
+          <div data-tip data-for={row.id + "_tuning"} data-class="tooltip-offset tooltipClass">
+            <span title={cell}>
+              {tuningkeys[i]}
+              <span className={suffix === "" ? "hidden" : ""}>
+                (Capo: {row.capofret}<sup>{suffix})</sup>
+              </span>
+              {offset}
+            </span>
+          </div>
+        </Fragment>
+      )
     }
   }
   return <span>Custom {JSON.stringify(combinedt)}</span>
