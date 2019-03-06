@@ -586,7 +586,7 @@ export async function getSongsOwned(start = 0, count = 10, sortField = "mastery"
   let searchSql = `( song like '%${escape(search)}%' or 
             artist like '%${escape(search)}%' or 
             album like '%${escape(search)}%' or
-            id like '${search}'
+            id like '${escape(search)}'
             )`
   switch (searchField) {
     case "song":
@@ -599,7 +599,7 @@ export async function getSongsOwned(start = 0, count = 10, sortField = "mastery"
       searchSql = `artist like '%${escape(search)}%'`
       break;
     case "id":
-      searchSql = `id like '${search}'`
+      searchSql = `id like '${escape(search)}'`
       break;
     case "cdlc":
       searchSql += ` and is_cdlc = 'true'`
