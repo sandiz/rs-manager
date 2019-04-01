@@ -802,6 +802,40 @@ export async function isTablePresent(tablename) {
   }
   return true;
 }
+export async function getAllSetlistNoFolderPaged(start, count = 10, name = "", sortField = "name", sortOrder = "asc") {
+  //console.log("__db_call__: getAllSetlist");
+  let sql = ''
+  sql = `
+    SELECT * from setlist_meta
+    WHERE 
+    (
+      /* filter setlist that has a parent */
+       (is_folder is NOT NULL AND is_folder != 'true') 
+      OR 
+      (is_folder is NULL)
+    )
+    AND
+    (
+      name like '%${name}%'
+    )
+    ORDER BY
+    ${sortField} collate nocase ${sortOrder}
+    LIMIT ${start},${count}
+    `
+  const tableState = db !== null && await isTablePresent("setlist_meta");
+  if (tableState) {
+    const all = await db.all(sql);
+    for (let i = 0; i < all.length; i += 1) {
+      if (all[i].parent_folder != null && all[i].parent_folder.length > 0) {
+        //eslint-disable-next-line
+        const meta = await getSetlistMetaInfo(all[i].parent_folder)
+        all[i].parent_folder_name = meta.name
+      }
+    }
+    return all;
+  }
+  return null;
+}
 export async function getAllSetlistNoFolder() {
   //console.log("__db_call__: getAllSetlist");
   let sql = ''
@@ -1149,8 +1183,14 @@ export async function updateSAFCStat(key, value, songID) {
   const sql = `update songs_owned set ${key}='${value}' where id='${songID}'`;
   await db.exec(sql);
 }
-export async function executeRawSql(sql) {
-  const op = await db.get(sql);
+export async function executeRawSql(sql, all = false) {
+  let op;
+  if (all) {
+    op = await db.all(sql);
+  }
+  else {
+    op = await db.get(sql);
+  }
   //console.log(op)
   return op;
 }

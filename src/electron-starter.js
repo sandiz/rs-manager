@@ -15,6 +15,11 @@ async function createWindow() {
         defaultHeight: 1064
     });
 
+    const frameOpts = {
+        frame: false,
+        titleBarStyle: 'hidden',
+    }
+
     // Create the window using the state information
     mainWindow = new BrowserWindow({
         x: mainWindowState.x,
@@ -22,7 +27,7 @@ async function createWindow() {
         width: mainWindowState.width,
         height: mainWindowState.height,
         show: false,
-
+        ...frameOpts,
         icon: path.join(__dirname, "./icons/png/icon-1024x1024.png"),
         webPreferences: {
             preload: path.join(__dirname, "./preload.js"),
