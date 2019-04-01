@@ -4,6 +4,8 @@ import TreeView from '../lib/deni-react-treeview'
 import { createRSSongList } from '../sqliteService';
 import { getShowPSStatsConfig } from '../configService';
 import { getState, saveState } from '../stateService';
+import { DispatcherService, DispatchEvents } from '../lib/libDispatcher'
+
 
 import("../css/Sidebar.css")
 
@@ -26,11 +28,6 @@ export default class Sidebar extends React.Component {
     this.readSidebarState();
     this.psInterval = null;
     this.treeViewRef = React.createRef();
-  }
-
-  componentDidMount = async () => {
-    //this.toggleActive(this.state.TabsData[0]);
-    this.startPSMonitor();
   }
 
   setChildActive(val, cid) {
@@ -91,9 +88,23 @@ export default class Sidebar extends React.Component {
     }, 2000);
   }
 
-  componentDidMount = () => {
+  componentDidMount = async () => {
+    this.startPSMonitor();
     this.checkForUpdate();
     setInterval(() => this.checkForUpdate(), 60 * 1000 * 30); //check for update every 60 * 30 secs
+    DispatcherService.on(DispatchEvents.SETLIST_SELECT, this.setlistSelect);
+  }
+
+  setlistSelect = (data) => {
+    const api = this.treeViewRef.current.api;
+    api.selectItem(data);
+    setTimeout(() => {
+      const elems = document.getElementsByClassName(data);
+      const sd = document.getElementsByClassName("sidebar-scroll");
+      if (elems.length > 0) {
+        sd[0].scrollTop = elems[0].offsetTop;
+      }
+    }, 100);
   }
 
   checkForUpdate = async () => {
@@ -263,10 +274,11 @@ export default class Sidebar extends React.Component {
       return;
     }
     if (typeof item.children !== "undefined") {
-      if (item.children.length === 0) {
+      if (item.children.length === 0 || item.id === "tab-setlist") {
         this.props.handleChange(item, null);
         return;
-      } else {
+      }
+      else {
         /*item.expanded = !item.expanded; */
         return;
       }
@@ -274,6 +286,7 @@ export default class Sidebar extends React.Component {
     if (parent.isFolder === true) {
       parent = api.getParentNode(parent);
     }
+
     this.props.handleChange(parent, item);
   }
 

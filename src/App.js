@@ -9,6 +9,7 @@ import SongAvailableView from './Components/songavailableView';
 import SetlistView from './Components/setlistView';
 import SettingsView from './Components/settingsView';
 import RSLiveView from './Components/rsliveView';
+import SetlistSearchView from './Components/setlistSearchView';
 import {
   getAllSetlist, initSongsOwnedDB,
   getStarredSetlists, getChildOfSetlistFolder,
@@ -218,13 +219,22 @@ class App extends Component {
         )
         break;
       case "tab-setlist":
-        if (child.isFolder === true) {
+        if (child && child.isFolder === true) {
           selectedTab = (
             <FolderEditView
               currentTab={tab}
               refreshTabs={this.refreshTabs}
               folder={child}
               updateHeader={this.updateChildHeader}
+            />
+          )
+        }
+        else if (child === null && tab.children.length > 0) {
+          selectedTab = (
+            <SetlistSearchView
+              currentTab={tab}
+              updateHeader={this.updateHeader}
+              resetHeader={this.resetHeader}
             />
           )
         }
@@ -450,6 +460,11 @@ class App extends Component {
     if (this.state.currentChildTab !== null
       && typeof this.state.currentChildTab !== 'undefined'
       && this.state.currentChildTab.id.includes("folder")) {
+      showmstat = "hidden";
+    }
+    if (this.state.currentChildTab === null
+      && this.state.currentTab !== null
+      && this.state.currentTab.id === "tab-setlist") {
       showmstat = "hidden";
     }
     return (

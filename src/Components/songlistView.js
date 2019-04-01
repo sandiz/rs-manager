@@ -542,6 +542,8 @@ export const RemoteAll = ({
   rowEvents,
   paginate = true,
   rowStyle,
+  noDataIndication = "No Songs",
+  classes = "psarcTable",
 }) => (
     <div>
       <BootstrapTable
@@ -558,11 +560,11 @@ export const RemoteAll = ({
           sizePerPageList: [],
         })}
         onTableChange={onTableChange}
-        classes="psarcTable"
+        classes={classes}
         hover
         bordered={false}
         rowEvents={rowEvents}
-        noDataIndication="No Songs"
+        noDataIndication={noDataIndication}
         rowStyle={rowStyle}
       />
     </div>
@@ -579,11 +581,15 @@ RemoteAll.propTypes = {
   rowEvents: PropTypes.object,
   rowStyle: PropTypes.func,
   paginate: PropTypes.bool,
+  noDataIndication: PropTypes.string,
+  classes: PropTypes.string,
 };
 RemoteAll.defaultProps = {
   paginate: true,
   rowEvents: {},
   rowStyle: () => { },
+  noDataIndication: "No Songs",
+  classes: "psarcTable",
 }
 export default class SonglistView extends React.Component {
   constructor(props) {

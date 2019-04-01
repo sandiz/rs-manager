@@ -440,23 +440,28 @@ export default class DashboardView extends React.Component {
   }
 
   fetchWeeklySpotlight = async () => {
-    const c = await window.fetch("https://www.reddit.com/r/rocksmith.json");
-    const d = await c.json();
-    const posts = d.data.children;
-    const weekly = { title: '', url: '' };
-    for (let i = 0; i < posts.length; i += 1) {
-      const post = posts[i].data;
-      if (post.title.includes("Weekly Song Spotlight")) {
-        const [keyIgnored, value] = post.title.split(":");
-        weekly.title = value;
-        weekly.url = post.url;
+    try {
+      const c = await window.fetch("https://www.reddit.com/r/rocksmith.json");
+      const d = await c.json();
+      const posts = d.data.children;
+      const weekly = { title: '', url: '' };
+      for (let i = 0; i < posts.length; i += 1) {
+        const post = posts[i].data;
+        if (post.title.includes("Weekly Song Spotlight")) {
+          const [keyIgnored, value] = post.title.split(":");
+          weekly.title = value;
+          weekly.url = post.url;
+        }
       }
+      const title = weekly.title.split("by");
+      const artist = title[1] ? unescape(title[1]).trim() : ""
+      const track = title[0] ? unescape(title[0]).trim() : ""
+      const url = await this.fetchCover(artist, track, false); //use trackname
+      this.setState({ weeklysongspotlight: weekly, coverreddit: url });
     }
-    const title = weekly.title.split("by");
-    const artist = title[1] ? unescape(title[1]).trim() : ""
-    const track = title[0] ? unescape(title[0]).trim() : ""
-    const url = await this.fetchCover(artist, track, false); //use trackname
-    this.setState({ weeklysongspotlight: weekly, coverreddit: url });
+    catch (e) {
+      console.log(e)
+    }
   }
 
   updateRecentlyPlayed = async () => {
