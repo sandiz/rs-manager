@@ -95,6 +95,10 @@ export default class Sidebar extends React.Component {
     DispatcherService.on(DispatchEvents.SETLIST_SELECT, this.setlistSelect);
   }
 
+  componentWillUnmount = () => {
+    DispatcherService.off(DispatchEvents.SETLIST_SELECT, this.setlistSelect);
+  }
+
   setlistSelect = (data) => {
     const api = this.treeViewRef.current.api;
     api.selectItem(data);
