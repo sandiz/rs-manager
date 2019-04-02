@@ -16,8 +16,8 @@ async function createWindow() {
     });
 
     const frameOpts = {
-        frame: false,
-        titleBarStyle: 'hidden',
+        //frame: false,
+        //titleBarStyle: 'hidden',
     }
 
     // Create the window using the state information
