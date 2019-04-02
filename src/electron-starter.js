@@ -15,9 +15,12 @@ async function createWindow() {
         defaultHeight: 1064
     });
 
-    const frameOpts = {
-        //frame: false,
-        //titleBarStyle: 'hidden',
+    let frameOpts = {}
+    if (process.platform !== 'win32') {
+        frameOpts = {
+            frame: false,
+            titleBarStyle: 'hidden',
+        };
     }
 
     // Create the window using the state information
