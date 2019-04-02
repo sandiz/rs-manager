@@ -6,6 +6,13 @@ const isDev = require('electron-is-dev');
 const windowStateKeeper = require('electron-window-state');
 const openAboutWindow = require('about-window').default;
 
+const setupEvents = require('./setupEvents');
+if (setupEvents.handleSquirrelEvent()) {
+    // squirrel event handled and app will exit in 1000ms, so don't do anything else
+    return;
+}
+
+
 let mainWindow;
 
 async function createWindow() {
