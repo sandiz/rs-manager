@@ -240,7 +240,7 @@ export default class SetlistSearchView extends React.Component {
     const zeroIndexPage = page - 1
     const start = zeroIndexPage * sizePerPage;
     const searchval = filters && filters.name ? filters.name.filterVal : '';
-    const allsetlists = await getAllSetlistNoFolderPaged(start, sizePerPage, searchval);
+    const allsetlists = await getAllSetlistNoFolderPaged(start, sizePerPage, escape(searchval));
     const countsetlists = await getAllSetlistNoFolder();
     const setlists = []
     const masteryT = await getMasteryThresholdConfig();
