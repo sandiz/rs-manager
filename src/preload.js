@@ -33,6 +33,7 @@ const express = require('express')
 const openid = require('openid');
 const nodeUrl = require('url');
 const util = require('util')
+const https = require('https');
 window.isDev = isDev;
 
 const exp = express()
@@ -290,3 +291,25 @@ process.once('loaded', () => {
     global.electron = require('electron')
     electron.webFrame.setZoomFactor(1)
 })
+
+
+window.pDownload = (url, dest) => {
+    var file = window.electronFS.createWriteStream(dest);
+    return new Promise((resolve, reject) => {
+        var responseSent = false; // flag to make sure that response is sent only once.
+        https.get(url, response => {
+            response.pipe(file);
+            file.on('finish', () => {
+                file.close(() => {
+                    if (responseSent) return;
+                    responseSent = true;
+                    resolve();
+                });
+            });
+        }).on('error', err => {
+            if (responseSent) return;
+            responseSent = true;
+            reject(err);
+        });
+    });
+}

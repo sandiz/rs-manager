@@ -93,10 +93,16 @@ export default class Sidebar extends React.Component {
     this.checkForUpdate();
     setInterval(() => this.checkForUpdate(), 60 * 1000 * 30); //check for update every 60 * 30 secs
     DispatcherService.on(DispatchEvents.SETLIST_SELECT, this.setlistSelect);
+    DispatcherService.on(DispatchEvents.SETLIST_REFRESH, this.refreshTabs);
   }
 
   componentWillUnmount = () => {
     DispatcherService.off(DispatchEvents.SETLIST_SELECT, this.setlistSelect);
+    DispatcherService.off(DispatchEvents.SETLIST_REFRESH, this.refreshTabs);
+  }
+
+  refreshTabs = async () => {
+    await this.props.RefreshTabs();
   }
 
   setlistSelect = (data) => {

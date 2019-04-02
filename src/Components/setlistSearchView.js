@@ -121,7 +121,7 @@ export default class SetlistSearchView extends React.Component {
       setlists: [],
       page: 1,
       totalSize: 0,
-      sizePerPage: 25,
+      sizePerPage: 19,
     };
     this.rowEvents = {
     };
