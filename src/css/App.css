@@ -1382,6 +1382,7 @@ hr {
     margin: 0 auto;
     line-height: 10px !important;
     border: 1px solid black;
+    margin-bottom: 30px;
 }
 
 .setlistSearchTable td {
