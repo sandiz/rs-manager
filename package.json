@@ -70,6 +70,7 @@
     "postinstall": "electron-rebuild  -f -w sqlite3, naudiodon && patch-package",
     "package-mac": "node scripts/package.js mac",
     "package-win": "node scripts/package.js win",
+    "dmg-mac": "mkdir -p node_modules/ds-store/assets && cp src/assets/DSStore-clean node_modules/ds-store/assets/ && electron-installer-dmg ./release-builds/Rocksmith\\ Manager-darwin-x64/Rocksmith\\ Manager.app 'Rocksmith Manager' --out=release-builds --overwrite --icon=src/assets/icons/mac/mac.icns",
     "contributors:add": "all-contributors add",
     "contributors:generate": "all-contributors generate",
     "contributors:check": "all-contributors check"
@@ -80,6 +81,7 @@
     "cross-spawn": "^6.0.5",
     "electron": "^4.0.4",
     "electron-builder": "^20.28.4",
+    "electron-installer-dmg": "^2.0.0",
     "electron-packager": "^12.2.0",
     "electron-rebuild": "^1.8.2",
     "eslint": "^5.6.0",
