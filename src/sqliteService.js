@@ -284,6 +284,7 @@ export async function addToSteamDLCCatalog(dlc, name, releaseDate, dontparseDate
 }
 export async function getDLCDetails(start = 0, count = 10, sortField = "release_date", sortOrder = "desc", search = "", owned = "", tags = []) {
   // console.log("__db_call__: getDLCDetails");
+  search = search.replace(/'/g, "");
   let sql;
   let tagstring = "";
   if (tags.length > 0) {
@@ -356,7 +357,6 @@ export async function getDLCDetails(start = 0, count = 10, sortField = "release_
     rows: rows.count,
     rowsnopack: rowsnopack.count,
   }
-  console.log(obj);
   return obj;
 }
 export async function isDLCInDB(dlc) {

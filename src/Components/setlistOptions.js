@@ -383,7 +383,8 @@ export default class SetlistOptions extends React.Component {
   shouldComponentUpdate = async (nextprops, nextstate) => {
     if (nextprops !== this.props) {
       const allFolders = await this.getAllFolders();
-      const sortoptions = JSON.parse(nextprops.info.sort_options);
+      const sortoptions = nextprops.info.sort_options
+        ? JSON.parse(nextprops.info.sort_options) : [];
       this.setState({
         setlistName: unescape(nextprops.info.name),
         isGenerated: nextprops.info.is_generated === "true",

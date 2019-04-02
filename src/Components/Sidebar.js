@@ -113,6 +113,7 @@ export default class Sidebar extends React.Component {
       const sd = document.getElementsByClassName("sidebar-scroll");
       if (elems.length > 0) {
         sd[0].scrollTop = elems[0].offsetTop;
+        elems[0].scrollIntoView();
       }
     }, 100);
   }

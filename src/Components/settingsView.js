@@ -211,7 +211,7 @@ export default class SettingsView extends React.Component {
   }
 
   importDLCPack = async () => {
-    this.props.updateHeader(this.tabname, "Downloading dlc pack data from git...");
+    this.props.updateHeader(this.tabname, "Downloading dlc pack data from github...");
 
     this.setState({
       processingSetlist: true,
@@ -220,29 +220,42 @@ export default class SettingsView extends React.Component {
     const filePath = window.os.tmpdir() + "/dlcs.csv"
     const datasrc = "https://gist.githubusercontent.com/JustinAiken/0cba27a4161a2ed3ad54fb6a58da2e70/raw/53959dbcfbf715d19a7140c34f815d648fcf9528/dlcs.csv";
     await window.pDownload(datasrc, filePath);
-
-    await createRSSongList("folder_dlcpack_import", "Imported DLC Pack",
-      false, false, false, false, false, true);
+    const stat = window.electronFS.statSync(filePath);
+    if (stat.size < 1024) { /* basic integrity check */
+      console.log("dlc.csv size < 1024");
+      this.props.updateHeader(this.tabname, "dlc.csv failed integrity check..")
+      this.setState({
+        processingSetlist: false,
+      })
+      return;
+    }
     const r = window.electronFS.createReadStream(filePath);
     const lr = new window.linereader(r, { stream: true });
+
+    await createRSSongList("folder_dlcpack_import", "DLC Pack Setlists",
+      false, false, false, false, false, true);
 
     let lastSongKey = "";
     lr.on('error', (err) => {
       console.log(err);
+      this.setState({
+        processingSetlist: false,
+      })
     });
 
     lr.on('line', async (line) => {
       // pause emitting of lines...
       lr.pause();
 
-      line = line.replace("'", "");
-      const items = parse(line)[0];
+
+      const l2 = line.replace(/'/gi, "_");
+      const items = parse(l2)[0];
       const release = items[0]
       const name = items[1]
       const pid = items[4];
       const dbOutput = await getSongByID(pid);
       if (dbOutput !== '' && lastSongKey !== dbOutput.songkey) {
-        const tableName = `setlist_${release}`.replace(/-/gi, "_");
+        const tableName = `setlist_${release}_${name}`.replace(/-/gi, "_").replace(/ /g, "_").replace(/\W/g, '');
         await createRSSongList(tableName, `${release} - ${name}`,
           false, true, false, false, false, false, "folder_dlcpack_import");
         await addtoRSSongList(tableName, dbOutput.songkey);
@@ -258,11 +271,10 @@ export default class SettingsView extends React.Component {
 
     lr.on('end', async () => {
       // All lines are read, file is closed now.
-      console.log("end")
       this.setState({
         processingSetlist: false,
       })
-      this.props.updateHeader(this.tabname, "Finished creating dlc setlists...");
+      this.props.updateHeader(this.tabname, "Finished creating dlc setlists");
       DispatcherService.dispatch(DispatchEvents.SETLIST_REFRESH);
     });
   }
@@ -999,8 +1011,8 @@ export default class SettingsView extends React.Component {
                       <span style={{ color: '#ccc' }}>
                         This creates setlists based on the songs you own, keyed
                         under the dlc pack it was released in.
-                        All the newly created setlists will be stored under
-                         &quot;Imported DLC Packs&quot; folder.
+                         The newly created setlists are under
+                         &quot;DLC Pack Setlists&quot; folder.
                          DLC Pack&nbsp;
                         <a
                           style={{ color: 'blue' }}
@@ -1008,7 +1020,7 @@ export default class SettingsView extends React.Component {
                             () => window.shell.openExternal("https://gist.githubusercontent.com/JustinAiken/0cba27a4161a2ed3ad54fb6a58da2e70/raw/53959dbcfbf715d19a7140c34f815d648fcf9528/dlcs.csv")
                           }
                         >data</a>
-                        &nbsp;courtesy of&nbsp;
+                        &nbsp;courtesy&nbsp;
                         <a
                           style={{ color: 'blue' }}
                           onClick={

@@ -21,7 +21,7 @@ export function setlistFormatter(cell, row) {
   return (
     <div>
       <span className={icon} style={{ display: "inline-flex", float: 'left' }}>
-        <label style={{ paddingLeft: 34 + 'px', paddingTop: 7 + 'px' }}>
+        <label style={{ paddingLeft: 34 + 'px', paddingTop: 7 + 'px', cursor: 'pointer' }}>
           {cell}
         </label>
       </span>
@@ -53,7 +53,8 @@ export function setlistFormatter(cell, row) {
             title="Export Setlist"
             className="fas fa-file-export"
             onClick={(e) => {
-              console.log(e);
+              DispatcherService.dispatch(DispatchEvents.SETLIST_EXPORT, row.key);
+              e.stopPropagation();
             }} />
         </span>
       </div>
@@ -124,6 +125,9 @@ export default class SetlistSearchView extends React.Component {
       sizePerPage: 19,
     };
     this.rowEvents = {
+      onClick: (e, row, rowIndex) => {
+        DispatcherService.dispatch(DispatchEvents.SETLIST_SELECT, row.key);
+      },
     };
   }
 
@@ -136,9 +140,16 @@ export default class SetlistSearchView extends React.Component {
       filters: {},
       sortOptions,
     })
+    DispatcherService.on(DispatchEvents.SETLIST_EXPORT, this.setlistExport);
   }
 
   componentWillUnmount = () => {
+    DispatcherService.off(DispatchEvents.SETLIST_EXPORT, this.setlistExport);
+  }
+
+  setlistExport = (key) => {
+    console.log(key);
+    this.props.updateHeader(this.tabname, "export setlist coming soon...")
   }
 
   compareValues = (key, order = 'asc') => {
