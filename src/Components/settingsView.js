@@ -18,10 +18,13 @@ import getProfileConfig, {
   updateCurrentZoomFactor,
 } from '../configService';
 import {
-  resetDB, createRSSongList, addtoRSSongList, isTablePresent, deleteRSSongList,
+  resetDB, createRSSongList, addtoRSSongList, isTablePresent, deleteRSSongList, getSongByID,
 } from '../sqliteService';
 import readProfile from '../steamprofileService';
 import { sortOrderCustomStyles, createOption } from './setlistOptions';
+import { DispatcherService, DispatchEvents } from '../lib/libDispatcher'
+
+const parse = require('csv-parse/lib/es5/sync');
 
 const { remote } = window.require('electron')
 const Fragment = React.Fragment;
@@ -205,6 +208,63 @@ export default class SettingsView extends React.Component {
     //set imported state to true
     this.refreshSetlist();
     this.props.refreshTabs();
+  }
+
+  importDLCPack = async () => {
+    this.props.updateHeader(this.tabname, "Downloading dlc pack data from git...");
+
+    this.setState({
+      processingSetlist: true,
+    })
+
+    const filePath = window.os.tmpdir() + "/dlcs.csv"
+    const datasrc = "https://gist.githubusercontent.com/JustinAiken/0cba27a4161a2ed3ad54fb6a58da2e70/raw/53959dbcfbf715d19a7140c34f815d648fcf9528/dlcs.csv";
+    await window.pDownload(datasrc, filePath);
+
+    await createRSSongList("folder_dlcpack_import", "Imported DLC Pack",
+      false, false, false, false, false, true);
+    const r = window.electronFS.createReadStream(filePath);
+    const lr = new window.linereader(r, { stream: true });
+
+    let lastSongKey = "";
+    lr.on('error', (err) => {
+      console.log(err);
+    });
+
+    lr.on('line', async (line) => {
+      // pause emitting of lines...
+      lr.pause();
+
+      line = line.replace("'", "");
+      const items = parse(line)[0];
+      const release = items[0]
+      const name = items[1]
+      const pid = items[4];
+      const dbOutput = await getSongByID(pid);
+      if (dbOutput !== '' && lastSongKey !== dbOutput.songkey) {
+        const tableName = `setlist_${release}`.replace(/-/gi, "_");
+        await createRSSongList(tableName, `${release} - ${name}`,
+          false, true, false, false, false, false, "folder_dlcpack_import");
+        await addtoRSSongList(tableName, dbOutput.songkey);
+        lastSongKey = dbOutput.songkey;
+      }
+
+      this.props.updateHeader(
+        this.tabname,
+        `Processing pack: ${name} (${release})`,
+      )
+      lr.resume();
+    });
+
+    lr.on('end', async () => {
+      // All lines are read, file is closed now.
+      console.log("end")
+      this.setState({
+        processingSetlist: false,
+      })
+      this.props.updateHeader(this.tabname, "Finished creating dlc setlists...");
+      DispatcherService.dispatch(DispatchEvents.SETLIST_REFRESH);
+    });
   }
 
   handleScoreAttack = (event) => {
@@ -913,6 +973,52 @@ export default class SettingsView extends React.Component {
                   easing="ease-in"
                 >
                   {this.generateSetlistOptions()}
+                  <Fragment>
+                    <br />
+                    <span style={{ float: 'left' }}>
+                      <a>
+                        Import DLCs as Setlists
+                      </a>
+                    </span>
+                    <span style={{
+                      float: 'right',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      width: 400 + 'px',
+                      textAlign: 'right',
+                      marginTop: 30 + 'px',
+                    }}>
+                      {
+                        this.state.processingSetlist
+                          ? <span> Processing... </span>
+                          : <a onClick={() => this.importDLCPack()}>Click to Import</a>
+                      }
+                    </span>
+                    <br />
+                    <div className="">
+                      <span style={{ color: '#ccc' }}>
+                        This creates setlists based on the songs you own, keyed
+                        under the dlc pack it was released in.
+                        All the newly created setlists will be stored under
+                         &quot;Imported DLC Packs&quot; folder.
+                         DLC Pack&nbsp;
+                        <a
+                          style={{ color: 'blue' }}
+                          onClick={
+                            () => window.shell.openExternal("https://gist.githubusercontent.com/JustinAiken/0cba27a4161a2ed3ad54fb6a58da2e70/raw/53959dbcfbf715d19a7140c34f815d648fcf9528/dlcs.csv")
+                          }
+                        >data</a>
+                        &nbsp;courtesy of&nbsp;
+                        <a
+                          style={{ color: 'blue' }}
+                          onClick={
+                            () => window.shell.openExternal("https://github.com/JustinAiken")
+                          }
+                        >@JustinAiken
+                          </a>
+                      </span>
+                    </div>
+                  </Fragment>
                 </Collapsible>
                 <br />
                 <Collapsible

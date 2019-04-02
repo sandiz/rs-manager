@@ -57,6 +57,7 @@ class Dispatcher {
 }
 export const DispatchEvents = {
     SETLIST_SELECT: "setlist_select",
+    SETLIST_REFRESH: "setlist_refresh",
 }
 
 
