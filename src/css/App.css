@@ -153,6 +153,7 @@ a:focus {
     padding: 20px;
     background: rgb(32, 33, 46);
     color: wheat;
+    margin-top: 2px;
 }
 
 #sidebar ul.components {
