@@ -218,7 +218,7 @@ export default class SettingsView extends React.Component {
     })
 
     const filePath = window.os.tmpdir() + "/dlcs.csv"
-    const datasrc = "https://gist.githubusercontent.com/JustinAiken/0cba27a4161a2ed3ad54fb6a58da2e70/raw/53959dbcfbf715d19a7140c34f815d648fcf9528/dlcs.csv";
+    const datasrc = "https://gist.githubusercontent.com/JustinAiken/0cba27a4161a2ed3ad54fb6a58da2e70/raw";
     await window.pDownload(datasrc, filePath);
     const stat = window.electronFS.statSync(filePath);
     if (stat.size < 1024) { /* basic integrity check */
@@ -989,7 +989,7 @@ export default class SettingsView extends React.Component {
                     <br />
                     <span style={{ float: 'left' }}>
                       <a>
-                        Import DLCs as Setlists
+                        Import DLC Packs as Setlists
                       </a>
                     </span>
                     <span style={{
@@ -1017,7 +1017,7 @@ export default class SettingsView extends React.Component {
                         <a
                           style={{ color: 'blue' }}
                           onClick={
-                            () => window.shell.openExternal("https://gist.githubusercontent.com/JustinAiken/0cba27a4161a2ed3ad54fb6a58da2e70/raw/53959dbcfbf715d19a7140c34f815d648fcf9528/dlcs.csv")
+                            () => window.shell.openExternal("https://gist.githubusercontent.com/JustinAiken/0cba27a4161a2ed3ad54fb6a58da2e70")
                           }
                         >data</a>
                         &nbsp;courtesy&nbsp;
