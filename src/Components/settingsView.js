@@ -989,7 +989,7 @@ export default class SettingsView extends React.Component {
                     <br />
                     <span style={{ float: 'left' }}>
                       <a>
-                        Import DLCs as Setlists
+                        Import DLC Packs as Setlists
                       </a>
                     </span>
                     <span style={{
