@@ -17,12 +17,7 @@ cache:
     - $HOME/.cache/electron
     - $HOME/.cache/electron-builder
 
-script:
-  - |
-    yarn install
-    yarn run build
-    yarn package-mac
-before_cache:
+script: yarn install && yarn run build && yarn package-mac
 
 branches:
   except:
