@@ -19,6 +19,7 @@ cache:
 
 script:
   - |
+    yarn install
     yarn run build
     yarn package-mac
 before_cache:
