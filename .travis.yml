@@ -6,16 +6,12 @@ matrix:
       node_js: "10"
       env:
         - ELECTRON_CACHE=$HOME/.cache/electron
-
-    - os: linux
-      services: docker
-      language: generic
-
 cache:
   directories:
     - node_modules
     - $HOME/.cache/electron
     - $HOME/.cache/electron-builder
+    - $HOME/.cache/yarn
 
 script: yarn install && yarn run build && yarn package-mac
 
