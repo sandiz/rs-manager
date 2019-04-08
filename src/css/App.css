@@ -23,7 +23,9 @@ body {
     -webkit-app-region: drag;
 }
 
+[draggable=true],
 button,
+iframe,
 input {
     -webkit-app-region: no-drag;
 }
