@@ -6,14 +6,26 @@ matrix:
       node_js: "10"
       env:
         - ELECTRON_CACHE=$HOME/.cache/electron
+    - os: windows
+      language: node_js
+      node_js: "10"
+      env:
+        - ELECTRON_CACHE=$HOME/.cache/electron
 cache:
+  yarn: true
   directories:
     - node_modules
     - $HOME/.cache/electron
     - $HOME/.cache/electron-builder
     - $HOME/.cache/yarn
 
-script: yarn install && yarn run build && yarn package-mac
+script: 
+  - |
+    if [ "$TRAVIS_OS_NAME" == "windows" ]; then
+      yarn install && yarn run build && yarn package-win
+    else
+      yarn install && yarn run build && yarn package-mac
+    fi
 
 branches:
   except:
