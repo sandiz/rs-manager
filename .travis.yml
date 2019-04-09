@@ -40,8 +40,6 @@ before_install:
 
     echo "DisableRealtimeMonitoring..."
     powershell Start-Process -PassThru -Wait PowerShell -ArgumentList "'-Command Set-MpPreference -DisableRealtimeMonitoring \$true'"
-  else
-    brew install zip
   fi
   yarn install --network-timeout 1000000
 script:
