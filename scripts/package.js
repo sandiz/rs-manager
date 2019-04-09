@@ -85,4 +85,13 @@ function postbuild() {
         ])
         console.log("Creating DMG...")
     }
+    else if (buildPlatform == "win32") {
+        process.chdir("release-builds/");
+        spawn("zip", [
+            "-9",
+            "-r",
+            "Rocksmith\ Manager-win32-x64/",
+            "Rocksmith\ Manager-win32-x64.zip"
+        ])
+    }
 }
