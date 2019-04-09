@@ -10,7 +10,6 @@ matrix:
     language: node_js
     node_js: '10'
     env:
-    - ELECTRON_CACHE=$HOME/.cache/electron
     - YARN_GPG=no
 cache:
   yarn: true
