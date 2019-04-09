@@ -229,8 +229,7 @@ export default class SettingsView extends React.Component {
       })
       return;
     }
-    const r = window.electronFS.createReadStream(filePath);
-    const lr = new window.linereader(r, { stream: true });
+    const lr = new window.linereader(filePath);
 
     await createRSSongList("folder_dlcpack_import", "DLC Pack Setlists",
       false, false, false, false, false, true);
@@ -246,7 +245,6 @@ export default class SettingsView extends React.Component {
     lr.on('line', async (line) => {
       // pause emitting of lines...
       lr.pause();
-
 
       const l2 = line.replace(/'/gi, "_");
       const items = parse(l2)[0];
