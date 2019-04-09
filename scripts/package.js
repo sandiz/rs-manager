@@ -1,4 +1,5 @@
 const spawn = require('cross-spawn');
+const fs = require("fs-extra")
 
 if (process.argv.length <= 2) {
     console.log("Need platform (win/mac)");
@@ -59,7 +60,10 @@ child.on('close', (code) => {
 
 function postbuild() {
     if (buildPlatform === "mac") {
-        process.chdir("release-builds/Rocksmith\ Manager-darwin-x64/Rocksmith\ Manager.app/Contents/Resources/app/");
+        process.chdir("release-builds/");
+        const olddir = process.cwd();
+
+        process.chdir("Rocksmith\ Manager-darwin-x64/Rocksmith\ Manager.app/Contents/Resources/app/");
         console.log("Running postbuild mac..");
         //console.log(process.cwd());
         spawn("install_name_tool", [
@@ -68,5 +72,17 @@ function postbuild() {
             "node_modules/naudiodon/build/Release/libportaudio.dylib",
             "node_modules/naudiodon/build/Release/naudiodon.node"
         ]);
+
+        process.chdir(olddir);
+        console.log("Zipping to Rocksmith Manager-macos-x64.zip")
+        spawn("ditto", [
+            "-c",
+            "-k",
+            "--sequesterRsrc",
+            "--keepParent",
+            "Rocksmith\ Manager-darwin-x64/",
+            "Rocksmith\ Manager-macos-x64.zip"
+        ])
+        console.log("Creating DMG...")
     }
 }
