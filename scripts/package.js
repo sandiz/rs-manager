@@ -81,7 +81,7 @@ function postbuild() {
             "--sequesterRsrc",
             "--keepParent",
             "Rocksmith\ Manager-darwin-x64/",
-            "Rocksmith\ Manager-macos-x64.zip"
+            "RocksmithManager-macos-x64.zip"
         ])
         console.log("Creating DMG...")
     }
@@ -91,7 +91,7 @@ function postbuild() {
             "-9",
             "-r",
             "Rocksmith\ Manager-win32-x64/",
-            "Rocksmith\ Manager-win32-x64.zip"
+            "RocksmithManager-win32-x64.zip"
         ])
     }
 }
