@@ -16,9 +16,6 @@ cache:
   yarn: true
   directories:
   - node_modules
-  - "$HOME/.cache/electron"
-  - "$HOME/.cache/electron-builder"
-  - "$HOME/.cache/yarn"
 before_install:
 - |
   if [ "$TRAVIS_OS_NAME" == "windows" ]; then
