@@ -75,7 +75,7 @@ function postbuild() {
 
         process.chdir(olddir);
         console.log("Zipping to Rocksmith Manager-macos-x64.zip")
-        spawn("ditto", [
+        const ditto = spawn("ditto", [
             "-c",
             "-k",
             "--sequesterRsrc",
@@ -83,6 +83,8 @@ function postbuild() {
             "Rocksmith\ Manager-darwin-x64/",
             "RocksmithManager-macos-x64.zip"
         ])
+        ditto.stdout.pipe(process.stdout);
+        ditto.stderr.pipe(process.stdout);
         console.log("Creating DMG...")
     }
     else if (buildPlatform == "win") {
