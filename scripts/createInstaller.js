@@ -17,7 +17,7 @@ function getInstallerConfig() {
         appDirectory: path.join(outPath, 'Rocksmith Manager-win32-x64/'),
         authors: 'sandiz',
         noMsi: true,
-        outputDirectory: path.join(outPath, 'win-installer'),
+        outputDirectory: outPath,
         exe: 'Rocksmith Manager.exe',
         setupExe: 'RocksmithManagerInstaller.exe',
         setupIcon: path.join(rootPath, 'src', 'assets', 'icons', 'win', 'rs.ico')

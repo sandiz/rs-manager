@@ -1,5 +1,5 @@
 const spawn = require('cross-spawn');
-const fs = require("fs-extra")
+const fs = require("fs");
 
 if (process.argv.length <= 2) {
     console.log("Need platform (win/mac)");
@@ -85,13 +85,37 @@ function postbuild() {
         ])
         console.log("Creating DMG...")
     }
-    else if (buildPlatform == "win32") {
+    else if (buildPlatform == "win") {
+        const outZip = "RocksmithManager-win32-x64.zip"
+        console.log("Zipping to " + outZip);
         process.chdir("release-builds/");
-        spawn("zip", [
-            "-9",
+        if (fs.existsSync(outZip))
+            fs.unlinkSync(outZip);
+        const ziper = spawn("7z", [
+            "a",
+            "-tzip",
+            "-aoa",
+            "-mm=Deflate",
+            "-mfb=258",
+            "-mpass=15",
             "-r",
+            outZip,
             "Rocksmith\ Manager-win32-x64/",
-            "RocksmithManager-win32-x64.zip"
-        ])
+        ]);
+        ziper.stdout.pipe(process.stdout);
+        ziper.stderr.pipe(process.stdout);
+
+
+        /*  ziper.stdout.on('data', (data) => {
+             sys.stdout.write(`stdout: ${data}`);
+         });
+ 
+         ziper.stderr.on('data', (data) => {
+             sys.stdout.write(`stderr: ${data}`);
+         }); */
+
+        ziper.on('exit', (code) => {
+            console.log('child process exited with code ' + code.toString());
+        });
     }
 }
