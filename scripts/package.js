@@ -74,11 +74,6 @@ function postbuild() {
         ]);
 
         process.chdir(olddir);
-        const t = spawn("ditto", ["--help"]);
-        t.stderr.on('data', (data) => {
-            console.log(`stdout: ${data}`);
-            console.log("\n");
-        });
         console.log("Zipping to Rocksmith Manager-macos-x64.zip")
         const ditto = spawn("ditto", [
             "-c",
