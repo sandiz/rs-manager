@@ -99,7 +99,6 @@ function postbuild() {
             "-aoa",
             "-mm=Deflate",
             "-mfb=258",
-            "-mpass=15",
             "-r",
             outZip,
             "Rocksmith\ Manager-win32-x64/",
