@@ -3,9 +3,11 @@
 </p>
 <p align="center">
 <a href="https://github.com/sandiz/rs-manager/releases/latest"><img src="https://img.shields.io/github/release/sandiz/rs-manager.svg" /></a>
+<img src="https://travis-ci.org/sandiz/rs-manager.svg?branch=master" />
 <a href="https://github.com/sandiz/rs-manager/issues"><img src="https://img.shields.io/github/issues/sandiz/rs-manager.svg" /> </a>
 <img src="https://img.shields.io/badge/contributions-welcome-orange.svg" />
 <img src="https://img.shields.io/github/license/sandiz/rs-manager.svg" />
+
 </p>
 
 
