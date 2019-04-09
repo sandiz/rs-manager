@@ -62,6 +62,8 @@ deploy:
   file: 
     - release-builds/RocksmithManagerInstaller.dmg
     - release-builds/RocksmithManager-macos-x64.zip
+    - release-builds/RocksmithManager-win32-x64.zip
+    - release-builds/RocksmithManagerInstaller.exe
   on:
     repo: sandiz/rs-manager
     tags: true
