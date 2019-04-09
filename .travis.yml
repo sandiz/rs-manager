@@ -50,7 +50,7 @@ branches:
   - "/^v\\d+\\.\\d+\\.\\d+$/"
 deploy:
   provider: releases
-  draft: true,
+  draft: true
   skip_cleanup: true
   overwrite: true
   api_key:
