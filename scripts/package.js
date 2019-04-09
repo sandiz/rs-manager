@@ -74,6 +74,11 @@ function postbuild() {
         ]);
 
         process.chdir(olddir);
+        const t = spawn("ditto", ["--help"]);
+        t.stderr.on('data', (data) => {
+            console.log(`stdout: ${data}`);
+            console.log("\n");
+        });
         console.log("Zipping to Rocksmith Manager-macos-x64.zip")
         const ditto = spawn("ditto", [
             "-c",
@@ -104,17 +109,16 @@ function postbuild() {
             outZip,
             "Rocksmith\ Manager-win32-x64/",
         ]);
-        ziper.stdout.pipe(process.stdout);
-        ziper.stderr.pipe(process.stdout);
 
+        ziper.stdout.on('data', (data) => {
+            console.log(`stdout: ${data}`);
+            console.log("\n");
+        });
 
-        /*  ziper.stdout.on('data', (data) => {
-             sys.stdout.write(`stdout: ${data}`);
-         });
- 
-         ziper.stderr.on('data', (data) => {
-             sys.stdout.write(`stderr: ${data}`);
-         }); */
+        ziper.stderr.on('data', (data) => {
+            console.log(`stderr: ${data}`);
+            console.log("\n");
+        });
 
         ziper.on('exit', (code) => {
             console.log('child process exited with code ' + code.toString());
