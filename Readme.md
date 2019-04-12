@@ -1,5 +1,5 @@
 <p align="center">
-<img width=12.5% src="https://github.com/sandiz/rs-manager/blob/master/src/assets/icons/icon-1024x1024.png">
+<img width=12.5% src="https://github.com/sandiz/rs-manager/raw/master/src/assets/icons/icon-1024x1024.png">
 </p>
 <p align="center">
 <a href="https://github.com/sandiz/rs-manager/releases/latest"><img src="https://img.shields.io/github/release/sandiz/rs-manager.svg" /></a>
@@ -9,7 +9,6 @@
 <img src="https://img.shields.io/github/license/sandiz/rs-manager.svg" />
 
 </p>
-
 
 # Rocksmith Manager (Windows/Mac [Download](https://github.com/sandiz/rs-manager/releases/latest))
 Rocksmith's UI leaves a lot to be desired especially when you have a lot of songs in your collection.  Rocksmith Manager uses Rocksmith + Steam data to consolidate stats/mastery/dlc/setlists under one roof. It also tracks your live session, showing you your accuracy, notes hit/missed in realtime.
