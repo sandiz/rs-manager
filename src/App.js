@@ -18,6 +18,7 @@ import './css/App.css'
 import HelpView from './Components/HelpView';
 import { getState } from './stateService';
 import { enableScroll, forceNoScroll } from './Components/songdetailView';
+import { getProfileName } from './steamprofileService';
 
 const csvparse = require('csv-parse/lib/es5/sync');
 
@@ -33,6 +34,7 @@ class App extends Component {
       appTitle: 'Running Migrations, please wait...',
       currentProfile: '',
       currentCookie: '',
+      rsProfileName: '',
       TabsV2Data: [
         {
           id: 'tab-dashboard',
@@ -150,7 +152,8 @@ class App extends Component {
   updateProfile = async () => {
     const prfldb = await getProfileConfig();
     const steamcookie = await getSteamIDConfig();
-    this.setState({ currentProfile: prfldb, currentCookie: steamcookie });
+    const rsProfileName = await getProfileName(prfldb);
+    this.setState({ currentProfile: prfldb, currentCookie: steamcookie, rsProfileName });
     //this.refreshTabs();
   }
 
@@ -475,6 +478,7 @@ class App extends Component {
             handleChange={this.handleChange}
             showSidebar={this.state.showSidebar}
             currentProfile={profile}
+            profileName={this.state.rsProfileName}
             steamConnected={cookie}
             ytConnected={false}
             TabsV2Data={this.state.TabsV2Data}

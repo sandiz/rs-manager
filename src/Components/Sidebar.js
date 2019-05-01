@@ -444,7 +444,7 @@ export default class Sidebar extends React.Component {
             <p style={{ margin: 0 + 'em' }}>
               Profile: {this.props.currentProfile}<br />
               Steam: {this.props.steamConnected} <br />
-              YouTube: {this.props.ytConnected ? 'Connected' : 'Disconnected'}
+              Name : {this.props.profileName}
             </p>
           </div>
           <div className="sidebar-custom">
@@ -477,7 +477,7 @@ Sidebar.propTypes = {
   showSidebar: PropTypes.bool.isRequired,
   currentProfile: PropTypes.string,
   steamConnected: PropTypes.string,
-  ytConnected: PropTypes.bool,
+  profileName: PropTypes.string,
   TabsV2Data: PropTypes.array,
   //TabsData: PropTypes.array,
   RefreshTabs: PropTypes.func,
@@ -486,7 +486,7 @@ Sidebar.propTypes = {
 Sidebar.defaultProps = {
   currentProfile: '',
   steamConnected: false,
-  ytConnected: false,
+  profileName: '',
   TabsV2Data: [],
   //TabsData: [],
   RefreshTabs: () => { },
