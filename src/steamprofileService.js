@@ -25,19 +25,50 @@ const keya = [
   192, 163, 194, 93, 2, 6, 95,
   22, 107, 75, 204, 88, 205, 38, 68, 242, 158,
 ]
+
+let cachedProfileObj = null;
 export default async function readProfile(prfldb) {
+  if (cachedProfileObj) {
+    return cachedProfileObj;
+  }
   const data = await readFile(prfldb);
-  //const unk1 = jspack.jspack.Unpack('<L', data.slice(16, 20));
   const aesEcb = new aesjs.ModeOfOperation.ecb(keya);
   const decrypted = aesEcb.decrypt(data.slice(20, data.length))
-  //console.log(Buffer.from(keya).toString('hex'));
+
   try {
     const rawjson = await unzip(decrypted);
     //if (window.isDev) {
     //  await writeFile("/tmp/player_data.json", rawjson)
     //}
     const jsonobj = JSON.parse(new TextDecoder("utf-8").decode(rawjson.slice(0, rawjson.length - 1)))
+    cachedProfileObj = jsonobj;
     return jsonobj;
+  }
+  catch (e) {
+    console.log(e);
+  }
+  return null;
+}
+
+export async function getProfileName(prfldb) {
+  const parsed = window.path.parse(prfldb)
+  const localProfiles = parsed.dir + "/LocalProfiles.json";
+
+  const lpdata = await readFile(localProfiles);
+  const aesEcb = new aesjs.ModeOfOperation.ecb(keya);
+  const decryptedlp = aesEcb.decrypt(lpdata.slice(20, lpdata.length))
+
+  try {
+    const lpjson = await unzip(decryptedlp)
+    const jsonobj = JSON.parse(new TextDecoder("utf-8").decode(lpjson.slice(0, lpjson.length - 1)))
+    const prflDBBase = parsed.name.toUpperCase().split("_PRFLDB")[0];
+    const profiles = jsonobj.Profiles;
+    for (let i = 0; i < profiles.length; i += 1) {
+      const obj = profiles[i];
+      if (obj.UniqueID === prflDBBase) {
+        return obj.PlayerName;
+      }
+    }
   }
   catch (e) {
     console.log(e);
