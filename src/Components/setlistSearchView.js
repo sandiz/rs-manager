@@ -56,7 +56,7 @@ export function setlistFormatter(cell, row) {
             title="Export Setlist"
             className="fas fa-file-export"
             onClick={(e) => {
-              DispatcherService.dispatch(DispatchEvents.SETLIST_EXPORT, row.key);
+              DispatcherService.dispatch(DispatchEvents.SETLIST_EXPORT, row);
               e.stopPropagation();
             }} />
         </span>
@@ -128,6 +128,7 @@ export default class SetlistSearchView extends React.Component {
       sizePerPage: 19,
       showExportOptions: false,
       exportSetlistKey: '',
+      exportSetlistName: '',
     };
     this.rowEvents = {
       onClick: (e, row, rowIndex) => {
@@ -152,8 +153,12 @@ export default class SetlistSearchView extends React.Component {
     DispatcherService.off(DispatchEvents.SETLIST_EXPORT, this.setlistExport);
   }
 
-  setlistExport = (key) => {
-    this.setState({ showExportOptions: true, exportSetlistKey: key })
+  setlistExport = (row) => {
+    this.setState({
+      showExportOptions: true,
+      exportSetlistKey: row.key,
+      exportSetlistName: row.name,
+    })
   }
 
   compareValues = (key, order = 'asc') => {
@@ -284,6 +289,7 @@ export default class SetlistSearchView extends React.Component {
         <ExportSetlistModal
           show={this.state.showExportOptions}
           exportSetlistKey={this.state.exportSetlistKey}
+          exportSetlistName={this.state.exportSetlistName}
           onClose={() => this.setState({ showExportOptions: false })} />
       </div>
     );

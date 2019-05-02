@@ -612,7 +612,7 @@ export default class SettingsView extends React.Component {
                   </div>
                   <br />
                   <span style={{ float: 'left' }}>
-                    <a onClick={this.enterCookie}>
+                    <a href="#">
                       Steam OAuth
                   </a>
                   </span>
@@ -628,7 +628,7 @@ export default class SettingsView extends React.Component {
                       (
                         <Fragment>
                           <i>
-                            <a onClick={this.enterCookie}>
+                            <a href="#">
                               {(this.state.steamID).toLowerCase()}
                             </a><br />
                           </i>
