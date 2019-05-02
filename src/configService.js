@@ -31,6 +31,7 @@ function getDefaultSettings() {
   obj.showSetlistOverlayAlways = false;
   obj.isSudoWhitelisted = false;
   obj.currentZoomFactor = 1;
+  obj.pathToImportRSM = '';
   return obj;
 }
 export async function getConfig(type) {
@@ -40,8 +41,11 @@ export async function getConfig(type) {
       const obj = getDefaultSettings();
       await writeFile(window.configPath, JSON.stringify(obj));
     }
-    const data = await readFile(window.configPath);
-    JsonObj = JSON.parse(data);
+    if (JsonObj == null) {
+      const data = await readFile(window.configPath);
+      JsonObj = JSON.parse(data);
+    }
+
     if (type in JsonObj) { return JsonObj[type]; }
     return '';
   }
@@ -110,6 +114,9 @@ export async function updateIsSudoWhitelisted(current) {
 }
 export async function updateCurrentZoomFactor(current) {
   await updateConfig("currentZoomFactor", current);
+}
+export async function updateImportRSMPath(current) {
+  await updateConfig("pathToImportRSM", current);
 }
 
 export default async function getProfileConfig() {
@@ -187,5 +194,9 @@ export async function getIsSudoWhitelistedConfig() {
 export async function getCurrentZoomFactorConfig() {
   const d = await getConfig("currentZoomFactor");
   if (d === '') return 1; //default value;
+  return d;
+}
+export async function getImportRSMConfig() {
+  const d = await getConfig("pathToImportRSM");
   return d;
 }

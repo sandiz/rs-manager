@@ -4,7 +4,10 @@ import PSARCView from './Components/psarcView'
 import SonglistView from './Components/songlistView'
 import FolderEditView from './Components/folderEditView'
 import DashboardView from './Components/dashboardView'
-import getProfileConfig, { getSteamIDConfig, getShowSetlistOverlayAlwaysConfig, getCurrentZoomFactorConfig } from './configService';
+import getProfileConfig, {
+  getSteamIDConfig, getShowSetlistOverlayAlwaysConfig,
+  getCurrentZoomFactorConfig, getImportRSMConfig, updateImportRSMPath,
+} from './configService';
 import SongAvailableView from './Components/songavailableView';
 import SetlistView from './Components/setlistView';
 import SettingsView from './Components/settingsView';
@@ -19,6 +22,7 @@ import HelpView from './Components/HelpView';
 import { getState } from './stateService';
 import { enableScroll, forceNoScroll } from './Components/songdetailView';
 import { getProfileName } from './steamprofileService';
+import { detectImportRSMPath } from './rsrtoolservice';
 
 const csvparse = require('csv-parse/lib/es5/sync');
 
@@ -118,6 +122,17 @@ class App extends Component {
     const zoomF = await getCurrentZoomFactorConfig();
     if (!Number.isNaN(parseFloat(zoomF))) {
       window.webFrame.setZoomFactor(zoomF);
+    }
+  }
+
+  componentDidMount = async () => {
+    const rsmConfig = await getImportRSMConfig();
+    if (rsmConfig === '') {
+      /* if importrsm path is empty, try to detect it and update config */
+      const rsmPath = await detectImportRSMPath();
+      if (rsmPath !== '') {
+        await updateImportRSMPath(rsmPath);
+      }
     }
   }
 
