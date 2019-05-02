@@ -16,6 +16,8 @@ import getProfileConfig, {
   updateIsSudoWhitelisted,
   getCurrentZoomFactorConfig,
   updateCurrentZoomFactor,
+  getImportRSMConfig,
+  updateImportRSMPath,
 } from '../configService';
 import {
   resetDB, createRSSongList, addtoRSSongList, isTablePresent, deleteRSSongList, getSongByID,
@@ -100,6 +102,7 @@ export default class SettingsView extends React.Component {
       showSetlistOverlayAlways: false,
       isSudoWhitelisted: false,
       currentZoomFactor: 1,
+      pathToImportRSM: '',
     };
     this.readConfigs();
     this.refreshSetlist();
@@ -373,6 +376,7 @@ export default class SettingsView extends React.Component {
     const o = await getShowSetlistOverlayAlwaysConfig();
     const p = await getIsSudoWhitelistedConfig();
     const q = await getCurrentZoomFactorConfig();
+    const r = await getImportRSMConfig();
     this.setState({
       prfldb: d,
       steamLoginSecure: e,
@@ -388,6 +392,7 @@ export default class SettingsView extends React.Component {
       showSetlistOverlayAlways: o,
       isSudoWhitelisted: p,
       currentZoomFactor: q,
+      pathToImportRSM: r,
     });
   }
 
@@ -405,6 +410,7 @@ export default class SettingsView extends React.Component {
     await updateScoreAttackDashboard(this.state.scoreAttackDashboard);
     await updateMasteryThreshold(this.state.masteryThreshold);
     await updateSteamAPIKey(this.state.steamAPIKey);
+    await updateImportRSMPath(this.state.pathToImportRSM);
     if (this.state.sortoptions.length === 0) {
       this.setState({ sortoptions: defaultSortOption }, async () => {
         await updateDefaultSortOption(this.state.sortoptions)
@@ -977,8 +983,8 @@ export default class SettingsView extends React.Component {
                 </Collapsible>
                 <br />
                 <Collapsible
-                  trigger={expandButton("Import RS Songlist")}
-                  triggerWhenOpen={collapseButton("Import RS Songlist")}
+                  trigger={expandButton("RS Songlist")}
+                  triggerWhenOpen={collapseButton("RS Songlist")}
                   transitionTime={200}
                   easing="ease-in"
                 >
@@ -1026,6 +1032,45 @@ export default class SettingsView extends React.Component {
                           }
                         >@JustinAiken
                           </a>
+                      </span>
+                    </div>
+                  </Fragment>
+                  <Fragment>
+                    <br />
+                    <span style={{ float: 'left' }}>
+                      <a>
+                        Path to <strong>importrsm</strong>
+                      </a>
+                    </span>
+                    <span style={{
+                      float: 'right',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      width: 400 + 'px',
+                      textAlign: 'right',
+                      marginTop: 30 + 'px',
+                    }}>
+                      {
+                        <input
+                          type="text"
+                          style={{ width: 400 + 'px', textAlign: 'right', paddingRight: 5 + 'px' }}
+                          value={this.state.pathToImportRSM}
+                          onChange={e => this.setState({ pathToImportRSM: e.target.value })}
+                        />
+                      }
+                    </span>
+                    <br />
+                    <div className="">
+                      <span style={{ color: '#ccc' }}>
+                        part of the <strong>
+                          <a
+                            style={{ color: 'blue' }}
+                            onClick={
+                              () => window.shell.openExternal("https://pypi.org/project/rsrtools/")
+                            }
+                          >rsrtools
+                          </a></strong> package, <strong>importrsm</strong> allows loading
+          setlists into Rocksmith.
                       </span>
                     </div>
                   </Fragment>
