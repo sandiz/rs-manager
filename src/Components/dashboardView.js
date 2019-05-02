@@ -636,7 +636,8 @@ export default class DashboardView extends React.Component {
       );
       //console.log("second search result: " + url);
     }
-    if (!url.toString().includes("http") || !url.toString().includes('rate limit exceeded')) {
+    if (!url.toString().includes("http") || url.toString().includes('rate limit exceeded')) {
+      console.log(url);
       url = "https://raw.githubusercontent.com/sandiz/rs-manager/master/screenshots/nothumb.jpg";
     }
     //console.log("---")
