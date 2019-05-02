@@ -20,7 +20,8 @@ import getProfileConfig, {
   updateImportRSMPath,
 } from '../configService';
 import {
-  resetDB, createRSSongList, addtoRSSongList, isTablePresent, deleteRSSongList, getSongByID,
+  resetDB, createRSSongList, addtoRSSongList,
+  isTablePresent, deleteRSSongList, getSongByID, resetRSSongList,
 } from '../sqliteService';
 import readProfile from '../steamprofileService';
 import { sortOrderCustomStyles, createOption } from './setlistOptions';
@@ -177,7 +178,6 @@ export default class SettingsView extends React.Component {
     }
     else if (method === "import") {
       //import setlist
-      console.log("create setlist", setlistnum);
       const tablename = "rs_song_list_" + (setlistnum + 1);
       const displayname = "RS Song List " + (setlistnum + 1);
       //set header to starting
@@ -190,10 +190,11 @@ export default class SettingsView extends React.Component {
       //create table for setlist
       //insert setlist to setlist_meta
       await createRSSongList(tablename, displayname, false, false, false, true);
-      const steamProfile = await readProfile(this.state.prfldb);
+      const steamProfile = await readProfile(this.state.prfldb, true);
       const songRoot = steamProfile.SongListsRoot.SongLists;
       const currentSetlist = songRoot[setlistnum] === 'undefined' ? [] : songRoot[setlistnum];
 
+      await resetRSSongList(tablename);
       //insert values to setlist (set header with item)
       for (let i = 0; i < currentSetlist.length; i += 1) {
         const songkey = currentSetlist[i];
@@ -1070,7 +1071,7 @@ export default class SettingsView extends React.Component {
                             }
                           >rsrtools
                           </a></strong> package, <strong>importrsm</strong> allows loading
-          setlists into Rocksmith.
+    setlists into Rocksmith.
                       </span>
                     </div>
                   </Fragment>
