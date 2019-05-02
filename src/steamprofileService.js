@@ -27,8 +27,8 @@ const keya = [
 ]
 
 let cachedProfileObj = null;
-export default async function readProfile(prfldb) {
-  if (cachedProfileObj) {
+export default async function readProfile(prfldb, force = false) {
+  if (cachedProfileObj && force === false) {
     return cachedProfileObj;
   }
   const data = await readFile(prfldb);

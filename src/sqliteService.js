@@ -963,6 +963,12 @@ export async function getHistory(id, limit = 10) {
   const op = await db.all(sql);
   return op;
 }
+
+export async function resetRSSongList(tablename) {
+  const sql = `DELETE from ${tablename};`;
+  await db.exec(sql)
+}
+
 export async function deleteRSSongList(tablename, drop = true) {
   let sql = "";
   if (drop) {

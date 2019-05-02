@@ -51,6 +51,12 @@ class ExportSetlistModal extends React.Component {
 
     handleChange = (selectedOption) => {
         this.setState({ selectedOption });
+        if (selectedOption && selectedOption.value === "songlist") {
+            this.setState({
+                showRSWarning: true,
+                showMessage: null,
+            });
+        }
     }
 
     handleSonglist = (selectedSonglist) => {
