@@ -29,6 +29,7 @@ const defaultState = {
     steamID: '',
     profileName: '',
     launchRS: false,
+    showRSWarning: true,
 }
 class ExportSetlistModal extends React.Component {
     constructor(props) {
@@ -57,6 +58,12 @@ class ExportSetlistModal extends React.Component {
     }
 
     startExport = async () => {
+        this.setState({
+            showRSWarning: false,
+            showMessage: null,
+            launchRS: false,
+            processing: false,
+        })
         if (this.state.selectedOption === null) {
             this.failureMsg("invalid export option")
             return;
@@ -254,6 +261,18 @@ class ExportSetlistModal extends React.Component {
                                                     onChange={this.handleSonglist}
                                                     options={rssonglistoptions}
                                                 />
+                                                {
+                                                    this.state.showRSWarning
+                                                        ? (
+                                                            <div className="alert alert-info" style={{ marginTop: 15 + 'px' }}>
+                                                                <span>
+                                                                    Please make sure
+                                                                    Rocksmith 2014 is not
+                                                                    running when you export.
+                                                                </span>
+                                                            </div>
+                                                        ) : null
+                                                }
                                             </div>
                                         )
                                         : null
@@ -272,7 +291,6 @@ class ExportSetlistModal extends React.Component {
                                 this.state.processing
                                     ? (
                                         <div className="alert alert-info" style={{ marginTop: 15 + 'px' }}>
-                                            <div className="spinner-border text-primary" role="status" />
                                             <span>
                                                 Processing, please wait...
                                             </span>
