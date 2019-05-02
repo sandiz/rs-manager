@@ -7,11 +7,12 @@ import {
 } from './songlistView'
 import {
   getAllSetlistNoFolderPaged, executeRawSql,
-  getAllSetlistNoFolder, getFolderSetlists, getSetlistMetaInfo,
+  getAllSetlistNoFolder, getFolderSetlists,
 } from '../sqliteService';
-import { getDefaultSortOptionConfig, getMasteryThresholdConfig, writeFile } from '../configService';
+import { getDefaultSortOptionConfig, getMasteryThresholdConfig } from '../configService';
 import { generateSql } from './setlistOptions';
 import { DispatcherService, DispatchEvents } from '../lib/libDispatcher'
+import ExportSetlistModal from './modalExportSetlist';
 
 
 export function setlistFormatter(cell, row) {
@@ -125,6 +126,8 @@ export default class SetlistSearchView extends React.Component {
       page: 1,
       totalSize: 0,
       sizePerPage: 19,
+      showExportOptions: false,
+      exportSetlistKey: '',
     };
     this.rowEvents = {
       onClick: (e, row, rowIndex) => {
@@ -149,57 +152,8 @@ export default class SetlistSearchView extends React.Component {
     DispatcherService.off(DispatchEvents.SETLIST_EXPORT, this.setlistExport);
   }
 
-  setlistExport = async (key) => {
-    const setlist = await getSetlistMetaInfo(key);
-    const isgen = setlist.is_generated === "true";
-    const songKeys = []
-    if (isgen) {
-      //eslint-disable-next-line
-      const sql = await generateSql(JSON.parse(setlist.view_sql));
-      try {
-        //eslint-disable-next-line
-        const op = await executeRawSql(sql, true);
-        for (let j = 0; j < op.length; j += 1) {
-          const arr = op[j];
-          if (!songKeys.includes(arr.songkey)) {
-            songKeys.push(arr.songkey);
-          }
-        }
-      }
-      catch (e) {
-        console.log(e)
-      }
-    }
-    else {
-      //eslint-disable-next-line
-      const op2 = await executeRawSql(`
-        SELECT *
-        FROM songs_owned
-        JOIN ${setlist.key}
-        ON ${setlist.key}.uniqkey = songs_owned.uniqkey
-        `, true);
-      for (let i = 0; i < op2.length; i += 1) {
-        const arr = op2[i];
-        if (!songKeys.includes(arr.songkey)) {
-          songKeys.push(arr.songkey);
-        }
-      }
-    }
-
-    if (songKeys.length > 0) {
-      const options = {
-        defaultPath: window.remote.app.getPath('documents') + `/${unescape(setlist.name)}_export.json`,
-      }
-      window.remote.dialog.showSaveDialog(null, options, async (path) => {
-        if (path) {
-          await writeFile(path, JSON.stringify(songKeys));
-          this.props.updateHeader(this.tabname, "Setlist exported");
-        }
-      })
-    }
-    else {
-      this.props.updateHeader(this.tabname, "Empty setlist, cannot export");
-    }
+  setlistExport = (key) => {
+    this.setState({ showExportOptions: true, exportSetlistKey: key })
   }
 
   compareValues = (key, order = 'asc') => {
@@ -327,6 +281,10 @@ export default class SetlistSearchView extends React.Component {
             classes="setlistSearchTable"
           />
         </div>
+        <ExportSetlistModal
+          show={this.state.showExportOptions}
+          exportSetlistKey={this.state.exportSetlistKey}
+          onClose={() => this.setState({ showExportOptions: false })} />
       </div>
     );
   }

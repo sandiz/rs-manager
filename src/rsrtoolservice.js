@@ -25,6 +25,7 @@ export const detectImportRSMPath = async () => {
             return path;
         }
         catch (ex) {
+            console.log('failed to find importrsm: ' + ex)
             return '';
         }
     }
