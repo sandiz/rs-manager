@@ -647,7 +647,10 @@ export default class SongAvailableView extends React.Component {
         timedout = false;
       }
       const dlc = dlcs[i];
-      const [artist, title] = dlc.name.split(" - ");
+      let [artist, title] = dlc.name.split(" - ");
+      if (!title) {
+        [artist, title] = dlc.name.split("- ");
+      }
       if (artist && title) {
         //eslint-disable-next-line
         const tags = await getTrackTags(artist.trim(), title.trim());

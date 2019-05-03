@@ -51,6 +51,7 @@ export default async function readProfile(prfldb, force = false) {
 }
 
 export async function getProfileName(prfldb) {
+  if (!prfldb || prfldb === '') return '';
   const parsed = window.path.parse(prfldb)
   const localProfiles = parsed.dir + "/LocalProfiles.json";
 
