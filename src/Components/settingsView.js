@@ -190,7 +190,7 @@ export default class SettingsView extends React.Component {
       //create table for setlist
       //insert setlist to setlist_meta
       await createRSSongList(tablename, displayname, false, false, false, true);
-      const steamProfile = await readProfile(this.state.prfldb, true);
+      const steamProfile = await readProfile(this.state.prfldb);
       const songRoot = steamProfile.SongListsRoot.SongLists;
       const currentSetlist = songRoot[setlistnum] === 'undefined' ? [] : songRoot[setlistnum];
 
