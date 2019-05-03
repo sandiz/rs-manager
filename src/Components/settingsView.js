@@ -1078,6 +1078,7 @@ export default class SettingsView extends React.Component {
                           }>
                           @BuongiornoTexas</a>, <strong>importrsm</strong> allows
 loading setlists into Rocksmith 2014.
+<br />(path can contain spaces, it&quot;s automatically escaped when invoking)
                       </span>
                     </div>
                   </Fragment>
