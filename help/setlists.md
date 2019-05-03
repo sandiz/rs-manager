@@ -42,17 +42,17 @@
 
 # Export Setlist
 
- - ### You can export setlists as a JSON file or as a Rocksmith Song list (needs [rsrtools](https://pypi.org/project/rsrtools/) package to be installed)
+ -  You can export setlists as a JSON file or as a Rocksmith Song list (needs [rsrtools](https://pypi.org/project/rsrtools/) package to be installed)
 
 <img width=60% src="https://raw.githubusercontent.com/sandiz/rs-manager/master/screenshots/images/exportsetlistinfo.png"/>
 
- - ### path to `importrsm` binary is autodetected at startup, in case it's not found, you can add the path in settings
+ -  path to `importrsm` binary is autodetected at startup, in case it's not found, you can add the path in settings
 
  ![](https://raw.githubusercontent.com/sandiz/rs-manager/master/screenshots/images/exportsetlistsettings.png)
 
- - ### before exporting make sure Rocksmith2014 is not running!
- - ### start export! on success, your song list will be overwritten and a backup of your profile will be created
+ -  before exporting make sure Rocksmith2014 is not running!
+ -  start export! on success, your song list will be overwritten and a backup of your profile will be created
  ![](https://raw.githubusercontent.com/sandiz/rs-manager/master/screenshots/images/exportsetlistmain.png)
 
- - ### if it fails for some reason, detailed error message is displayed. Please report it [here](https://github.com/sandiz/rs-manager/issues)
+ -  if it fails for some reason, detailed error message is displayed. Please report it [here](https://github.com/sandiz/rs-manager/issues)
  <img width=60% src="https://raw.githubusercontent.com/sandiz/rs-manager/master/screenshots/images/exportsetlistfail.png" />
