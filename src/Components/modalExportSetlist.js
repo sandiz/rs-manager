@@ -121,16 +121,19 @@ class ExportSetlistModal extends React.Component {
                         (
                             <React.Fragment>
                                 <span>an error occurred</span>
-                                <div style={{
+                                <pre style={{
+                                    width: 100 + '%',
                                     height: 200 + 'px',
                                     overflow: 'auto',
+                                    overflowX: 'hidden',
+                                    textAlign: 'left',
                                     wordBreak: 'break-all',
                                     userSelect: 'text',
                                     marginLeft: -15 + 'px',
                                     marginRight: -15 + 'px',
                                 }}>
                                     {logs}
-                                </div>
+                                </pre>
                             </React.Fragment>
                         ),
                     );
