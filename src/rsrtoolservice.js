@@ -22,7 +22,8 @@ const spawnPromise = (cmd, args) => new Promise((resolve, reject) => {
         output = data.toString().replace(/\n|\r/g, "").trim()
     });
     child.stderr.on('data', (data) => {
-        stderr = data.toString().replace(/\n|\r/g, "").trim()
+        //dont replace new lines so that it fornats nicely in <pre> tags
+        stderr = data.toString().trim();
     });
     child.on('close', (code) => {
         if (code === 0) {
