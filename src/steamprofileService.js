@@ -26,11 +26,7 @@ const keya = [
   22, 107, 75, 204, 88, 205, 38, 68, 242, 158,
 ]
 
-let cachedProfileObj = null;
-export default async function readProfile(prfldb, force = false) {
-  if (cachedProfileObj && force === false) {
-    return cachedProfileObj;
-  }
+export default async function readProfile(prfldb) {
   const data = await readFile(prfldb);
   const aesEcb = new aesjs.ModeOfOperation.ecb(keya);
   const decrypted = aesEcb.decrypt(data.slice(20, data.length))
