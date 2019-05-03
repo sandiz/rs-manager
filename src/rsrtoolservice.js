@@ -25,7 +25,11 @@ const spawnPromise = (cmd, args) => new Promise((resolve, reject) => {
         //dont replace new lines so that it fornats nicely in <pre> tags
         stderr = data.toString().trim();
     });
-    child.on('close', (code) => {
+    child.on('error', (err) => {
+        //eslint-disable-next-line
+        reject({ code: -1, stderr: JSON.stringify(err) });
+    })
+    child.on('exit', (code) => {
         if (code === 0) {
             resolve(output);
         }
@@ -73,6 +77,9 @@ export const executeRSMRequest = async (steamID, profileName, songList, songKeys
 
     const file = window.path.join(tmpdir, "songkeys.json");
     await writeFile(file, JSON.stringify(songKeys));
+    console.log("importrsm path: " + importRSMPath);
+    console.log("Creating tmp directory at: " + tmpdir);
+    console.log("songkeys.json: " + file)
 
     if (window.process.platform === "darwin") {
         try {
