@@ -52,9 +52,17 @@ export const detectImportRSMPath = async () => {
         }
     }
     else {
-        console.log('win impl');
+        try {
+            console.log("trying to detect importrsm path");
+            const path = await spawnPromise("where", ["importrsm.exe"])
+            console.log(path);
+            return path;
+        }
+        catch (ex) {
+            console.log('failed to find importrsm: ' + JSON.stringify(ex))
+            return '';
+        }
     }
-    return '';
 }
 
 export const executeRSMRequest = async (steamID, profileName, songList, songKeys) => {
@@ -78,16 +86,33 @@ export const executeRSMRequest = async (steamID, profileName, songList, songKeys
                 file,
                 tmpdir,
             ])
+            tmpobj.removeCallback();
             return [true, output, tmpdir];
         }
         catch (ex) {
+            tmpobj.removeCallback();
             return [false, ex.stderr];
         }
     }
     else {
-        console.log('win impl');
+        try {
+            const output = await spawnPromise(importRSMPath, [
+                "--silent",
+                "-a",
+                steamID,
+                "-p",
+                profileName,
+                "-sl",
+                songList,
+                file,
+                tmpdir,
+            ])
+            tmpobj.removeCallback();
+            return [true, output, tmpdir];
+        }
+        catch (ex) {
+            tmpobj.removeCallback();
+            return [false, ex.stderr];
+        }
     }
-
-    tmpobj.removeCallback();
-    return [false, ''];
 }
