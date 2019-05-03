@@ -1049,7 +1049,7 @@ export default class SettingsView extends React.Component {
                       textOverflow: 'ellipsis',
                       width: 400 + 'px',
                       textAlign: 'right',
-                      marginTop: 30 + 'px',
+                      marginTop: 12 + 'px',
                     }}>
                       {
                         <input
@@ -1070,8 +1070,14 @@ export default class SettingsView extends React.Component {
                               () => window.shell.openExternal("https://pypi.org/project/rsrtools/")
                             }
                           >rsrtools
-                          </a></strong> package, <strong>importrsm</strong> allows loading
-  setlists into Rocksmith 2014.
+                          </a></strong> package, by&nbsp;
+                            <a
+                          style={{ color: 'blue' }}
+                          onClick={
+                            () => window.shell.openExternal("https://github.com/BuongiornoTexas")
+                          }>
+                          @BuongiornoTexas</a>, <strong>importrsm</strong> allows
+loading setlists into Rocksmith 2014.
                       </span>
                     </div>
                   </Fragment>
