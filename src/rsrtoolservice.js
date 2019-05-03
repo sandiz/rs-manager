@@ -71,12 +71,18 @@ export const detectImportRSMPath = async () => {
 }
 
 export const executeRSMRequest = async (steamID, profileName, songList, songKeys) => {
-    const importRSMPath = await getImportRSMConfig();
+    let importRSMPath = await getImportRSMConfig();
     const tmpobj = tmp.dirSync();
-    const tmpdir = tmpobj.name.trim();
+    let tmpdir = tmpobj.name.trim();
 
-    const file = window.path.join(tmpdir, "songkeys.json");
+    let file = window.path.join(tmpdir, "songkeys.json");
     await writeFile(file, JSON.stringify(songKeys));
+
+    /* escape spaces in path */
+    importRSMPath = importRSMPath.replace(/(\s+)/g, '\\$1');
+    file = file.replace(/(\s+)/g, '\\$1');
+    tmpdir = tmpdir.replace(/(\s+)/g, '\\$1');
+
     console.log("importrsm path: " + importRSMPath);
     console.log("Creating tmp directory at: " + tmpdir);
     console.log("songkeys.json: " + file)
