@@ -37,7 +37,6 @@ export default async function readProfile(prfldb) {
     //  await writeFile("/tmp/player_data.json", rawjson)
     //}
     const jsonobj = JSON.parse(new TextDecoder("utf-8").decode(rawjson.slice(0, rawjson.length - 1)))
-    cachedProfileObj = jsonobj;
     return jsonobj;
   }
   catch (e) {
