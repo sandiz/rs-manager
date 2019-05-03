@@ -5,6 +5,7 @@ import getProfileConfig, { writeFile, getImportRSMConfig, getSteamIDConfig } fro
 import { getSetlistMetaInfo, executeRawSql } from '../sqliteService';
 import { executeRSMRequest } from '../rsrtoolservice';
 import { getProfileName } from '../steamprofileService';
+import { generateSql } from './setlistOptions';
 
 const selectoptions = [
     { value: 'json', label: 'JSON' },
