@@ -44,7 +44,7 @@
 
  -  You can export setlists as a JSON file or as a Rocksmith Song list (needs [rsrtools](https://pypi.org/project/rsrtools/) package to be installed)
 
-<img width=60% src="https://raw.githubusercontent.com/sandiz/rs-manager/master/screenshots/images/exportsetlistinfo.png"/>
+<img width=60% style="border-radius: 6px" src="https://raw.githubusercontent.com/sandiz/rs-manager/master/screenshots/images/exportsetlistinfo.png"/>
 
  -  path to `importrsm` binary is autodetected at startup, in case it's not found, you can add the path in settings
 
