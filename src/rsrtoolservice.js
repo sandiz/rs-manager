@@ -1,13 +1,20 @@
 import { getImportRSMConfig, writeFile } from "./configService";
 
 //import { writeFile, readFile } from "./configService";
+const shellEnv = window.require('shell-env');
 const spawn = window.require('cross-spawn');
 const tmp = window.require('tmp');
 tmp.setGracefulCleanup();
 
 
 const spawnPromise = (cmd, args) => new Promise((resolve, reject) => {
-    const child = spawn(cmd, args);
+    const se = shellEnv.sync();
+    const child = spawn(cmd, args, {
+        deteched: true,
+        shell: true,
+        windowsHide: true,
+        env: se,
+    });
     let output = "";
     let stderr = "";
 
@@ -34,11 +41,13 @@ const spawnPromise = (cmd, args) => new Promise((resolve, reject) => {
 export const detectImportRSMPath = async () => {
     if (window.process.platform === "darwin") {
         try {
-            const path = await spawnPromise("which", ["importrsm"])
+            console.log("trying to detect importrsm path");
+            const path = await spawnPromise("/usr/bin/which", ["importrsm"])
+            console.log(path);
             return path;
         }
         catch (ex) {
-            console.log('failed to find importrsm: ' + ex)
+            console.log('failed to find importrsm: ' + JSON.stringify(ex))
             return '';
         }
     }

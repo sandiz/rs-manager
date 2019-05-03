@@ -1071,7 +1071,7 @@ export default class SettingsView extends React.Component {
                             }
                           >rsrtools
                           </a></strong> package, <strong>importrsm</strong> allows loading
-    setlists into Rocksmith.
+  setlists into Rocksmith 2014.
                       </span>
                     </div>
                   </Fragment>
