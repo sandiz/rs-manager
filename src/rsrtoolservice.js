@@ -17,6 +17,9 @@ const spawnPromise = (cmd, args) => new Promise((resolve, reject) => {
     });
     let output = "";
     let stderr = "";
+    if (window.isDev) {
+        console.log(`invoking cmd ${cmd} with args: `, args.join(" "));
+    }
 
     child.stdout.on('data', (data) => {
         output = data.toString().replace(/\n|\r/g, "").trim()
@@ -78,17 +81,13 @@ export const executeRSMRequest = async (steamID, profileName, songList, songKeys
     let file = window.path.join(tmpdir, "songkeys.json");
     await writeFile(file, JSON.stringify(songKeys));
 
-    /* escape spaces in path */
-    importRSMPath = importRSMPath.replace(/(\s+)/g, '\\$1');
-    file = file.replace(/(\s+)/g, '\\$1');
-    tmpdir = tmpdir.replace(/(\s+)/g, '\\$1');
-
-    console.log("importrsm path: " + importRSMPath);
-    console.log("Creating tmp directory at: " + tmpdir);
-    console.log("songkeys.json: " + file)
-
     if (window.process.platform === "darwin") {
         try {
+            /* escape spaces in path */
+            importRSMPath = importRSMPath.replace(/(\s+)/g, '\\$1');
+            file = file.replace(/(\s+)/g, '\\$1');
+            tmpdir = tmpdir.replace(/(\s+)/g, '\\$1');
+
             const output = await spawnPromise(importRSMPath, [
                 "--silent",
                 "-a",
@@ -110,7 +109,7 @@ export const executeRSMRequest = async (steamID, profileName, songList, songKeys
     }
     else {
         try {
-            const output = await spawnPromise(importRSMPath, [
+            const output = await spawnPromise(`"${importRSMPath}"`, [
                 "--silent",
                 "-a",
                 steamID,
@@ -118,8 +117,8 @@ export const executeRSMRequest = async (steamID, profileName, songList, songKeys
                 profileName,
                 "-sl",
                 songList,
-                file,
-                tmpdir,
+                `"${file}"`,
+                `"${tmpdir}"`,
             ])
             tmpobj.removeCallback();
             return [true, output, tmpdir];
