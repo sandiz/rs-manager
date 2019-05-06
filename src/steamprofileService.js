@@ -5,6 +5,7 @@
 //const jspack = require("./jspack");
 const aesjs = require('aes-js');
 const zlib = require('zlib')
+const vdf = require('node-vdf')
 
 const readFile = filePath => new Promise((resolve, reject) => {
   window.electronFS.readFile(filePath, (err, data) => {
@@ -33,16 +34,33 @@ export default async function readProfile(prfldb) {
 
   try {
     const rawjson = await unzip(decrypted);
-    //if (window.isDev) {
-    //  await writeFile("/tmp/player_data.json", rawjson)
-    //}
     const jsonobj = JSON.parse(new TextDecoder("utf-8").decode(rawjson.slice(0, rawjson.length - 1)))
+    //if (window.isDev) {
+    //  await writeFile("/tmp/player_data.json", JSON.stringify(jsonobj))
+    //}
     return jsonobj;
   }
   catch (e) {
     console.log(e);
   }
   return null;
+}
+
+export async function getAllProfiles(prfldbdir) {
+  const localProfiles = prfldbdir + "/LocalProfiles.json";
+  const lpdata = await readFile(localProfiles);
+  const aesEcb = new aesjs.ModeOfOperation.ecb(keya);
+  const decryptedlp = aesEcb.decrypt(lpdata.slice(20, lpdata.length))
+
+  try {
+    const lpjson = await unzip(decryptedlp)
+    const jsonobj = JSON.parse(new TextDecoder("utf-8").decode(lpjson.slice(0, lpjson.length - 1)))
+    return jsonobj.Profiles;
+  }
+  catch (e) {
+    console.log(e);
+  }
+  return [];
 }
 
 export async function getProfileName(prfldb) {
@@ -123,6 +141,7 @@ export async function getOwnedHistory(cookie, cookieSess) {
     return [];
   }
 }
+
 export async function getTrackTags(artist, title, trackonly = false) {
   //simple o-b-fus-cation
   const p = "a2V5PWxSbktOaUh4UUFpc1d2VGpOT01oJnNlY3JldD1kYWV6VVhlaktwZlBGbkxtZVNIYVdvQmFEb0t0Y05zTg";
@@ -208,4 +227,33 @@ export async function getTrackTags(artist, title, trackonly = false) {
     console.log(text);
   }
   return null;
+}
+
+export async function readSteamLoginItems() {
+  if (window.process.platform === "darwin") {
+    const vdffile = window.path.join(window.os.homedir(), "/Library/Application Support/Steam/config", "loginusers.vdf");
+    if (window.electronFS.existsSync(vdffile)) {
+      const data = await readFile(vdffile);
+      return vdf.parse(data.toString());
+    }
+  }
+  else {
+    console.log("win impl");
+  }
+  return [];
+}
+
+export function getSteamPathForRocksmith(uid32) {
+  if (window.process.platform === "darwin") {
+    return window.path.join(
+      window.os.homedir(),
+      "Library/Application Support/Steam", //fixed
+      `userdata/${uid32}`, // user dir
+      "221680/remote", // rs2014 dir
+    );
+  }
+  else {
+    console.log("win impl");
+    return "";
+  }
 }

@@ -2,6 +2,7 @@ import React from 'react'
 import Collapsible from 'react-collapsible';
 import CreatableSelect from "react-select/lib/Creatable";
 import PropTypes from 'prop-types';
+import Select from 'react-select';
 import getProfileConfig, {
   updateSteamLoginSecureCookie, getSteamLoginSecureCookie, updateProfileConfig,
   getScoreAttackConfig, updateScoreAttackConfig, updateUseCDLCConfig,
@@ -23,9 +24,12 @@ import {
   resetDB, createRSSongList, addtoRSSongList,
   isTablePresent, deleteRSSongList, getSongByID, resetRSSongList,
 } from '../sqliteService';
-import readProfile from '../steamprofileService';
+import readProfile, { readSteamLoginItems, getAllProfiles, getSteamPathForRocksmith } from '../steamprofileService';
 import { sortOrderCustomStyles, createOption } from './setlistOptions';
 import { DispatcherService, DispatchEvents } from '../lib/libDispatcher'
+
+import steam from '../assets/tree-icons/catalog.svg'
+import * as rsicon from '../assets/icons/icon-1024x1024-gray.png'
 
 const parse = require('csv-parse/lib/es5/sync');
 
@@ -104,11 +108,40 @@ export default class SettingsView extends React.Component {
       isSudoWhitelisted: false,
       currentZoomFactor: 1,
       pathToImportRSM: '',
+      currentSteamProfile: '',
+      steamProfileOptions: [],
+      currentRSProfile: '',
+      rsProfileOptions: [],
+      profileAboutToSave: false,
+      profileSaved: false,
     };
     this.readConfigs();
+    this.readSteamProfiles();
     this.refreshSetlist();
     this.sortfieldref = React.createRef();
     this.sortorderref = React.createRef();
+  }
+
+  readSteamProfiles = async () => {
+    const items = await readSteamLoginItems();
+    const users = items.users;
+    const uids = Object.keys(users);
+    const options = []
+    const reducer = (source, destination, key) => {
+      destination[key.toLowerCase()] = source[key];
+      return destination;
+    };
+    for (let i = 0; i < uids.length; i += 1) {
+      const user = users[uids[i]];
+      const louser = Object.keys(user)
+        .reduce((dest, key) => reducer(user, dest, key), {});
+      const account = louser.accountname
+      options.push({
+        value: `${uids[i]}:${louser.personaname}:${louser.accountname}`,
+        label: louser.personaname + " [" + account + "]" + (louser.mostrecent ? " (most recent)" : ""),
+      })
+    }
+    this.setState({ steamProfileOptions: options })
   }
 
   generateSetlistOptions = () => {
@@ -535,6 +568,54 @@ export default class SettingsView extends React.Component {
     this.setState({ sortoptions: value })
   }
 
+  resetProfileState = () => {
+    this.setState({
+      currentRSProfile: '',
+      currentSteamProfile: '',
+      profileSaved: false,
+    })
+  }
+
+  handleSteamProfileChange = async (so) => {
+    const split = so.value.split(":");
+    const name = split[1] + " [" + split[2] + "]";
+    this.setState({ currentSteamProfile: name });
+    const uid = window.BigInt(split[0])
+    //eslint-disable-next-line
+    const uid32 = uid & window.BigInt(0xFFFFFFFF);
+    const prfldbdir = getSteamPathForRocksmith(uid32);
+
+    if (window.electronFS.existsSync(prfldbdir)) {
+      const profiles = await getAllProfiles(prfldbdir);
+      const options = []
+      for (let i = 0; i < profiles.length; i += 1) {
+        const profile = profiles[i];
+        options.push({
+          value: `${prfldbdir}/${profile.UniqueID}_PRFLDB`,
+          label: profile.PlayerName,
+        })
+      }
+      this.setState({ rsProfileOptions: options });
+    }
+  }
+
+  handleRSProfileChange = async (so) => {
+    const prfldb = so.value;
+    this.setState({ currentRSProfile: so.label, profileAboutToSave: true });
+    console.log(prfldb);
+  }
+
+  saveProfile = async () => {
+  }
+
+  resetProfile = async () => {
+
+  }
+
+  goToPsarc = async () => { }
+
+  refreshStats = async () => { }
+
   render = () => {
     if (this.props.currentTab === null) {
       return null;
@@ -547,11 +628,225 @@ export default class SettingsView extends React.Component {
               <br /> <br />
               <div style={{ marginTop: -30 + 'px', paddingLeft: 30 + 'px', paddingRight: 30 + 'px' }}>
                 <Collapsible
-                  trigger={expandButton('General')}
-                  triggerWhenOpen={collapseButton('General')}
+                  trigger={expandButton('Profile Selection')}
+                  triggerWhenOpen={collapseButton('Profile Selection')}
                   transitionTime={200}
                   easing="ease-in"
                   open
+                  overflowWhenOpen="visible"
+                >
+                  <div className="d-flex flex-row justify-content-center" style={{ margin: '0 auto', width: 65 + '%' }}>
+                    <div style={{ width: 30 + '%', margin: 20 + 'px' }}>
+                      <div className="ta-center">
+                        <img src={steam} alt="steam icon" style={{ width: 80 + 'px', height: 80 + 'px' }} />
+                      </div>
+                      <div style={{ marginTop: 12 + 'px' }}>
+                        {
+                          this.state.currentSteamProfile.length === 0
+                            ? (
+                              <Select
+                                placeholder="Choose Steam Profile"
+                                options={this.state.steamProfileOptions}
+                                onChange={this.handleSteamProfileChange}
+                              />
+                            )
+                            : (
+                              <div className="ta-center profile-text">
+                                <span className="pointer" style={{ borderBottom: "1px dotted" }} onClick={this.resetProfileState}>
+                                  {this.state.currentSteamProfile}
+                                </span>
+                              </div>
+                            )
+                        }
+                      </div>
+                    </div>
+                    <div className="profile-arrow">
+                      <i className="fas fa-chevron-right" />
+                    </div>
+                    <div style={{ width: 30 + '%', margin: 12 + 'px' }}>
+                      <div className="ta-center">
+                        <img src={rsicon} alt="steam icon" style={{ width: 90 + 'px', height: 90 + 'px' }} />
+                      </div>
+                      <div style={{ marginTop: 10 + 'px' }}>
+                        {
+                          this.state.currentRSProfile.length === 0
+                            ? (
+                              <Select
+                                placeholder="Choose Rocksmith Profile"
+                                isDisabled={this.state.currentSteamProfile.length === 0}
+                                options={this.state.rsProfileOptions}
+                                onChange={this.handleRSProfileChange}
+                              />
+                            )
+                            : (
+                              <div className="ta-center profile-text">
+                                {this.state.currentRSProfile}
+                              </div>
+                            )
+                        }
+                      </div>
+                    </div>
+                    <div className="profile-arrow">
+                      <i className="fas fa-chevron-right" />
+                    </div>
+                    <div style={{
+                      width: 30 + '%',
+                      margin: 20 + 'px',
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      flexDirection: 'column',
+                    }}>
+                      <div className="ta-center">
+                        <img src="https://steamcommunity-a.akamaihd.net/public/images/signinthroughsteam/sits_01.png" alt="steam login" />
+                      </div>
+                      <div style={{ textAlign: 'center', marginTop: 3 + 'px' }}>
+                        (optional)
+                      </div>
+                    </div>
+                  </div>
+                  <div className="ta-center">
+                    {
+                      this.state.profileAboutToSave
+                        ? (
+                          <div className="ta-center profile-save-div">
+                            <a
+                              onClick={this.saveProfile}
+                              className="extraPadding download">
+                              Save
+                            </a>
+                            <a
+                              onClick={this.resetProfile}
+                              className="extraPadding download">
+                              Cancel
+                            </a>
+                          </div>
+                        )
+                        : null
+                    }
+                    {
+                      this.state.profileSaved && this.state.currentRSProfile.length > 0
+                        ? (
+                          <a
+                            onClick={this.saveSettings}
+                            className="extraPadding download smallbutton">
+                            Refresh Profile Stats
+                            </a>
+                        )
+                        : null
+                    }
+                  </div>
+                </Collapsible>
+                <br />
+                <Collapsible
+                  trigger={expandButton("RS Songlist")}
+                  triggerWhenOpen={collapseButton("RS Songlist")}
+                  transitionTime={200}
+                  easing="ease-in"
+                >
+                  {this.generateSetlistOptions()}
+                  <Fragment>
+                    <br />
+                    <span style={{ float: 'left' }}>
+                      <a>
+                        Import DLC Packs as Setlists
+                      </a>
+                    </span>
+                    <span style={{
+                      float: 'right',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      width: 400 + 'px',
+                      textAlign: 'right',
+                      marginTop: 30 + 'px',
+                    }}>
+                      {
+                        this.state.processingSetlist
+                          ? <span> Processing... </span>
+                          : <a onClick={() => this.importDLCPack()}>Click to Import</a>
+                      }
+                    </span>
+                    <br />
+                    <div className="">
+                      <span style={{ color: '#ccc' }}>
+                        This creates setlists based on the songs you own, keyed
+                        under the dlc pack it was released in.
+                         The newly created setlists are under
+                         &quot;DLC Pack Setlists&quot; folder.
+                         DLC Pack&nbsp;
+                        <a
+                          style={{ color: 'blue' }}
+                          onClick={
+                            () => window.shell.openExternal("https://gist.githubusercontent.com/JustinAiken/0cba27a4161a2ed3ad54fb6a58da2e70")
+                          }
+                        >data</a>
+                        &nbsp;courtesy&nbsp;
+                        <a
+                          style={{ color: 'blue' }}
+                          onClick={
+                            () => window.shell.openExternal("https://github.com/JustinAiken")
+                          }
+                        >@JustinAiken
+                          </a>
+                      </span>
+                    </div>
+                  </Fragment>
+                  <Fragment>
+                    <br />
+                    <span style={{ float: 'left' }}>
+                      <a>
+                        Path to <strong>importrsm</strong>
+                      </a>
+                    </span>
+                    <span style={{
+                      float: 'right',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      width: 400 + 'px',
+                      textAlign: 'right',
+                      marginTop: 12 + 'px',
+                    }}>
+                      {
+                        <input
+                          type="text"
+                          style={{ width: 400 + 'px', textAlign: 'right', paddingRight: 5 + 'px' }}
+                          value={this.state.pathToImportRSM}
+                          onChange={e => this.setState({ pathToImportRSM: e.target.value })}
+                        />
+                      }
+                    </span>
+                    <br />
+                    <div className="">
+                      <span style={{ color: '#ccc' }}>
+                        part of the <strong>
+                          <a
+                            style={{ color: 'blue' }}
+                            onClick={
+                              () => window.shell.openExternal("https://pypi.org/project/rsrtools/")
+                            }
+                          >rsrtools
+                          </a></strong> package, by&nbsp;
+                            <a
+                          style={{ color: 'blue' }}
+                          onClick={
+                            () => window.shell.openExternal("https://github.com/BuongiornoTexas")
+                          }>
+                          @BuongiornoTexas</a>, <strong>importrsm</strong> allows
+loading setlists into Rocksmith 2014.
+<br />(path can contain spaces, it&quot;s automatically escaped when invoking)
+                      </span>
+                    </div>
+                  </Fragment>
+                </Collapsible>
+                <br />
+              </div>
+              <div style={{ marginTop: -6 + 'px', paddingLeft: 30 + 'px', paddingRight: 30 + 'px' }}>
+                <Collapsible
+                  trigger={expandButton('Config Info')}
+                  triggerWhenOpen={collapseButton('Config Info')}
+                  transitionTime={200}
+                  easing="ease-in"
+                  close
                 >
                   <span>
                     Config Path:
@@ -984,107 +1279,6 @@ export default class SettingsView extends React.Component {
                 </Collapsible>
                 <br />
                 <Collapsible
-                  trigger={expandButton("RS Songlist")}
-                  triggerWhenOpen={collapseButton("RS Songlist")}
-                  transitionTime={200}
-                  easing="ease-in"
-                >
-                  {this.generateSetlistOptions()}
-                  <Fragment>
-                    <br />
-                    <span style={{ float: 'left' }}>
-                      <a>
-                        Import DLC Packs as Setlists
-                      </a>
-                    </span>
-                    <span style={{
-                      float: 'right',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      width: 400 + 'px',
-                      textAlign: 'right',
-                      marginTop: 30 + 'px',
-                    }}>
-                      {
-                        this.state.processingSetlist
-                          ? <span> Processing... </span>
-                          : <a onClick={() => this.importDLCPack()}>Click to Import</a>
-                      }
-                    </span>
-                    <br />
-                    <div className="">
-                      <span style={{ color: '#ccc' }}>
-                        This creates setlists based on the songs you own, keyed
-                        under the dlc pack it was released in.
-                         The newly created setlists are under
-                         &quot;DLC Pack Setlists&quot; folder.
-                         DLC Pack&nbsp;
-                        <a
-                          style={{ color: 'blue' }}
-                          onClick={
-                            () => window.shell.openExternal("https://gist.githubusercontent.com/JustinAiken/0cba27a4161a2ed3ad54fb6a58da2e70")
-                          }
-                        >data</a>
-                        &nbsp;courtesy&nbsp;
-                        <a
-                          style={{ color: 'blue' }}
-                          onClick={
-                            () => window.shell.openExternal("https://github.com/JustinAiken")
-                          }
-                        >@JustinAiken
-                          </a>
-                      </span>
-                    </div>
-                  </Fragment>
-                  <Fragment>
-                    <br />
-                    <span style={{ float: 'left' }}>
-                      <a>
-                        Path to <strong>importrsm</strong>
-                      </a>
-                    </span>
-                    <span style={{
-                      float: 'right',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      width: 400 + 'px',
-                      textAlign: 'right',
-                      marginTop: 12 + 'px',
-                    }}>
-                      {
-                        <input
-                          type="text"
-                          style={{ width: 400 + 'px', textAlign: 'right', paddingRight: 5 + 'px' }}
-                          value={this.state.pathToImportRSM}
-                          onChange={e => this.setState({ pathToImportRSM: e.target.value })}
-                        />
-                      }
-                    </span>
-                    <br />
-                    <div className="">
-                      <span style={{ color: '#ccc' }}>
-                        part of the <strong>
-                          <a
-                            style={{ color: 'blue' }}
-                            onClick={
-                              () => window.shell.openExternal("https://pypi.org/project/rsrtools/")
-                            }
-                          >rsrtools
-                          </a></strong> package, by&nbsp;
-                            <a
-                          style={{ color: 'blue' }}
-                          onClick={
-                            () => window.shell.openExternal("https://github.com/BuongiornoTexas")
-                          }>
-                          @BuongiornoTexas</a>, <strong>importrsm</strong> allows
-loading setlists into Rocksmith 2014.
-<br />(path can contain spaces, it&quot;s automatically escaped when invoking)
-                      </span>
-                    </div>
-                  </Fragment>
-                </Collapsible>
-                <br />
-                <Collapsible
                   trigger={expandButton("Reset Collection")}
                   triggerWhenOpen={collapseButton("Reset Collection")}
                   transitionTime={200}
@@ -1158,6 +1352,6 @@ SettingsView.defaultProps = {
   currentTab: null,
   handleChange: () => { },
   updateHeader: () => { },
-  //resetHeader: () => { },
+  //resetHeader: () => {},
   refreshTabs: () => { },
 }
