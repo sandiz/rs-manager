@@ -12,6 +12,12 @@ export const readFile = filePath => new Promise((resolve, reject) => {
     else resolve(data);
   });
 });
+export const setStateAsync = (obj, state) => {
+  return new Promise((resolve) => {
+    obj.setState(state, resolve)
+  });
+}
+
 let JsonObj = null;
 function getDefaultSettings() {
   const obj = {};

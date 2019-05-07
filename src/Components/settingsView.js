@@ -19,6 +19,7 @@ import getProfileConfig, {
   updateCurrentZoomFactor,
   getImportRSMConfig,
   updateImportRSMPath,
+  setStateAsync,
 } from '../configService';
 import {
   resetDB, createRSSongList, addtoRSSongList,
@@ -115,14 +116,19 @@ export default class SettingsView extends React.Component {
       profileAboutToSave: false,
       profileSaved: false,
     };
-    this.readConfigs();
-    this.readSteamProfiles();
-    this.refreshSetlist();
+    this.loadState();
     this.sortfieldref = React.createRef();
     this.sortorderref = React.createRef();
   }
 
-  readSteamProfiles = async () => {
+  loadState = async () => {
+    await this.readConfigs();
+    await this.loadSteamProfiles();
+    await this.setProfiles();
+    await this.refreshSetlist();
+  }
+
+  loadSteamProfiles = async () => {
     const items = await readSteamLoginItems();
     const users = items.users;
     const uids = Object.keys(users);
@@ -137,11 +143,13 @@ export default class SettingsView extends React.Component {
         .reduce((dest, key) => reducer(user, dest, key), {});
       const account = louser.accountname
       options.push({
+        uid: uids[i],
+        user: louser,
         value: `${uids[i]}:${louser.personaname}:${louser.accountname}`,
         label: louser.personaname + " [" + account + "]" + (louser.mostrecent ? " (most recent)" : ""),
       })
     }
-    this.setState({ steamProfileOptions: options })
+    setStateAsync(this, { steamProfileOptions: options })
   }
 
   generateSetlistOptions = () => {
@@ -395,6 +403,34 @@ export default class SettingsView extends React.Component {
     });
   }
 
+  setProfiles = async () => {
+    let currentRSProfile = '';
+    let currentSteamProfile = '';
+    if (this.state.prfldb !== '') {
+      const parsed = window.path.parse(this.state.prfldb);
+      const split = parsed.name.split("_PRFLDB");
+      const allProfiles = await getAllProfiles(parsed.dir);
+      for (let i = 0; i < allProfiles.length; i += 1) {
+        const profile = allProfiles[i];
+        if (profile.UniqueID === split[0]) {
+          currentRSProfile = profile.PlayerName;
+        }
+      }
+    }
+    if (this.state.steamID !== '') {
+      for (let i = 0; i < this.state.steamProfileOptions.length; i += 1) {
+        const steamProfile = this.state.steamProfileOptions[i];
+        if (steamProfile.uid === this.state.steamID) {
+          currentSteamProfile = `${steamProfile.user.personaname} [${steamProfile.user.accountname}]`
+        }
+      }
+    }
+    setStateAsync(this, {
+      currentRSProfile,
+      currentSteamProfile,
+    })
+  }
+
   readConfigs = async () => {
     const d = await getProfileConfig();
     const e = await getSteamLoginSecureCookie();
@@ -411,7 +447,7 @@ export default class SettingsView extends React.Component {
     const p = await getIsSudoWhitelistedConfig();
     const q = await getCurrentZoomFactorConfig();
     const r = await getImportRSMConfig();
-    this.setState({
+    setStateAsync(this, {
       prfldb: d,
       steamLoginSecure: e,
       showScoreAttack: f,
@@ -595,21 +631,14 @@ export default class SettingsView extends React.Component {
           label: profile.PlayerName,
         })
       }
-      this.setState({ rsProfileOptions: options });
+      this.setState({ rsProfileOptions: options, steamID: split[0] });
     }
   }
 
   handleRSProfileChange = async (so) => {
     const prfldb = so.value;
-    this.setState({ currentRSProfile: so.label, profileAboutToSave: true });
-    console.log(prfldb);
-  }
-
-  saveProfile = async () => {
-  }
-
-  resetProfile = async () => {
-
+    this.setState({ currentRSProfile: so.label, profileAboutToSave: true, prfldb });
+    // console.log(prfldb);
   }
 
   goToPsarc = async () => { }
@@ -635,7 +664,7 @@ export default class SettingsView extends React.Component {
                   open
                   overflowWhenOpen="visible"
                 >
-                  <div className="d-flex flex-row justify-content-center" style={{ margin: '0 auto', width: 65 + '%' }}>
+                  <div className="d-flex flex-row justify-content-center" style={{ margin: '0 auto', width: 80 + '%' }}>
                     <div style={{ width: 30 + '%', margin: 20 + 'px' }}>
                       <div className="ta-center">
                         <img src={steam} alt="steam icon" style={{ width: 80 + 'px', height: 80 + 'px' }} />
@@ -651,7 +680,7 @@ export default class SettingsView extends React.Component {
                               />
                             )
                             : (
-                              <div className="ta-center profile-text">
+                              <div className="ta-center profile-text overflowellipsis">
                                 <span className="pointer" style={{ borderBottom: "1px dotted" }} onClick={this.resetProfileState}>
                                   {this.state.currentSteamProfile}
                                 </span>
@@ -679,7 +708,7 @@ export default class SettingsView extends React.Component {
                               />
                             )
                             : (
-                              <div className="ta-center profile-text">
+                              <div className="ta-center profile-text overflowellipsis">
                                 {this.state.currentRSProfile}
                               </div>
                             )
@@ -711,7 +740,7 @@ export default class SettingsView extends React.Component {
                         ? (
                           <div className="ta-center profile-save-div">
                             <a
-                              onClick={this.saveProfile}
+                              onClick={this.saveSettings}
                               className="extraPadding download">
                               Save
                             </a>
@@ -728,7 +757,7 @@ export default class SettingsView extends React.Component {
                       this.state.profileSaved && this.state.currentRSProfile.length > 0
                         ? (
                           <a
-                            onClick={this.saveSettings}
+                            onClick={this.loadState}
                             className="extraPadding download smallbutton">
                             Refresh Profile Stats
                             </a>

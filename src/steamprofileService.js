@@ -89,6 +89,7 @@ export async function getProfileName(prfldb) {
   }
   return null;
 }
+
 export async function getOwnedPackages(cookie, cookieSess) {
   const c = await window.request(
     "https://store.steampowered.com/dynamicstore/userdata/",
