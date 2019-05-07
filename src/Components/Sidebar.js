@@ -5,7 +5,8 @@ import { createRSSongList } from '../sqliteService';
 import { getShowPSStatsConfig } from '../configService';
 import { getState, saveState } from '../stateService';
 import { DispatcherService, DispatchEvents } from '../lib/libDispatcher'
-
+import steam from '../assets/tree-icons/catalog.svg'
+import * as rsicon from '../assets/icons/icon-1024x1024-gray.png'
 
 import("../css/Sidebar.css")
 
@@ -440,12 +441,43 @@ export default class Sidebar extends React.Component {
         </div>
 
         <ul className="list-unstyled components" style={{ padding: 0 + 'px' }}>
-          <div style={{ borderBottom: '1px solid #47748b' }}>
-            <p style={{ margin: 0 + 'em' }}>
-              Profile: {this.props.currentProfile}<br />
-              Steam: {this.props.steamConnected} <br />
-              Name : {this.props.profileName}
-            </p>
+          <div
+            style={{
+              borderBottom: '1px solid #47748b',
+              display: 'flex',
+              flexDirection: 'column',
+              paddingTop: 2 + 'px',
+              paddingBottom: 7 + 'px',
+            }}>
+            <div style={{ display: 'flex' }}>
+              <div>
+                <img
+                  src={steam}
+                  alt="steam icon"
+                  style={{
+                    width: 40 + 'px',
+                    height: 40 + 'px',
+                    marginTop: 6 + 'px',
+                    marginLeft: 6 + 'px',
+                  }} />
+              </div>
+              <div className="sidebar-steam"> {this.props.steamConnected} </div>
+            </div>
+            <div style={{ display: 'flex' }}>
+              <div>
+                <img
+                  src={rsicon}
+                  alt="rs icon"
+                  style={{
+                    width: 40 + 'px',
+                    height: 40 + 'px',
+                    filter: "invert(100%)",
+                    marginLeft: 6 + 'px',
+                    marginTop: 6 + 'px',
+                  }} />
+              </div>
+              <div className="sidebar-steam">  {this.props.profileName} </div>
+            </div>
           </div>
           <div className="sidebar-custom">
             <TreeView
@@ -475,7 +507,6 @@ export default class Sidebar extends React.Component {
 Sidebar.propTypes = {
   handleChange: PropTypes.func.isRequired,
   showSidebar: PropTypes.bool.isRequired,
-  currentProfile: PropTypes.string,
   steamConnected: PropTypes.string,
   profileName: PropTypes.string,
   TabsV2Data: PropTypes.array,
@@ -484,9 +515,8 @@ Sidebar.propTypes = {
   Changelog: PropTypes.func,
 }
 Sidebar.defaultProps = {
-  currentProfile: '',
-  steamConnected: false,
-  profileName: '',
+  steamConnected: '-',
+  profileName: '-',
   TabsV2Data: [],
   //TabsData: [],
   RefreshTabs: () => { },

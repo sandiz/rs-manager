@@ -124,10 +124,10 @@ export default class SettingsView extends React.Component {
   }
 
   loadState = async () => {
-     this.readConfigs();
-     this.loadSteamProfiles();
-     this.setProfiles();
-     this.refreshSetlist();
+    this.readConfigs();
+    this.loadSteamProfiles();
+    this.setProfiles();
+    this.refreshSetlist();
   }
 
   loadSteamProfiles = async () => {
@@ -658,7 +658,7 @@ export default class SettingsView extends React.Component {
                     </div>
                     <div style={{ width: 30 + '%', margin: 12 + 'px' }}>
                       <div className="ta-center">
-                        <img src={rsicon} alt="steam icon" style={{ width: 90 + 'px', height: 90 + 'px' }} />
+                        <img src={rsicon} alt="rs icon" style={{ width: 90 + 'px', height: 90 + 'px' }} />
                       </div>
                       <div style={{ marginTop: 10 + 'px' }}>
                         {
