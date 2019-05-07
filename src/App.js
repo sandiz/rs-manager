@@ -5,8 +5,8 @@ import SonglistView from './Components/songlistView'
 import FolderEditView from './Components/folderEditView'
 import DashboardView from './Components/dashboardView'
 import getProfileConfig, {
-  getSteamIDConfig, getShowSetlistOverlayAlwaysConfig,
-  getCurrentZoomFactorConfig, getImportRSMConfig, updateImportRSMPath,
+  getShowSetlistOverlayAlwaysConfig,
+  getCurrentZoomFactorConfig, getImportRSMConfig, updateImportRSMPath, getSteamNameFromSteamID,
 } from './configService';
 import SongAvailableView from './Components/songavailableView';
 import SetlistView from './Components/setlistView';
@@ -26,8 +26,6 @@ import { detectImportRSMPath } from './rsrtoolservice';
 
 const csvparse = require('csv-parse/lib/es5/sync');
 
-const { path } = window;
-
 class App extends Component {
   constructor(props) {
     super(props);
@@ -36,7 +34,6 @@ class App extends Component {
       currentChildTab: null,
       showSidebar: true,
       appTitle: 'Running Migrations, please wait...',
-      currentProfile: '',
       currentCookie: '',
       rsProfileName: '',
       TabsV2Data: [
@@ -166,9 +163,9 @@ class App extends Component {
 
   updateProfile = async () => {
     const prfldb = await getProfileConfig();
-    const steamcookie = await getSteamIDConfig();
+    const steamcookie = await getSteamNameFromSteamID();
     const rsProfileName = await getProfileName(prfldb);
-    this.setState({ currentProfile: prfldb, currentCookie: steamcookie, rsProfileName });
+    this.setState({ currentCookie: steamcookie, rsProfileName });
     //this.refreshTabs();
   }
 
@@ -467,10 +464,7 @@ class App extends Component {
   }
 
   render = () => {
-    const len = this.state.currentProfile.length;
-    let profile = len > 0
-      ? path.basename(this.state.currentProfile).slice(0, 6) + "..." + this.state.currentProfile.slice(len - 6, len) : "-";
-    profile = profile.toLowerCase();
+    const profile = this.state.rsProfileName.length > 0 ? this.state.rsProfileName : "-";
     const cookie = this.state.currentCookie.length > 0 ? this.state.currentCookie : "-";
     const showhelpstyle = "modal-window-help " + (this.state.showhelp ? "" : "hidden")
     const helpstyle = (this.state.currentTab !== null && (this.state.currentTab.id === "tab-settings" || this.state.currentTab.id === "tab-help")) ? "hidden" : ""
@@ -492,8 +486,7 @@ class App extends Component {
             ref={this.sidebarRef}
             handleChange={this.handleChange}
             showSidebar={this.state.showSidebar}
-            currentProfile={profile}
-            profileName={this.state.rsProfileName}
+            profileName={profile}
             steamConnected={cookie}
             ytConnected={false}
             TabsV2Data={this.state.TabsV2Data}

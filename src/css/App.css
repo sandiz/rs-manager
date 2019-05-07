@@ -1398,3 +1398,55 @@ hr {
     color: black;
     padding-top: 3px;
 }
+
+.profile-steam {
+    width: 50px;
+    height: 50px;
+    background-size: 40px !important;
+    background-position-y: 6px !important;
+}
+
+.profile-rs {
+    width: 50px;
+    height: 50px;
+    background-size: 50px !important; 
+    background-image: url("../assets/icons/icon-1024x1024-old.png") !important;
+    background-position-x: 4px;
+    background-position-y: -3px;
+}
+
+.profile-arrow {
+    align-items: center;
+    /* justify-content: center; */
+    display: flex;
+    transform: translateY(-13%);
+}
+.profile-text{
+    font-size: 25px;
+    font-weight: bold;
+}
+.smallerbutton {
+    width: 6%;
+}
+
+
+.profile-save-div {
+    border-top: 1px solid lightgray;
+    width: 88%;
+    margin: 0 auto;
+    padding-top: 10px;
+    margin-top: 20px;
+}
+
+.sidebar-steam {
+    align-items: center;
+    justify-content: left;
+    display: block;
+    margin-left: 10px;
+    margin-top: 15px;
+    font-size: 17px;
+    width: 75%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
