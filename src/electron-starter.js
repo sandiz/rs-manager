@@ -32,6 +32,7 @@ async function createWindow() {
 
     // Create the window using the state information
     mainWindow = new BrowserWindow({
+        id: 1,
         x: mainWindowState.x,
         y: mainWindowState.y,
         width: mainWindowState.width,

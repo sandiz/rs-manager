@@ -117,6 +117,7 @@ export default class SettingsView extends React.Component {
       rsProfileOptions: [],
       profileAboutToSave: false,
       profileSaved: false,
+      cookieSaved: false,
     };
     this.loadState();
     this.sortfieldref = React.createRef();
@@ -468,7 +469,7 @@ export default class SettingsView extends React.Component {
     document.getElementsByTagName("body")[0].scrollTop = 0;
     document.getElementsByTagName("html")[0].scrollTop = 0;
     this.props.refreshTabs();
-    this.setState({ profileSaved: false, profileAboutToSave: false })
+    this.setState({ profileSaved: false, profileAboutToSave: false, cookieSaved: false })
   }
 
   enterPrfldb = async () => {
@@ -535,6 +536,8 @@ export default class SettingsView extends React.Component {
       await updateSessionIDConfig(token.cookieSess)
       await updateSteamIDConfig(token.steam_id);
       await this.readConfigs();
+      await this.setProfiles();
+      this.setState({ cookieSaved: true, profileSaved: false, profileAboutToSave: false });
     }
     catch (e) {
       console.log("error with steam auth", e);
@@ -575,6 +578,7 @@ export default class SettingsView extends React.Component {
       currentRSProfile: '',
       currentSteamProfile: '',
       profileSaved: false,
+      cookieSaved: false,
     })
   }
 
@@ -609,23 +613,20 @@ export default class SettingsView extends React.Component {
 
   saveProfileSettings = async () => {
     await this.saveSettings();
-    this.setState({ profileSaved: true, profileAboutToSave: false });
+    this.setState({ profileSaved: true, profileAboutToSave: false, cookieSaved: false });
   }
 
   resetProfileSettings = async () => {
     await this.loadState();
-    this.setState({ profileSaved: false, profileAboutToSave: false });
+    this.setState({ profileSaved: false, profileAboutToSave: false, cookieSaved: false });
   }
-
-  goToPsarc = async () => { }
-
-  refreshStats = async () => { }
 
   render = () => {
     if (this.props.currentTab === null) {
       return null;
     }
     else if (this.props.currentTab.id === this.tabname) {
+      const showSuccess = this.state.profileSaved || this.state.cookieSaved;
       return (
         <div className="container-fluid">
           <div className="row justify-content-lg-center">
@@ -704,11 +705,23 @@ export default class SettingsView extends React.Component {
                       alignItems: 'center',
                       flexDirection: 'column',
                     }}>
-                      <div className="ta-center">
-                        <img src="https://steamcommunity-a.akamaihd.net/public/images/signinthroughsteam/sits_01.png" alt="steam login" />
+                      <div
+                        className="ta-center"
+                        style={{
+                          margin: 'auto',
+                        }}>
+                        <a onClick={this.steamLogin}>
+                          <img src="https://steamcommunity-a.akamaihd.net/public/images/signinthroughsteam/sits_01.png" alt="steam login" />
+                        </a>
                       </div>
-                      <div style={{ textAlign: 'center', marginTop: 3 + 'px' }}>
-                        (optional)
+                      <div style={{ textAlign: 'center', fontSize: 21 + 'px' }}>
+                        <div className="ta-center profile-text overflowellipsis text-secondary pointer">
+                          (optional)
+                          <span style={{ borderBottom: "1px dotted" }} onClick={this.steamLogin}>
+                            <br />
+                            Tracks steam dlc purchases
+                            </span>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -732,19 +745,43 @@ export default class SettingsView extends React.Component {
                         : null
                     }
                     {
-                      this.state.profileSaved && this.state.currentRSProfile.length > 0
+                      showSuccess && this.state.currentRSProfile.length > 0
                         ? (
                           <div className="ta-center profile-save-div text-success">
                             <span style={{ fontSize: 20 + 'px' }}>
                               <i className="fas fa-check" />&nbsp;
-                              Profile setup complete! You can import your dlc&apos;s in&nbsp;
-                              <span
-                                onClick={() => DispatcherService.dispatch(DispatchEvents.SIDEBAR_GOTO, "tab-psarc")}
-                                style={{ borderBottom: "1px dotted", cursor: 'pointer' }}>PSARC explorer</span>
-                              &nbsp;and view/refresh your stats in&nbsp;
-                              <span
-                                onClick={() => DispatcherService.dispatch(DispatchEvents.SIDEBAR_GOTO, "tab-dashboard")}
-                                style={{ borderBottom: "1px dotted", cursor: 'pointer' }}>Dashboard.</span>
+                              {
+                                this.state.profileSaved
+                                  ? (
+                                    <span>
+                                      Profile setup complete!
+                                      You can now import your dlc&apos;s in&nbsp;
+                                      <span
+                                        onClick={() => DispatcherService.dispatch(DispatchEvents.SIDEBAR_GOTO, "tab-psarc")}
+                                        style={{ borderBottom: "1px dotted", cursor: 'pointer' }}>PSARC explorer
+                                      </span>
+                                      &nbsp;and view/refresh your stats in&nbsp;
+                                      <span
+                                        onClick={() => DispatcherService.dispatch(DispatchEvents.SIDEBAR_GOTO, "tab-dashboard")}
+                                        style={{ borderBottom: "1px dotted", cursor: 'pointer' }}>Dashboard.
+                                      </span>
+                                    </span>
+                                  ) : null
+                              }
+                              {
+                                this.state.cookieSaved
+                                  ? (
+                                    <span>
+                                      Steam login complete!
+                                      You can now track your steam dlc purchases in&nbsp;
+                                      <span
+                                        onClick={() => DispatcherService.dispatch(DispatchEvents.SIDEBAR_GOTO, "songs-available")}
+                                        style={{ borderBottom: "1px dotted", cursor: 'pointer' }}>DLC Catalog
+                                      </span>
+
+                                    </span>
+                                  ) : null
+                              }
                             </span>
                           </div>
                         )
@@ -754,8 +791,8 @@ export default class SettingsView extends React.Component {
                 </Collapsible>
                 <br />
                 <Collapsible
-                  trigger={expandButton("RS Songlist")}
-                  triggerWhenOpen={collapseButton("RS Songlist")}
+                  trigger={expandButton("Rocksmith Songlists")}
+                  triggerWhenOpen={collapseButton("Rocksmith Songlists")}
                   transitionTime={200}
                   easing="ease-in"
                 >
@@ -852,118 +889,6 @@ loading setlists into Rocksmith 2014.
                       </span>
                     </div>
                   </Fragment>
-                </Collapsible>
-                <br />
-              </div>
-              <div style={{ marginTop: -6 + 'px', paddingLeft: 30 + 'px', paddingRight: 30 + 'px' }}>
-                <Collapsible
-                  trigger={expandButton('Config Info')}
-                  triggerWhenOpen={collapseButton('Config Info')}
-                  transitionTime={200}
-                  easing="ease-in"
-                  close
-                >
-                  <span>
-                    Config Path:
-                  </span>
-                  <span style={{
-                    float: 'right',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    width: 90 + '%',
-                    textAlign: 'right',
-                  }}>
-                    {window.configPath}
-                  </span>
-                  <br /> <br />
-                  <span>
-                    SQLite Path:
-                  </span>
-                  <span style={{
-                    float: 'right',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    width: 90 + '%',
-                    textAlign: 'right',
-                  }}>
-                    {window.sqlitePath}
-                  </span>
-                  <br /> <br />
-                  <span style={{ float: 'left' }}>
-                    <a onClick={this.enterPrfldb}>
-                      Rocksmith Profile (_prfldb):
-                  </a>
-                  </span>
-                  <span style={{
-                    float: 'right',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    width: 400 + 'px',
-                    textAlign: 'right',
-                    paddingRight: 1 + 'px',
-                  }}>
-                    {
-                      this.state.prfldb === ''
-                        ? <a onClick={this.enterPrfldb}>Click to Change </a>
-                        : (
-                          <a onClick={this.enterPrfldb}>
-                            <i>{window.path.basename(this.state.prfldb).toLowerCase()}</i>
-                          </a>
-                        )
-                    }
-                  </span>
-                  <br />
-                  <div className="">
-                    <span style={{ color: '#ccc' }}>
-                      Choose the rocksmith profile to read stats from.
-                    The profile is only read and never written to.<br />
-                      RS profile ends with _prfldb and is typically found
-                      in your __SteamFolder__/Steam/userdata/__random_number__/221680/remote/
-                  </span>
-                  </div>
-                  <br />
-                  <span style={{ float: 'left' }}>
-                    <a href="#">
-                      Steam OAuth
-                  </a>
-                  </span>
-                  <span style={{
-                    float: 'right',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    width: 500 + 'px',
-                    textAlign: 'right',
-                    paddingRight: 1 + 'px',
-                  }}>
-                    {
-                      (
-                        <Fragment>
-                          <i>
-                            <a href="#">
-                              {(this.state.steamID).toLowerCase()}
-                            </a><br />
-                          </i>
-                          <a onClick={this.steamLogin}>
-                            <img src="https://steamcommunity-a.akamaihd.net/public/images/signinthroughsteam/sits_01.png" alt="steam login" />
-                          </a>
-                        </Fragment>
-                      )
-                    }
-                  </span>
-                  <br />
-                  <div className="">
-                    <span style={{ color: '#ccc' }}>
-                      The app queries your
-                      <a style={{ color: 'blue' }} onClick={() => window.shell.openExternal("http://store.steampowered.com/dynamicstore/userdata/")}>
-                        &nbsp;userdata&nbsp;
-                      </a>
-                      to fetch your dlc&#39;s and
-                      <a style={{ color: 'blue' }} onClick={() => window.shell.openExternal("https://store.steampowered.com/account/AjaxLoadMoreHistory/")}>
-                        &nbsp;purchase history&nbsp;
-                      </a>
-                      to fetch owned/acquired date.
-                  </span>
-                  </div>
                 </Collapsible>
               </div>
               <div style={{ marginTop: -6 + 'px', paddingLeft: 30 + 'px', paddingRight: 30 + 'px' }}>
