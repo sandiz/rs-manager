@@ -3,9 +3,12 @@
 
 //import { writeFile } from './configService'
 //const jspack = require("./jspack");
+import { enumerateValues, HKEY, RegistryValueType } from 'registry-js'
+
 const aesjs = require('aes-js');
 const zlib = require('zlib')
 const vdf = require('node-vdf')
+
 
 const readFile = filePath => new Promise((resolve, reject) => {
   window.electronFS.readFile(filePath, (err, data) => {
@@ -230,6 +233,22 @@ export async function getTrackTags(artist, title, trackonly = false) {
   return null;
 }
 
+export function getWinSteamPath() {
+  const values = enumerateValues(
+    HKEY.HKEY_LOCAL_MACHINE,
+    'Software\\Valve\\Steam\\SteamPath',
+  );
+  for (let i = 0; i < values.length; i += 1) {
+    const value = values[i];
+    if (value.type === RegistryValueType.REG_SZ) {
+      const steamPath = value.data
+      console.log(`Found: ${value.name} is ${steamPath}`)
+      return steamPath;
+    }
+  }
+  return '';
+}
+
 export async function readSteamLoginItems() {
   if (window.process.platform === "darwin") {
     const vdffile = window.path.join(window.os.homedir(), "/Library/Application Support/Steam/config", "loginusers.vdf");
@@ -239,7 +258,12 @@ export async function readSteamLoginItems() {
     }
   }
   else {
-    console.log("win impl");
+    const steamPath = getWinSteamPath();
+    const vdffile = window.path.join(steamPath, "config", "loginusers.vdf");
+    if (window.electronFS.existsSync(vdffile)) {
+      const data = await readFile(vdffile);
+      return vdf.parse(data.toString());
+    }
   }
   return [];
 }
@@ -254,8 +278,11 @@ export function getSteamPathForRocksmith(uid32) {
     );
   }
   else {
-    console.log("win impl");
-    return "";
+    return window.path.join(
+      getWinSteamPath(),
+      `userdata/${uid32}`, // user dir
+      "221680/remote", // rs2014 dir
+    );
   }
 }
 
