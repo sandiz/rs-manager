@@ -258,3 +258,27 @@ export function getSteamPathForRocksmith(uid32) {
     return "";
   }
 }
+
+export async function getSteamProfiles() {
+  const items = await readSteamLoginItems();
+  const users = items.users;
+  const uids = Object.keys(users);
+  const options = []
+  const reducer = (source, destination, key) => {
+    destination[key.toLowerCase()] = source[key];
+    return destination;
+  };
+  for (let i = 0; i < uids.length; i += 1) {
+    const user = users[uids[i]];
+    const louser = Object.keys(user)
+      .reduce((dest, key) => reducer(user, dest, key), {});
+    const account = louser.accountname
+    options.push({
+      uid: uids[i],
+      user: louser,
+      value: `${uids[i]}:${louser.personaname}:${louser.accountname}`,
+      label: louser.personaname + " [" + account + "]" + (louser.mostrecent ? " (most recent)" : ""),
+    })
+  }
+  return options;
+}

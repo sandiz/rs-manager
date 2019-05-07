@@ -20,12 +20,14 @@ import getProfileConfig, {
   getImportRSMConfig,
   updateImportRSMPath,
   setStateAsync,
+  getRSProfileFromPrfldb,
+  getSteamNameFromSteamID,
 } from '../configService';
 import {
   resetDB, createRSSongList, addtoRSSongList,
   isTablePresent, deleteRSSongList, getSongByID, resetRSSongList,
 } from '../sqliteService';
-import readProfile, { readSteamLoginItems, getAllProfiles, getSteamPathForRocksmith } from '../steamprofileService';
+import readProfile, { getAllProfiles, getSteamPathForRocksmith, getSteamProfiles } from '../steamprofileService';
 import { sortOrderCustomStyles, createOption } from './setlistOptions';
 import { DispatcherService, DispatchEvents } from '../lib/libDispatcher'
 
@@ -122,33 +124,14 @@ export default class SettingsView extends React.Component {
   }
 
   loadState = async () => {
-    await this.readConfigs();
-    await this.loadSteamProfiles();
-    await this.setProfiles();
-    await this.refreshSetlist();
+     this.readConfigs();
+     this.loadSteamProfiles();
+     this.setProfiles();
+     this.refreshSetlist();
   }
 
   loadSteamProfiles = async () => {
-    const items = await readSteamLoginItems();
-    const users = items.users;
-    const uids = Object.keys(users);
-    const options = []
-    const reducer = (source, destination, key) => {
-      destination[key.toLowerCase()] = source[key];
-      return destination;
-    };
-    for (let i = 0; i < uids.length; i += 1) {
-      const user = users[uids[i]];
-      const louser = Object.keys(user)
-        .reduce((dest, key) => reducer(user, dest, key), {});
-      const account = louser.accountname
-      options.push({
-        uid: uids[i],
-        user: louser,
-        value: `${uids[i]}:${louser.personaname}:${louser.accountname}`,
-        label: louser.personaname + " [" + account + "]" + (louser.mostrecent ? " (most recent)" : ""),
-      })
-    }
+    const options = await getSteamProfiles();
     setStateAsync(this, { steamProfileOptions: options })
   }
 
@@ -404,27 +387,8 @@ export default class SettingsView extends React.Component {
   }
 
   setProfiles = async () => {
-    let currentRSProfile = '';
-    let currentSteamProfile = '';
-    if (this.state.prfldb !== '') {
-      const parsed = window.path.parse(this.state.prfldb);
-      const split = parsed.name.split("_PRFLDB");
-      const allProfiles = await getAllProfiles(parsed.dir);
-      for (let i = 0; i < allProfiles.length; i += 1) {
-        const profile = allProfiles[i];
-        if (profile.UniqueID === split[0]) {
-          currentRSProfile = profile.PlayerName;
-        }
-      }
-    }
-    if (this.state.steamID !== '') {
-      for (let i = 0; i < this.state.steamProfileOptions.length; i += 1) {
-        const steamProfile = this.state.steamProfileOptions[i];
-        if (steamProfile.uid === this.state.steamID) {
-          currentSteamProfile = `${steamProfile.user.personaname} [${steamProfile.user.accountname}]`
-        }
-      }
-    }
+    const currentRSProfile = await getRSProfileFromPrfldb();
+    const currentSteamProfile = await getSteamNameFromSteamID();
     setStateAsync(this, {
       currentRSProfile,
       currentSteamProfile,
