@@ -1432,9 +1432,10 @@ hr {
 
 .profile-save-div {
     border-top: 1px solid lightgray;
-    width: 46%;
+    width: 88%;
     margin: 0 auto;
     padding-top: 10px;
+    margin-top: 20px;
 }
 
 .sidebar-steam {

@@ -467,6 +467,7 @@ export default class SettingsView extends React.Component {
     document.getElementsByTagName("body")[0].scrollTop = 0;
     document.getElementsByTagName("html")[0].scrollTop = 0;
     this.props.refreshTabs();
+    this.setState({ profileSaved: false, profileAboutToSave: false })
   }
 
   enterPrfldb = async () => {
@@ -568,7 +569,7 @@ export default class SettingsView extends React.Component {
     this.setState({ sortoptions: value })
   }
 
-  resetProfileState = () => {
+  resetProfileState = (rsOnly = false) => {
     this.setState({
       currentRSProfile: '',
       currentSteamProfile: '',
@@ -603,6 +604,16 @@ export default class SettingsView extends React.Component {
     const prfldb = so.value;
     this.setState({ currentRSProfile: so.label, profileAboutToSave: true, prfldb });
     // console.log(prfldb);
+  }
+
+  saveProfileSettings = async () => {
+    await this.saveSettings();
+    this.setState({ profileSaved: true, profileAboutToSave: false });
+  }
+
+  resetProfileSettings = async () => {
+    await this.loadState();
+    this.setState({ profileSaved: false, profileAboutToSave: false });
   }
 
   goToPsarc = async () => { }
@@ -673,7 +684,9 @@ export default class SettingsView extends React.Component {
                             )
                             : (
                               <div className="ta-center profile-text overflowellipsis">
-                                {this.state.currentRSProfile}
+                                <span className="pointer" style={{ borderBottom: "1px dotted" }} onClick={() => this.resetProfileState(true)}>
+                                  {this.state.currentRSProfile}
+                                </span>
                               </div>
                             )
                         }
@@ -704,12 +717,12 @@ export default class SettingsView extends React.Component {
                         ? (
                           <div className="ta-center profile-save-div">
                             <a
-                              onClick={this.saveSettings}
+                              onClick={this.saveProfileSettings}
                               className="extraPadding download">
                               Save
                             </a>
                             <a
-                              onClick={this.resetProfile}
+                              onClick={this.resetProfileSettings}
                               className="extraPadding download">
                               Cancel
                             </a>
@@ -720,11 +733,19 @@ export default class SettingsView extends React.Component {
                     {
                       this.state.profileSaved && this.state.currentRSProfile.length > 0
                         ? (
-                          <a
-                            onClick={this.loadState}
-                            className="extraPadding download smallbutton">
-                            Refresh Profile Stats
-                            </a>
+                          <div className="ta-center profile-save-div text-success">
+                            <span style={{ fontSize: 20 + 'px' }}>
+                              <i className="fas fa-check" />&nbsp;
+                              Profile setup complete! You can import your dlc&apos;s in&nbsp;
+                              <span
+                                onClick={() => DispatcherService.dispatch(DispatchEvents.SIDEBAR_GOTO, "tab-psarc")}
+                                style={{ borderBottom: "1px dotted", cursor: 'pointer' }}>PSARC explorer</span>
+                              &nbsp;and view/refresh your stats in&nbsp;
+                              <span
+                                onClick={() => DispatcherService.dispatch(DispatchEvents.SIDEBAR_GOTO, "tab-dashboard")}
+                                style={{ borderBottom: "1px dotted", cursor: 'pointer' }}>Dashboard.</span>
+                            </span>
+                          </div>
                         )
                         : null
                     }
