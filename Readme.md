@@ -70,10 +70,17 @@ Rocksmith's UI leaves a lot to be desired especially when you have a lot of song
 
 
 ## TODO
-1. [Mac] Find Pointer to Game State + PersistentID (instead of scanning)
-2. [Win] Find Pointer to PersistentID (instead of scanning)
-3. [Win] https://github.com/hiitiger/gelectron exploration (steam type overlay)
+NEXT:
+   1. profile selection
+   2. sidebar selection
+   3. test cookie storage
+   4. zoom out images
 
+FUTURE:
+   1. [Mac] Find Pointer to Game State + PersistentID (instead of scanning)
+   2. [Win] Find Pointer to PersistentID (instead of scanning)
+   3. [Win] https://github.com/hiitiger/gelectron exploration (steam type overlay)
+   4. file system watcher
 
 ## Development
 - Instructions for dev

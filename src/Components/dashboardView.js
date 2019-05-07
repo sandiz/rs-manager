@@ -636,7 +636,7 @@ export default class DashboardView extends React.Component {
       );
       //console.log("second search result: " + url);
     }
-    if (!url.toString().includes("http") || url.toString().includes('rate limit exceeded')) {
+    if (!url.toString().includes("http") || url.toString().toLowerCase().includes('rate limit exceeded')) {
       console.log(url);
       url = "https://raw.githubusercontent.com/sandiz/rs-manager/master/screenshots/nothumb.jpg";
     }
@@ -864,7 +864,7 @@ export default class DashboardView extends React.Component {
               <a onClick={() => this.fetchRandomStats(false, true)}>Random Purchasable DLC</a>
               <hr />
             </div>
-            <div style={{ marginTop: -6 + 'px' }}>
+            <div style={{ marginTop: -6 + 'px', display: 'flex' }}>
               <div>
                 <img
                   alt="albumcover"
@@ -872,7 +872,14 @@ export default class DashboardView extends React.Component {
                   className="albumcover"
                 />
               </div>
-              <div style={{ fontSize: 25 + 'px', textAlign: 'left' }} title={this.state.randompack}>
+              <div
+                style={{
+                  fontSize: 25 + 'px',
+                  textAlign: 'left',
+                  overflow: 'hidden',
+                  height: 80 + 'px',
+                }}
+                title={this.state.randompack}>
                 <a
                   onClick={() => { this.setState({ showsongpackpreview: true }) }}>
                   {this.state.randompack.length > 35 ? this.state.randompack.slice(0, 35) + "..." : this.state.randompack}
@@ -889,7 +896,7 @@ export default class DashboardView extends React.Component {
               </a>
               <hr />
             </div>
-            <div style={{ marginTop: -6 + 'px' }}>
+            <div style={{ marginTop: -6 + 'px', display: 'flex' }}>
               <div>
                 <img
                   alt="albumcover"
@@ -897,7 +904,14 @@ export default class DashboardView extends React.Component {
                   className="albumcover"
                 />
               </div>
-              <div style={{ fontSize: 25 + 'px', textAlign: 'left' }} title={this.state.weeklysongspotlight.title}>
+              <div
+                style={{
+                  fontSize: 25 + 'px',
+                  textAlign: 'left',
+                  overflow: 'hidden',
+                  height: 80 + 'px',
+                }}
+                stitle={this.state.weeklysongspotlight.title}>
                 <a
                   onClick={() => {
                     this.setState({ showweekly: true, showsongpackpreview: true })

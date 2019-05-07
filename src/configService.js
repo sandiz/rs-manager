@@ -1,4 +1,5 @@
 import { defaultSortOption } from "./Components/settingsView";
+import { getAllProfiles, getSteamProfiles } from "./steamprofileService";
 
 export const writeFile = (filePath, data) => new Promise((resolve, reject) => {
   window.electronFS.writeFile(filePath, data, (err) => {
@@ -12,6 +13,12 @@ export const readFile = filePath => new Promise((resolve, reject) => {
     else resolve(data);
   });
 });
+export const setStateAsync = (obj, state) => {
+  return new Promise((resolve) => {
+    obj.setState(state, resolve)
+  });
+}
+
 let JsonObj = null;
 function getDefaultSettings() {
   const obj = {};
@@ -199,4 +206,31 @@ export async function getCurrentZoomFactorConfig() {
 export async function getImportRSMConfig() {
   const d = await getConfig("pathToImportRSM");
   return d;
+}
+export async function getRSProfileFromPrfldb() {
+  const prfldb = await getProfileConfig()
+  if (prfldb === '') return '';
+  const parsed = window.path.parse(prfldb);
+  const split = parsed.name.split("_PRFLDB");
+  const allProfiles = await getAllProfiles(parsed.dir);
+  for (let i = 0; i < allProfiles.length; i += 1) {
+    const profile = allProfiles[i];
+    if (profile.UniqueID === split[0]) {
+      return profile.PlayerName;
+    }
+  }
+  return '';
+}
+export async function getSteamNameFromSteamID() {
+  const steamID = await getSteamIDConfig();
+  if (steamID === '') return '';
+
+  const allusers = await getSteamProfiles();
+  for (let i = 0; i < allusers.length; i += 1) {
+    const user = allusers[i];
+    if (user.uid === steamID) {
+      return `${user.user.personaname} [${user.user.accountname}]`
+    }
+  }
+  return '';
 }
