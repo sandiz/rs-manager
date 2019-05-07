@@ -3,11 +3,16 @@
 
 //import { writeFile } from './configService'
 //const jspack = require("./jspack");
-import { enumerateValues, HKEY, RegistryValueType } from 'registry-js'
+//import { enumerateValues, HKEY, RegistryValueType } from 'registry-js'
 
 const aesjs = require('aes-js');
 const zlib = require('zlib')
 const vdf = require('node-vdf')
+
+const registry = window.require('registry-js');
+const enumerateValues = registry.enumerateValues;
+const HKEY = registry.HKEY;
+const RegistryValueType = registry.RegistryValueType;
 
 
 const readFile = filePath => new Promise((resolve, reject) => {
@@ -235,14 +240,13 @@ export async function getTrackTags(artist, title, trackonly = false) {
 
 export function getWinSteamPath() {
   const values = enumerateValues(
-    HKEY.HKEY_LOCAL_MACHINE,
-    'Software\\Valve\\Steam\\SteamPath',
+    HKEY.HKEY_CURRENT_USER,
+    'SOFTWARE\\Valve\\Steam\\',
   );
   for (let i = 0; i < values.length; i += 1) {
     const value = values[i];
-    if (value.type === RegistryValueType.REG_SZ) {
+    if (value.type === RegistryValueType.REG_SZ && value.name === "SteamPath") {
       const steamPath = value.data
-      console.log(`Found: ${value.name} is ${steamPath}`)
       return steamPath;
     }
   }
@@ -287,25 +291,28 @@ export function getSteamPathForRocksmith(uid32) {
 }
 
 export async function getSteamProfiles() {
-  const items = await readSteamLoginItems();
-  const users = items.users;
-  const uids = Object.keys(users);
   const options = []
-  const reducer = (source, destination, key) => {
-    destination[key.toLowerCase()] = source[key];
-    return destination;
-  };
-  for (let i = 0; i < uids.length; i += 1) {
-    const user = users[uids[i]];
-    const louser = Object.keys(user)
-      .reduce((dest, key) => reducer(user, dest, key), {});
-    const account = louser.accountname
-    options.push({
-      uid: uids[i],
-      user: louser,
-      value: `${uids[i]}:${louser.personaname}:${louser.accountname}`,
-      label: louser.personaname + " [" + account + "]" + (louser.mostrecent ? " (most recent)" : ""),
-    })
+
+  const items = await readSteamLoginItems();
+  if ("users" in items) {
+    const users = items.users;
+    const uids = Object.keys(users);
+    const reducer = (source, destination, key) => {
+      destination[key.toLowerCase()] = source[key];
+      return destination;
+    };
+    for (let i = 0; i < uids.length; i += 1) {
+      const user = users[uids[i]];
+      const louser = Object.keys(user)
+        .reduce((dest, key) => reducer(user, dest, key), {});
+      const account = louser.accountname
+      options.push({
+        uid: uids[i],
+        user: louser,
+        value: `${uids[i]}:${louser.personaname}:${louser.accountname}`,
+        label: louser.personaname + " [" + account + "]" + (louser.mostrecent ? " (most recent)" : ""),
+      })
+    }
   }
   return options;
 }
