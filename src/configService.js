@@ -209,6 +209,7 @@ export async function getImportRSMConfig() {
 }
 export async function getRSProfileFromPrfldb() {
   const prfldb = await getProfileConfig()
+  if (prfldb === '') return '';
   const parsed = window.path.parse(prfldb);
   const split = parsed.name.split("_PRFLDB");
   const allProfiles = await getAllProfiles(parsed.dir);

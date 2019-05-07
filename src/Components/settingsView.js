@@ -453,8 +453,9 @@ export default class SettingsView extends React.Component {
     else {
       await updateDefaultSortOption(this.state.sortoptions)
     }
-    await updateShowSetlistOverlayAlways(this.state.showSetlistOverlayAlways)
-    await updateIsSudoWhitelisted(this.state.isSudoWhitelisted)
+    await updateSteamIDConfig(this.state.steamID);
+    await updateShowSetlistOverlayAlways(this.state.showSetlistOverlayAlways);
+    await updateIsSudoWhitelisted(this.state.isSudoWhitelisted);
     const flt = parseFloat(this.state.currentZoomFactor);
     if (flt > 0 && flt <= 1) {
       this.setState({ currentZoomFactor: flt });
