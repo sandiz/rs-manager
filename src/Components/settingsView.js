@@ -20,14 +20,16 @@ import getProfileConfig, {
   getImportRSMConfig,
   updateImportRSMPath,
   setStateAsync,
-  getRSProfileFromPrfldb,
   getSteamNameFromSteamID,
 } from '../configService';
 import {
   resetDB, createRSSongList, addtoRSSongList,
   isTablePresent, deleteRSSongList, getSongByID, resetRSSongList,
 } from '../sqliteService';
-import readProfile, { getAllProfiles, getSteamPathForRocksmith, getSteamProfiles } from '../steamprofileService';
+import readProfile, {
+  getAllProfiles, getSteamPathForRocksmith,
+  getSteamProfiles, getProfileName,
+} from '../steamprofileService';
 import { sortOrderCustomStyles, createOption } from './setlistOptions';
 import { DispatcherService, DispatchEvents } from '../lib/libDispatcher'
 
@@ -388,7 +390,8 @@ export default class SettingsView extends React.Component {
   }
 
   setProfiles = async () => {
-    const currentRSProfile = await getRSProfileFromPrfldb();
+    const prfldb = await getProfileConfig();
+    const currentRSProfile = await getProfileName(prfldb);
     const currentSteamProfile = await getSteamNameFromSteamID();
     setStateAsync(this, {
       currentRSProfile,
