@@ -75,6 +75,7 @@ FUTURE:
    2. [Win] Find Pointer to PersistentID (instead of scanning)
    3. [Win] https://github.com/hiitiger/gelectron exploration (steam type overlay)
    4. file system watcher
+   5. background thread for all long running operations
 
 ## Development
 - Instructions for dev
