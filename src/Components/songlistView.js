@@ -182,15 +182,35 @@ export function unescapeFormatter(cell, row, rowIndex, extraData) {
   }
 }
 export function difficultyFormatter(cell, row) {
+  const def = "iconPreview difficulty ";
+  let diff = "diff_0";
+  if (cell <= 20) {
+    diff = "diff_0"
+  }
+  else if (cell > 20 && cell <= 40) {
+    diff = "diff_1"
+  }
+  else if (cell > 40 && cell <= 60) {
+    diff = "diff_2"
+  }
+  else if (cell > 60 && cell <= 80) {
+    diff = "diff_3"
+  }
+  else if (cell > 80) {
+    diff = "diff_4"
+  }
+  const diffClass = def + diff;
   return (
-    <span
+    <div
+      className={diffClass}
       style={{
         fontSize: 20 + 'px',
-        marginTop: 4 + 'px',
+        width: 70 + 'px',
+        height: 26 + 'px',
       }}
       title={cell.toFixed(2)}>
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    </span>
+    </div>
   )
 }
 export function round100Formatter(cell, row) {
@@ -221,24 +241,7 @@ export function countFormmatter(cell, row) {
   return <span>{cell + row.sa_playcount}</span>;
 }
 export function difficultyClass(cell, row, rowIndex, colIndex) {
-  const def = "iconPreview difficulty ";
-  let diff = "diff_0";
-  if (cell <= 20) {
-    diff = "diff_0"
-  }
-  else if (cell > 20 && cell <= 40) {
-    diff = "diff_1"
-  }
-  else if (cell > 40 && cell <= 60) {
-    diff = "diff_2"
-  }
-  else if (cell > 60 && cell <= 80) {
-    diff = "diff_3"
-  }
-  else if (cell > 80) {
-    diff = "diff_4"
-  }
-  return def + diff;
+  return '';
 }
 export function badgeFormatter(cell, row) {
   const badgeClassDefault = "col col-md-3 col-md-34 ta-center iconPreview ";
@@ -510,7 +513,7 @@ export function tuningFormatter(cell, row) {
           </ReactTooltip>
 
           <div data-tip data-for={row.id + "_tuning"} data-class="tooltip-offset tooltipClass">
-            <span title={cell}>
+            <span>
               {tuningkeys[i]}
               <span className={suffix === "" ? "hidden" : ""}>
                 (Capo: {row.capofret}<sup>{suffix})</sup>
