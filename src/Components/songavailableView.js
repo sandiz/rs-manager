@@ -618,6 +618,14 @@ export default class SongAvailableView extends React.Component {
     });
   }
 
+  softRefresh = () => {
+    this.handleTableChange('filter', {
+      page: this.state.page,
+      sizePerPage: this.state.sizePerPage,
+      filters: { search: "" },
+    });
+  }
+
   fetchTags = async () => {
     const tagsCount = await getTagsCount();
     if (tagsCount === 0) {
@@ -887,7 +895,7 @@ export default class SongAvailableView extends React.Component {
             artist=""
             album=""
             showDetail={this.state.showsongpackpreview}
-            close={() => this.setState({ showsongpackpreview: false }, () => this.refreshTable())}
+            close={() => this.setState({ showsongpackpreview: false }, () => this.softRefresh())}
             isSongpack
             dlcappid={this.state.randompackappid}
             isSetlist={false}
