@@ -73,9 +73,10 @@ Rocksmith's UI leaves a lot to be desired especially when you have a lot of song
 FUTURE:
    1. [Mac] Find Pointer to Game State + PersistentID (instead of scanning)
    2. [Win] Find Pointer to PersistentID (instead of scanning)
-   3. [Win] https://github.com/hiitiger/gelectron exploration (steam type overlay)
    4. file system watcher
    5. background thread for all long running operations
+   6. rocksniffer updates
+   7. bloom filter for not-in-set updates
 
 ## Development
 - Instructions for dev
