@@ -49,6 +49,17 @@ else {
     window.path = require("path");
 }
 
+const ncvxrl = window.path.resolve(window.dirname + '/../ncvxrl.json')
+window.keys = {
+    yt: '',
+    lfm: '',
+    path: ncvxrl,
+}
+const data = window.electronFS.readFileSync(ncvxrl);
+const body = JSON.parse(data);
+window.keys.yt = body.yt;
+window.keys.lfm = body.lfm;
+
 
 window.request = async function (uri, cookies, cookieurl, qs, form, method = "GET") {
 

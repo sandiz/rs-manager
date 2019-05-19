@@ -120,7 +120,7 @@ export default class SongDetailView extends React.Component {
     const url = 'https://www.googleapis.com/youtube/v3/search';
     const params = {
       part: 'snippet',
-      key: 'AIzaSyAQPZZZVEH-lUTRuN4l2XF-zUB25eR45zo',
+      key: window.keys.yt,
       q: searchterm,
       maxResults: this.maxResults,
     };

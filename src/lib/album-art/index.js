@@ -27,7 +27,7 @@
     }, options)
 
     // Public Key on purpose
-    const apiKey = '4cb074e4b8ec4ee9ad3eb37d6f7eb240'
+    const apiKey = window.keys.lfm;
     const sizes = ['small', 'medium', 'large', 'extralarge', 'mega']
     let method = "artist";
     if (opts.track) method = "track";
