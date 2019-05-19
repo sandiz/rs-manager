@@ -25,6 +25,14 @@ else {
     process.exit(-1);
 }
 
+const yt = process.env.YOUTUBE_API_KEY
+const lfm = process.env.LASTFM_API_KEY
+
+const keys = {
+    yt, lfm
+};
+console.log("updating api keys");
+fs.writeFileSync("ncvxrl.json", JSON.stringify(keys));
 
 const child = spawn("yarn", [
     "run",
