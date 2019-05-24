@@ -857,7 +857,7 @@ export default class SetlistView extends React.Component {
                     {
                         this.state.setlistMeta.is_manual === "true" || this.state.setlistMeta.is_rssetlist === "true"
                             ? (
-                                <div>
+                                <div style={{ marginBottom: 10 + 'px' }}>
                                     <input
                                         ref={(node) => { this.search = node }}
                                         style={{ width: 50 + '%', border: "1px solid black", padding: 5 + "px" }}
@@ -899,13 +899,34 @@ export default class SetlistView extends React.Component {
                                     Update Favorites from RS Profile
                                 </button>
                             )
-                            : ""
+                            : null
+                    }
+                    {
+                        this.state.setlistMeta.is_manual === "true"
+                            ? (
+                                <button
+                                    type="button"
+                                    style={{ width: 150 + 'px' }}
+                                    className={choosesettingsstyle}
+                                    onClick={() => this.setState({ showOptions: true })}>
+                                    Add Songs
+                                </button>
+                            )
+                            : null
                     }
                     <button
                         type="button"
+                        style={{ width: 170 + 'px' }}
                         onClick={this.updateMastery}
                         className={choosepsarchstyle}>
-                        Update Mastery from RS Profile
+                        Update Mastery
+                    </button>
+                    <button
+                        type="button"
+                        style={{ width: 150 + 'px' }}
+                        className={choosesettingsstyle}
+                        onClick={() => this.setState({ showOptions: true })}>
+                        Export
                     </button>
                     <button
                         type="button"
