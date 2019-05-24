@@ -1476,3 +1476,12 @@ hr {
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
+.no-padding {
+    padding: 0px !important;
+}
+
+.diff-style {
+    width: 40px;
+    margin-top: -3px;
+}
