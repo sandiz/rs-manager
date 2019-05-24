@@ -22,6 +22,7 @@ import getProfileConfig, {
 } from '../configService';
 import SetlistOptions, { generateSql } from './setlistOptions';
 import ExportSetlistModal from './modalExportSetlist';
+import AddSongModal from './modalAddSong';
 
 const { path } = window;
 const options = [
@@ -121,6 +122,7 @@ export default class SetlistView extends React.Component {
             modal_no_sa_stats: false,
 
             showExportOptions: false,
+            showAddOptions: false,
         };
         this.search = null;
         this.columns = [
@@ -911,7 +913,7 @@ export default class SetlistView extends React.Component {
                                     type="button"
                                     style={{ width: 150 + 'px' }}
                                     className={choosesettingsstyle}
-                                    onClick={() => this.setState({ showOptions: true })}>
+                                    onClick={() => this.setState({ showAddOptions: true })}>
                                     Add Songs
                                 </button>
                             )
@@ -1096,6 +1098,15 @@ export default class SetlistView extends React.Component {
                         }}
                     />
                 </div>
+
+                <AddSongModal
+                    show={this.state.showAddOptions}
+                    exportSetlistKey={this.state.setlistMeta.key}
+                    exportSetlistName={this.state.setlistMeta.name}
+                    onClose={() => {
+                        this.setState({ showAddOptions: false });
+                        this.refreshView();
+                    }} />
 
                 <ExportSetlistModal
                     show={this.state.showExportOptions}
