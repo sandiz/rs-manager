@@ -892,25 +892,28 @@ export default class SetlistView extends React.Component {
                     {
                         this.lastChildID === "setlist_favorites"
                             ? (
-                                <a
+                                <button
+                                    type="button"
                                     onClick={this.updateFavs}
                                     className="extraPadding download">
                                     Update Favorites from RS Profile
-                                </a>
+                                </button>
                             )
                             : ""
                     }
-                    <a
+                    <button
+                        type="button"
                         onClick={this.updateMastery}
                         className={choosepsarchstyle}>
                         Update Mastery from RS Profile
-                    </a>
-                    <a
+                    </button>
+                    <button
+                        type="button"
                         style={{ width: 150 + 'px' }}
                         className={choosesettingsstyle}
                         onClick={() => this.setState({ showOptions: true })}>
                         Settings
-                    </a>
+                    </button>
                     <br />
                 </div>
                 <div className="modal-sa-stat" id="open-modal" style={modalstyle}>

@@ -825,24 +825,27 @@ export default class DashboardView extends React.Component {
               <option value="rhythm">Rhythm</option>
               <option value="bass">Bass</option>
             </select>
-            <a
+            <button
+              type="button"
               onClick={() => { this.setState({ genInfoState: "default" }) }}
               style={{
                 width: 5 + '%',
               }}
               className="extraPadding download">
               Back
-            </a>
-            <a
+            </button>
+            <button
+              type="button"
               onClick={this.generateStats}
               style={{
                 width: 5 + '%',
               }}
               className="extraPadding download">
               Go
-            </a>
+            </button>
           </div>
-          <a
+          <button
+            type="button"
             onClick={this.showInfoOptions}
             style={{
               width: 15 + '%',
@@ -850,12 +853,16 @@ export default class DashboardView extends React.Component {
             ref={this.infoRef}
             className={infostyle}>
             Generate Infographic
-            </a>
-          <a
+            </button>
+          <button
+            type="button"
             onClick={this.refreshStats}
+            style={{
+              width: 15 + '%',
+            }}
             className="extraPadding download">
             Refresh Stats from Profile
-            </a>
+            </button>
         </div>
         <br />
         <div className="row justify-content-md-center" style={{ marginTop: -38 + 'px' }}>

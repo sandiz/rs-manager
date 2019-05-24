@@ -23,7 +23,7 @@ const customStyles = {
     ...styles, display: 'flex', marginTop: -8 + 'px', marginBottom: 5 + 'px',
   }),
   control: styles => ({
-    ...styles, backgroundColor: 'white', color: 'black', width: 25 + '%', left: 35 + '%',
+    ...styles, backgroundColor: 'white', color: 'black', width: 25 + '%', left: 37 + '%',
   }),
   option: (styles, {
     data, isDisabled, isFocused, isSelected,
@@ -863,18 +863,20 @@ export default class SongAvailableView extends React.Component {
               placeholder="Filter by genre"
             />
           </div>
-          <a
+          <button
+            type="button"
             style={{ width: 15 + '%' }}
             onClick={this.updateSteamDLCCatalog}
             className="extraPadding download">
             Update Rocksmith DLC Catalog
-          </a>
-          <a
+          </button>
+          <button
+            type="button"
             style={{ width: 15 + '%' }}
             onClick={this.updateOwnedStatus}
             className={ownedstyle}>
             Update Owned/Acquired Date
-          </a>
+          </button>
         </div>
         <div>
           <RemoteAll

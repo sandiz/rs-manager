@@ -963,16 +963,18 @@ export default class SetlistOptions extends React.Component {
             <div>
               <br />
               <hr />
-              <a
+              <button
+                type="button"
                 onClick={this.saveOptions}
                 className={buttonstyle}>
                 Save Options
-            </a>
-              <a
+              </button>
+              <button
+                type="button"
                 onClick={this.deleteSetlist}
                 className={buttonstyle}>
                 Delete Setlist
-            </a>
+              </button>
             </div>
           </div>
         </div>

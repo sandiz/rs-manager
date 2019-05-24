@@ -307,7 +307,8 @@ class ExportSetlistModal extends React.Component {
                                         </div>
                                     )
                                     : (
-                                        <a
+                                        <button
+                                            type="button"
                                             style={{
                                                 width: 33 + '%',
                                                 marginBottom: -15 + 'px',
@@ -315,13 +316,14 @@ class ExportSetlistModal extends React.Component {
                                             onClick={this.startExport}
                                             className="extraPadding download">
                                             Start Export
-                                        </a>
+                                        </button>
                                     )
                             }
                             {
                                 this.state.launchRS
                                     ? (
-                                        <a
+                                        <button
+                                            type="button"
                                             style={{
                                                 width: 40 + '%',
                                                 marginBottom: -15 + 'px',
@@ -329,7 +331,7 @@ class ExportSetlistModal extends React.Component {
                                             onClick={() => window.shell.openExternal("steam://run/221680")}
                                             className="extraPadding download">
                                             steam://run/rocksmith
-                                        </a>
+                                        </button>
                                     )
                                     : null
                             }

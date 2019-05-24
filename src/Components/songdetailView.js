@@ -31,7 +31,7 @@ export function enableScroll() {
 }
 const customStyles = {
   container: styles => ({
-    ...styles, display: 'flex', marginTop: -8 + 'px', marginBottom: 5 + 'px',
+    ...styles, display: 'flex', marginBottom: 5 + 'px',
   }),
   control: styles => ({
     ...styles, backgroundColor: 'white', color: 'black', width: 50 + '%', left: 25 + '%',
@@ -440,33 +440,40 @@ export default class SongDetailView extends React.Component {
             </div>
           </div>
           <div className="centerButton list-unstyled">
-            <a
+            <button
+              type="button"
+              style={{ width: 17 + '%' }}
               onClick={this.choosePlay}
               className={ptstyle}>
               Playthrough Video
-            </a>
+            </button>
             {
               this.props.isWeekly ? ""
                 : this.props.isSongpack
                   ? (
-                    <a
+                    <button
+                      style={{ width: 17 + '%' }}
+                      type="button"
                       onClick={() => {
                         console.log(this.props.dlcappid);
                         window.shell.openExternal("steam://openurl/https://store.steampowered.com/app/" + this.props.dlcappid);
                       }}
                       className={mvstyle}>
                       Buy From Steam
-                  </a>
+                  </button>
                   )
                   : (
                     <span>
-                      <a
+                      <button
+                        type="button"
+                        style={{ width: 17 + '%' }}
                         onClick={this.chooseMV}
                         className={mvstyle}>
                         Music Video
-                      </a>
+                      </button>
                       <div className={remfromsetlistoptionstyle}>
-                        <a
+                        <button
+                          type="button"
                           onClick={() => {
                             this.props.removeFromSetlistByID(this.props.songData);
                             this.handleHide();
@@ -476,8 +483,9 @@ export default class SongDetailView extends React.Component {
                           }}
                           className="extraPadding download">
                           Rem. this arngmnt.
-                        </a>
-                        <a
+                        </button>
+                        <button
+                          type="button"
                           onClick={async () => {
                             this.props.removeFromSetlist();
                             this.handleHide();
@@ -487,38 +495,44 @@ export default class SongDetailView extends React.Component {
                           }}
                           className="extraPadding download">
                           Rem. all arngmnts.
-                        </a>
+                        </button>
                       </div>
-                      <a
+                      <button
+                        style={{ width: 17 + '%' }}
+                        type="button"
                         onClick={async () => {
                           this.setState({ showremfromsetlistoptions: true })
                         }}
                         className={remfromsetliststyle}>
                         Remove from Setlist
-                      </a>
+                      </button>
                       <div className={setlistoptionstyle}>
-                        <a
+                        <button
+                          type="button"
                           onClick={() => { this.addToSetlist(true); this.handleHide() }}
                           style={{
                             width: 14 + '%',
                           }}
                           className="extraPadding download">
                           Add this arngmnt.
-                        </a>
-                        <a
+                        </button>
+                        <button
+                          type="button"
                           onClick={async () => { this.addToSetlist(); this.handleHide(); }}
                           style={{
                             width: 14 + '%',
                           }}
                           className="extraPadding download">
                           Add all arngmnts.
-                        </a>
+                        </button>
                       </div>
-                      <a
+                      <button
+                        style={{ width: 17 + '%' }}
+                        type="button"
                         onClick={async () => { this.setState({ showaddtosetlistoptions: true }) }}
                         className={addtosetliststyle}>
                         Add to Setlist
-                      </a>
+                      </button>
                       <select className={selectsetliststyle} onChange={this.saveSetlist} style={{ width: 21 + '%', margin: 12 + 'px' }}>
                         {this.state.setlists}
                       </select>
@@ -554,6 +568,7 @@ export default class SongDetailView extends React.Component {
                     <span
                       className={cdlcyesstyle}>
                       <a
+                        type="button"
                         href="#"
                         onClick={() => this.updateCDLCStatus(true)}>
                         Yes
@@ -563,6 +578,7 @@ export default class SongDetailView extends React.Component {
                     <span
                       className={cdlcnostyle}>
                       <a
+                        type="button"
                         href="#"
                         onClick={() => this.updateCDLCStatus(false)}>
                         No
@@ -705,19 +721,21 @@ export default class SongDetailView extends React.Component {
                 </div>
               </div>
               <br />
-              <div className="options-flex-center">
+              <div className="options-flex-center" style={{ height: 70 + 'px' }}>
                 <div style={{ marginRight: 30 + 'px' }} className="options-flex-div">
-                  <a
+                  <button
+                    type="button"
                     style={{ width: 100 + '%' }}
                     className={songliststyle}
                     onClick={async () => {
                       await this.showLocalNote();
                     }}>
                     <span>Add Note</span>
-                  </a>
+                  </button>
                 </div>
                 <div style={{ marginRight: 30 + 'px' }} className="options-flex-div">
-                  <a
+                  <button
+                    type="button"
                     style={{ width: 100 + '%' }}
                     className={songliststyle}
                     onClick={async () => {
@@ -725,10 +743,11 @@ export default class SongDetailView extends React.Component {
                       this.handleHide();
                     }}>
                     <span>Delete Song from DB</span>
-                  </a>
+                  </button>
                 </div>
                 <div style={{}} className="options-flex-div">
-                  <a
+                  <button
+                    type="button"
                     style={{ width: 100 + '%' }}
                     className={songliststyle}
                     onClick={async () => {
@@ -737,7 +756,7 @@ export default class SongDetailView extends React.Component {
                       this.handleHide();
                     }}>
                     <span>Delete and Never Import</span>
-                  </a>
+                  </button>
                 </div>
               </div>
             </Collapsible>
