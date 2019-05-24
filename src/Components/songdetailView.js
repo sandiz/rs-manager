@@ -6,7 +6,7 @@ import moment from 'moment';
 import Swal from 'sweetalert2'
 import AsyncSelect from 'react-select/lib/Async';
 import {
-  getAllSetlist, saveSongToSetlist, getSongByID,
+  saveSongToSetlist, getSongByID,
   updateCDLCStat, updateSAFCStat, saveSongByIDToSetlist,
   updateNotes, getNotes, getAllTags, executeRawSql, addTag,
 } from '../sqliteService';
@@ -67,7 +67,6 @@ export default class SongDetailView extends React.Component {
       showMusicVideo: false,
       pturl: '',
       mvurl: '',
-      setlists: [],
       currentSetlist: '',
       ptindex: 0,
       mvindex: 0,
@@ -79,8 +78,6 @@ export default class SongDetailView extends React.Component {
       sa_fc_medium: null,
       sa_fc_hard: null,
       sa_fc_master: null,
-      showaddtosetlistoptions: false,
-      showremfromsetlistoptions: false,
       tags: [],
     }
     this.maxResults = 10;
@@ -189,7 +186,6 @@ export default class SongDetailView extends React.Component {
     this.choosePlay();
     this.props.close();
     enableScroll();
-    this.setState({ showaddtosetlistoptions: false, showremfromsetlistoptions: false });
   }
 
   addToSetlist = async (addSongID = false) => {
@@ -210,16 +206,7 @@ export default class SongDetailView extends React.Component {
   }
 
   generateSetlistOptions = async () => {
-    const items = []
-    const output = await getAllSetlist(true);
-    for (let i = 0; i < output.length; i += 1) {
-      items.push(<option key={output[i].key} value={output[i].key}>
-        {unescape(output[i].name)}</option>);
-      //here I will be creating my options dynamically based on
-      //what props are currently passed to the parent component
-    }
     const showsastats = await getScoreAttackConfig();
-    this.setState({ setlists: items, currentSetlist: output.length > 0 ? output[0].key : '', showsastats });
     const songDetails = await getSongByID(this.props.songID);
     const isTrueSet = (songDetails.is_cdlc === 'true');
     const tags = await getAllTags(this.props.dlcappid)
@@ -231,6 +218,7 @@ export default class SongDetailView extends React.Component {
       return obj;
     });
     this.setState({
+      showsastats,
       is_cdlc: isTrueSet,
       sa_fc_easy: songDetails.sa_fc_easy == null ? null : moment(songDetails.sa_fc_easy),
       sa_fc_medium: songDetails.sa_fc_medium == null ? null : moment(songDetails.sa_fc_medium),
@@ -332,21 +320,12 @@ export default class SongDetailView extends React.Component {
   render = () => {
     const cdlcyesstyle = this.state.is_cdlc ? "song-detail-option" : "song-detail-option-disabled";
     const cdlcnostyle = this.state.is_cdlc ? "song-detail-option-disabled" : "song-detail-option";
-    const setlistyle = "extraPadding download " + (this.props.isSetlist && !this.props.isGenerated ? "" : "hidden");
-    const songlistanddashstyle = "extraPadding download " + (this.props.isSongview ? "" : "hidden");
     const songliststyle = "extraPadding download " + (this.props.isSongview && !this.props.isDashboard ? "" : "hidden");
     const songliststylegeneric = (this.props.isSongview && !this.props.isDashboard ? "" : "hidden");
     const ptstyle = "extraPadding download " + (!this.state.showPlaythrough ? "" : "isDisabled");
     const mvstyle = "extraPadding download " + (!this.state.showMusicVideo ? "" : "isDisabled");
     const ptdivstyle = this.state.showPlaythrough ? "dblock" : "hidden";
     const mvdivstyle = this.state.showMusicVideo ? "dblock" : "hidden";
-    const selectsetliststyle = (this.props.isSongview ? "" : "hidden") + " " + (this.props.isGenerated || this.props.isRSSetlist ? "hidden" : "");
-    let addtosetliststyle = songlistanddashstyle + " " + (this.state.showaddtosetlistoptions ? "hidden" : "extraPadding download");
-    if (this.state.setlists.length <= 0) addtosetliststyle += " isDisabled";
-    const remfromsetliststyle = setlistyle + " " + (this.state.showremfromsetlistoptions ? "hidden" : "extraPadding download");
-    const setlistoptionstyle = this.state.showaddtosetlistoptions ? "inline" : "hidden";
-    const remfromsetlistoptionstyle = this.state.showremfromsetlistoptions ? "inline" : "hidden";
-
 
     let showleftarrow = '';
     let showrightarrow = '';
@@ -471,71 +450,6 @@ export default class SongDetailView extends React.Component {
                         className={mvstyle}>
                         Music Video
                       </button>
-                      <div className={remfromsetlistoptionstyle}>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            this.props.removeFromSetlistByID(this.props.songData);
-                            this.handleHide();
-                          }}
-                          style={{
-                            width: 16 + '%',
-                          }}
-                          className="extraPadding download">
-                          Rem. this arngmnt.
-                        </button>
-                        <button
-                          type="button"
-                          onClick={async () => {
-                            this.props.removeFromSetlist();
-                            this.handleHide();
-                          }}
-                          style={{
-                            width: 16 + '%',
-                          }}
-                          className="extraPadding download">
-                          Rem. all arngmnts.
-                        </button>
-                      </div>
-                      <button
-                        style={{ width: 17 + '%' }}
-                        type="button"
-                        onClick={async () => {
-                          this.setState({ showremfromsetlistoptions: true })
-                        }}
-                        className={remfromsetliststyle}>
-                        Remove from Setlist
-                      </button>
-                      <div className={setlistoptionstyle}>
-                        <button
-                          type="button"
-                          onClick={() => { this.addToSetlist(true); this.handleHide() }}
-                          style={{
-                            width: 14 + '%',
-                          }}
-                          className="extraPadding download">
-                          Add this arngmnt.
-                        </button>
-                        <button
-                          type="button"
-                          onClick={async () => { this.addToSetlist(); this.handleHide(); }}
-                          style={{
-                            width: 14 + '%',
-                          }}
-                          className="extraPadding download">
-                          Add all arngmnts.
-                        </button>
-                      </div>
-                      <button
-                        style={{ width: 17 + '%' }}
-                        type="button"
-                        onClick={async () => { this.setState({ showaddtosetlistoptions: true }) }}
-                        className={addtosetliststyle}>
-                        Add to Setlist
-                      </button>
-                      <select className={selectsetliststyle} onChange={this.saveSetlist} style={{ width: 21 + '%', margin: 12 + 'px' }}>
-                        {this.state.setlists}
-                      </select>
                     </span>
                   )
             }
@@ -796,14 +710,9 @@ SongDetailView.propTypes = {
   isDashboard: PropTypes.bool,
   isWeekly: PropTypes.bool,
   dlcappid: PropTypes.string,
-  removeFromSetlist: PropTypes.func,
   removeFromDB: PropTypes.func,
   ignoreArrangement: PropTypes.func,
   songID: PropTypes.string,
-  isGenerated: PropTypes.bool,
-  isRSSetlist: PropTypes.bool,
-  songData: PropTypes.object,
-  removeFromSetlistByID: PropTypes.func,
   refreshView: PropTypes.func,
 }
 SongDetailView.defaultProps = {
@@ -818,13 +727,8 @@ SongDetailView.defaultProps = {
   isWeekly: false,
   dlcappid: '',
   close: () => { },
-  removeFromSetlist: () => { },
-  removeFromSetlistByID: () => { },
   removeFromDB: () => { },
   ignoreArrangement: () => { },
   songID: '',
-  isGenerated: false,
-  isRSSetlist: false,
-  songData: {},
   refreshView: () => { },
 }
