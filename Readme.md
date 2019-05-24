@@ -69,15 +69,6 @@ Rocksmith's UI leaves a lot to be desired especially when you have a lot of song
 ![Settings](https://github.com/sandiz/rs-manager/raw/master/screenshots/images/settings.png)
 
 
-## TODO
-FUTURE:
-   1. [Mac] Find Pointer to Game State + PersistentID (instead of scanning)
-   2. [Win] Find Pointer to PersistentID (instead of scanning)
-   4. file system watcher
-   5. background thread for all long running operations
-   6. rocksniffer updates
-   7. bloom filter for not-in-set updates
-
 ## Development
 - Instructions for dev
     - `yarn install` to install all dependencies
