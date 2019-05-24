@@ -21,6 +21,7 @@ import getProfileConfig, {
     getDefaultSortOptionConfig, getScoreAttackDashboardConfig,
 } from '../configService';
 import SetlistOptions, { generateSql } from './setlistOptions';
+import ExportSetlistModal from './modalExportSetlist';
 
 const { path } = window;
 const options = [
@@ -118,6 +119,8 @@ export default class SetlistView extends React.Component {
             modal_no_sa_hard: false,
             modal_no_sa_master: false,
             modal_no_sa_stats: false,
+
+            showExportOptions: false,
         };
         this.search = null;
         this.columns = [
@@ -924,8 +927,8 @@ export default class SetlistView extends React.Component {
                     <button
                         type="button"
                         style={{ width: 150 + 'px' }}
-                        className={choosesettingsstyle}
-                        onClick={() => this.setState({ showOptions: true })}>
+                        className={choosepsarchstyle}
+                        onClick={() => this.setState({ showExportOptions: true })}>
                         Export
                     </button>
                     <button
@@ -1093,6 +1096,12 @@ export default class SetlistView extends React.Component {
                         }}
                     />
                 </div>
+
+                <ExportSetlistModal
+                    show={this.state.showExportOptions}
+                    exportSetlistKey={this.state.setlistMeta.key}
+                    exportSetlistName={this.state.setlistMeta.name}
+                    onClose={() => this.setState({ showExportOptions: false })} />
             </div>
         );
     }

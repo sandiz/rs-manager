@@ -245,7 +245,7 @@ class ExportSetlistModal extends React.Component {
                                     marginTop: -8 + 'px',
                                 }}>
                                     <span>Setlist: </span>
-                                    <span className="font-weight-bold"> {this.props.exportSetlistName}</span>
+                                    <span className="font-weight-bold"> {unescape(this.props.exportSetlistName)}</span>
                                     <br />
                                     <span>Rocksmith Profile: </span>
                                     <span className="font-weight-bold"> {this.state.profileName}</span>
@@ -311,7 +311,6 @@ class ExportSetlistModal extends React.Component {
                                             type="button"
                                             style={{
                                                 width: 33 + '%',
-                                                marginBottom: -15 + 'px',
                                             }}
                                             onClick={this.startExport}
                                             className="extraPadding download">
@@ -325,8 +324,7 @@ class ExportSetlistModal extends React.Component {
                                         <button
                                             type="button"
                                             style={{
-                                                width: 40 + '%',
-                                                marginBottom: -15 + 'px',
+                                                width: 50 + '%',
                                             }}
                                             onClick={() => window.shell.openExternal("steam://run/221680")}
                                             className="extraPadding download">
