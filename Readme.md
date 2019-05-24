@@ -31,10 +31,10 @@ Rocksmith's UI leaves a lot to be desired especially when you have a lot of song
  - Setlists
     - unlimited setlists to sort your collection
     - supports manual, filter based and rocksmith in-game song lists
+    - [export](#export-setlist) to Rocksmith song list
 
 ## Screenshots
 ### Stats
-![Stats](https://github.com/sandiz/rs-manager/raw/master/screenshots/images/dashboard.stats.png)
 ![Stats](https://github.com/sandiz/rs-manager/raw/master/screenshots/images/dashboard.stats-2.png)
 ### Songs Owned
 ![Songs Owned](https://github.com/sandiz/rs-manager/raw/master/screenshots/images/songs.owned.png)
@@ -57,16 +57,14 @@ Rocksmith's UI leaves a lot to be desired especially when you have a lot of song
 ![Filter One](https://raw.githubusercontent.com/sandiz/rs-manager/master/screenshots/images/custom.setlist.filterone.jpg)
 
 ![Filter Two](https://raw.githubusercontent.com/sandiz/rs-manager/master/screenshots/images/custom.setlist.filtertwo.jpg)
-### RS favorites - All the songs in rocksmith favorites in-game playlist
-![Setlist favorites](https://github.com/sandiz/rs-manager/raw/master/screenshots/images/setlist.favorites.png)
-### Setlist Custom - list of songs manually added to setlist
-![Setlist Custom](https://github.com/sandiz/rs-manager/raw/master/screenshots/images/setlist.practicelist.png)
 ### PSARC Explorer - scan and import all Rocksmith songs
 ![PSARC Explorer](https://github.com/sandiz/rs-manager/raw/master/screenshots/images/psarcExplorer.png)
 ### PSARC Info/Extract - inspect psarc files for more details
 ![PSARC Explorer](https://github.com/sandiz/rs-manager/raw/master/screenshots/images/extractFromPsarc.png)
 ### Settings
 ![Settings](https://github.com/sandiz/rs-manager/raw/master/screenshots/images/settings.png)
+### Export Setlist
+<img width=100% src="https://raw.githubusercontent.com/sandiz/rs-manager/master/screenshots/images/exportsetlistmain.png"/>
 
 
 ## Development
