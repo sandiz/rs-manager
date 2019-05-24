@@ -24,7 +24,7 @@ window.linereader = require('line-by-line');
 window.shortid = require('shortid');
 window.pidusage = require('pidusage');
 window.WaveFile = require('wavefile');
-
+window.defaultZoom = 0.9;
 
 
 const rp = require('request-promise');
@@ -300,7 +300,7 @@ window.remote.app.on("quit", () => {
 
 process.once('loaded', () => {
     global.electron = require('electron')
-    electron.webFrame.setZoomFactor(1)
+    electron.webFrame.setZoomFactor(defaultZoom);
 })
 
 

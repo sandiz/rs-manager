@@ -17,6 +17,12 @@ import getProfileConfig, {
 import SongDetailView from './songdetailView';
 import { defaultSortOption } from './settingsView';
 
+import diff0 from '../assets/diff-icons/diff_0.svg';
+import diff1 from '../assets/diff-icons/diff_1.svg';
+import diff2 from '../assets/diff-icons/diff_2.svg';
+import diff3 from '../assets/diff-icons/diff_3.svg';
+import diff4 from '../assets/diff-icons/diff_4.svg';
+
 const { path } = window;
 const Fragment = React.Fragment;
 
@@ -182,34 +188,28 @@ export function unescapeFormatter(cell, row, rowIndex, extraData) {
   }
 }
 export function difficultyFormatter(cell, row) {
-  const def = "iconPreview difficulty ";
-  let diff = "diff_0";
+  let diff = diff0;
   if (cell <= 20) {
-    diff = "diff_0"
+    diff = diff0;
   }
   else if (cell > 20 && cell <= 40) {
-    diff = "diff_1"
+    diff = diff1;
   }
   else if (cell > 40 && cell <= 60) {
-    diff = "diff_2"
+    diff = diff2;
   }
   else if (cell > 60 && cell <= 80) {
-    diff = "diff_3"
+    diff = diff3;
   }
   else if (cell > 80) {
-    diff = "diff_4"
+    diff = diff4;
   }
-  const diffClass = def + diff;
   return (
     <div
-      className={diffClass}
       style={{
-        fontSize: 20 + 'px',
-        width: 70 + 'px',
-        height: 26 + 'px',
       }}
       title={cell.toFixed(2)}>
-      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      <img className="diff-style" src={diff} alt="" />
     </div>
   )
 }
@@ -241,7 +241,7 @@ export function countFormmatter(cell, row) {
   return <span>{cell + row.sa_playcount}</span>;
 }
 export function difficultyClass(cell, row, rowIndex, colIndex) {
-  return '';
+  return 'no-padding';
 }
 export function badgeFormatter(cell, row) {
   const badgeClassDefault = "col col-md-3 col-md-34 ta-center iconPreview ";
