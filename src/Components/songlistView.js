@@ -1093,11 +1093,12 @@ export default class SonglistView extends React.Component {
           </select>
         </div>
         <div className="centerButton list-unstyled">
-          <a
+          <button
+            type="button"
             onClick={this.updateMastery}
             className={choosepsarchstyle}>
             Update Mastery from RS Profile
-          </a>
+          </button>
         </div>
         <div>
           <RemoteAll

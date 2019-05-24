@@ -1701,29 +1701,32 @@ export default class RSLiveView extends React.Component {
       default:
       case 2:
         trackingButton = (
-          <a
+          <button
+            type="button"
             onClick={this.stopTracking}
             className={buttonclass}>
             Stop Tracking
-          </a>
+          </button>
         );
         break;
       case 1:
         trackingButton = (
-          <a
+          <button
+            type="button"
             onClick={this.stopTracking}
             className={buttonclass + " isDisabled"}>
             Waiting for tracking...
-          </a>
+          </button>
         );
         break;
       case 0:
         trackingButton = (
-          <a
+          <button
+            type="button"
             onClick={this.startTracking}
             className={buttonclass}>
             Start Tracking
-          </a>
+          </button>
         )
         break;
     }
@@ -1743,24 +1746,27 @@ export default class RSLiveView extends React.Component {
     return (
       <div className="container-fluid">
         <div className="ta-center">
-          <a
+          <button
+            type="button"
             onClick={() => {
               window.shell.openExternal("steam://run/221680");
             }}
             className="extraPadding download smallbutton">
             steam://run/rocksmith
-          </a>
+          </button>
           {trackingButton}
-          <a
+          <button
+            type="button"
             onClick={this.updateMastery}
             className={updateMasteryclass}>
             Update Mastery/History
-          </a>
-          <a
+          </button>
+          <button
+            type="button"
             onClick={this.updateRecentlyPlayed}
             className={buttonclass}>
             Update Recently Played
-          </a>
+          </button>
         </div>
         <br />
         <div key="live-stats" className="row justify-content-md-center" style={{ marginTop: -30 + 'px' }}>
@@ -1969,11 +1975,12 @@ export default class RSLiveView extends React.Component {
               <div style={{ position: 'relative', top: '12%' }}>
                 <span ref={this.recordTitleRef} style={{ color: 'azure' }}>Not Recording...</span>
                 <br />
-                <a
+                <button
+                  type="button"
                   onClick={this.handleRecord}
                   className={buttonclass}>
                   {recordText}
-                </a>
+                </button>
               </div>
             </div>
           }

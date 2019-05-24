@@ -49,7 +49,8 @@ async function createWindow() {
     // automatically (the listeners will be removed when the window is closed)
     // and restore the maximized or full screen state
     mainWindowState.manage(mainWindow);
-    mainWindow.setAutoHideMenuBar(true)
+    mainWindow.setAutoHideMenuBar(true);
+    mainWindow.setMinimumSize(1700, 1070);
     //mainWindow.maximize();
     if (isDev) {
         mainWindow.webContents.openDevTools({ mode: 'detach' });

@@ -263,16 +263,18 @@ export default class FolderEditView extends React.Component {
             <div className="ta-center">
               <br />
               <hr />
-              <a
+              <button
+                type="button"
                 onClick={this.saveOptions}
                 className="extraPadding download">
                 Save Changes
-              </a>
-              <a
+              </button>
+              <button
+                type="button"
                 onClick={this.deleteFolder}
                 className="extraPadding download">
                 Delete Folder
-              </a>
+              </button>
             </div>
           </div>
         </div>

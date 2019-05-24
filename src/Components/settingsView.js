@@ -733,16 +733,18 @@ export default class SettingsView extends React.Component {
                       this.state.profileAboutToSave
                         ? (
                           <div className="ta-center profile-save-div">
-                            <a
+                            <button
+                              type="button"
                               onClick={this.saveProfileSettings}
                               className="extraPadding download">
                               Save
-                            </a>
-                            <a
+                            </button>
+                            <button
+                              type="button"
                               onClick={this.resetProfileSettings}
                               className="extraPadding download">
                               Cancel
-                            </a>
+                            </button>
                           </div>
                         )
                         : null
@@ -888,7 +890,7 @@ export default class SettingsView extends React.Component {
                           }>
                           @BuongiornoTexas</a>, <strong>importrsm</strong> allows
 loading setlists into Rocksmith 2014.
-<br />(path can contain spaces, it&quot;s automatically escaped when invoking)
+<br />(path can contain spaces, it&apos;s automatically escaped when invoking)
                       </span>
                     </div>
                   </Fragment>
@@ -1239,11 +1241,12 @@ loading setlists into Rocksmith 2014.
                     width: 50 + '%',
                     textAlign: 'right',
                   }}>
-                    <a
+                    <button
+                      type="button"
                       onClick={this.resetdb}
                       className="extraPadding download">
                       Reset
-                  </a>
+                    </button>
                   </span>
                   <br /> <br />
                   <span style={{ float: 'left', color: 'red', marginTop: 18 + 'px' }}>
@@ -1257,12 +1260,14 @@ loading setlists into Rocksmith 2014.
                     textOverflow: 'ellipsis',
                     width: 50 + '%',
                     textAlign: 'right',
+                    height: 62 + 'px',
                   }}>
-                    <a
+                    <button
+                      type="button"
                       onClick={this.resetSidebarState}
                       className="extraPadding download">
                       Reset
-                  </a>
+                    </button>
                   </span>
                   <br /> <br />
                 </Collapsible>
@@ -1271,11 +1276,12 @@ loading setlists into Rocksmith 2014.
             </div>
           </div>
           <div className="centerButton list-unstyled">
-            <a
+            <button
+              type="button"
               onClick={this.saveSettings}
               className="extraPadding download">
               Save Settings
-            </a>
+            </button>
           </div>
         </div>
       )

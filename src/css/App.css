@@ -218,6 +218,32 @@ a.download {
     background: rgb(199, 185, 154) !important;
     font-size: 15px !important;
 }
+button.download:active {
+    position:relative;
+    top:1px;
+    outline: none;
+}
+button.download:focus {
+    outline: none;
+}
+button.download:hover {
+	background: #9e9580 !important;
+	background-color:#9e9580;
+}
+
+button.download {
+    font-size: 15px !important;
+    cursor: pointer;
+
+	box-shadow: 0px 10px 14px -7px #1d1f1f;
+	background:  #c7b99a !important;
+	background-color:#c7b99a;
+	border-radius:8px;
+	display:inline-block;
+	cursor:pointer;
+    color:#000000;
+    border: 0px solid black;
+}
 
 a.article,
 a.article:hover {

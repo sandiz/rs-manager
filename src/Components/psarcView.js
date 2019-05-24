@@ -322,34 +322,39 @@ export default class PSARCView extends React.Component {
     return (
       <div>
         <div className="centerButton list-unstyled">
-          <a
+          <button
+            type="button"
             onClick={this.openFileDialog}
             className={choosepsarchstyle}>
             Choose .psarc File(s)
-            </a>
-          <a
+            </button>
+          <button
+            type="button"
             onClick={this.openDirDialog}
             className={choosepsarchstyle}>
             Choose .psarc Directory
-            </a>
-          <a
+            </button>
+          <button
+            type="button"
             onClick={this.stopProcessing}
             className="extraPadding download"
             style={{ display: `${stopprocessingstyle}` }}>
             Stop Processing
-            </a>
-          <a
+            </button>
+          <button
+            type="button"
             onClick={this.forceViewUpdate}
             className="extraPadding download"
             style={{ display: `${stopprocessingstyle}` }}>
             Force Generate View
-            </a>
-          <a
+            </button>
+          <button
+            type="button"
             onClick={this.updateSongList}
             className="extraPadding download"
             style={{ display: `${hasdatastyle}` }}>
             Update Songs &gt; Owned
-            </a>
+            </button>
           <span style={{ display: `${hasdatastyle}` }}>
             <label htmlFor="cdlc">Mark All as CDLC</label>
             <input
