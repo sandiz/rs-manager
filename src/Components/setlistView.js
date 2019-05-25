@@ -898,23 +898,25 @@ export default class SetlistView extends React.Component {
                         this.lastChildID === "setlist_favorites"
                             ? (
                                 <button
+                                    style={{ width: 165 + 'px' }}
                                     type="button"
                                     onClick={this.updateFavs}
                                     className="extraPadding download">
-                                    Update Favorites from RS Profile
+                                    Update Favorites
                                 </button>
                             )
                             : null
                     }
                     {
-                        this.state.setlistMeta.is_manual === "true"
+                        this.state.setlistMeta.is_generated === "false"
+                            && this.state.setlistMeta.is_rssetlist === "false"
                             ? (
                                 <button
                                     type="button"
-                                    style={{ width: 150 + 'px' }}
+                                    style={{ width: 165 + 'px' }}
                                     className={choosesettingsstyle}
                                     onClick={() => this.setState({ showAddOptions: true })}>
-                                    Add Songs
+                                    Add / Remove Songs
                                 </button>
                             )
                             : null
