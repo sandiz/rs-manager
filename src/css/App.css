@@ -1485,3 +1485,15 @@ hr {
     width: 40px;
     margin-top: -3px;
 }
+
+.switch-candy-rs a{
+    background-color: #c7b99a;
+    border-radius: 5px;
+    outline: 0;
+}
+.switch-candy-rs a:active{
+    outline: 0;
+}
+.switch-candy-rs a:focus{
+    outline: 0;
+}

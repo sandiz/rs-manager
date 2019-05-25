@@ -1,9 +1,9 @@
-## Setlists - Custom list containing only arrangements you want
+## Setlists - Custom list containing only the arrangements you want
 ![](https://github.com/sandiz/rs-manager/raw/master/screenshots/images/setlist.favorites.png)
 
 #### Type of Setlists
  - Manual
-   * manually add arrangements to list via Song Details->Add to setlist
+   * manually add arrangements to list via Add/Remove songs
    * supports basic filters (see next point)
  - RSSetlist
    * starts with `RS`, this is a special setlist imported from in-game song list.
