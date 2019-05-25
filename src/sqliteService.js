@@ -1154,10 +1154,8 @@ export async function saveSongToSetlist(setlist, song, artist) {
 export async function saveSongByIDToSetlist(setlist, id) {
   const sql = `select uniqkey from songs_owned where id='${id}'`
   const op = await db.get(sql)
-  console.log(op);
   if (typeof op.uniqkey !== 'undefined') {
     const sql2 = `replace into '${setlist}' values ('${op.uniqkey}')`;
-    console.log(sql2);
     await db.run(sql2);
   }
 }
