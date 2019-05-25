@@ -172,7 +172,7 @@ class AddSongModal extends React.Component {
                     <div id="modal-info" style={{ width: 25 + '%' }}>
                         <a title="Close" className="modal-close" onClick={this.onHide}>Close</a>
                         <div style={{ textAlign: 'center' }}>
-                            <div>
+                            <div className="toggle-button-row">
                                 <label className="switch-light switch-candy-rs">
                                     <input type="checkbox" onChange={this.onChange} checked={this.state.removeMode} />
                                     <span>
