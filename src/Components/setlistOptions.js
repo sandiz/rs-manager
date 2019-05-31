@@ -40,7 +40,7 @@ function generateAnyTuningSql(filter) {
   const allNonStandardJSON = allNonStandardTunings.map(e => tunings[e])
 
   const allOpenTunings = [
-    "Open A", "Open D", "Open G", "Open E",
+    "Open A", "Open D", "Open G", "Open E", "DADGAD",
   ]
   const allOpenJSON = allOpenTunings.map(e => tunings[e]);
 

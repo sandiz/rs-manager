@@ -43,6 +43,7 @@ export const allTunings = {
   "Open D": [-2, 0, 0, -1, -2, -2],
   "Open G": [-2, -2, 0, 0, 0, -2],
   "Open E": [0, 2, 2, 1, 0, 0],
+  DADGAD: [-2, 0, 0, 0, -2, -2],
 }
 export const techniqueNames = {
   barreChords: "Barre Chords",
