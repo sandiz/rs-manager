@@ -101,6 +101,7 @@
     "eslint-plugin-jsx-a11y": "^6.1.1",
     "eslint-plugin-react": "^7.11.0",
     "foreman": "^3.0.1",
+    "google-translate": "^2.2.0",
     "jest": "23.6.0",
     "patch-package": "^5.1.1",
     "react-app-rewire-eslint": "^0.2.3",
