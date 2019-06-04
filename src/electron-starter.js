@@ -7,7 +7,7 @@ const windowStateKeeper = require('electron-window-state');
 const openAboutWindow = require('about-window').default;
 
 const i18n = require('./app-config/i18next.config').i18n;
-const i18nOptions = require('./app-config/i18next.config').i18Options;
+const languages = require('./app-config/i18next.config').languages;
 
 
 const setupEvents = require('./setupEvents');
@@ -90,7 +90,7 @@ function createMenu() {
     },
     ];
 
-    const languageMenu = i18nOptions.whitelist.map((languageCode) => {
+    const languageMenu = languages.map((languageCode) => {
         return {
             label: i18n.t(languageCode),
             type: 'radio',
