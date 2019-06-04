@@ -6,14 +6,108 @@ const isDev = require('electron-is-dev');
 const windowStateKeeper = require('electron-window-state');
 const openAboutWindow = require('about-window').default;
 
+const i18n = require('./app-config/i18next.config').i18n;
+const i18nOptions = require('./app-config/i18next.config').i18Options;
+
+
 const setupEvents = require('./setupEvents');
 if (setupEvents.handleSquirrelEvent()) {
     // squirrel event handled and app will exit in 1000ms, so don't do anything else
     return;
 }
 
-
 let mainWindow;
+
+function createMenu() {
+    // Create the Application's main menu
+    var template = [{
+        label: i18n.t("About"),
+        submenu: [
+            {
+                label: i18n.t("About Application"), click: () => {
+                    openAboutWindow({
+                        icon_path: path.join(__dirname, "./assets/icons/icon-1024x1024.png"),
+                        package_json_dir: path.join(__dirname, "../"),
+                        copyright: 'Copyright (c) 2018 sandiz',
+                        homepage: 'https://github.com/sandiz/rs-manager',
+                    });
+                }
+            },
+            { type: "separator" },
+            { label: i18n.t("Quit"), accelerator: "Command+Q", click: function () { app.quit(); } }
+        ]
+    }, {
+        label: i18n.t("Edit"),
+        submenu: [
+            { label: i18n.t("Undo"), accelerator: "CmdOrCtrl+Z", selector: "undo:" },
+            { label: i18n.t("Redo"), accelerator: "Shift+CmdOrCtrl+Z", selector: "redo:" },
+            { type: "separator" },
+            { label: i18n.t("Cut"), accelerator: "CmdOrCtrl+X", selector: "cut:" },
+            { label: i18n.t("Copy"), accelerator: "CmdOrCtrl+C", selector: "copy:" },
+            { label: i18n.t("Paste"), accelerator: "CmdOrCtrl+V", selector: "paste:" },
+            { label: i18n.t("Select All"), accelerator: "CmdOrCtrl+A", selector: "selectAll:" },
+            { label: i18n.t("Toggle Developer Tools"), role: "toggleDevTools" }
+        ]
+    }, {
+        label: i18n.t('View'),
+        submenu: [
+            {
+                label: i18n.t('Reload'),
+                accelerator: 'CmdOrCtrl+R',
+                click(item, focusedWindow) {
+                    if (focusedWindow) focusedWindow.reload()
+                }
+            },
+            {
+                type: 'separator'
+            },
+            {
+                label: i18n.t('Reset Zoom'),
+                role: 'resetzoom'
+            },
+            {
+                label: i18n.t('Zoom In'),
+                role: 'zoomin'
+            },
+            {
+                label: i18n.t('Zoom Out'),
+                role: 'zoomout'
+            },
+            {
+                type: 'separator'
+            },
+            {
+                label: i18n.t('Toggle Full Screen'),
+                role: 'togglefullscreen'
+            },
+            {
+                label: i18n.t('Toggle Full Screen (local)'),
+                click(item, focusedWindow) {
+                    if (focusedWindow) focusedWindow.setSimpleFullScreen(!focusedWindow.isSimpleFullScreen());
+                }
+            }
+        ]
+    },
+    ];
+
+    const languageMenu = i18nOptions.whitelist.map((languageCode) => {
+        return {
+            label: i18n.t(languageCode),
+            type: 'radio',
+            checked: i18n.language === languageCode,
+            click: () => {
+                i18n.changeLanguage(languageCode);
+            }
+        }
+    });
+
+    template.push({
+        label: i18n.t('Language'),
+        submenu: languageMenu
+    });
+
+    Menu.setApplicationMenu(Menu.buildFromTemplate(template));
+}
 
 async function createWindow() {
     // Load the previous state with fallback to defaults
@@ -71,75 +165,7 @@ async function createWindow() {
         c({ cancel: false, responseHeaders: d.responseHeaders });
     });
 
-
-    // Create the Application's main menu
-    var template = [{
-        label: "About",
-        submenu: [
-            {
-                label: "About Application", click: () => {
-                    openAboutWindow({
-                        icon_path: path.join(__dirname, "./assets/icons/icon-1024x1024.png"),
-                        package_json_dir: path.join(__dirname, "../"),
-                        copyright: 'Copyright (c) 2018 sandiz',
-                        homepage: 'https://github.com/sandiz/rs-manager',
-                    });
-                }
-            },
-            { type: "separator" },
-            { label: "Quit", accelerator: "Command+Q", click: function () { app.quit(); } }
-        ]
-    }, {
-        label: "Edit",
-        submenu: [
-            { label: "Undo", accelerator: "CmdOrCtrl+Z", selector: "undo:" },
-            { label: "Redo", accelerator: "Shift+CmdOrCtrl+Z", selector: "redo:" },
-            { type: "separator" },
-            { label: "Cut", accelerator: "CmdOrCtrl+X", selector: "cut:" },
-            { label: "Copy", accelerator: "CmdOrCtrl+C", selector: "copy:" },
-            { label: "Paste", accelerator: "CmdOrCtrl+V", selector: "paste:" },
-            { label: "Select All", accelerator: "CmdOrCtrl+A", selector: "selectAll:" },
-            { label: "Toggle Developer Tools", role: "toggleDevTools" }
-        ]
-    }, {
-        label: 'View',
-        submenu: [
-            {
-                label: 'Reload',
-                accelerator: 'CmdOrCtrl+R',
-                click(item, focusedWindow) {
-                    if (focusedWindow) focusedWindow.reload()
-                }
-            },
-            {
-                type: 'separator'
-            },
-            {
-                role: 'resetzoom'
-            },
-            {
-                role: 'zoomin'
-            },
-            {
-                role: 'zoomout'
-            },
-            {
-                type: 'separator'
-            },
-            {
-                role: 'togglefullscreen'
-            },
-            {
-                label: 'Toggle Full Screen (local)',
-                click(item, focusedWindow) {
-                    if (focusedWindow) focusedWindow.setSimpleFullScreen(!focusedWindow.isSimpleFullScreen());
-                }
-            }
-        ]
-    },
-    ];
-
-    Menu.setApplicationMenu(Menu.buildFromTemplate(template));
+    createMenu();
 
     mainWindow.on("closed", () => {
         mainWindow = null;
@@ -147,7 +173,6 @@ async function createWindow() {
     mainWindow.once('ready-to-show', () => {
         mainWindow.show()
     })
-
 }
 
 app.on("ready", createWindow);
@@ -162,4 +187,13 @@ app.on("activate", () => {
     if (mainWindow === null) {
         createWindow();
     }
+});
+
+i18n.on('loaded', (loaded) => {
+    i18n.changeLanguage('en');
+    i18n.off('loaded');
+});
+
+i18n.on('languageChanged', (lng) => {
+    createMenu();
 });

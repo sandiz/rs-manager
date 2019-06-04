@@ -24,6 +24,8 @@
     "find-process": "^1.1.3",
     "highcharts": "^6.2.0",
     "highcharts-react-official": "^2.0.0",
+    "i18next": "^15.1.3",
+    "i18next-node-fs-backend": "^2.1.3",
     "line-by-line": "^0.1.6",
     "marked": "^0.5.1",
     "memorystream": "^0.3.1",
