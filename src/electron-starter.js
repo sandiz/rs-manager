@@ -1,5 +1,5 @@
 const electron = require("electron");
-var { app, BrowserWindow, Menu, webFrame } = electron;
+var { app, BrowserWindow, Menu, webFrame, ipcMain } = electron;
 const path = require("path");
 const url = require("url");
 const isDev = require('electron-is-dev');
@@ -7,8 +7,8 @@ const windowStateKeeper = require('electron-window-state');
 const openAboutWindow = require('about-window').default;
 
 const i18n = require('./app-config/i18next.config').i18n;
-const languages = require('./app-config/i18next.config').languages;
-
+const languages = require('./app-config/base-config').languages;
+let currentLocale = 'en';
 
 const setupEvents = require('./setupEvents');
 if (setupEvents.handleSquirrelEvent()) {
@@ -175,7 +175,11 @@ async function createWindow() {
     })
 }
 
-app.on("ready", createWindow);
+app.on("ready", () => {
+    createWindow();
+    currentLocale = app.getLocale();
+    //currentLocale = 'bn';
+});
 
 app.on("window-all-closed", () => {
     //if (process.platform !== "darwin") {
@@ -190,10 +194,26 @@ app.on("activate", () => {
 });
 
 i18n.on('loaded', (loaded) => {
-    i18n.changeLanguage('en');
+    i18n.changeLanguage(currentLocale);
     i18n.off('loaded');
 });
 
 i18n.on('languageChanged', (lng) => {
     createMenu();
+    mainWindow.webContents.send('language-changed', {
+        language: lng,
+        namespace: 'translation',
+        resource: i18n.getResourceBundle(lng, 'translation')
+    });
+});
+
+ipcMain.on('get-initial-translations', (event, arg) => {
+    const loc = currentLocale;
+    i18n.loadLanguages(loc, (err, t) => {
+        const initial = {};
+        initial[loc] = {
+            'translation': i18n.getResourceBundle(loc, 'translation')
+        }
+        event.returnValue = initial;
+    });
 });

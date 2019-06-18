@@ -1,4 +1,6 @@
 import React, { Component } from 'react'
+import { translate, Trans } from 'react-i18next';
+
 import Sidebar from './Components/Sidebar'
 import PSARCView from './Components/psarcView'
 import SonglistView from './Components/songlistView'
@@ -26,61 +28,65 @@ import { detectImportRSMPath } from './rsrtoolservice';
 
 const csvparse = require('csv-parse/lib/es5/sync');
 
+const t = e => <Trans>{e}</Trans>;
+
 class App extends Component {
   constructor(props) {
     super(props);
+    //const t = e => console.log(e);
+
     this.state = {
       currentTab: null,
       currentChildTab: null,
       showSidebar: true,
-      appTitle: 'Running Migrations, please wait...',
+      appTitle: t('Running Migrations, please wait...'),
       currentCookie: '',
       rsProfileName: '',
       TabsV2Data: [
         {
           id: 'tab-dashboard',
-          name: 'Dashboard',
+          name: t('Dashboard'),
           children: [],
         },
         {
           id: 'tab-songs',
-          name: 'Songs',
+          name: t('Songs'),
           children: [
             {
               id: 'songs-owned',
-              name: 'Owned',
+              name: t('Owned'),
               isLeaf: true,
             },
             {
               id: 'songs-available',
-              name: 'DLC Catalog',
+              name: t('DLC Catalog'),
               isLeaf: true,
             },
           ],
         },
         {
           id: 'tab-setlist',
-          name: 'Setlists',
+          name: t('Setlists'),
           children: [],
         },
         {
           id: 'tab-psarc',
-          name: 'psarc Explorer',
+          name: t('psarc Explorer'),
           children: [],
         },
         {
           id: 'tab-rslive',
-          name: 'Rocksmith Live',
+          name: t('Rocksmith Live'),
           children: [],
         },
         {
           id: 'tab-settings',
-          name: 'Settings',
+          name: t('Settings'),
           children: [],
         },
         {
           id: 'tab-help',
-          name: 'Help',
+          name: t('Help'),
           children: [],
         },
       ],
@@ -123,6 +129,7 @@ class App extends Component {
   }
 
   componentDidMount = async () => {
+    //eslint-disable-next-line
     const rsmConfig = await getImportRSMConfig();
     if (rsmConfig === '') {
       /* if importrsm path is empty, try to detect it and update config */
@@ -583,5 +590,5 @@ class App extends Component {
     );
   }
 }
-
-export default App;
+// eslint-disable-next-line
+export default translate('translation')(App);
