@@ -1,7 +1,7 @@
 const i18n = require('i18next');
 const i18nextBackend = require('i18next-node-fs-backend');
 
-const languages = ['fr', 'en', 'es', 'bn'];
+const languages = require('./base-config').languages;
 const i18nextOptions = {
     backend: {
         // path where resources get loaded from
@@ -14,15 +14,16 @@ const i18nextOptions = {
         jsonIndent: 2,
     },
     interpolation: {
-        escapeValue: false
+        escapeValue: false,
     },
-    saveMissing: true,
+    saveMissing: false,
     fallbackLng: 'en',
+    lng: 'en',
     whitelist: languages,
     react: {
-        wait: false
+        wait: false,
     },
-    namespace: 'translation'
+    namespace: 'translation',
 };
 
 i18n
@@ -35,4 +36,3 @@ if (!i18n.isInitialized) {
 }
 
 module.exports.i18n = i18n;
-module.exports.languages = languages;

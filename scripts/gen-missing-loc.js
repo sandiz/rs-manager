@@ -1,5 +1,5 @@
 const fs = require('fs');
-const languages = require('../src/app-config/i18next.config').languages;
+const languages = require('../src/app-config/base-config').languages;
 
 const enMissingJSON = JSON.parse(fs.readFileSync(`../locales/en/translation.missing.json`));
 
