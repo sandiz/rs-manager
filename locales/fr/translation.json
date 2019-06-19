@@ -21,5 +21,15 @@
 	"en": "Anglais",
 	"es": "Espanol",
 	"bn": "bengali",
-	"Language": "La langue"
+	"Language": "La langue",
+	"Dashboard": "Tableau de bord",
+	"DLC Catalog": "Catalogue DLC",
+	"Help": "Aidez-moi",
+	"Owned": "Possédé",
+	"psarc Explorer": "psarc explorer",
+	"Rocksmith Live": "Rocksmith Live",
+	"Running Migrations, please wait...": "Lancer Migrations, veuillez patienter ...",
+	"Setlists": "Setlists",
+	"Settings": "Réglages",
+	"Songs": "Chansons"
 }

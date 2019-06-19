@@ -1,26 +1,33 @@
 const fs = require('fs');
+const child_process = require('child_process');
 const languages = require('../src/app-config/base-config').languages;
 
-const enMissingJSON = JSON.parse(fs.readFileSync(`../locales/en/translation.missing.json`));
+const root = '../src/'
+const wcCmd = `find ${root} -name \"*.js\" | grep -v node_modules/ | grep -v deni | xargs grep -o -E -w --no-filename \"t\\((\\\"|').*?(\\\"|')\\)\" | sort -u  --ignore-case| wc -l`
+const allKeys = `find ${root} -name \"*.js\" | grep -v node_modules/ | grep -v deni| xargs grep -o -E -w --no-filename \"t\\((\\\"|').*?(\\\"|')\\)\" | tr -s ' ' | tr '\\\"' \"'\" | grep -oE \"'.*'\" | tr \"'\" \" \" | tr -s \" \" | sort -u  --ignore-case`;
 
 
-if (!('TRANSLATE_API_KEY' in process.env)) {
-    console.log("TRANSLATE_API_KEY not found in environment variables");
-    process.exit(-1);
-}
-const googleTranslate = require('google-translate')(process.env.TRANSLATE_API_KEY);
-
-translate = (str, lang) => new Promise((resolve, reject) => {
-    googleTranslate.translate(str, lang, function (err, translations) {
-        if (err) reject(err);
-        else resolve(translations);
-    });
-})
 
 async function getTranslations() {
+    if (!('TRANSLATE_API_KEY' in process.env)) {
+        console.log("TRANSLATE_API_KEY not found in environment variables");
+        process.exit(-1);
+    }
+    const googleTranslate = require('google-translate')(process.env.TRANSLATE_API_KEY);
+    translate = (str, lang) => new Promise((resolve, reject) => {
+        googleTranslate.translate(str, lang, function (err, translations) {
+            if (err) reject(err);
+            else resolve(translations);
+        });
+    })
+
+    const enJSON = JSON.parse(fs.readFileSync(`../locales/en/translation.json`));
+    console.log("english translation keys => ", Object.keys(enJSON).length);
     for (let k = 0; k < languages.length; k += 1) {
         const lang = languages[k];
-        console.log(`generating missing loc for ${lang}`);
+        if (lang === 'en') continue;
+
+        console.log(`\ngenerating missing loc for '${lang}'..`);
 
         // open lang json
         let langJSON = null;
@@ -31,30 +38,88 @@ async function getTranslations() {
             langJSON = {};
         }
         // iterate over missing json
-        const missingKeys = Object.keys(enMissingJSON);
+        const enKeys = Object.keys(enJSON);
         const toTranslate = [];
 
-        for (let i = 0; i < missingKeys.length; i += 1) {
-            const missingKey = missingKeys[i];
-            toTranslate.push(enMissingJSON[missingKey]);
+        for (let i = 0; i < enKeys.length; i += 1) {
+            const enKey = enKeys[i];
+            if (enKey in langJSON) {
+            }
+            else {
+                const obj = {};
+                obj[enKey] = enJSON[enKey];
+                toTranslate.push(obj);
+            }
         }
+        console.log('# keys to translate =>', toTranslate.length);
 
+        const toTranslateArr = toTranslate.map(v => Object.values(v)[0]);
         let translations = [];
-        if (lang == 'en') {
+        translations = await translate(toTranslateArr, lang);
 
+        for (let i = 0; i < toTranslate.length; i += 1) {
+            const key = Object.keys(toTranslate[i])[0];
+            const translated = translations[i].translatedText;
+            langJSON[key] = translated;
         }
-        else {
-            translations = await translate(toTranslate, lang);
-        }
-        for (let i = 0; i < missingKeys.length; i += 1) {
-            const missingKey = missingKeys[i];
-            const translated = lang === 'en' ? enMissingJSON[missingKey] : translations[i].translatedText;
-            langJSON[missingKey] = translated;
-        }
-        console.log(langJSON);
+        console.log(`finished ${lang} translations, # keys => `, Object.keys(langJSON).length);
         //save to json
         fs.writeFileSync(`../locales/${lang}/translation.json`, JSON.stringify(langJSON, null, "\t"))
     }
 }
 
-getTranslations();
+function getMissingLocsFromEnglish() {
+    const wcOutput = child_process.execSync(wcCmd, {
+    });
+    const numLocs = parseInt(wcOutput.toString().trim());
+    console.log("# of t('calls')\t=> ", numLocs);
+
+    const allKeyOutput = child_process.execSync(allKeys);
+    let keys = allKeyOutput.toString().trim().split('\n');
+    keys = keys.map(v => v.trim());
+    console.log("# of t('keys')\t=> ", keys.length);
+
+    const enFile = `../locales/en/translation.json`;
+    const enJSON = JSON.parse(fs.readFileSync(enFile));
+    const missing = [];
+    for (let i = 0; i < keys.length; i += 1) {
+        const key = keys[i];
+        if (key in enJSON) {
+        }
+        else {
+            missing.push(key);
+        }
+    }
+    if (missing.length > 0) {
+        console.log("missing lockeys in english (default) =>", missing.length)
+        console.log(missing);
+
+        if (process.argv.includes("--update-en-if-reqd")) {
+            for (let i = 0; i < missing.length; i += 1) {
+                const loc = missing[i];
+                enJSON[loc] = loc;
+            }
+            const enStr = JSON.stringify(enJSON, null, "\t");
+            fs.writeFileSync(enFile, enStr);
+            console.log("loc file updated =>", enFile);
+        }
+        else {
+            console.log("pass --update-en-if-reqd to update the english translation with default english text")
+        }
+        process.exit(1);
+    }
+    else {
+        console.log("no missing loc keys found in =>", enFile);
+        process.exit(0);
+    }
+}
+
+if (process.argv.includes("--show-missing-locs-en")) {
+    getMissingLocsFromEnglish();
+}
+else if (process.argv.includes("--generate-translations")) {
+    getTranslations();
+}
+else {
+    getMissingLocsFromEnglish();
+}
