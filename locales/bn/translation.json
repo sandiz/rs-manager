@@ -22,5 +22,14 @@
 	"es": "স্পেনীয়",
 	"bn": "বাঙালি",
 	"Language": "ভাষা",
-	"Dashboard": "ভাষা"
+	"Dashboard": "ড্যাশবোর্ড",
+	"DLC Catalog": "DLC ক্যাটালগ",
+	"Help": "সাহায্য করুন",
+	"Owned": "মালিক",
+	"psarc Explorer": "psarc এক্সপ্লোরার",
+	"Rocksmith Live": "Rocksmith লাইভ",
+	"Running Migrations, please wait...": "চলমান মাইগ্রেশন, অনুগ্রহ করে অপেক্ষা করুন ...",
+	"Setlists": "Setlists",
+	"Settings": "সেটিংস",
+	"Songs": "গান"
 }
