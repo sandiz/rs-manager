@@ -1142,7 +1142,7 @@ SonglistView.propTypes = {
 }
 SonglistView.defaultProps = {
   updateHeader: () => { },
-  resetHeader: () => { },
+  //resetHeader: () => { },
   handleChange: () => { },
   saveSearch: () => { },
   getSearch: () => { },

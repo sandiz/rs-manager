@@ -242,7 +242,8 @@ export default class SongAvailableView extends React.Component {
                     },
                   }}
                   dateFormat="ddd ll" />
-              </div>);
+              </div>
+            );
           }
           const d = moment.unix(cell / 1000);
           //d.setUTCSeconds(cell / 1000);
@@ -254,7 +255,8 @@ export default class SongAvailableView extends React.Component {
                 selected={d}
                 onChange={t => this.updateSingleAcquireDate(cell, row, t)}
                 dateFormat="ddd ll" />
-            </div>);
+            </div>
+          );
         },
       },
       {
