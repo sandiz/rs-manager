@@ -8434,9 +8434,10 @@ natural-compare@^1.4.0:
   resolved "https://registry.yarnpkg.com/natural-compare/-/natural-compare-1.4.0.tgz#4abebfeed7541f2c27acfb29bdbbd15c8d5ba4f7"
   integrity sha1-Sr6/7tdUHywnrPspvbvRXI1bpPc=
 
-"naudiodon@https://github.com/Streampunk/naudiodon":
+naudiodon@^2.1.0:
   version "2.1.0"
-  resolved "https://github.com/Streampunk/naudiodon#8e946ebd4d4b3737dcdbc2ac7dc9c91cafe19f3e"
+  resolved "https://registry.yarnpkg.com/naudiodon/-/naudiodon-2.1.0.tgz#0cd13901fc05dba2e6e6ac1b0fd8ad2f50377315"
+  integrity sha512-yqACO6HSUUfl0gPIxOOq5k8oHhsMnP821di46MuoFN2uNwIgTEU+ddErXNIRl9n130jd4cuAz22OCp9SHTwdTg==
   dependencies:
     bindings "^1.5.0"
     node-addon-api "^1.6.3"
