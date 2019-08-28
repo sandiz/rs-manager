@@ -34,7 +34,6 @@ class App extends Component {
   constructor(props) {
     super(props);
     //const t = e => console.log(e);
-
     this.state = {
       currentTab: null,
       currentChildTab: null,
@@ -321,11 +320,10 @@ class App extends Component {
     }
 
     //check default show stat config
-
     this.setState({
       currentTab: tab,
       currentChildTab: child,
-      appTitle: text,
+      appTitle: t(text),
       selectedTab,
       showModalStats,
     });
@@ -336,7 +334,7 @@ class App extends Component {
       return;
     }
     if (tabname === this.state.currentTab.id) {
-      this.setState({ appTitle: text });
+      this.setState({ appTitle: t(text) });
     }
   }
 
@@ -345,7 +343,7 @@ class App extends Component {
       return;
     }
     if (tabname === this.state.currentTab.id && childname === this.state.currentChildTab.id) {
-      this.setState({ appTitle: text });
+      this.setState({ appTitle: t(text) });
     }
   }
 

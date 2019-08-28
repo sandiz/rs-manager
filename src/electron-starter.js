@@ -178,7 +178,7 @@ async function createWindow() {
 app.on("ready", () => {
     createWindow();
     currentLocale = app.getLocale();
-    //currentLocale = 'bn';
+    // currentLocale = 'bn';
 });
 
 app.on("window-all-closed", () => {
