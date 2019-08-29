@@ -1,6 +1,6 @@
-//config-overrides.js
-const rewireEslint = require('react-app-rewire-eslint');
-module.exports = function override(config, env) {
- config = rewireEslint(config, env);
- return config;
-}
+const { override, useEslintRc } = require('customize-cra');
+const path = require('path');
+
+module.exports = override(
+    useEslintRc(path.resolve(__dirname, '.eslintrc'))
+);

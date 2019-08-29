@@ -7,7 +7,7 @@ export const writeFile = (filePath, data) => new Promise((resolve, reject) => {
     else resolve();
   });
 });
-export const readFile = filePath => new Promise((resolve, reject) => {
+export const readFile = (filePath) => new Promise((resolve, reject) => {
   window.electronFS.readFile(filePath, (err, data) => {
     if (err) reject(err);
     else resolve(data);

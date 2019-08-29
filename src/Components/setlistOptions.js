@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types';
-import CreatableSelect from "react-select/lib/Creatable";
+import CreatableSelect from "react-select/creatable";
 
 import { enableScroll, forceNoScroll } from './songdetailView';
 import {
@@ -811,8 +811,8 @@ export default class SetlistOptions extends React.Component {
                         defaultValue={this.state.selectedFolder}
                         onChange={(e) => {
                           this.setState({ selectedFolder: e.target.value })
-                        }
-                        }>
+                        }}
+                      >
                         <option value="none">None</option>
                         {this.state.allFolders}
                       </select>

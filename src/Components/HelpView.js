@@ -34,6 +34,7 @@ export default class HelpView extends React.Component {
         <img src=${href} title=${title} style="width:100%" /> 
       `
     }
+    this.changeTo(this.props.defaultReadme)
   }
 
   imagerenderer = async (size) => {
@@ -46,10 +47,6 @@ export default class HelpView extends React.Component {
         <img src=${href} title=${title} style="width:${size}%" /> 
       `
     }
-  }
-
-  componentWillMount = async () => {
-    this.changeTo(this.props.defaultReadme)
   }
 
   shouldComponentUpdate = async (nextprops, nextstate) => {
@@ -102,7 +99,7 @@ export default class HelpView extends React.Component {
           const cdata = await window.fetch("https://api.github.com/repos/sandiz/rs-manager/releases?per_page=100");
           let cjson = await cdata.json();
           if (cjson.length > 0) {
-            cjson = cjson.filter(cl => cl.prerelease === false)
+            cjson = cjson.filter((cl) => cl.prerelease === false)
             this.setState({
               fileData: "",
               defaultReadme: id,
