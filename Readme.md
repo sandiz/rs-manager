@@ -73,8 +73,8 @@ Rocksmith's UI leaves a lot to be desired especially when you have a lot of song
     - `yarn start` to launch app in debug mode
 - Instructions for build
     - `yarn run build` to generate build files
-    - `yarn run package-mac` for mac builds
-    - `yarn run package-win` for win builds
+    - `yarn run dist-mac` for mac builds
+    - `yarn run dist-win` for win builds
 
 ## Thanks
    - [@kokolihapihvi](https://github.com/kokolihapihvi/RockSniffer) for the awesome `RockSniffer` tool.
