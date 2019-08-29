@@ -4,7 +4,7 @@ import Collapsible from 'react-collapsible';
 import DatePicker from 'react-datepicker';
 import moment from 'moment';
 import Swal from 'sweetalert2'
-import AsyncSelect from 'react-select/lib/Async';
+import AsyncSelect from 'react-select/async';
 import {
   saveSongToSetlist, getSongByID,
   updateCDLCStat, updateSAFCStat, saveSongByIDToSetlist,

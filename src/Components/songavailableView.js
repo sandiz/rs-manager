@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types';
 import DatePicker from 'react-datepicker';
 import moment from 'moment';
-import AsyncSelect from 'react-select/lib/Async';
+import AsyncSelect from 'react-select/async';
 import 'react-datepicker/dist/react-datepicker.css';
 
 import {
@@ -79,7 +79,7 @@ export function replaceRocksmithTerms(str) {
     .replace(/["']/g, '')
     .trim());
 }
-export async function tagOptions(inputValue) {
+export function tagOptions(inputValue) {
   return new Promise(async (resolve, reject) => {
     let tags = await getAllDistinctTags();
     let ft = [];
