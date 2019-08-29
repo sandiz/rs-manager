@@ -46,7 +46,7 @@
     "react-bootstrap-table2-filter": "^1.0.0",
     "react-bootstrap-table2-paginator": "^2.0.8",
     "react-collapsible": "^2.3.1",
-    "react-datepicker": "^2.8.0",
+    "react-datepicker": "^1.8.0",
     "react-dom": "^16.5.2",
     "react-select": "^3.0.4",
     "react-tooltip": "^3.8.4",
