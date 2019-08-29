@@ -34,6 +34,7 @@ export default class HelpView extends React.Component {
         <img src=${href} title=${title} style="width:100%" /> 
       `
     }
+    this.changeTo(this.props.defaultReadme)
   }
 
   imagerenderer = async (size) => {
@@ -46,10 +47,6 @@ export default class HelpView extends React.Component {
         <img src=${href} title=${title} style="width:${size}%" /> 
       `
     }
-  }
-
-  componentWillMount = async () => {
-    this.changeTo(this.props.defaultReadme)
   }
 
   shouldComponentUpdate = async (nextprops, nextstate) => {

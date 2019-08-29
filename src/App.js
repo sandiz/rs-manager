@@ -97,6 +97,8 @@ class App extends Component {
     //this.selectedTab = null;
     this.sidebarRef = React.createRef();
     this.navbarRef = React.createRef();
+
+    this.cwmasync();
   }
 
   cwmasync = async () => {
@@ -112,10 +114,6 @@ class App extends Component {
     this.setState({ readytorender: true }, () => {
       this.handleChange(this.state.TabsV2Data[0]);
     });
-  }
-
-  componentWillMount = async () => {
-    this.cwmasync();
     const zoomF = await getCurrentZoomFactorConfig();
     if (!Number.isNaN(parseFloat(zoomF))) {
       window.webFrame.setZoomFactor(zoomF);

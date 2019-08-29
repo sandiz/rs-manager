@@ -135,9 +135,10 @@ export default class SetlistSearchView extends React.Component {
         DispatcherService.dispatch(DispatchEvents.SETLIST_SELECT, row.key);
       },
     };
+    this.cwmasync();
   }
 
-  componentWillMount = async () => {
+  cwmasync = async () => {
     const sortOptions = await getDefaultSortOptionConfig();
 
     this.onTableChange("cdm", {
