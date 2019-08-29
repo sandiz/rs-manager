@@ -58,6 +58,13 @@
         "jsx-a11y/anchor-is-valid": "off",
         "no-else-return": "off",
         "react/prop-types": "off",
+        "import/no-cycle": "off",
+        "react/jsx-fragments": "off",
+        "arrow-parens": "off",
+        "max-classes-per-file": "off",
+        "prefer-object-spread": "off",
+        "no-mixed-operators": "off",
+        "no-async-promise-executor": "off"
     },
     "parser": "babel-eslint",
     "extends": "airbnb",

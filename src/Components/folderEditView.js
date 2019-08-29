@@ -16,6 +16,7 @@ export default class FolderEditView extends React.Component {
       allsetlists: [],
       checkedsetlist: [],
     }
+    this.refresh();
   }
 
   shouldComponentUpdate = async (nextprops, nextstate) => {
@@ -27,10 +28,6 @@ export default class FolderEditView extends React.Component {
       return true;
     }
     return false;
-  }
-
-  componentWillMount = async () => {
-    this.refresh();
   }
 
   handleChange = (event) => {
@@ -159,7 +156,7 @@ export default class FolderEditView extends React.Component {
         return (
           <div key={item.key}>
             <input
-              onChange={e => this.onChange(e, item)}
+              onChange={(e) => this.onChange(e, item)}
               checked={checked}
               key={item.key}
               value={item.key}

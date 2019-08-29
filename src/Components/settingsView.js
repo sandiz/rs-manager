@@ -1,6 +1,6 @@
 import React from 'react'
 import Collapsible from 'react-collapsible';
-import CreatableSelect from "react-select/lib/Creatable";
+import CreatableSelect from "react-select/creatable";
 import PropTypes from 'prop-types';
 import Select from 'react-select';
 import getProfileConfig, {
@@ -1160,38 +1160,39 @@ loading setlists into Rocksmith 2014.
                     </div>
                   </Fragment>
                   {
-                    window.os.platform() === "darwin" ? (<Fragment>
-                      <br />
-                      <span style={{ float: 'left' }}>
-                        <a>
-                          Passwordless Rocksmith Live
+                    window.os.platform() === "darwin" ? (
+                      <Fragment>
+                        <br />
+                        <span style={{ float: 'left' }}>
+                          <a>
+                            Passwordless Rocksmith Live
                       </a>
-                      </span>
-                      <span style={{
-                        float: 'right',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        width: 400 + 'px',
-                        textAlign: 'right',
-                        marginTop: 30 + 'px',
-                      }}>
-                        <input
-                          type="checkbox"
-                          checked={this.state.isSudoWhitelisted}
-                          onChange={event => this.handleCheckBasedSetting(event, "isSudoWhitelisted")} />
-                      </span>
-                      <br />
-                      <div className="">
-                        <span style={{ color: '#ccc' }}>
-                          if true, you&#39;ll have to create a file
-                          in /etc/sudoers.d/ with the values<br />
-                          {
-                            //eslint-disable-next-line
-                            <span style={{ userSelect: 'text' }}>%staff ALL=(ALL) NOPASSWD:&lt;path to Rocksmith Manager.app&gt;/Contents/Resources/app/src/tools/rocksniff_mac</span>
-                          }
                         </span>
-                      </div>
-                    </Fragment>
+                        <span style={{
+                          float: 'right',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          width: 400 + 'px',
+                          textAlign: 'right',
+                          marginTop: 30 + 'px',
+                        }}>
+                          <input
+                            type="checkbox"
+                            checked={this.state.isSudoWhitelisted}
+                            onChange={event => this.handleCheckBasedSetting(event, "isSudoWhitelisted")} />
+                        </span>
+                        <br />
+                        <div className="">
+                          <span style={{ color: '#ccc' }}>
+                            if true, you&#39;ll have to create a file
+                          in /etc/sudoers.d/ with the values<br />
+                            {
+                              //eslint-disable-next-line
+                              <span style={{ userSelect: 'text' }}>%staff ALL=(ALL) NOPASSWD:&lt;path to Rocksmith Manager.app&gt;/Contents/Resources/app/src/tools/rocksniff_mac</span>
+                            }
+                          </span>
+                        </div>
+                      </Fragment>
                     ) : null
                   }
                   <Fragment>
