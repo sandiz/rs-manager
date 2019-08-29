@@ -5,10 +5,6 @@
   "version": "2.2.0",
   "license": "GPL-3.0",
   "private": true,
-  "optionalDependencies": {
-    "appdmg": "^0.6.0",
-    "fs-xattr": "^0.3.0"
-  },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.8.1",
     "about-window": "^1.12.1",
@@ -78,10 +74,10 @@
     "pack": "build --dir",
     "dist-mac": "yarn run build && yarn run package-mac && yarn run dmg-mac",
     "dist-win": "yarn run build && yarn run package-win && yarn run exe-win",
-    "postinstall": "electron-rebuild  -f -w sqlite3, naudiodon, segfault-handler, registry-js && ./node_modules/.bin/electron-builder install-app-deps && npm rebuild --update-binary && patch-package",
+    "postinstall": "electron-builder install-app-deps && patch-package",
     "package-mac": "node scripts/package.js mac",
-    "package-win": "./node_modules/.bin/electron-builder install-app-deps &&  node scripts/package.js win",
-    "dmg-mac": "mkdir -p node_modules/ds-store/assets && cp src/assets/DSStore-clean node_modules/ds-store/assets/ && electron-installer-dmg ./release-builds/Rocksmith\\ Manager-darwin-x64/Rocksmith\\ Manager.app 'RocksmithManagerInstaller' --out=release-builds --overwrite --icon=src/assets/icons/mac/mac.icns",
+    "package-win": "node scripts/package.js win",
+    "dmg-mac": "yarn run electron-builder build --mac -c.extraMetadata.main=src/electron-starter.js -c.mac.identity=null --prepackaged 'release-builds/Rocksmith Manager-darwin-x64'",
     "exe-win": "node scripts/createinstaller.js",
     "contributors:add": "all-contributors add",
     "contributors:generate": "all-contributors generate",
@@ -94,9 +90,7 @@
     "customize-cra": "^0.5.0",
     "electron": "^6.0.5",
     "electron-builder": "^21.2.0",
-    "electron-installer-dmg": "^3.0.0",
     "electron-packager": "^14.0.5",
-    "electron-rebuild": "^1.8.2",
     "electron-winstaller": "^4.0.0",
     "eslint": "^6.2.2",
     "eslint-config-airbnb": "^18.0.1",
@@ -114,13 +108,66 @@
   "homepage": "./",
   "main": "src/electron-starter.js",
   "build": {
+    "productName": "Rocksmith Manager",
     "appId": "com.sandi.rsmanager",
+    "files": [
+      "src/",
+      ".",
+      "!dev${/*}",
+      "!samples${/*}",
+      "!demos${/*}",
+      "!doc${/*}",
+      "!test${/*}",
+      "!functest${/*}",
+      "!patches/*",
+      "!packages/*"
+    ],
+    "dmg": {
+      "contents": [
+        {
+          "x": 130,
+          "y": 220
+        },
+        {
+          "x": 410,
+          "y": 220,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    },
+    "mac": {
+      "icon": "src/assets/icons/mac/mac.icns",
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "electronLanguages": [
+        "en"
+      ]
+    },
     "win": {
-      "icon": "./src/assets/icon.jpg"
+      "icon": ".src/assets/icons/win/rs.ico",
+      "target": [
+        "zip",
+        "msi",
+        "nsis"
+      ]
     },
     "directories": {
-      "buildResources": "public"
-    }
+      "buildResources": "public",
+      "output": "release-builds"
+    },
+    "asar": "false",
+    "extraFiles": [
+      {
+        "from": "ncvxrl.json",
+        "to": "Resources/app",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ]
   },
   "jest": {
     "collectCoverageFrom": [
