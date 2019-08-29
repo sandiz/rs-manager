@@ -102,7 +102,7 @@ export default class HelpView extends React.Component {
           const cdata = await window.fetch("https://api.github.com/repos/sandiz/rs-manager/releases?per_page=100");
           let cjson = await cdata.json();
           if (cjson.length > 0) {
-            cjson = cjson.filter(cl => cl.prerelease === false)
+            cjson = cjson.filter((cl) => cl.prerelease === false)
             this.setState({
               fileData: "",
               defaultReadme: id,

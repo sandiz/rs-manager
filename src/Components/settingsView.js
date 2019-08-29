@@ -1,6 +1,6 @@
 import React from 'react'
 import Collapsible from 'react-collapsible';
-import CreatableSelect from "react-select/lib/Creatable";
+import CreatableSelect from "react-select/creatable";
 import PropTypes from 'prop-types';
 import Select from 'react-select';
 import getProfileConfig, {

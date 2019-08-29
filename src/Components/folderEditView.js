@@ -159,7 +159,7 @@ export default class FolderEditView extends React.Component {
         return (
           <div key={item.key}>
             <input
-              onChange={e => this.onChange(e, item)}
+              onChange={(e) => this.onChange(e, item)}
               checked={checked}
               key={item.key}
               value={item.key}
