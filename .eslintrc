@@ -56,7 +56,8 @@
         "indent": "off",
         "react/jsx-indent-props": "off",
         "jsx-a11y/anchor-is-valid": "off",
-        "no-else-return": "off"
+        "no-else-return": "off",
+        "import/no-cycle":"off"
     },
     "parser": "babel-eslint",
     "extends": "airbnb",
