@@ -80,7 +80,7 @@
     "dist-win": "yarn run build && yarn run package-win && yarn run exe-win",
     "postinstall": "electron-rebuild  -f -w sqlite3, naudiodon, segfault-handler, registry-js && ./node_modules/.bin/electron-builder install-app-deps && npm rebuild --update-binary && patch-package",
     "package-mac": "node scripts/package.js mac",
-    "package-win": "node scripts/package.js win",
+    "package-win": "./node_modules/.bin/electron-builder install-app-deps &&  node scripts/package.js win",
     "dmg-mac": "mkdir -p node_modules/ds-store/assets && cp src/assets/DSStore-clean node_modules/ds-store/assets/ && electron-installer-dmg ./release-builds/Rocksmith\\ Manager-darwin-x64/Rocksmith\\ Manager.app 'RocksmithManagerInstaller' --out=release-builds --overwrite --icon=src/assets/icons/mac/mac.icns",
     "exe-win": "node scripts/createinstaller.js",
     "contributors:add": "all-contributors add",
