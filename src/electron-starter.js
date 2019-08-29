@@ -41,8 +41,10 @@ async function createWindow() {
         ...frameOpts,
         icon: path.join(__dirname, "./icons/png/icon-1024x1024.png"),
         webPreferences: {
-            preload: path.join(__dirname, "./preload.js"),
+            preload: path.resolve(__dirname, "preload.js"),
             webSecurity: false,
+            nodeIntegration: true,
+            contextIsolation: false,
         },
     });
     // Let us register listeners on the window, so we can update the state
@@ -63,6 +65,7 @@ async function createWindow() {
             slashes: true
         })
     );
+    /*
     mainWindow.webContents.session.webRequest.onHeadersReceived({}, (d, c) => {
         if (d.responseHeaders['x-frame-options'] || d.responseHeaders['X-Frame-Options']) {
             delete d.responseHeaders['x-frame-options'];
@@ -70,6 +73,7 @@ async function createWindow() {
         }
         c({ cancel: false, responseHeaders: d.responseHeaders });
     });
+    */
 
 
     // Create the Application's main menu
