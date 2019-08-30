@@ -28,6 +28,10 @@
 
     // Public Key on purpose
     const apiKey = window.keys.lfm;
+    if (!apiKey) {
+      return 'LASTFM_API_KEY not set!!';
+    }
+
     const sizes = ['small', 'medium', 'large', 'extralarge', 'mega']
     let method = "artist";
     if (opts.track) method = "track";

@@ -34,6 +34,11 @@ const keys = {
 console.log("updating api keys");
 fs.writeFileSync("ncvxrl.json", JSON.stringify(keys));
 
+const dir = "release-builds"
+if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir);
+}
+
 const child = spawn("yarn", [
     "run",
     "electron-packager",
@@ -66,6 +71,7 @@ child.on('close', (code) => {
     postbuild();
 });
 
+
 function postbuild() {
     if (buildPlatform === "mac") {
         process.chdir("release-builds/");
@@ -73,6 +79,16 @@ function postbuild() {
 
         process.chdir("Rocksmith\ Manager-darwin-x64/Rocksmith\ Manager.app/Contents/Resources/app/");
         console.log("Running postbuild mac..");
+        const c = spawn("find", [
+            "node_modules",
+            "-name",
+            "*.d.ts",
+            "-exec",
+            "rm",
+            "{}",
+            ";"
+        ]);
+
         //console.log(process.cwd());
         spawn("install_name_tool", [
             "-change",
@@ -80,22 +96,10 @@ function postbuild() {
             "node_modules/naudiodon/build/Release/libportaudio.dylib",
             "node_modules/naudiodon/build/Release/naudiodon.node"
         ]);
-
-        process.chdir(olddir);
-        console.log("Zipping to Rocksmith Manager-macos-x64.zip")
-        const ditto = spawn("ditto", [
-            "-c",
-            "-k",
-            "--sequesterRsrc",
-            "--keepParent",
-            "Rocksmith\ Manager-darwin-x64/",
-            "RocksmithManager-macos-x64.zip"
-        ])
-        ditto.stdout.pipe(process.stdout);
-        ditto.stderr.pipe(process.stdout);
-        console.log("Creating DMG...")
+        console.log("Creating Zip/DMG...")
     }
     else if (buildPlatform == "win") {
+        /*
         const outZip = "RocksmithManager-win32-x64.zip"
         console.log("Zipping to " + outZip);
         process.chdir("release-builds/");
@@ -130,5 +134,6 @@ function postbuild() {
         ziper.on('exit', (code) => {
             console.log('child process exited with code ' + code.toString());
         });
+        */
     }
 }

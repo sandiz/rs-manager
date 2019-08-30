@@ -114,6 +114,10 @@ export default class SongDetailView extends React.Component {
   }
 
   getYoutubeResult = async (searchterm, divID) => {
+    if (!window.keys.yt) {
+      console.error("YOUTUBE_API_KEY not set!")
+      return;
+    }
     const url = 'https://www.googleapis.com/youtube/v3/search';
     const params = {
       part: 'snippet',
