@@ -72,8 +72,8 @@
     "electron-start": "node src/electron-wait-react",
     "react-start": "react-app-rewired start",
     "pack": "build --dir",
-    "dist-mac": "yarn run build && yarn run package-mac && yarn run dmg-mac",
-    "dist-win": "yarn run build && yarn run package-win && yarn run exe-win",
+    "dist-mac": "electron-builder install-app-deps && yarn run build && yarn run package-mac && yarn run dmg-mac",
+    "dist-win": "electron-builder install-app-deps && yarn run build && yarn run package-win && yarn run exe-win",
     "postinstall": "electron-builder install-app-deps && patch-package",
     "package-mac": "node scripts/package.js mac",
     "package-win": "node scripts/package.js win",
@@ -149,9 +149,16 @@
       "icon": "src/assets/icons/win/rs.ico",
       "target": [
         "zip",
-        "msi"
+        "nsis"
       ]
     },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "uninstallDisplayName": "${productName}"
+    },
+    "artifactName": "${productName}-${version}-${os}.${ext}",
     "directories": {
       "buildResources": "public",
       "output": "release-builds"
