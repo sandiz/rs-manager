@@ -118,6 +118,10 @@ class App extends Component {
     if (!Number.isNaN(parseFloat(zoomF))) {
       window.webFrame.setZoomFactor(zoomF);
     }
+    else {
+      const defaultZoom = 0.9;
+      window.webFrame.setZoomFactor(defaultZoom);
+    }
   }
 
   componentDidMount = async () => {

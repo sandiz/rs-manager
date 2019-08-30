@@ -200,7 +200,7 @@ export async function getIsSudoWhitelistedConfig() {
 }
 export async function getCurrentZoomFactorConfig() {
   const d = await getConfig("currentZoomFactor");
-  if (d === '') return 1; //default value;
+  if (d === '') return 0.9; //default value;
   return d;
 }
 export async function getImportRSMConfig() {

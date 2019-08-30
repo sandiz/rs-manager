@@ -91,7 +91,6 @@
     "electron": "^6.0.5",
     "electron-builder": "^21.2.0",
     "electron-packager": "^14.0.5",
-    "electron-winstaller": "^4.0.0",
     "eslint": "^6.2.2",
     "eslint-config-airbnb": "^18.0.1",
     "eslint-plugin-import": "^2.14.0",
@@ -147,7 +146,7 @@
       ]
     },
     "win": {
-      "icon": ".src/assets/icons/win/rs.ico",
+      "icon": "src/assets/icons/win/rs.ico",
       "target": [
         "zip",
         "msi",
