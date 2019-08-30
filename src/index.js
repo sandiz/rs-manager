@@ -11,11 +11,13 @@ const ipcRenderer = electron.ipcRenderer;
 
 const initialI18nStore = ipcRenderer.sendSync('get-initial-translations');
 ipcRenderer.on('language-changed', (event, message) => {
+    console.log("language-changed", message)
     if (!i18n.hasResourceBundle(message.language, message.namespace)) {
         i18n.addResourceBundle(message.language, message.namespace, message.resource);
     }
     i18n.changeLanguage(message.language);
 });
+electron.webFrame.setZoomFactor(0.9);
 
 
 ReactDOM.render(
