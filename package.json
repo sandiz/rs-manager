@@ -149,8 +149,7 @@
       "icon": "src/assets/icons/win/rs.ico",
       "target": [
         "zip",
-        "msi",
-        "nsis"
+        "msi"
       ]
     },
     "directories": {

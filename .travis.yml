@@ -57,9 +57,8 @@ deploy:
     secure: JLBAyE1qr4V0Vj3GiGqav2a8D46OnVQza3sQwdGXt1zKknFeL+vCE6Ww9wZc4zizdgk+iqDKJ4c/KgFNI/rn+gThDkEb3KTrXST9A9h2F3AoIk3UWwX3U6S880yWel+cOEFShVDIc2aZBduA7fhvhCjVRXmqF3+UHYe3xW4ivEcVrFBAW3FAoC7j+mKAqXgP3cH6XDa8dJhK/Tu15j+OoRFvNR9bCtm/qonLwWjrRpz2tKSYegUwrohWQJ80ck1CsPTeF5G/KR5aLqvzl9Xodl9lkbLBZSMv004LBpsae21UtMn3wLOi+16TO/XELOgDMj2ddH7OSZj2mv/ialuRtRZ8DBYu/x3Jo4lp7bJHTdQxNc0H8gjRouxmvPAkpjvlD6Dk0z3XNELm4/OVZk8SevKm+MMDKHmNuaFeTijewgO1KhIyM76EA78IutWEPBLLLGTlO+rlCuZH8B3d+yntn/DTYexOJ6/DM9HJwCDinC1l1AA4hz77XlWOGisY7T7oYEouXrteeqdey9QbWi1doe5aJugfexvxZ4CctmsIlbgZVzBEZPKAAaV+Qd6KAmyddc/3SX4t/VUl3Mycde5BvgThFgb5BUbZYnpRjlF6GXnnwTzH75fWmPNGC8y1epEH/TGm+ju/mVD0BBNXv3c+2tEfd3qCpuZJbJqQLEOOuGA=
   file_glob: true
   file: 
-    - release-builds/*.dmg
-    - release-builds/*.zip
-    - release-builds/*.zip
-    - release-builds/*.msi
+    - "release-builds/*.dmg"
+    - "release-builds/*.zip"
+    - "release-builds/*.msi"
   on:
     repo: sandiz/rs-manager
