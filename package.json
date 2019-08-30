@@ -2,7 +2,7 @@
   "name": "rs-manager",
   "description": "Manage Rocksmith playlists, songs, stats and dlc's",
   "author": "sandiz",
-  "version": "2.1.9",
+  "version": "2.2.0",
   "license": "GPL-3.0",
   "private": true,
   "dependencies": {
@@ -10,11 +10,9 @@
     "about-window": "^1.12.1",
     "aes-js": "^3.1.1",
     "album-art": "^2.0.1",
-    "appdmg": "^0.6.0",
     "await-spawn": "^3.0.0",
     "babel-eslint": "^10.0.3",
     "binary-parser": "^1.3.2",
-    "chartjs-plugin-zoom": "^0.7.3",
     "core-js": "^3.2.1",
     "css-toggle-switch": "^4.1.0",
     "csv-parse": "^4.4.5",
@@ -25,7 +23,6 @@
     "electron-window-state": "^5.0.1",
     "express": "^4.16.3",
     "find-process": "^1.1.3",
-    "fs-xattr": "^0.3.0",
     "highcharts": "^7.1.3",
     "highcharts-react-official": "^2.0.0",
     "i18next": "^15.1.3",
@@ -51,7 +48,7 @@
     "react-bootstrap-table2-filter": "^1.0.0",
     "react-bootstrap-table2-paginator": "^2.0.8",
     "react-collapsible": "^2.3.1",
-    "react-datepicker": "^2.8.0",
+    "react-datepicker": "^1.8.0",
     "react-dom": "^16.5.2",
     "react-i18next": "^9.0.10",
     "react-select": "^3.0.4",
@@ -78,13 +75,13 @@
     "electron-start": "node src/electron-wait-react",
     "react-start": "react-app-rewired start",
     "pack": "build --dir",
-    "dist-mac": "yarn run build && yarn run package-mac && yarn run dmg-mac",
-    "dist-win": "yarn run build && yarn run package-win && yarn run exe-win",
-    "postinstall": "electron-rebuild  -f -w sqlite3, naudiodon, segfault-handler && ./node_modules/.bin/electron-builder install-app-deps && patch-package",
+    "dist-mac": "electron-builder install-app-deps && yarn run build && yarn run package-mac && yarn run dmg-mac",
+    "dist-win": "electron-builder install-app-deps && yarn run build && yarn run package-win && yarn run exe-win",
+    "postinstall": "electron-builder install-app-deps && patch-package",
     "package-mac": "node scripts/package.js mac",
     "package-win": "node scripts/package.js win",
-    "dmg-mac": "mkdir -p node_modules/ds-store/assets && cp src/assets/DSStore-clean node_modules/ds-store/assets/ && electron-installer-dmg ./release-builds/Rocksmith\\ Manager-darwin-x64/Rocksmith\\ Manager.app 'RocksmithManagerInstaller' --out=release-builds --overwrite --icon=src/assets/icons/mac/mac.icns",
-    "exe-win": "node scripts/createinstaller.js",
+    "dmg-mac": "yarn run electron-builder build --publish=never --mac -c.extraMetadata.main=src/electron-starter.js -c.mac.identity=null --prepackaged 'release-builds/Rocksmith Manager-darwin-x64'",
+    "exe-win": "yarn run electron-builder build --publish=never --windows --c.extraMetadata.main=src/electron-starter.js --prepackaged \".\\release-builds\\Rocksmith Manager-win32-x64\"",
     "contributors:add": "all-contributors add",
     "contributors:generate": "all-contributors generate",
     "contributors:check": "all-contributors check"
@@ -96,10 +93,7 @@
     "customize-cra": "^0.5.0",
     "electron": "^6.0.5",
     "electron-builder": "^21.2.0",
-    "electron-installer-dmg": "^3.0.0",
     "electron-packager": "^14.0.5",
-    "electron-rebuild": "^1.8.2",
-    "electron-winstaller": "^4.0.0",
     "eslint": "^6.2.2",
     "eslint-config-airbnb": "^18.0.1",
     "eslint-plugin-import": "^2.14.0",
@@ -117,13 +111,72 @@
   "homepage": "./",
   "main": "src/electron-starter.js",
   "build": {
+    "productName": "Rocksmith Manager",
     "appId": "com.sandi.rsmanager",
-    "win": {
-      "icon": "./src/assets/icon.jpg"
+    "files": [
+      "src/",
+      ".",
+      "!dev${/*}",
+      "!samples${/*}",
+      "!demos${/*}",
+      "!doc${/*}",
+      "!test${/*}",
+      "!functest${/*}",
+      "!patches/*",
+      "!packages/*"
+    ],
+    "dmg": {
+      "contents": [
+        {
+          "x": 130,
+          "y": 220
+        },
+        {
+          "x": 410,
+          "y": 220,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
     },
+    "mac": {
+      "icon": "src/assets/icons/mac/mac.icns",
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "electronLanguages": [
+        "en"
+      ]
+    },
+    "win": {
+      "icon": "src/assets/icons/win/rs.ico",
+      "target": [
+        "zip",
+        "nsis"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "uninstallDisplayName": "${productName}"
+    },
+    "artifactName": "${productName}-${version}-${os}.${ext}",
     "directories": {
-      "buildResources": "public"
-    }
+      "buildResources": "public",
+      "output": "release-builds"
+    },
+    "asar": "false",
+    "extraFiles": [
+      {
+        "from": "ncvxrl.json",
+        "to": "Resources/app",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ]
   },
   "jest": {
     "collectCoverageFrom": [
