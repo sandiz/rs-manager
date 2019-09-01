@@ -1,5 +1,5 @@
 import React from 'react'
-import { translate, Trans } from 'react-i18next';
+import { withI18n, Trans } from 'react-i18next';
 import PropTypes from 'prop-types';
 
 import StatsTableView, { getStatsWidth } from './statsTableView';
@@ -178,12 +178,16 @@ class DashboardView extends React.Component {
 
   getPlayingTimeText = (secs) => {
     let playingText = ""
+    const daysText = this.props.t('days');
+    const hoursText = this.props.t('hours');
+    const minutesText = this.props.t('minutes');
+    const secondsText = this.props.t('seconds');
     switch (this.state.playingTimeFormat) {
       default:
       case "dhm":
         {
           const dateObj = this.convertMS(secs * 1000);
-          playingText = `${dateObj.d} days ${dateObj.h} hours ${dateObj.m} minutes`
+          playingText = `${dateObj.d} ${daysText} ${dateObj.h} ${hoursText} ${dateObj.m} ${minutesText}`
         }
         break;
       case "hm":
@@ -191,7 +195,7 @@ class DashboardView extends React.Component {
           let m = Math.floor(secs / 60);
           const h = Math.floor(m / 60);
           m %= 60;
-          playingText = `${h} hours ${m} minutes`
+          playingText = `${h} ${hoursText} ${m} ${minutesText}`
         }
         break;
       case "ms":
@@ -199,11 +203,11 @@ class DashboardView extends React.Component {
           let s = Math.floor(secs);
           const m = Math.floor(s / 60);
           s %= 60;
-          playingText = `${m} minutes ${s} seconds`
+          playingText = `${m} ${minutesText} ${s} ${secondsText}`
         }
         break;
       case "s":
-        playingText = `${secs} seconds`;
+        playingText = `${secs} ${secondsText}`;
         break;
     }
     return playingText;
@@ -874,7 +878,11 @@ class DashboardView extends React.Component {
         <div className="row justify-content-md-center" style={{ marginTop: -38 + 'px' }}>
           <div className="col col-md-3 ta-center dashboard-top dashboard-header">
             <div>
-              <a onClick={() => this.fetchRandomStats(false, true)}>Random Purchasable DLC</a>
+              <a onClick={() => this.fetchRandomStats(false, true)}>
+                <Trans i18nKey="randomPurchasableDLC">
+                  Random Purchasable DLC
+                </Trans>
+              </a>
               <hr />
             </div>
             <div style={{ marginTop: -6 + 'px', display: 'flex' }}>
@@ -905,7 +913,9 @@ class DashboardView extends React.Component {
             <div>
               <a
                 onClick={() => { window.shell.openExternal(this.state.weeklysongspotlight.url) }}>
-                Reddit Weekly Song Spotlight
+                <Trans i18nKey="redditWeekly">
+                  Reddit Weekly Song Spotlight
+                </Trans>
               </a>
               <hr />
             </div>
@@ -937,7 +947,11 @@ class DashboardView extends React.Component {
           </div>
           <div className="col col-md-3 ta-center dashboard-top dashboard-header">
             <div>
-              <a onClick={() => this.fetchRandomStats(true, false)}> Random Learn a Song</a>
+              <a onClick={() => this.fetchRandomStats(true, false)}>
+                <Trans i18nKey="randomLAS">
+                  Random Learn a Song
+                </Trans>
+              </a>
               <hr />
             </div>
             <div style={{ marginTop: -6 + 'px' }}>
@@ -987,14 +1001,18 @@ class DashboardView extends React.Component {
         <div className="row justify-content-md-center" style={{ marginTop: 10 + 'px' }}>
           <div className="col col-lg-5 ta-center dashboard-top">
             <div>
-              General
-                <hr />
+              <Trans i18nKey="general">
+                General
+              </Trans>
+              <hr />
             </div>
             <div className="stat-container">
               <div style={{ width: 50 + '%' }} className="ta-left">
                 <a onClick={this.changePlayingTimeSrc}>
-                  Total Playing Time
-                 <span style={{ fontSize: 12 + 'px' }}>(via {this.state.playingTimeSrc === "rs" ? "Rocksmith" : "Steam"})</span>
+                  <Trans i18nKey="totalPlayingTime">
+                    Total Playing Time
+                  </Trans>
+                  <span style={{ fontSize: 12 + 'px' }}>(via {this.state.playingTimeSrc === "rs" ? "Rocksmith" : "Steam"})</span>
                 </a>
               </div>
               <div style={{ width: 50 + '%' }} className="ta-right">
@@ -1003,24 +1021,30 @@ class DashboardView extends React.Component {
             </div>
             <div className="stat-container">
               <div style={{ width: 90 + '%' }} className="ta-left">
-                Max Consecutive Days
-                </div>
+                <Trans i18nKey="maxConsecutiveDays">
+                  Max Consecutive Days
+                </Trans>
+              </div>
               <div style={{ width: 10 + '%' }} className="ta-right">
                 {this.state.maxConsecutiveDays}
               </div>
             </div>
             <div className="stat-container">
               <div style={{ width: 90 + '%' }} className="ta-left">
-                Longest Note Streak
-                </div>
+                <Trans i18nKey="longestNoteStreak">
+                  Longest Note Streak
+                </Trans>
+              </div>
               <div style={{ width: 10 + '%' }} className="ta-right">
                 {this.state.longestStreak}
               </div>
             </div>
             <div className="stat-container">
               <div style={{ width: 90 + '%' }} className="ta-left">
-                Highest Solo Accuracy
-                </div>
+                <Trans i18nKey="highestSoloAccuracy">
+                  Highest Solo Accuracy
+                </Trans>
+              </div>
               <div style={{ width: 10 + '%' }} className="ta-right">
                 {this.state.highestSolo * 100}%
                 </div>
@@ -1028,37 +1052,47 @@ class DashboardView extends React.Component {
           </div>
           <div className="col col-lg-5 ta-center dashboard-top">
             <div>
-              Songs
-                <hr />
+              <Trans i18nKey="Songs">
+                Songs
+              </Trans>
+              <hr />
             </div>
             <div className="stat-container">
               <div style={{ width: 90 + '%' }} className="ta-left">
-                Songs Owned
-                </div>
+                <Trans i18nKey="songsOwned">
+                  Songs Owned
+                </Trans>
+              </div>
               <div style={{ width: 10 + '%' }} className="ta-right">
                 {this.state.songsOwned}
               </div>
             </div>
             <div className="stat-container">
               <div style={{ width: 90 + '%' }} className="ta-left">
-                Songs Playthroughs
-                </div>
+                <Trans i18nKey="songsPlaythroughs">
+                  Songs Playthroughs
+                </Trans>
+              </div>
               <div style={{ width: 10 + '%' }} className="ta-right">
                 {this.state.songPlays}
               </div>
             </div>
             <div className="stat-container">
               <div style={{ width: 30 + '%' }} className="ta-left">
-                Most Played Song
-                </div>
+                <Trans i18nKey="mostPlayedSong">
+                  Most Played Song
+                </Trans>
+              </div>
               <div style={{ width: 65 + '%' }} className="ta-right">
                 {this.state.mostPlayed}
               </div>
             </div>
             <div className="stat-container">
               <div style={{ width: 80 + '%' }} className="ta-left">
-                Arrangements Mastered
-                </div>
+                <Trans i18nKey="arrangementsMastered">
+                  Arrangements Mastered
+                </Trans>
+              </div>
               <div style={{ width: 20 + '%' }} className="ta-right">
                 {this.state.arrMaster}
               </div>
@@ -1101,7 +1135,7 @@ class DashboardView extends React.Component {
             this.state.scoreAttackDashboard[0] === true
               ? (
                 <div className={scoreattackstyle}>
-                  <span style={{ fontSize: 17 + 'px' }}>Score Attack - Easy</span>
+                  <span style={{ fontSize: 17 + 'px' }}><Trans i18nKey="scoreAttack">Score Attack</Trans> - <Trans i18nKey="easy">Easy</Trans></span>
                   <StatsTableView
                     scoreattack
                     total={this.state.satotal}
@@ -1115,7 +1149,7 @@ class DashboardView extends React.Component {
             this.state.scoreAttackDashboard[1] === true
               ? (
                 <div className={scoreattackstyle}>
-                  <span style={{ fontSize: 17 + 'px' }}>Score Attack - Medium</span>
+                  <span style={{ fontSize: 17 + 'px' }}><Trans i18nKey="scoreAttack">Score Attack</Trans> - <Trans i18nKey="medium">Medium</Trans></span>
                   <StatsTableView
                     scoreattack
                     total={this.state.satotal}
@@ -1129,7 +1163,7 @@ class DashboardView extends React.Component {
             this.state.scoreAttackDashboard[2] === true
               ? (
                 <div className={scoreattackstyle}>
-                  <span style={{ fontSize: 17 + 'px' }}>Score Attack - Hard</span>
+                  <span style={{ fontSize: 17 + 'px' }}><Trans i18nKey="scoreAttack">Score Attack</Trans> - <Trans i18nKey="hard">Hard</Trans></span>
                   <StatsTableView
                     scoreattack
                     total={this.state.satotal}
@@ -1143,7 +1177,7 @@ class DashboardView extends React.Component {
             this.state.scoreAttackDashboard[3] === true
               ? (
                 <div className={scoreattackstyle}>
-                  <span style={{ fontSize: 17 + 'px' }}>Score Attack - Master</span>
+                  <span style={{ fontSize: 17 + 'px' }}><Trans i18nKey="scoreAttack">Score Attack</Trans> - <Trans i18nKey="master">Master</Trans></span>
                   <StatsTableView
                     scoreattack
                     total={this.state.satotal}
@@ -1195,4 +1229,4 @@ DashboardView.defaultProps = {
   //resetHeader: () => {},
   handleChange: () => { },
 }
-export default translate('translation')(DashboardView)
+export default withI18n('translation')(DashboardView)

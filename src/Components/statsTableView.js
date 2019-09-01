@@ -1,5 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types';
+import { translate, Trans } from 'react-i18next';
+
 
 export const getStatsWidth = (input, min, max) => {
   const w = ((input - min) * 100) / (max - min);
@@ -7,7 +9,7 @@ export const getStatsWidth = (input, min, max) => {
   return w;
 }
 
-export default class StatsTableView extends React.Component {
+class StatsTableView extends React.Component {
   testFunction = () => {
     console.log("test");
   }
@@ -20,7 +22,7 @@ export default class StatsTableView extends React.Component {
             ? (
               <tbody>
                 <tr>
-                  <td>Total</td>
+                  <td><Trans i18nKey="total">Total</Trans></td>
                   <td className="">
                     <span id="lead_total" className="ta-right right-align header-sa-top">
                       {this.props.total}
@@ -122,7 +124,9 @@ export default class StatsTableView extends React.Component {
                 <tr>
                   <td
                     title="Unplayed Arrangments">
-                    Unplayed
+                    <Trans i18nKey="unplayed">
+                      Unplayed
+                    </Trans>
                   </td>
                   <td className="ta-left skinny">
                     <span>
@@ -140,7 +144,7 @@ export default class StatsTableView extends React.Component {
             : (
               <tbody>
                 <tr>
-                  <td>Total</td>
+                  <td><Trans i18nKey="total">Total</Trans></td>
                   <td className="">
                     <span id="lead_total" className="ta-right right-align header-top">
                       {this.props.total}
@@ -254,7 +258,9 @@ export default class StatsTableView extends React.Component {
                 <tr>
                   <td
                     title="Unplayed Arrangments">
-                    Unplayed
+                    <Trans i18nKey="unplayed">
+                      Unplayed
+                    </Trans>
                   </td>
                   <td className="ta-left skinny">
                     <span>
@@ -290,3 +296,5 @@ StatsTableView.defaultProps = {
   masteryTotals: [0, 0, 0, 0],
   masteryWidths: [0, 0, 0, 0],
 }
+
+export default translate('translation')(StatsTableView);
