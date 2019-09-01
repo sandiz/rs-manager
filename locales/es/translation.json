@@ -67,5 +67,19 @@
 	"no": "No",
 	"addNote": "Añadir la nota",
 	"deleteSongFromDB": "Eliminar canción de DB",
-	"deleteNeverImport": "Eliminar y nunca importar"
+	"deleteNeverImport": "Eliminar y nunca importar",
+	"ID": "CARNÉ DE IDENTIDAD",
+	"Song": "Canción",
+	"Artist": "Artista",
+	"Album": "Álbum",
+	"Arrangement": "Arreglo",
+	"Mastery": "Maestría",
+	"Tuning": "Sintonización",
+	"Count": "Contar",
+	"Difficulty": "Dificultad",
+	"Badges": "Insignias",
+	"Search": "Buscar",
+	"updateMasteryFromProfile": "Actualizar dominio del perfil",
+	"anything": "Cualquier cosa",
+	"Anything": "Cualquier cosa"
 }

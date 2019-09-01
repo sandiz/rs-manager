@@ -67,5 +67,19 @@
 	"no": "Non",
 	"addNote": "Ajouter une note",
 	"deleteSongFromDB": "Supprimer la chanson de la base de données",
-	"deleteNeverImport": "Supprimer et ne jamais importer"
+	"deleteNeverImport": "Supprimer et ne jamais importer",
+	"ID": "ID",
+	"Song": "Chanson",
+	"Artist": "Artiste",
+	"Album": "Album",
+	"Arrangement": "Arrangement",
+	"Mastery": "La maîtrise",
+	"Tuning": "Réglage",
+	"Count": "Compter",
+	"Difficulty": "Difficulté",
+	"Badges": "Insignes",
+	"Search": "Chercher",
+	"updateMasteryFromProfile": "Mettre à jour la maîtrise du profil",
+	"anything": "N'importe quoi",
+	"Anything": "N'importe quoi"
 }
