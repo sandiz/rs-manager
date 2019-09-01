@@ -1,5 +1,7 @@
 import React from 'react'
+import { translate, Trans } from 'react-i18next';
 import PropTypes from 'prop-types';
+
 import StatsTableView, { getStatsWidth } from './statsTableView';
 import getProfileConfig, {
   updateProfileConfig, getScoreAttackConfig, getUseCDLCConfig,
@@ -24,7 +26,7 @@ const { path } = window;
 const Steam = require('steam-webapi');
 const albumArt = require('./../lib/album-art');
 
-export default class DashboardView extends React.Component {
+class DashboardView extends React.Component {
   constructor(props) {
     super(props);
     this.tabname = 'tab-dashboard';
@@ -852,8 +854,10 @@ export default class DashboardView extends React.Component {
             }}
             ref={this.infoRef}
             className={infostyle}>
-            Generate Infographic
-            </button>
+            <Trans i18nKey="generateInfographic">
+              Generate Infographic
+            </Trans>
+          </button>
           <button
             type="button"
             onClick={this.refreshStats}
@@ -861,8 +865,10 @@ export default class DashboardView extends React.Component {
               width: 15 + '%',
             }}
             className="extraPadding download">
-            Refresh Stats from Profile
-            </button>
+            <Trans i18nKey="refreshStats">
+              Refresh Stats from Profile
+            </Trans>
+          </button>
         </div>
         <br />
         <div className="row justify-content-md-center" style={{ marginTop: -38 + 'px' }}>
@@ -1189,3 +1195,4 @@ DashboardView.defaultProps = {
   //resetHeader: () => {},
   handleChange: () => { },
 }
+export default translate('translation')(DashboardView)
