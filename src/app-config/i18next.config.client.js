@@ -12,7 +12,7 @@ const i18nextOptions = {
         escapeValue: false,
     },
     //debug: true,
-    saveMissing: true,
+    saveMissing: false,
     lng: 'bn',
     fallbackLng: 'en',
     whitelist: languages,

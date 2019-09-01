@@ -29,7 +29,6 @@ import { detectImportRSMPath } from './rsrtoolservice';
 const csvparse = require('csv-parse/lib/es5/sync');
 
 const t = e => <Trans i18nKey={e}>{e}</Trans>;
-
 class App extends Component {
   constructor(props) {
     super(props);
@@ -102,8 +101,6 @@ class App extends Component {
     //this.selectedTab = null;
     this.sidebarRef = React.createRef();
     this.navbarRef = React.createRef();
-
-    this.cwmasync();
   }
 
   cwmasync = async () => {
@@ -116,9 +113,10 @@ class App extends Component {
     //this.props.handleChange(TabsData[2], TabsData[2].child[0])
     //this.toggleActive(TabsData[2]);
     this.updateHeader("tab-dashboard", "Rocksmith 2014 Dashboard")
-    this.setState({ readytorender: true }, () => {
-      this.handleChange(this.state.TabsV2Data[0]);
-    });
+    this.setState({ readytorender: true });
+
+    this.handleChange(this.state.TabsV2Data[0]);
+
     const zoomF = await getCurrentZoomFactorConfig();
     if (!Number.isNaN(parseFloat(zoomF))) {
       window.webFrame.setZoomFactor(zoomF);
@@ -130,6 +128,7 @@ class App extends Component {
   }
 
   componentDidMount = async () => {
+    await this.cwmasync();
     //eslint-disable-next-line
     const rsmConfig = await getImportRSMConfig();
     if (rsmConfig === '') {
