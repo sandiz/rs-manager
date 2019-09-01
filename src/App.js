@@ -28,7 +28,7 @@ import { detectImportRSMPath } from './rsrtoolservice';
 
 const csvparse = require('csv-parse/lib/es5/sync');
 
-const t = e => <Trans>{e}</Trans>;
+const t = e => <Trans i18nKey={e}>{e}</Trans>;
 
 class App extends Component {
   constructor(props) {

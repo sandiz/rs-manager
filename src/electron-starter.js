@@ -15,7 +15,6 @@ if (setupEvents.handleSquirrelEvent()) {
     // squirrel event handled and app will exit in 1000ms, so don't do anything else
     return;
 }
-
 let mainWindow;
 
 function createMenu() {
@@ -182,6 +181,7 @@ async function createWindow() {
 app.on("ready", () => {
     createWindow();
     currentLocale = app.getLocale();
+    // console.log('currentLocale: ' + currentLocale);
     // currentLocale = 'bn';
 });
 
@@ -198,6 +198,7 @@ app.on("activate", () => {
 });
 
 i18n.on('loaded', (loaded) => {
+    //console.log('i18n-loaded');
     i18n.changeLanguage(currentLocale);
     i18n.off('loaded');
 });

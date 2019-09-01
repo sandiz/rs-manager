@@ -11,6 +11,7 @@ const i18nextOptions = {
     interpolation: {
         escapeValue: false,
     },
+    //debug: true,
     saveMissing: true,
     lng: 'bn',
     fallbackLng: 'en',

@@ -31,5 +31,7 @@
 	"Running Migrations, please wait...": "Ejecutando Migraciones, por favor espere ...",
 	"Setlists": "Setlists",
 	"Settings": "Ajustes",
-	"Songs": "Canciones"
+	"Songs": "Canciones",
+	"generateInfographic": "Generar infografía",
+	"refreshStats": "Actualizar estadísticas del perfil"
 }

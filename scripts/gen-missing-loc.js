@@ -52,14 +52,19 @@ async function getTranslations() {
             }
         }
         console.log('# keys to translate =>', toTranslate.length);
-
+        if (toTranslate.length == 0)
+            continue;
         const toTranslateArr = toTranslate.map(v => Object.values(v)[0]);
         let translations = [];
         translations = await translate(toTranslateArr, lang);
-
         for (let i = 0; i < toTranslate.length; i += 1) {
             const key = Object.keys(toTranslate[i])[0];
-            const translated = translations[i].translatedText;
+            let translated = "";
+            if (Array.isArray(translations))
+                translated = translations[i].translatedText;
+            else
+                translated = translations.translatedText;
+
             langJSON[key] = translated;
         }
         console.log(`finished ${lang} translations, # keys => `, Object.keys(langJSON).length);
