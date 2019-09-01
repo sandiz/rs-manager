@@ -67,5 +67,18 @@
 	"no": "No",
 	"addNote": "Add Note",
 	"deleteSongFromDB": "Delete Song from DB",
-	"deleteNeverImport": "Delete and Never Import"
+	"deleteNeverImport": "Delete and Never Import",
+	"ID": "ID",
+	"Song": "Song",
+	"Artist": "Artist",
+	"Album": "Album",
+	"Arrangement": "Arrangement",
+	"Mastery": "Mastery",
+	"Tuning": "Tuning",
+	"Count": "Count",
+	"Difficulty": "Difficulty",
+	"Badges": "Badges",
+	"Search": "Search",
+	"updateMasteryFromProfile": "Update Mastery from Profile",
+	"Anything": "Anything"
 }

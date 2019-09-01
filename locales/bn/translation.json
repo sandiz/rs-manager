@@ -25,7 +25,7 @@
 	"Dashboard": "ড্যাশবোর্ড",
 	"DLC Catalog": "DLC ক্যাটালগ",
 	"Help": "সাহায্য",
-	"Owned": "মালিক",
+	"Owned": "নিজের",
 	"psarc Explorer": "psarc এক্সপ্লোরার",
 	"Rocksmith Live": "Rocksmith লাইভ",
 	"Running Migrations, please wait...": "চলমান মাইগ্রেশন, অনুগ্রহ করে অপেক্ষা করুন ...",
@@ -67,5 +67,18 @@
 	"no": "না",
 	"addNote": "নোট যোগ করুন",
 	"deleteSongFromDB": "ডিবি থেকে গান মুছুন",
-	"deleteNeverImport": "মুছুন এবং না আমদানি"
+	"deleteNeverImport": "মুছুন এবং না আমদানি",
+	"ID": "আইডি",
+	"Song": "গান",
+	"Artist": "শিল্পী",
+	"Album": "অ্যালবাম",
+	"Arrangement": "ব্যবস্থা",
+	"Mastery": "আধিপত্য",
+	"Tuning": "সুরকরণ",
+	"Count": "গণনা",
+	"Difficulty": "কঠিনতা",
+	"Badges": "ব্যাজ",
+	"Search": "অনুসন্ধান",
+	"updateMasteryFromProfile": "প্রোফাইল থেকে মাস্টারি আপডেট করুন",
+	"Anything": "যাহা-কিছু"
 }
