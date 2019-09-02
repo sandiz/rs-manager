@@ -104,5 +104,21 @@
 	"backupOfYourProfile": "A backup of your profile was created",
 	"here": "here",
 	"anErrorOcurred": "an error occurred",
-	"rocksmithWarning": " Please make sure Rocksmith 2014 is not running when you export."
+	"rocksmithWarning": " Please make sure Rocksmith 2014 is not running when you export.",
+	"setlistOptions": "Setlist Options",
+	"name": "Name",
+	"type": "Type",
+	"setlistManual": "Manual - Add Songs manually",
+	"setlistGenerated": "Generated  - Add Songs via filters",
+	"setlistRs": "Rocksmith Setlist - Imported from game",
+	"folder": "Folder",
+	"defualtSortOrder": "Default<br />Sort Order",
+	"filters": "Filters",
+	"filterType": "Filter Type",
+	"comparator": "Comparator",
+	"value": "Value",
+	"logicChain": "Logic Chain",
+	"delete": "Delete",
+	"Save Options": "Save Options",
+	"Delete Setlist": "Delete Setlist"
 }

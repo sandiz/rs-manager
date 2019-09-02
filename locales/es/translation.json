@@ -105,5 +105,21 @@
 	"backupOfYourProfile": "Se creó una copia de seguridad de su perfil.",
 	"here": "aquí",
 	"anErrorOcurred": "ocurrió un error",
-	"rocksmithWarning": "Asegúrese de que Rocksmith 2014 no se esté ejecutando cuando exporte."
+	"rocksmithWarning": "Asegúrese de que Rocksmith 2014 no se esté ejecutando cuando exporte.",
+	"setlistOptions": "Opciones de Setlist",
+	"name": "Nombre",
+	"type": "Tipo",
+	"setlistManual": "Manual - Agregar canciones manualmente",
+	"setlistGenerated": "Generado - Agregue canciones a través de filtros",
+	"setlistRs": "Setlist de Rocksmith: importado del juego",
+	"folder": "Carpeta",
+	"defualtSortOrder": "Defecto <br /> Orden de clasificación",
+	"filters": "Filtros",
+	"filterType": "Tipo de filtro",
+	"comparator": "Comparador",
+	"value": "Valor",
+	"logicChain": "Cadena lógica",
+	"delete": "Borrar",
+	"Save Options": "Guardar opciones",
+	"Delete Setlist": "Eliminar Setlist"
 }
