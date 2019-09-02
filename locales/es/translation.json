@@ -81,5 +81,14 @@
 	"Search": "Buscar",
 	"updateMasteryFromProfile": "Actualizar dominio del perfil",
 	"anything": "Cualquier cosa",
-	"Anything": "Cualquier cosa"
+	"Anything": "Cualquier cosa",
+	"Rocksmith 2014 Dashboard": "Panel de Rocksmith 2014",
+	"Filter by genre": "Filtrar por género",
+	"updateAcquiredDates": "Actualizar fechas adquiridas",
+	"updateRocksmithDLCCatalog": "Actualizar catálogo DLC",
+	"DLC Name": "Nombre DLC",
+	"Release Date": "Fecha de lanzamiento",
+	"Acquired Date": "Fecha de adquisición",
+	"Mastered": "Dominado",
+	"Percent": "Por ciento"
 }

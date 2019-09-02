@@ -81,5 +81,14 @@
 	"Search": "Chercher",
 	"updateMasteryFromProfile": "Mettre à jour la maîtrise du profil",
 	"anything": "N'importe quoi",
-	"Anything": "N'importe quoi"
+	"Anything": "N'importe quoi",
+	"Rocksmith 2014 Dashboard": "Tableau de bord Rocksmith 2014",
+	"Filter by genre": "Filtrer par genre",
+	"updateAcquiredDates": "Mettre à jour les dates acquises",
+	"updateRocksmithDLCCatalog": "Mettre à jour le catalogue DLC",
+	"DLC Name": "Nom DLC",
+	"Release Date": "Date de sortie",
+	"Acquired Date": "Date d'acquisition",
+	"Mastered": "Maîtrisé",
+	"Percent": "Pour cent"
 }

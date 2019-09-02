@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types';
+import { withI18n, Trans } from 'react-i18next';
 import DatePicker from 'react-datepicker';
 import moment from 'moment';
 import AsyncSelect from 'react-select/async';
@@ -96,7 +97,7 @@ export function tagOptions(inputValue) {
     resolve(ft);
   });
 }
-export default class SongAvailableView extends React.Component {
+class SongAvailableView extends React.Component {
   constructor(props) {
     super(props);
     this.tabname = "tab-songs"
@@ -139,7 +140,7 @@ export default class SongAvailableView extends React.Component {
       },
       {
         dataField: "name",
-        text: "DLC Name",
+        text: this.props.t("DLC Name"),
         style: (cell, row, rowIndex, colIndex) => {
           return {
             width: '45%',
@@ -185,7 +186,7 @@ export default class SongAvailableView extends React.Component {
       },
       {
         dataField: "release_date",
-        text: "Release Date",
+        text: this.props.t("Release Date"),
         style: (cell, row, rowIndex, colIndex) => {
           return {
             width: '25%',
@@ -208,7 +209,7 @@ export default class SongAvailableView extends React.Component {
       },
       {
         dataField: "acquired_date",
-        text: "Acquired Date",
+        text: this.props.t("Acquired Date"),
         style: (cell, row, rowIndex, colIndex) => {
           return {
             width: '25%',
@@ -261,7 +262,7 @@ export default class SongAvailableView extends React.Component {
       },
       {
         dataField: "owned",
-        text: "Owned",
+        text: this.props.t("Owned"),
         style: (cell, row, rowIndex, colIndex) => {
           return {
             width: '15%',
@@ -271,6 +272,9 @@ export default class SongAvailableView extends React.Component {
           };
         },
         sort: true,
+        formatter: (cell, row) => {
+          return cell === true ? this.props.t("yes") : this.props.t("no");
+        },
       },
     ]
   }
@@ -862,7 +866,7 @@ export default class SongAvailableView extends React.Component {
               defaultOptions
               styles={customStyles}
               loadOptions={tagOptions}
-              placeholder="Filter by genre"
+              placeholder={this.props.t("Filter by genre")}
             />
           </div>
           <button
@@ -870,14 +874,18 @@ export default class SongAvailableView extends React.Component {
             style={{ width: 15 + '%' }}
             onClick={this.updateSteamDLCCatalog}
             className="extraPadding download">
-            Update Rocksmith DLC Catalog
+            <Trans i18nKey="updateRocksmithDLCCatalog">
+              Update Rocksmith DLC Catalog
+            </Trans>
           </button>
           <button
             type="button"
             style={{ width: 15 + '%' }}
             onClick={this.updateOwnedStatus}
             className={ownedstyle}>
-            Update Owned/Acquired Date
+            <Trans i18nKey="updateAcquiredDates">
+              Update Acquired Dates
+            </Trans>
           </button>
         </div>
         <div>
@@ -947,3 +955,5 @@ DateAcquiredInput.propTypes = {
   onClick: PropTypes.func,
   value: PropTypes.string,
 };
+
+export default withI18n('translation')(SongAvailableView);

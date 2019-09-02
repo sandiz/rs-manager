@@ -80,5 +80,14 @@
 	"Badges": "Badges",
 	"Search": "Search",
 	"updateMasteryFromProfile": "Update Mastery from Profile",
-	"Anything": "Anything"
+	"Anything": "Anything",
+	"Rocksmith 2014 Dashboard": "Rocksmith 2014 Dashboard",
+	"Filter by genre": "Filter by genre",
+	"updateRocksmithDLCCatalog": "Update DLC Catalog",
+	"updateAcquiredDates": "Update Acquired Dates",
+	"DLC Name": "DLC Name",
+	"Release Date": "Release Date",
+	"Acquired Date": "Acquired Date",
+	"Mastered": "Mastered",
+	"Percent": "Percent"
 }
