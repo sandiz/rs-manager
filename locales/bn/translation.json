@@ -80,5 +80,14 @@
 	"Badges": "ব্যাজ",
 	"Search": "অনুসন্ধান",
 	"updateMasteryFromProfile": "প্রোফাইল থেকে মাস্টারি আপডেট করুন",
-	"Anything": "যাহা-কিছু"
+	"Anything": "যাহা-কিছু",
+	"Rocksmith 2014 Dashboard": "রকস্মিথ 2014 ড্যাশবোর্ড",
+	"Filter by genre": "ঘরানার মাধ্যমে ফিল্টার করুন",
+	"updateAcquiredDates": "অর্জিত তারিখগুলি আপডেট",
+	"updateRocksmithDLCCatalog": "ডিএলসি ক্যাটালগ আপডেট",
+	"DLC Name": "ডিএলসি নাম",
+	"Release Date": "প্রকাশের তারিখ",
+	"Acquired Date": "অর্জিত তারিখ",
+	"Mastered": "আয়ত্ত",
+	"Percent": "শতাংশ"
 }

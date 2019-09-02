@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { translate, Trans } from 'react-i18next';
+import { withI18n } from 'react-i18next';
 
 import Sidebar from './Components/Sidebar'
 import PSARCView from './Components/psarcView'
@@ -28,7 +28,6 @@ import { detectImportRSMPath } from './rsrtoolservice';
 
 const csvparse = require('csv-parse/lib/es5/sync');
 
-const t = e => <Trans i18nKey={e}>{e}</Trans>;
 class App extends Component {
   constructor(props) {
     super(props);
@@ -37,54 +36,54 @@ class App extends Component {
       currentTab: null,
       currentChildTab: null,
       showSidebar: true,
-      appTitle: t('Running Migrations, please wait...'),
+      appTitle: this.props.t('Running Migrations, please wait...'),
       currentCookie: '',
       rsProfileName: '',
       TabsV2Data: [
         {
           id: 'tab-dashboard',
-          name: t('Dashboard'),
+          name: this.props.t('Dashboard'),
           children: [],
         },
         {
           id: 'tab-songs',
-          name: t('Songs'),
+          name: this.props.t('Songs'),
           children: [
             {
               id: 'songs-owned',
-              name: t('Owned'),
+              name: this.props.t('Owned'),
               isLeaf: true,
             },
             {
               id: 'songs-available',
-              name: t('DLC Catalog'),
+              name: this.props.t('DLC Catalog'),
               isLeaf: true,
             },
           ],
         },
         {
           id: 'tab-setlist',
-          name: t('Setlists'),
+          name: this.props.t('Setlists'),
           children: [],
         },
         {
           id: 'tab-psarc',
-          name: t('psarc Explorer'),
+          name: this.props.t('psarc Explorer'),
           children: [],
         },
         {
           id: 'tab-rslive',
-          name: t('Rocksmith Live'),
+          name: this.props.t('Rocksmith Live'),
           children: [],
         },
         {
           id: 'tab-settings',
-          name: t('Settings'),
+          name: this.props.t('Settings'),
           children: [],
         },
         {
           id: 'tab-help',
-          name: t('Help'),
+          name: this.props.t('Help'),
           children: [],
         },
       ],
@@ -112,18 +111,14 @@ class App extends Component {
     //sthis.handleChange(this.state.TabsData[0]);
     //this.props.handleChange(TabsData[2], TabsData[2].child[0])
     //this.toggleActive(TabsData[2]);
-    this.updateHeader("tab-dashboard", "Rocksmith 2014 Dashboard")
-    this.setState({ readytorender: true });
-
-    this.handleChange(this.state.TabsV2Data[0]);
+    this.updateHeader("tab-dashboard", this.props.t("Rocksmith 2014 Dashboard"))
+    this.setState({ readytorender: true }, () => {
+      this.handleChange(this.state.TabsV2Data[0]);
+    });
 
     const zoomF = await getCurrentZoomFactorConfig();
     if (!Number.isNaN(parseFloat(zoomF))) {
       window.webFrame.setZoomFactor(zoomF);
-    }
-    else {
-      const defaultZoom = 0.9;
-      window.webFrame.setZoomFactor(defaultZoom);
     }
   }
 
@@ -324,7 +319,7 @@ class App extends Component {
     this.setState({
       currentTab: tab,
       currentChildTab: child,
-      appTitle: t(text),
+      appTitle: text,
       selectedTab,
       showModalStats,
     });
@@ -335,7 +330,7 @@ class App extends Component {
       return;
     }
     if (tabname === this.state.currentTab.id) {
-      this.setState({ appTitle: t(text) });
+      this.setState({ appTitle: text });
     }
   }
 
@@ -344,7 +339,7 @@ class App extends Component {
       return;
     }
     if (tabname === this.state.currentTab.id && childname === this.state.currentChildTab.id) {
-      this.setState({ appTitle: t(text) });
+      this.setState({ appTitle: text });
     }
   }
 
@@ -590,4 +585,4 @@ class App extends Component {
   }
 }
 // eslint-disable-next-line
-export default translate('translation')(App);
+export default withI18n('translation')(App);

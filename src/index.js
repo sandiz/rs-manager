@@ -19,9 +19,9 @@ ipcRenderer.on('language-changed', (event, message) => {
 });
 electron.webFrame.setZoomFactor(0.9);
 
-
+const appLocale = electron.remote.app.getLocale();
 ReactDOM.render(
-    <I18nextProvider i18n={i18n} initialI18nStore={initialI18nStore} initialLanguage="en">
+    <I18nextProvider i18n={i18n} initialI18nStore={initialI18nStore} initialLanguage={appLocale}>
         <App />
     </I18nextProvider>,
     document.getElementById('root'),

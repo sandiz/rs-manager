@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types';
+import { withI18n } from 'react-i18next';
 import { textFilter } from 'react-bootstrap-table2-filter';
 import {
   RemoteAll,
@@ -64,60 +65,8 @@ export function setlistFormatter(cell, row) {
     </div>
   );
 }
-const columns = [
-  {
-    dataField: "name",
-    text: "Setlist",
-    style: (cell, row, rowIndex, colIndex) => {
-      return {
-        width: '60%',
-        cursor: 'pointer',
-        textAlign: 'right',
-      };
-    },
-    formatter: setlistFormatter,
-    sort: true,
-    filter: textFilter({
-      style: {
-        marginTop: '10px',
-        marginLeft: '20px',
-        width: '94%',
-        display: '',
-      },
-    }),
-  },
-  {
-    dataField: "total",
-    text: "Arrangements",
-    style: (cell, row, rowIndex, colIndex) => {
-      return {
-        width: '10%',
-      };
-    },
-    sort: true,
-  },
-  {
-    dataField: "mastered",
-    text: "Mastered",
-    style: (cell, row, rowIndex, colIndex) => {
-      return {
-        width: '10%',
-      };
-    },
-    sort: true,
-  },
-  {
-    dataField: "percent",
-    text: "%",
-    formatter: round100Formatter,
-    style: (cell, row, rowIndex, colIndex) => {
-      return {
-        width: '20%',
-      };
-    },
-  },
-];
-export default class SetlistSearchView extends React.Component {
+
+class SetlistSearchView extends React.Component {
   constructor(props) {
     super(props);
     this.tabname = 'tab-setlist';
@@ -135,6 +84,58 @@ export default class SetlistSearchView extends React.Component {
         DispatcherService.dispatch(DispatchEvents.SETLIST_SELECT, row.key);
       },
     };
+    this.columns = [
+      {
+        dataField: "name",
+        text: this.props.t("Setlists"),
+        style: (cell, row, rowIndex, colIndex) => {
+          return {
+            width: '60%',
+            cursor: 'pointer',
+            textAlign: 'right',
+          };
+        },
+        formatter: setlistFormatter,
+        sort: true,
+        filter: textFilter({
+          style: {
+            marginTop: '10px',
+            marginLeft: '20px',
+            display: '',
+          },
+        }),
+      },
+      {
+        dataField: "total",
+        text: this.props.t("Arrangement"),
+        style: (cell, row, rowIndex, colIndex) => {
+          return {
+            width: '10%',
+          };
+        },
+        sort: true,
+      },
+      {
+        dataField: "mastered",
+        text: this.props.t("Mastered"),
+        style: (cell, row, rowIndex, colIndex) => {
+          return {
+            width: '10%',
+          };
+        },
+        sort: true,
+      },
+      {
+        dataField: "percent",
+        text: this.props.t("Percent"),
+        formatter: round100Formatter,
+        style: (cell, row, rowIndex, colIndex) => {
+          return {
+            width: '20%',
+          };
+        },
+      },
+    ];
     this.cwmasync();
   }
 
@@ -281,7 +282,7 @@ export default class SetlistSearchView extends React.Component {
             sizePerPage={sizePerPage}
             totalSize={this.state.totalSize}
             onTableChange={this.onTableChange}
-            columns={columns}
+            columns={this.columns}
             rowEvents={this.rowEvents}
             noDataIndication="No Setlists"
             classes="setlistSearchTable"
@@ -307,3 +308,4 @@ SetlistSearchView.defaultProps = {
   //resetHeader: () => { },
   updateHeader: () => { },
 }
+export default withI18n('translation')(SetlistSearchView);
