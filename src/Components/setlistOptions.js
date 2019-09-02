@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types';
+import { withI18n, Trans } from 'react-i18next';
 import CreatableSelect from "react-select/creatable";
 
 import { enableScroll, forceNoScroll } from './songdetailView';
@@ -231,7 +232,7 @@ export const sortOrderCustomStyles = {
   }),
 }
 const defaultSortOption = []
-export default class SetlistOptions extends React.Component {
+class SetlistOptions extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -726,18 +727,18 @@ export default class SetlistOptions extends React.Component {
     return (
       <div ref={(ref) => { this.modal_div = ref }} id="open-modal" className="modal-window" style={{ opacity: 1, pointerEvents: "auto" }}>
         <div id="modal-info" className={modalinfostyle}>
-          <a onKeyUp={this.onKeyUp} title="Close" className="modal-close" onClick={this.handleHide}>Close</a>
+          <a onKeyUp={this.onKeyUp} title="Close" className="modal-close" onClick={this.handleHide}><Trans i18nKey="close">Close</Trans></a>
           <br />
           <div style={{ textAlign: 'center' }}>
             <h4 style={{ fontSize: 150 + "%", fontWeight: 'bold', marginTop: -25 + 'px' }}>
-              Setlist Options
+              <Trans i18nKey="setlistOptions">Setlist Options</Trans>
             </h4>
             <hr />
             <div style={{ fontSize: 20 + 'px' }}>
               <table style={{ width: 100 + '%' }}>
                 <tbody>
                   <tr style={{ backgroundColor: 'inherit', border: 'none', color: 'black' }}>
-                    <td style={{ border: 'none', width: 20 + '%', borderRight: '1px solid' }}>Name</td>
+                    <td style={{ border: 'none', width: 20 + '%', borderRight: '1px solid' }}><Trans i18nKey="name">Name</Trans></td>
                     <td style={{ border: 'none', width: 80 + '%', textAlign: 'left' }}>
                       <input type="text" defaultValue={this.state.setlistName} onChange={this.handleChange} style={{ marginLeft: 30 + 'px', paddingLeft: 10 + 'px', width: 80 + '%' }} />
                       <div
@@ -749,7 +750,7 @@ export default class SetlistOptions extends React.Component {
                     </td>
                   </tr>
                   <tr style={{ backgroundColor: 'inherit', border: 'none', color: 'black' }}>
-                    <td style={{ border: 'none', width: 20 + '%', borderRight: '1px solid' }}>Type</td>
+                    <td style={{ border: 'none', width: 20 + '%', borderRight: '1px solid' }}><Trans i18nKey="type">Type</Trans></td>
                     <td style={{
                       border: 'none', width: 80 + '%', textAlign: 'left', fontSize: 16 + 'px',
                     }}>
@@ -763,7 +764,7 @@ export default class SetlistOptions extends React.Component {
                           onChange={this.handleManual}
                         />
                         <span className="manual" style={{ display: 'inline-flex' }}>
-                          <label style={{ paddingLeft: 34 + 'px' }} htmlFor="setlist_manual">Manual - Add Songs manually</label>
+                          <label style={{ paddingLeft: 34 + 'px' }} htmlFor="setlist_manual"><Trans i18nKey="setlistManual">Manual - Add Songs manually</Trans></label>
                         </span>
                       </div>
                       <div style={{ marginLeft: 30 + 'px' }}>
@@ -776,7 +777,7 @@ export default class SetlistOptions extends React.Component {
                           onChange={this.handleGenerated}
                         />
                         <span className="generated" style={{ display: 'inline-flex' }}>
-                          <label style={{ paddingLeft: 34 + 'px' }} htmlFor="setlist_generated">Generated  - Add Songs via filters</label>
+                          <label style={{ paddingLeft: 34 + 'px' }} htmlFor="setlist_generated"><Trans i18nKey="setlistGenerated">Generated  - Add Songs via filters</Trans></label>
                         </span>
                       </div>
                       <div style={{ marginLeft: 30 + 'px' }}>
@@ -793,7 +794,7 @@ export default class SetlistOptions extends React.Component {
                             display: 'inline-flex',
                             color: 'darkgray',
                           }}>
-                          <label style={{ paddingLeft: 34 + 'px' }} htmlFor="setlist_rs">Rocksmith Setlist - Imported from game</label>
+                          <label style={{ paddingLeft: 34 + 'px' }} htmlFor="setlist_rs"><Trans i18nKey="setlistRs">Rocksmith Setlist - Imported from game</Trans></label>
                         </span>
                       </div>
                     </td>
@@ -803,7 +804,7 @@ export default class SetlistOptions extends React.Component {
               <table style={{ width: 100 + '%' }}>
                 <tbody>
                   <tr style={{ backgroundColor: 'inherit', border: 'none', color: 'black' }}>
-                    <td style={{ border: 'none', width: 20 + '%', borderRight: '1px solid' }}>Folder</td>
+                    <td style={{ border: 'none', width: 20 + '%', borderRight: '1px solid' }}><Trans i18nKey="folder">Folder</Trans></td>
                     <td style={{ border: 'none', width: 30 + '%', textAlign: 'left' }}>
                       <select
                         style={{ marginLeft: 30 + 'px', width: 90 + '%' }}
@@ -819,7 +820,7 @@ export default class SetlistOptions extends React.Component {
                     </td>
                     <td style={{
                       border: 'none', width: 16 + '%', borderRight: '1px solid', fontSize: 18 + 'px',
-                    }}>Default<br />Sort Order</td>
+                    }}><Trans i18nKey="defaultSortOrder">Default<br />Sort Order</Trans></td>
                     <td style={{ border: 'none', width: 80 + '%', textAlign: 'left' }}>
                       <CreatableSelect
                         components={{
@@ -870,7 +871,7 @@ export default class SetlistOptions extends React.Component {
                 this.state.isGenerated
                   ? (
                     <div>
-                      <h4>Filters</h4>
+                      <h4><Trans i18nKey="filters">Filters</Trans></h4>
                       <hr />
                       <button
                         type="button"
@@ -896,11 +897,11 @@ export default class SetlistOptions extends React.Component {
                                 }}>
                                 <thead>
                                   <tr>
-                                    <td>Filter Type</td>
-                                    <td>Comparator</td>
-                                    <td>Value</td>
-                                    <td>Logic Chain</td>
-                                    <td>Delete</td>
+                                    <td><Trans i18nKey="filterType">Filter Type</Trans></td>
+                                    <td><Trans i18nKey="comparator">Comparator</Trans></td>
+                                    <td><Trans i18nKey="value">Value</Trans></td>
+                                    <td><Trans i18nKey="logicChain">Logic Chain</Trans></td>
+                                    <td><Trans i18nKey="delete">Delete</Trans></td>
                                   </tr>
                                 </thead>
                                 <tbody>
@@ -967,13 +968,13 @@ export default class SetlistOptions extends React.Component {
                 type="button"
                 onClick={this.saveOptions}
                 className={buttonstyle}>
-                Save Options
+                <Trans i18nKey="Save Options">Save Options</Trans>
               </button>
               <button
                 type="button"
                 onClick={this.deleteSetlist}
                 className={buttonstyle}>
-                Delete Setlist
+                <Trans i18nKey="Delete Setlist">Delete Setlist</Trans>
               </button>
             </div>
           </div>
@@ -1000,3 +1001,5 @@ SetlistOptions.defaultProps = {
   fetchMeta: () => { },
   clearPage: () => { },
 }
+
+export default withI18n('translation')(SetlistOptions);
