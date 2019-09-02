@@ -549,6 +549,7 @@ export const RemoteAll = ({
   rowStyle,
   noDataIndication = "No Songs",
   classes = "psarcTable",
+  headerClasses = "",
 }) => (
     <div>
       <BootstrapTable
@@ -571,6 +572,7 @@ export const RemoteAll = ({
         rowEvents={rowEvents}
         noDataIndication={noDataIndication}
         rowStyle={rowStyle}
+        headerClasses={headerClasses}
       />
     </div>
   );

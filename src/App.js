@@ -411,8 +411,8 @@ class App extends Component {
       tempChilds.push(setlistObj);
     }
     t2[2].children = tempChilds;
-    t2[2].children.unshift({ name: 'New Folder', id: 'add-setlist-folder', isLeaf: true });
-    t2[2].children.unshift({ name: 'New Setlist', id: 'add-setlist', isLeaf: true });
+    t2[2].children.unshift({ name: this.props.t('New Folder'), id: 'add-setlist-folder', isLeaf: true });
+    t2[2].children.unshift({ name: this.props.t('New Setlist'), id: 'add-setlist', isLeaf: true });
     this.setState({ TabsV2Data: t2 });
     await this.sidebarRef.current.refresh();
   }

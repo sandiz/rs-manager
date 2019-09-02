@@ -90,5 +90,20 @@
 	"Release Date": "Date de sortie",
 	"Acquired Date": "Date d'acquisition",
 	"Mastered": "Maîtrisé",
-	"Percent": "Pour cent"
+	"Percent": "Pour cent",
+	"New Folder": "Nouveau dossier",
+	"New Setlist": "Nouvelle setlist",
+	"Goto Setlist": "Aller à la setlist",
+	"Export Setlist": "Exporter une setlist",
+	"exportSetlistAs": "Exporter la setlist en tant que:",
+	"setlist": "Setlist",
+	"rocksmithProfile": "Profil de forgeron",
+	"processingPleaseWait": "Traitement en cours, veuillez patienter ...",
+	"startExport": "Lancer l'exportation",
+	"exportedSuccessfully": "Exporté avec succès",
+	"exportFailed": "L'exportation a échoué",
+	"backupOfYourProfile": "Une sauvegarde de votre profil a été créée",
+	"here": "ici",
+	"anErrorOcurred": "une erreur est survenue",
+	"rocksmithWarning": "Assurez-vous que Rocksmith 2014 ne fonctionne pas lorsque vous exportez."
 }

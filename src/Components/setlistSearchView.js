@@ -15,6 +15,7 @@ import { generateSql } from './setlistOptions';
 import { DispatcherService, DispatchEvents } from '../lib/libDispatcher'
 import ExportSetlistModal from './modalExportSetlist';
 
+const i18n = require('i18next');
 
 export function setlistFormatter(cell, row) {
   let icon = "new";
@@ -42,7 +43,7 @@ export function setlistFormatter(cell, row) {
           color: 'black !important',
         }}>
           <i
-            title="Goto Setlist"
+            title={i18n.t("Goto Setlist")}
             className="fas fa-external-link-square-alt"
             onClick={(e) => {
               DispatcherService.dispatch(DispatchEvents.SETLIST_SELECT, row.key);
@@ -54,7 +55,7 @@ export function setlistFormatter(cell, row) {
           color: 'black !important',
         }}>
           <i
-            title="Export Setlist"
+            title={i18n.t("Export Setlist")}
             className="fas fa-file-export"
             onClick={(e) => {
               DispatcherService.dispatch(DispatchEvents.SETLIST_EXPORT, row);
@@ -286,6 +287,7 @@ class SetlistSearchView extends React.Component {
             rowEvents={this.rowEvents}
             noDataIndication="No Setlists"
             classes="setlistSearchTable"
+            headerClasses="setlistHeaderClass"
           />
         </div>
         <ExportSetlistModal
