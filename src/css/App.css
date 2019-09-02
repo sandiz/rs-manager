@@ -1505,3 +1505,11 @@ hr {
     margin-top: 6px;
     border-radius: 5px;
 }
+
+.setlistHeaderClass th:first-child {
+    text-align: left;
+}
+
+.setlistHeaderClass th > label {
+    width: 67%;
+}

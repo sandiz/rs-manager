@@ -89,5 +89,20 @@
 	"Release Date": "Release Date",
 	"Acquired Date": "Acquired Date",
 	"Mastered": "Mastered",
-	"Percent": "Percent"
+	"Percent": "Percent",
+	"New Folder": "New Folder",
+	"New Setlist": "New Setlist",
+	"Goto Setlist": "Goto Setlist",
+	"Export Setlist": "Export Setlist",
+	"exportSetlistAs": "Export setlist as:",
+	"setlist": "Setlist",
+	"rocksmithProfile": "Rocksmith Profile",
+	"processingPleaseWait": "Processing, please wait...",
+	"startExport": "Start Export",
+	"exportedSuccessfully": "Exported Successfully",
+	"exportFailed": "Export Failed",
+	"backupOfYourProfile": "A backup of your profile was created",
+	"here": "here",
+	"anErrorOcurred": "an error occurred",
+	"rocksmithWarning": " Please make sure Rocksmith 2014 is not running when you export."
 }
