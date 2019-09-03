@@ -1,6 +1,7 @@
 import React from 'react'
 import Select from 'react-select';
 import PropTypes from 'prop-types';
+import { withI18n } from 'react-i18next';
 import StatsTableView, { getStatsWidth } from './statsTableView';
 import {
     RemoteAll,
@@ -74,7 +75,7 @@ export const generateOrderSql = (sortOptions, withOrder = false) => {
     }
     return ordersql;
 }
-export default class SetlistView extends React.Component {
+class SetlistView extends React.Component {
     constructor(props) {
         super(props);
         this.tabname = "tab-setlist"
@@ -1143,3 +1144,4 @@ SetlistView.defaultProps = {
     showModalStats: false,
     globalNotes: {},
 }
+export default withI18n('translation')(SetlistView);
