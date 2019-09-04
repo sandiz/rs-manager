@@ -1,7 +1,7 @@
 import React from 'react'
 import Select from 'react-select';
 import PropTypes from 'prop-types';
-import { withI18n } from 'react-i18next';
+import { withI18n, Trans } from 'react-i18next';
 import StatsTableView, { getStatsWidth } from './statsTableView';
 import {
     RemoteAll,
@@ -129,7 +129,7 @@ class SetlistView extends React.Component {
         this.columns = [
             {
                 dataField: "id",
-                text: "ID",
+                text: this.props.t("ID"),
                 style: (cell, row, rowIndex, colIndex) => {
                     return {
                         width: '20%',
@@ -140,7 +140,7 @@ class SetlistView extends React.Component {
             },
             {
                 dataField: "song",
-                text: "Song",
+                text: this.props.t("Song"),
                 style: (cell, row, rowIndex, colIndex) => {
                     return {
                         width: '20%',
@@ -155,7 +155,7 @@ class SetlistView extends React.Component {
             },
             {
                 dataField: "artist",
-                text: "Artist",
+                text: this.props.t("Artist"),
                 style: (cell, row, rowIndex, colIndex) => {
                     return {
                         width: '19%',
@@ -167,7 +167,7 @@ class SetlistView extends React.Component {
             },
             {
                 dataField: "album",
-                text: "Album",
+                text: this.props.t("Album"),
                 style: (cell, row, rowIndex, colIndex) => {
                     return {
                         width: '20%',
@@ -184,7 +184,7 @@ class SetlistView extends React.Component {
             },
             {
                 dataField: "arrangement",
-                text: "Arrangement",
+                text: this.props.t("Arrangement"),
                 style: (cell, row, rowIndex, colIndex) => {
                     return {
                         width: '5%',
@@ -196,7 +196,7 @@ class SetlistView extends React.Component {
             },
             {
                 dataField: "mastery",
-                text: "Mastery",
+                text: this.props.t("Mastery"),
                 style: (cell, row, rowIndex, colIndex) => {
                     return {
                         width: '15%',
@@ -208,7 +208,7 @@ class SetlistView extends React.Component {
             },
             {
                 dataField: "tuning_weight",
-                text: "Tuning",
+                text: this.props.t("Tuning"),
                 style: (cell, row, rowIndex, colIndex) => {
                     return {
                         width: '5%',
@@ -220,7 +220,7 @@ class SetlistView extends React.Component {
             },
             {
                 dataField: "count",
-                text: "Count",
+                text: this.props.t("Count"),
                 style: (cell, row, rowIndex, colIndex) => {
                     return {
                         width: '5%',
@@ -232,7 +232,7 @@ class SetlistView extends React.Component {
             {
                 classes: difficultyClass,
                 dataField: "difficulty",
-                text: "Difficulty",
+                text: this.props.t("Difficulty"),
                 style: (cell, row, rowIndex, colIndex) => {
                     return {
                         width: '5%',
@@ -874,11 +874,11 @@ class SetlistView extends React.Component {
                                     />
                                     &nbsp; &nbsp;
                                     <select id="search_field" onChange={this.refreshView}>
-                                        <option value="anything">Anything</option>
-                                        <option value="song">Song</option>
-                                        <option value="artist">Artist</option>
-                                        <option value="album">Album</option>
-                                        <option value="arrangement">Arrangement</option>
+                                        <option value="anything">{this.props.t('Anything')}</option>
+                                        <option value="song">{this.props.t('Song')}</option>
+                                        <option value="artist">{this.props.t('Artist')}</option>
+                                        <option value="album">{this.props.t('Album')}</option>
+                                        <option value="arrangement">{this.props.t('Arrangement')}</option>
                                     </select>
                                     <br />
                                     <Select
@@ -903,7 +903,9 @@ class SetlistView extends React.Component {
                                     type="button"
                                     onClick={this.updateFavs}
                                     className="extraPadding download">
-                                    Update Favorites
+                                    <Trans i18nKey="updateFavorites">
+                                        Update Favorites
+                                    </Trans>
                                 </button>
                             )
                             : null
@@ -917,7 +919,9 @@ class SetlistView extends React.Component {
                                     style={{ width: 165 + 'px' }}
                                     className={choosesettingsstyle}
                                     onClick={() => this.setState({ showAddOptions: true })}>
-                                    Add / Remove Songs
+                                    <Trans i18nKey="addRemoveSongs">
+                                        Add / Remove Songs
+                                    </Trans>
                                 </button>
                             )
                             : null
@@ -927,21 +931,27 @@ class SetlistView extends React.Component {
                         style={{ width: 170 + 'px' }}
                         onClick={this.updateMastery}
                         className={choosepsarchstyle}>
-                        Update Mastery
+                        <Trans i18nKey="updateMastery">
+                            Update Mastery
+                        </Trans>
                     </button>
                     <button
                         type="button"
                         style={{ width: 150 + 'px' }}
                         className={choosepsarchstyle}
                         onClick={() => this.setState({ showExportOptions: true })}>
-                        Export
+                        <Trans i18nKey="export">
+                            Export
+                        </Trans>
                     </button>
                     <button
                         type="button"
                         style={{ width: 150 + 'px' }}
                         className={choosesettingsstyle}
                         onClick={() => this.setState({ showOptions: true })}>
-                        Settings
+                        <Trans i18nKey="settings">
+                            Settings
+                        </Trans>
                     </button>
                     <br />
                 </div>

@@ -121,5 +121,10 @@
 	"logicChain": "Cadena lógica",
 	"delete": "Borrar",
 	"Save Options": "Guardar opciones",
-	"Delete Setlist": "Eliminar Setlist"
+	"Delete Setlist": "Eliminar Setlist",
+	"updateMastery": "Actualizar dominio",
+	"export": "Exportar",
+	"settings": "Configuraciones",
+	"updateFavorites": "Actualizar favoritos",
+	"addRemoveSongs": "Agregar / quitar canciones"
 }
