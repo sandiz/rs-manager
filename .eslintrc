@@ -57,6 +57,7 @@
         "react/jsx-indent-props": "off",
         "jsx-a11y/anchor-is-valid": "off",
         "no-else-return": "off",
+        "react/prop-types": "off",
         "import/no-cycle": "off",
         "react/jsx-fragments": "off",
         "arrow-parens": "off",

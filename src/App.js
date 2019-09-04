@@ -1,4 +1,6 @@
 import React, { Component } from 'react'
+import { withI18n } from 'react-i18next';
+
 import Sidebar from './Components/Sidebar'
 import PSARCView from './Components/psarcView'
 import SonglistView from './Components/songlistView'
@@ -29,58 +31,59 @@ const csvparse = require('csv-parse/lib/es5/sync');
 class App extends Component {
   constructor(props) {
     super(props);
+    //const t = e => console.log(e);
     this.state = {
       currentTab: null,
       currentChildTab: null,
       showSidebar: true,
-      appTitle: 'Running Migrations, please wait...',
+      appTitle: this.props.t('Running Migrations, please wait...'),
       currentCookie: '',
       rsProfileName: '',
       TabsV2Data: [
         {
           id: 'tab-dashboard',
-          name: 'Dashboard',
+          name: this.props.t('Dashboard'),
           children: [],
         },
         {
           id: 'tab-songs',
-          name: 'Songs',
+          name: this.props.t('Songs'),
           children: [
             {
               id: 'songs-owned',
-              name: 'Owned',
+              name: this.props.t('Owned'),
               isLeaf: true,
             },
             {
               id: 'songs-available',
-              name: 'DLC Catalog',
+              name: this.props.t('DLC Catalog'),
               isLeaf: true,
             },
           ],
         },
         {
           id: 'tab-setlist',
-          name: 'Setlists',
+          name: this.props.t('Setlists'),
           children: [],
         },
         {
           id: 'tab-psarc',
-          name: 'psarc Explorer',
+          name: this.props.t('psarc Explorer'),
           children: [],
         },
         {
           id: 'tab-rslive',
-          name: 'Rocksmith Live',
+          name: this.props.t('Rocksmith Live'),
           children: [],
         },
         {
           id: 'tab-settings',
-          name: 'Settings',
+          name: this.props.t('Settings'),
           children: [],
         },
         {
           id: 'tab-help',
-          name: 'Help',
+          name: this.props.t('Help'),
           children: [],
         },
       ],
@@ -97,8 +100,6 @@ class App extends Component {
     //this.selectedTab = null;
     this.sidebarRef = React.createRef();
     this.navbarRef = React.createRef();
-
-    this.cwmasync();
   }
 
   cwmasync = async () => {
@@ -110,21 +111,20 @@ class App extends Component {
     //sthis.handleChange(this.state.TabsData[0]);
     //this.props.handleChange(TabsData[2], TabsData[2].child[0])
     //this.toggleActive(TabsData[2]);
-    this.updateHeader("tab-dashboard", "Rocksmith 2014 Dashboard")
+    this.updateHeader("tab-dashboard", this.props.t("Rocksmith 2014 Dashboard"))
     this.setState({ readytorender: true }, () => {
       this.handleChange(this.state.TabsV2Data[0]);
     });
+
     const zoomF = await getCurrentZoomFactorConfig();
     if (!Number.isNaN(parseFloat(zoomF))) {
       window.webFrame.setZoomFactor(zoomF);
     }
-    else {
-      const defaultZoom = 0.9;
-      window.webFrame.setZoomFactor(defaultZoom);
-    }
   }
 
   componentDidMount = async () => {
+    await this.cwmasync();
+    //eslint-disable-next-line
     const rsmConfig = await getImportRSMConfig();
     if (rsmConfig === '') {
       /* if importrsm path is empty, try to detect it and update config */
@@ -316,7 +316,6 @@ class App extends Component {
     }
 
     //check default show stat config
-
     this.setState({
       currentTab: tab,
       currentChildTab: child,
@@ -412,8 +411,8 @@ class App extends Component {
       tempChilds.push(setlistObj);
     }
     t2[2].children = tempChilds;
-    t2[2].children.unshift({ name: 'New Folder', id: 'add-setlist-folder', isLeaf: true });
-    t2[2].children.unshift({ name: 'New Setlist', id: 'add-setlist', isLeaf: true });
+    t2[2].children.unshift({ name: this.props.t('New Folder'), id: 'add-setlist-folder', isLeaf: true });
+    t2[2].children.unshift({ name: this.props.t('New Setlist'), id: 'add-setlist', isLeaf: true });
     this.setState({ TabsV2Data: t2 });
     await this.sidebarRef.current.refresh();
   }
@@ -585,5 +584,5 @@ class App extends Component {
     );
   }
 }
-
-export default App;
+// eslint-disable-next-line
+export default withI18n('translation')(App);

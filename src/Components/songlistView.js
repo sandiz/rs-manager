@@ -1,4 +1,5 @@
 import React from 'react'
+import { withI18n, Trans } from 'react-i18next';
 import BootstrapTable from 'react-bootstrap-table-next'
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import filterFactory from 'react-bootstrap-table2-filter';
@@ -548,6 +549,7 @@ export const RemoteAll = ({
   rowStyle,
   noDataIndication = "No Songs",
   classes = "psarcTable",
+  headerClasses = "",
 }) => (
     <div>
       <BootstrapTable
@@ -570,6 +572,7 @@ export const RemoteAll = ({
         rowEvents={rowEvents}
         noDataIndication={noDataIndication}
         rowStyle={rowStyle}
+        headerClasses={headerClasses}
       />
     </div>
   );
@@ -595,7 +598,7 @@ RemoteAll.defaultProps = {
   noDataIndication: "No Songs",
   classes: "psarcTable",
 }
-export default class SonglistView extends React.Component {
+class SonglistView extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -615,7 +618,7 @@ export default class SonglistView extends React.Component {
     this.columns = [
       {
         dataField: "id",
-        text: "ID",
+        text: this.props.t("ID"),
         style: (cell, row, rowIndex, colIndex) => {
           return {
             width: '20%',
@@ -626,7 +629,7 @@ export default class SonglistView extends React.Component {
       },
       {
         dataField: "song",
-        text: "Song",
+        text: this.props.t("Song"),
         style: (cell, row, rowIndex, colIndex) => {
           return {
             width: '20%',
@@ -641,7 +644,7 @@ export default class SonglistView extends React.Component {
       },
       {
         dataField: "artist",
-        text: "Artist",
+        text: this.props.t("Artist"),
         style: (cell, row, rowIndex, colIndex) => {
           return {
             width: '19%',
@@ -653,7 +656,7 @@ export default class SonglistView extends React.Component {
       },
       {
         dataField: "album",
-        text: "Album",
+        text: this.props.t("Album"),
         style: (cell, row, rowIndex, colIndex) => {
           return {
             width: '20%',
@@ -670,7 +673,7 @@ export default class SonglistView extends React.Component {
       },
       {
         dataField: "arrangement",
-        text: "Arrangement",
+        text: this.props.t("Arrangement"),
         style: (cell, row, rowIndex, colIndex) => {
           return {
             width: '5%',
@@ -682,7 +685,7 @@ export default class SonglistView extends React.Component {
       },
       {
         dataField: "mastery",
-        text: "Mastery",
+        text: this.props.t("Mastery"),
         style: (cell, row, rowIndex, colIndex) => {
           return {
             width: '15%',
@@ -694,7 +697,7 @@ export default class SonglistView extends React.Component {
       },
       {
         dataField: "tuning_weight",
-        text: "Tuning",
+        text: this.props.t("Tuning"),
         style: (cell, row, rowIndex, colIndex) => {
           return {
             width: '5%',
@@ -706,7 +709,7 @@ export default class SonglistView extends React.Component {
       },
       {
         dataField: "count",
-        text: "Count",
+        text: this.props.t("Count"),
         style: (cell, row, rowIndex, colIndex) => {
           return {
             width: '5%',
@@ -718,7 +721,7 @@ export default class SonglistView extends React.Component {
       {
         classes: difficultyClass,
         dataField: "difficulty",
-        text: "Difficulty",
+        text: this.props.t("Difficulty"),
         style: (cell, row, rowIndex, colIndex) => {
           return {
             width: '5%',
@@ -764,7 +767,7 @@ export default class SonglistView extends React.Component {
       },
       {
         dataField: "sa_highest_badge",
-        text: 'Badges',
+        text: this.props.t('Badges'),
         sort: true,
         style: (cell, row, rowIndex, colIndex) => {
           return {
@@ -1079,15 +1082,15 @@ export default class SonglistView extends React.Component {
             style={{ width: 50 + '%', border: "1px solid black", padding: 5 + "px" }}
             name="search"
             onChange={this.handleSearchChange}
-            placeholder="Search..."
+            placeholder={this.props.t("Search") + "..."}
             type="search"
           />
           &nbsp;&nbsp;
           <select id="search_field" onChange={this.refreshView}>
-            <option value="anything">Anything</option>
-            <option value="song">Song</option>
-            <option value="artist">Artist</option>
-            <option value="album">Album</option>
+            <option value="anything">{this.props.t('Anything')}</option>
+            <option value="song">{this.props.t('Song')}</option>
+            <option value="artist">{this.props.t('Artist')}</option>
+            <option value="album">{this.props.t('Album')}</option>
             <option value="cdlc">CDLC</option>
             <option value="odlc">ODLC</option>
             <option value="id">SongID</option>
@@ -1098,7 +1101,9 @@ export default class SonglistView extends React.Component {
             type="button"
             onClick={this.updateMastery}
             className={choosepsarchstyle}>
-            Update Mastery from RS Profile
+            <Trans i18nKey="updateMasteryFromProfile">
+              Update Mastery from Profile
+            </Trans>
           </button>
         </div>
         <div>
@@ -1148,3 +1153,4 @@ SonglistView.defaultProps = {
   getSearch: () => { },
   globalNotes: {},
 }
+export default withI18n('translation')(SonglistView)

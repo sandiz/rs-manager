@@ -1,4 +1,5 @@
 import React from 'react'
+import { withI18n, Trans } from 'react-i18next';
 import BootstrapTable from 'react-bootstrap-table-next'
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
@@ -22,107 +23,7 @@ function dateFormatter(cell, row) {
 function difficultyFormatter(cell, row) {
   return <span />;
 }
-const columns = [
-  {
-    dataField: "id",
-    text: "ID",
-    style: (cell, row, rowIndex, colIndex) => {
-      return {
-        width: '25%',
-        cursor: 'pointer',
-      };
-    },
-    hidden: true,
-  },
-  {
-    dataField: "song",
-    text: "Song",
-    style: (cell, row, rowIndex, colIndex) => {
-      return {
-        width: '25%',
-        cursor: 'pointer',
-      };
-    },
-    sort: true,
-    filter: textFilter({
-      style: {
-        marginTop: '10px',
-        marginLeft: '20px',
-        display: '',
-      },
-    }),
-  },
-  {
-    dataField: "artist",
-    text: "Artist",
-    style: (cell, row, rowIndex, colIndex) => {
-      return {
-        width: '25%',
-        cursor: 'pointer',
-      };
-    },
-    sort: true,
-    filter: textFilter({
-      style: {
-        marginTop: '10px',
-        marginLeft: '20px',
-        display: '',
-      },
-    }),
-  },
-  {
-    dataField: "psarc",
-    text: "File Name",
-    style: (cell, row, rowIndex, colIndex) => {
-      return {
-        width: '15%',
-        cursor: 'pointer',
-      };
-    },
-    sort: true,
-    filter: textFilter({
-      style: {
-        marginTop: '10px',
-        marginLeft: '20px',
-        display: '',
-      },
-    }),
-  },
-  {
-    dataField: "arrangement",
-    text: "Arrangement",
-    style: (cell, row, rowIndex, colIndex) => {
-      return {
-        width: '15%',
-        cursor: 'pointer',
-      };
-    },
-    sort: true,
-  },
-  {
-    dataField: "size",
-    text: "Size",
-    formatter: sizeFormatter,
-    style: (cell, row, rowIndex, colIndex) => {
-      return {
-        width: '10%',
-      };
-    },
-    sort: true,
-  },
-  {
-    dataField: "created",
-    text: "Created At",
-    formatter: dateFormatter,
-    style: (cell, row, rowIndex, colIndex) => {
-      return {
-        width: '10%',
-      };
-    },
-    sort: true,
-  },
-];
-export default class PSARCView extends React.Component {
+class PSARCView extends React.Component {
   constructor(props) {
     super(props);
     this.tabname = 'tab-psarc';
@@ -147,15 +48,116 @@ export default class PSARCView extends React.Component {
       sizePerPageList: [],
     }
     this.markAsCDLC = null;
+    this.columns = [
+      {
+        dataField: "id",
+        text: this.props.t("ID"),
+        style: (cell, row, rowIndex, colIndex) => {
+          return {
+            width: '25%',
+            cursor: 'pointer',
+          };
+        },
+        hidden: true,
+      },
+      {
+        dataField: "song",
+        text: this.props.t("Song"),
+        style: (cell, row, rowIndex, colIndex) => {
+          return {
+            width: '25%',
+            cursor: 'pointer',
+          };
+        },
+        sort: true,
+        filter: textFilter({
+          style: {
+            marginTop: '10px',
+            marginLeft: '20px',
+            display: '',
+          },
+        }),
+      },
+      {
+        dataField: "artist",
+        text: this.props.t("Artist"),
+        style: (cell, row, rowIndex, colIndex) => {
+          return {
+            width: '25%',
+            cursor: 'pointer',
+          };
+        },
+        sort: true,
+        filter: textFilter({
+          style: {
+            marginTop: '10px',
+            marginLeft: '20px',
+            display: '',
+          },
+        }),
+      },
+      {
+        dataField: "psarc",
+        text: this.props.t("File Name"),
+        style: (cell, row, rowIndex, colIndex) => {
+          return {
+            width: '15%',
+            cursor: 'pointer',
+          };
+        },
+        sort: true,
+        filter: textFilter({
+          style: {
+            marginTop: '10px',
+            marginLeft: '20px',
+            display: '',
+          },
+        }),
+      },
+      {
+        dataField: "arrangement",
+        text: this.props.t("Arrangement"),
+        style: (cell, row, rowIndex, colIndex) => {
+          return {
+            width: '15%',
+            cursor: 'pointer',
+          };
+        },
+        sort: true,
+      },
+      {
+        dataField: "size",
+        text: this.props.t("Size"),
+        formatter: sizeFormatter,
+        style: (cell, row, rowIndex, colIndex) => {
+          return {
+            width: '10%',
+          };
+        },
+        sort: true,
+      },
+      {
+        dataField: "created",
+        text: this.props.t("Created At"),
+        formatter: dateFormatter,
+        style: (cell, row, rowIndex, colIndex) => {
+          return {
+            width: '10%',
+          };
+        },
+        sort: true,
+      },
+    ];
   }
 
   openDirDialog = async () => {
-    const dirs = remote.dialog.showOpenDialog({
+    let dirs = await remote.dialog.showOpenDialog({
       properties: ["openDirectory"],
     });
-    if (dirs === null || typeof dirs === 'undefined' || dirs.length <= 0) {
+    if (dirs === null || typeof dirs === 'undefined' || dirs.filePaths.length <= 0 || dirs.canceled) {
       return;
     }
+    dirs = dirs.filePaths;
     const results = this.walkSync(dirs[0] + "/", null);
     console.log("psarc found: " + results.length);
     if (results.length > 0) {
@@ -165,15 +167,16 @@ export default class PSARCView extends React.Component {
   }
 
   openFileDialog = async () => {
-    const files = remote.dialog.showOpenDialog({
+    let files = await remote.dialog.showOpenDialog({
       properties: ["openFile", "multiSelections"],
       filters: [
         { name: 'PSARC', extensions: ['psarc'] },
       ],
     });
-    if (files === null || typeof files === 'undefined' || files.length <= 0) {
+    if (files === null || typeof files === 'undefined' || files.filePaths.length <= 0 || files.canceled) {
       return;
     }
+    files = files.filePaths;
     const results = [];
     const fs = remote.require("fs");
     for (let i = 0; i < files.length; i += 1) {
@@ -326,37 +329,51 @@ export default class PSARCView extends React.Component {
             type="button"
             onClick={this.openFileDialog}
             className={choosepsarchstyle}>
-            Choose .psarc File(s)
-            </button>
+            <Trans i18nKey="choosePsarcFile">
+              Choose .psarc File(s)
+            </Trans>
+          </button>
           <button
             type="button"
             onClick={this.openDirDialog}
             className={choosepsarchstyle}>
-            Choose .psarc Directory
-            </button>
+            <Trans i18nKey="choosePsarcDirectory">
+              Choose .psarc Directory
+            </Trans>
+          </button>
           <button
             type="button"
             onClick={this.stopProcessing}
             className="extraPadding download"
             style={{ display: `${stopprocessingstyle}` }}>
-            Stop Processing
-            </button>
+            <Trans i18nKey="stopProcessing">
+              Stop Processing
+            </Trans>
+          </button>
           <button
             type="button"
             onClick={this.forceViewUpdate}
             className="extraPadding download"
             style={{ display: `${stopprocessingstyle}` }}>
-            Force Generate View
-            </button>
+            <Trans i18nKey="forceGenerateView">
+              Force Generate View
+            </Trans>
+          </button>
           <button
             type="button"
             onClick={this.updateSongList}
             className="extraPadding download"
             style={{ display: `${hasdatastyle}` }}>
-            Update Songs &gt; Owned
-            </button>
+            <Trans i18nKey="updateSongsOwned">
+              Update Songs &gt; Owned
+            </Trans>
+          </button>
           <span style={{ display: `${hasdatastyle}` }}>
-            <label htmlFor="cdlc">Mark All as CDLC</label>
+            <label htmlFor="cdlc">
+              <Trans i18nKey="markAllAsCDLC">
+                Mark All as CDLC
+            </Trans>
+            </label>
             <input
               ref={(node) => { this.markAsCDLC = node }}
               style={{ margin: 7 + 'px' }}
@@ -371,7 +388,7 @@ export default class PSARCView extends React.Component {
           <BootstrapTable
             keyField="uniquekey"
             data={this.state.files}
-            columns={columns}
+            columns={this.columns}
             classes="psarcTable"
             hover
             bordered={false}
@@ -550,3 +567,5 @@ PSARCView.defaultProps = {
   updateHeader: () => { },
   //resetHeader: () => { },
 }
+
+export default withI18n('translation')(PSARCView);

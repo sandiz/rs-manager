@@ -1593,7 +1593,7 @@ export default class RSLiveView extends React.Component {
       //start recording
       this.setState({ recording: 1 });
       const startTime = getMinutesSecs(this.state.timeCurrent);
-      const rsDevice = window.libRecord.startRecording(
+      const rsDevice = await window.libRecord.startRecording(
         (err) => {
           this.recordTitleRef.current.innerHTML = "Internal error while recording";
           console.log(err)

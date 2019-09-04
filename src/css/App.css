@@ -580,7 +580,7 @@ tbody tr:hover {
 }
 
 .width-52 {
-    width: 58% !important;
+    width: 48% !important;
 }
 
 .modal-window header {
@@ -1504,4 +1504,12 @@ hr {
     background-color: lightgray;
     margin-top: 6px;
     border-radius: 5px;
+}
+
+.setlistHeaderClass th:first-child {
+    text-align: left;
+}
+
+.setlistHeaderClass th > label {
+    width: 67%;
 }

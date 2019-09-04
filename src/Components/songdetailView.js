@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types';
+import { withI18n, Trans } from 'react-i18next';
 import Collapsible from 'react-collapsible';
 import DatePicker from 'react-datepicker';
 import moment from 'moment';
@@ -59,7 +60,7 @@ const customStyles = {
     ...styles, width: 50 + '%', left: 25 + '%',
   }),
 }
-export default class SongDetailView extends React.Component {
+class SongDetailView extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -360,7 +361,7 @@ export default class SongDetailView extends React.Component {
     return (
       <div ref={(ref) => { this.modal_div = ref }} id="open-modal" className="modal-window" style={{ opacity: 1, pointerEvents: "auto" }}>
         <div id="modal-info" className={modalinfostyle}>
-          <a title="Close" className="modal-close" onClick={this.handleHide}>Close</a>
+          <a title="Close" className="modal-close" onClick={this.handleHide}><Trans i18nKey="close">Close</Trans></a>
           <br />
           <div style={{ textAlign: 'center' }}>
             <h4 style={{ fontSize: 150 + "%", fontWeight: 'bold' }}>{unescape(this.props.song)}
@@ -428,7 +429,9 @@ export default class SongDetailView extends React.Component {
               style={{ width: 17 + '%' }}
               onClick={this.choosePlay}
               className={ptstyle}>
-              Playthrough Video
+              <Trans i18nKey="playthroughVideo">
+                Playthrough Video
+              </Trans>
             </button>
             {
               this.props.isWeekly ? ""
@@ -442,8 +445,10 @@ export default class SongDetailView extends React.Component {
                         window.shell.openExternal("steam://openurl/https://store.steampowered.com/app/" + this.props.dlcappid);
                       }}
                       className={mvstyle}>
-                      Buy From Steam
-                  </button>
+                      <Trans i18nKey="buyFromSteam">
+                        Buy From Steam
+                      </Trans>
+                    </button>
                   )
                   : (
                     <span>
@@ -452,7 +457,9 @@ export default class SongDetailView extends React.Component {
                         style={{ width: 17 + '%' }}
                         onClick={this.chooseMV}
                         className={mvstyle}>
-                        Music Video
+                        <Trans i18nKey="musicVideo">
+                          Music Video
+                        </Trans>
                       </button>
                     </span>
                   )
@@ -461,8 +468,8 @@ export default class SongDetailView extends React.Component {
           <div className={songliststylegeneric}>
             <br />
             <Collapsible
-              trigger={expandButton('More Options', 6)}
-              triggerWhenOpen={collapseButton('More Options', 6)}
+              trigger={expandButton(this.props.t('More Options'), 6)}
+              triggerWhenOpen={collapseButton(this.props.t('More Options'), 6)}
               transitionTime={200}
               easing="ease-in"
               close
@@ -481,7 +488,7 @@ export default class SongDetailView extends React.Component {
               </div>
               <div className="options-flex" style={{ marginTop: 6 + 'px' }}>
                 <div style={{ flexBasis: 100 + '%' }} className="options-flex-div">
-                  <div style={{ float: 'left' }}>Custom DLC</div>
+                  <div style={{ float: 'left' }}><Trans i18nKey="customdlc">Custom DLC</Trans></div>
                   <div style={{ float: 'right' }}>
                     <span
                       className={cdlcyesstyle}>
@@ -489,8 +496,8 @@ export default class SongDetailView extends React.Component {
                         type="button"
                         href="#"
                         onClick={() => this.updateCDLCStatus(true)}>
-                        Yes
-                    </a>
+                        <Trans i18nKey="yes">Yes</Trans>
+                      </a>
                     </span>
                     <span>&nbsp;&nbsp;</span>
                     <span
@@ -499,8 +506,8 @@ export default class SongDetailView extends React.Component {
                         type="button"
                         href="#"
                         onClick={() => this.updateCDLCStatus(false)}>
-                        No
-                    </a>
+                        <Trans i18nKey="no">No</Trans>
+                      </a>
                     </span>
                   </div>
                 </div>
@@ -508,7 +515,7 @@ export default class SongDetailView extends React.Component {
               <div style={{ marginTop: 6 + 'px' }}>
                 {
                   this.state.showsastats
-                    ? <div style={{ float: 'left' }}>Score Attack FCs</div>
+                    ? <div style={{ float: 'left' }}><Trans i18nKey="scoreAttack">Score Attack</Trans> FCs</div>
                     : ""
                 }
                 <div className="options-flex-right" style={{ textAlign: 'right' }}>
@@ -516,7 +523,7 @@ export default class SongDetailView extends React.Component {
                     this.state.showsastats
                       ? (
                         <div className="options-flex-div">
-                          <span>Master</span>
+                          <span><Trans i18nKey="master">Master</Trans></span>
                           <span>&nbsp;&nbsp;&nbsp;</span>
                           <div
                             className="song-detail-option"
@@ -547,7 +554,7 @@ export default class SongDetailView extends React.Component {
                     this.state.showsastats
                       ? (
                         <div className="options-flex-div">
-                          <span>Hard</span>
+                          <span><Trans i18nKey="hard">Hard</Trans></span>
                           <span>&nbsp;&nbsp;&nbsp;</span>
                           <div
                             className="song-detail-option"
@@ -578,7 +585,7 @@ export default class SongDetailView extends React.Component {
                     this.state.showsastats
                       ? (
                         <div className="options-flex-div">
-                          <span>Medium</span>
+                          <span><Trans i18nKey="medium">Medium</Trans></span>
                           <span>&nbsp;&nbsp;&nbsp;</span>
                           <div
                             className="song-detail-option"
@@ -609,7 +616,7 @@ export default class SongDetailView extends React.Component {
                     this.state.showsastats
                       ? (
                         <div className="options-flex-div">
-                          <span>Easy</span>
+                          <span><Trans i18nKey="easy">Easy</Trans></span>
                           <span>&nbsp;&nbsp;&nbsp;</span>
                           <div
                             className="song-detail-option"
@@ -648,7 +655,7 @@ export default class SongDetailView extends React.Component {
                     onClick={async () => {
                       await this.showLocalNote();
                     }}>
-                    <span>Add Note</span>
+                    <span><Trans i18nKey="addNote">Add Note</Trans></span>
                   </button>
                 </div>
                 <div style={{ marginRight: 30 + 'px' }} className="options-flex-div">
@@ -660,7 +667,7 @@ export default class SongDetailView extends React.Component {
                       await this.props.removeFromDB();
                       this.handleHide();
                     }}>
-                    <span>Delete Song from DB</span>
+                    <span><Trans i18nKey="deleteSongFromDB">Delete Song from DB</Trans></span>
                   </button>
                 </div>
                 <div style={{}} className="options-flex-div">
@@ -673,7 +680,7 @@ export default class SongDetailView extends React.Component {
                       await this.props.ignoreArrangement();
                       this.handleHide();
                     }}>
-                    <span>Delete and Never Import</span>
+                    <span><Trans i18nKey="deleteNeverImport">Delete and Never Import</Trans></span>
                   </button>
                 </div>
               </div>
@@ -736,3 +743,5 @@ SongDetailView.defaultProps = {
   songID: '',
   refreshView: () => { },
 }
+
+export default withI18n('translation')(SongDetailView)

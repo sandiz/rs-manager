@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types';
+import { withI18n, Trans } from 'react-i18next';
 import Select from 'react-select';
 import getProfileConfig, { writeFile, getImportRSMConfig, getSteamIDConfig } from '../configService';
 import { getSetlistMetaInfo, executeRawSql } from '../sqliteService';
@@ -38,9 +39,9 @@ class ExportSetlistModal extends React.Component {
         this.state = { ...defaultState }
     }
 
-    successMsg = (msg = null) => { this.setState({ showMessage: (<span>Exported Successfully! {msg}</span>), messageType: 'alert-success' }) }
+    successMsg = (msg = null) => { this.setState({ showMessage: (<span><Trans i18nKey="exportedSuccessfully">Exported Successfully</Trans>! {msg}</span>), messageType: 'alert-success' }) }
 
-    failureMsg = (msg) => { this.setState({ showMessage: (<span>Export Failed: {msg}</span>), messageType: 'alert-danger' }) }
+    failureMsg = (msg) => { this.setState({ showMessage: (<span><Trans i18nKey="exportFailed">Export Failed</Trans>: {msg}</span>), messageType: 'alert-danger' }) }
 
     shouldComponentUpdate = async (nextProps, nextState) => {
         if (nextProps === this.props) return false;
@@ -107,10 +108,14 @@ class ExportSetlistModal extends React.Component {
                     this.successMsg(
                         (
                             <div>
-                                A backup of your profile was created&nbsp;
+                                <Trans i18nKey="backupOfYourProfile">
+                                    A backup of your profile was created
+                                </Trans>&nbsp;
                                 <span style={{ textDecoration: 'underline' }}>
                                     <a href="#" onClick={() => window.shell.showItemInFolder(tmpDir)}>
-                                        here.
+                                        <Trans i18nKey="here">
+                                            here.
+                                        </Trans>
                                     </a>
                                 </span>
                             </div>
@@ -121,20 +126,24 @@ class ExportSetlistModal extends React.Component {
                     this.failureMsg(
                         (
                             <React.Fragment>
-                                <span>an error occurred</span>
-                                <pre style={{
-                                    width: 100 + '%',
-                                    height: 200 + 'px',
-                                    overflow: 'auto',
-                                    overflowX: 'hidden',
-                                    textAlign: 'left',
-                                    wordBreak: 'break-all',
-                                    userSelect: 'text',
-                                    marginLeft: -15 + 'px',
-                                    marginRight: -15 + 'px',
-                                }}>
+                                <span><Trans i18nKey="anErrorOcurred">an error occurred</Trans></span>
+                                <textarea
+                                    readOnly
+                                    className="alert-danger"
+                                    style={{
+                                        width: 100 + '%',
+                                        height: 200 + 'px',
+                                        overflow: 'auto',
+                                        overflowX: 'hidden',
+                                        textAlign: 'left',
+                                        wordBreak: 'break-all',
+                                        userSelect: 'text',
+                                        marginLeft: -15 + 'px',
+                                        marginRight: -15 + 'px',
+                                        border: 'none',
+                                    }}>
                                     {logs}
-                                </pre>
+                                </textarea>
                             </React.Fragment>
                         ),
                     );
@@ -234,9 +243,9 @@ class ExportSetlistModal extends React.Component {
             <div style={{ display: this.props.show ? "block" : "none" }}>
                 <div id="open-modal" className="modal-window" style={{ opacity: 1, pointerEvents: "auto" }}>
                     <div id="modal-info" style={{ width: 25 + '%' }}>
-                        <a title="Close" className="modal-close" onClick={this.onHide}>Close</a>
+                        <a title="Close" className="modal-close" onClick={this.onHide}><Trans i18nKey="close">Close</Trans></a>
                         <div style={{ textAlign: 'center' }}>
-                            <h3>Export setlist as:</h3>
+                            <h3><Trans i18nKey="exportSetlistAs">Export setlist as:</Trans></h3>
                             <hr />
                             <div>
                                 <div style={{
@@ -244,10 +253,10 @@ class ExportSetlistModal extends React.Component {
                                     marginLeft: 2 + 'px',
                                     marginTop: -8 + 'px',
                                 }}>
-                                    <span>Setlist: </span>
+                                    <span><Trans i18nKey="setlist">Setlist</Trans>: </span>
                                     <span className="font-weight-bold"> {unescape(this.props.exportSetlistName)}</span>
                                     <br />
-                                    <span>Rocksmith Profile: </span>
+                                    <span><Trans i18nKey="rocksmithProfile">Rocksmith Profile</Trans>: </span>
                                     <span className="font-weight-bold"> {this.state.profileName}</span>
                                 </div>
                                 <div style={{
@@ -276,9 +285,11 @@ class ExportSetlistModal extends React.Component {
                                                         ? (
                                                             <div className="alert alert-info" style={{ marginTop: 15 + 'px' }}>
                                                                 <span>
-                                                                    Please make sure
-                                                                    Rocksmith 2014 is not
-                                                                    running when you export.
+                                                                    <Trans i18nKey="rocksmithWarning">
+                                                                        Please make sure
+                                                                            Rocksmith 2014 is not
+                                                                            running when you export.
+                                                                    </Trans>
                                                                 </span>
                                                             </div>
                                                         ) : null
@@ -302,7 +313,9 @@ class ExportSetlistModal extends React.Component {
                                     ? (
                                         <div className="alert alert-info" style={{ marginTop: 15 + 'px' }}>
                                             <span>
-                                                Processing, please wait...
+                                                <Trans i18nKey="processingPleaseWait">
+                                                    Processing, please wait...
+                                                </Trans>
                                             </span>
                                         </div>
                                     )
@@ -314,7 +327,9 @@ class ExportSetlistModal extends React.Component {
                                             }}
                                             onClick={this.startExport}
                                             className="extraPadding download">
-                                            Start Export
+                                            <Trans i18nKey="startExport">
+                                                Start Export
+                                            </Trans>
                                         </button>
                                     )
                             }
@@ -355,4 +370,4 @@ ExportSetlistModal.defaultProps = {
     exportSetlistName: '',
 };
 
-export default ExportSetlistModal;
+export default withI18n('translation')(ExportSetlistModal);
