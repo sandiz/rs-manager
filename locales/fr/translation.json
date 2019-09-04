@@ -135,5 +135,18 @@
 	"markAllAsCDLC": "Marquer tout comme CDLC",
 	"File Name": "Nom de fichier",
 	"Size": "Taille",
-	"Created At": "Créé à"
+	"Created At": "Créé à",
+	"Profile Selection": "Sélection du profil",
+	"optional": "Optionnel",
+	"trackSteamDLCPurchase": "Suit les achats de vapeur dlc",
+	"profileSetupComplete": "Configuration du profil terminée! Vous pouvez maintenant importer vos dlc dans",
+	"andviewrefresh": "et affichez / actualisez vos statistiques dans",
+	"steamLoginComplete": "Connexion Steam terminée! Vous pouvez maintenant suivre vos achats de vapeur dlc dans",
+	"Rocksmith Songlists": "Rocksmith Listes de chansons",
+	"deleteSetlist": "Supprimer la liste de sélection",
+	"reimportSetlist": "Liste de réimportation",
+	"clickToImport": "Cliquez pour importer",
+	"Processing": "En traitement",
+	"Reset Collection": "Réinitialiser la collection",
+	"Advanced": "Avancée"
 }

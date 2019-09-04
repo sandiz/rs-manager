@@ -134,5 +134,18 @@
 	"markAllAsCDLC": "Mark All as CDLC",
 	"File Name": "File Name",
 	"Size": "Size",
-	"Created At": "Created At"
+	"Created At": "Created At",
+	"Profile Selection": "Profile Selection",
+	"optional": "Optional",
+	"trackSteamDLCPurchase": "Tracks steam dlc purchases",
+	"profileSetupComplete": "Profile setup complete! You can now import your dlc&apos;s in&nbsp;",
+	"andviewrefresh": "&nbsp;and view/refresh your stats in&nbsp;",
+	"steamLoginComplete": "Steam login complete! You can now track your steam dlc purchases in&nbsp;",
+	"Rocksmith Songlists": "Rocksmith Songlists",
+	"deleteSetlist": "Delete Setlist",
+	"reimportSetlist": "Reimport Setlist",
+	"clickToImport": "Click to Import",
+	"Processing": "Processing",
+	"Reset Collection": "Reset Collection",
+	"Advanced": "Advanced"
 }

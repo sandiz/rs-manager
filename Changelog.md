@@ -1,5 +1,5 @@
 v2.3.0
-- translate all views
+- translate most views (todo: rslive, settings options)
 - update showOpenDialog and showSaveDialog to async
 v2.2.0
 - update all packages to latest released version (aug 2019)

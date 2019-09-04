@@ -1,4 +1,5 @@
 import React from 'react'
+import { withI18n, Trans } from 'react-i18next';
 import Collapsible from 'react-collapsible';
 import CreatableSelect from "react-select/creatable";
 import PropTypes from 'prop-types';
@@ -91,7 +92,7 @@ export const collapseButton = (text, size = 3) => {
   );
 }
 export const defaultSortOption = [{ label: 'mastery-desc', value: 'mastery-desc' }]
-export default class SettingsView extends React.Component {
+class SettingsView extends React.Component {
   constructor(props) {
     super(props);
     this.tabname = "tab-settings"
@@ -154,17 +155,37 @@ export default class SettingsView extends React.Component {
             textAlign: 'right',
           }}>
             {
-              this.state.processingSetlist ? "Processing..."
+              this.state.processingSetlist ? (
+                <span>
+                  <Trans i18nKey="Processing">
+                    Processing
+                  </Trans>...
+                </span>
+              )
                 : (
                   this.state.setlistImported[i]
                     ? (
                       <span>
-                        <a style={{ color: 'red' }} onClick={() => this.importDeleteSetlist(i, "delete")}>Delete Setlist</a>
+                        <a style={{ color: 'red' }} onClick={() => this.importDeleteSetlist(i, "delete")}>
+                          <Trans i18nKey="deleteSetlist">
+                            Delete Setlist
+                          </Trans>
+                        </a>
                         &nbsp;| &nbsp;
-                        <a onClick={() => this.importDeleteSetlist(i, "import")}>Reimport Setlist</a>
+                        <a onClick={() => this.importDeleteSetlist(i, "import")}>
+                          <Trans i18nKey="reimportSetlist">
+                            Reimport Setlist
+                          </Trans>
+                        </a>
                       </span>
                     )
-                    : <a onClick={() => this.importDeleteSetlist(i, "import")}>Click to Import</a>
+                    : (
+                      <a onClick={() => this.importDeleteSetlist(i, "import")}>
+                        <Trans i18nKey="clickToImport">
+                          Click to Import
+                      </Trans>
+                      </a>
+                    )
                 )
             }
           </span>
@@ -637,8 +658,8 @@ export default class SettingsView extends React.Component {
               <br /> <br />
               <div style={{ marginTop: -30 + 'px', paddingLeft: 30 + 'px', paddingRight: 30 + 'px' }}>
                 <Collapsible
-                  trigger={expandButton('Profile Selection')}
-                  triggerWhenOpen={collapseButton('Profile Selection')}
+                  trigger={expandButton(this.props.t('Profile Selection'))}
+                  triggerWhenOpen={collapseButton(this.props.t('Profile Selection'))}
                   transitionTime={200}
                   easing="ease-in"
                   open
@@ -719,11 +740,13 @@ export default class SettingsView extends React.Component {
                       </div>
                       <div style={{ textAlign: 'center', fontSize: 21 + 'px' }}>
                         <div className="ta-center profile-text overflowellipsis text-secondary pointer">
-                          (optional)
+                          (<Trans i18nKey="optional">optional</Trans>)
                           <span style={{ borderBottom: "1px dotted" }} onClick={this.steamLogin}>
                             <br />
-                            Tracks steam dlc purchases
-                            </span>
+                            <Trans i18nKey="trackSteamDLCPurchase">
+                              Tracks steam dlc purchases
+                            </Trans>
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -737,13 +760,17 @@ export default class SettingsView extends React.Component {
                               type="button"
                               onClick={this.saveProfileSettings}
                               className="extraPadding download">
-                              Save
+                              <Trans i18nKey="save">
+                                Save
+                              </Trans>
                             </button>
                             <button
                               type="button"
                               onClick={this.resetProfileSettings}
                               className="extraPadding download">
-                              Cancel
+                              <Trans i18nKey="cancel">
+                                Cancel
+                              </Trans>
                             </button>
                           </div>
                         )
@@ -759,13 +786,20 @@ export default class SettingsView extends React.Component {
                                 this.state.profileSaved
                                   ? (
                                     <span>
-                                      Profile setup complete!
-                                      You can now import your dlc&apos;s in&nbsp;
+                                      <Trans i18nKey="profileSetupComplete">
+                                        Profile setup complete!
+                                        You can now import your dlc&apos;s in&nbsp;
+                                      </Trans>
                                       <span
                                         onClick={() => DispatcherService.dispatch(DispatchEvents.SIDEBAR_GOTO, "tab-psarc")}
-                                        style={{ borderBottom: "1px dotted", cursor: 'pointer' }}>PSARC explorer
+                                        style={{ borderBottom: "1px dotted", cursor: 'pointer' }}>
+                                        <Trans i18nKey="psarc Explorer">
+                                          PSARC explorer
+                                        </Trans>
                                       </span>
-                                      &nbsp;and view/refresh your stats in&nbsp;
+                                      <Trans i18nKey="andviewrefresh">
+                                        &nbsp;and view/refresh your stats in&nbsp;
+                                      </Trans>
                                       <span
                                         onClick={() => DispatcherService.dispatch(DispatchEvents.SIDEBAR_GOTO, "tab-dashboard")}
                                         style={{ borderBottom: "1px dotted", cursor: 'pointer' }}>Dashboard.
@@ -777,13 +811,17 @@ export default class SettingsView extends React.Component {
                                 this.state.cookieSaved
                                   ? (
                                     <span>
-                                      Steam login complete!
-                                      You can now track your steam dlc purchases in&nbsp;
+                                      <Trans i18nKey="steamLoginComplete">
+                                        Steam login complete!
+                                        You can now track your steam dlc purchases in&nbsp;
+                                      </Trans>
                                       <span
                                         onClick={() => DispatcherService.dispatch(DispatchEvents.SIDEBAR_GOTO, "songs-available")}
-                                        style={{ borderBottom: "1px dotted", cursor: 'pointer' }}>DLC Catalog
+                                        style={{ borderBottom: "1px dotted", cursor: 'pointer' }}>
+                                        <Trans i18nKey="DLC Catalog">
+                                          DLC Catalog
+                                        </Trans>
                                       </span>
-
                                     </span>
                                   ) : null
                               }
@@ -796,8 +834,8 @@ export default class SettingsView extends React.Component {
                 </Collapsible>
                 <br />
                 <Collapsible
-                  trigger={expandButton("Rocksmith Songlists")}
-                  triggerWhenOpen={collapseButton("Rocksmith Songlists")}
+                  trigger={expandButton(this.props.t("Rocksmith Songlists"))}
+                  triggerWhenOpen={collapseButton(this.props.t("Rocksmith Songlists"))}
                   transitionTime={200}
                   easing="ease-in"
                 >
@@ -819,8 +857,8 @@ export default class SettingsView extends React.Component {
                     }}>
                       {
                         this.state.processingSetlist
-                          ? <span> Processing... </span>
-                          : <a onClick={() => this.importDLCPack()}>Click to Import</a>
+                          ? <span> <Trans i18nKey="Processing">Processing</Trans>... </span>
+                          : <a onClick={() => this.importDLCPack()}><Trans i18nKey="clickToImport">Click to Import</Trans></a>
                       }
                     </span>
                     <br />
@@ -899,8 +937,8 @@ loading setlists into Rocksmith 2014.
               <div style={{ marginTop: -6 + 'px', paddingLeft: 30 + 'px', paddingRight: 30 + 'px' }}>
                 <br />
                 <Collapsible
-                  trigger={expandButton("Advanced ")}
-                  triggerWhenOpen={collapseButton("Advanced")}
+                  trigger={expandButton(this.props.t("Advanced"))}
+                  triggerWhenOpen={collapseButton(this.props.t("Advanced"))}
                   transitionTime={200}
                   easing="ease-in"
                 >
@@ -1225,8 +1263,8 @@ loading setlists into Rocksmith 2014.
                 </Collapsible>
                 <br />
                 <Collapsible
-                  trigger={expandButton("Reset Collection")}
-                  triggerWhenOpen={collapseButton("Reset Collection")}
+                  trigger={expandButton(this.props.t("Reset Collection"))}
+                  triggerWhenOpen={collapseButton(this.props.t("Reset Collection"))}
                   transitionTime={200}
                   easing="ease-in"
                 >
@@ -1305,3 +1343,5 @@ SettingsView.defaultProps = {
   //resetHeader: () => {},
   refreshTabs: () => { },
 }
+
+export default withI18n('translation')(SettingsView);

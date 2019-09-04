@@ -134,5 +134,18 @@
 	"markAllAsCDLC": "সমস্ত সিডিএলসি হিসাবে চিহ্নিত করুন",
 	"File Name": "ফাইলের নাম",
 	"Size": "আয়তন",
-	"Created At": "এ নির্মিত"
+	"Created At": "এ নির্মিত",
+	"Profile Selection": "প্রোফাইল নির্বাচন",
+	"optional": "ঐচ্ছিক",
+	"trackSteamDLCPurchase": "steam dlc ক্রয় ট্র্যাক",
+	"profileSetupComplete": "প্রোফাইল সেটআপ সম্পূর্ণ! আপনি এখন আপনার dlc এর আমদানি করতে পারেন",
+	"andviewrefresh": "এবং আপনার পরিসংখ্যানটি দেখুন / রিফ্রেশ করুন",
+	"steamLoginComplete": "steam লগইন সম্পূর্ণ! আপনি এখন আপনার steam dlc কেনাকাটা ট্র্যাক করতে পারেন",
+	"Rocksmith Songlists": "রকস্মিথ গানের তালিকাগুলি",
+	"deleteSetlist": "সেটলিস্ট মুছুন",
+	"reimportSetlist": "রেিমপোর্ট সেটলিস্ট",
+	"clickToImport": "আমদানি করতে ক্লিক করুন",
+	"Processing": "প্রসেসিং",
+	"Reset Collection": "সংগ্রহ পুনরায় সেট করুন",
+	"Advanced": "অগ্রসর"
 }
