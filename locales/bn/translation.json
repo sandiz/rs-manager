@@ -120,5 +120,10 @@
 	"logicChain": "লজিক চেইন",
 	"delete": "মুছে ফেলা",
 	"Save Options": "বিকল্প সংরক্ষণ করুন",
-	"Delete Setlist": "সেটলিস্ট মুছুন"
+	"Delete Setlist": "সেটলিস্ট মুছুন",
+	"updateMastery": "মাস্টার আপডেট করুন",
+	"export": "রপ্তানি",
+	"settings": "সেটিংস",
+	"updateFavorites": "পছন্দসই আপডেট করুন",
+	"addRemoveSongs": "গানগুলি জুড়ুন / সরান"
 }
