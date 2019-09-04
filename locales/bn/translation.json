@@ -125,5 +125,14 @@
 	"export": "রপ্তানি",
 	"settings": "সেটিংস",
 	"updateFavorites": "পছন্দসই আপডেট করুন",
-	"addRemoveSongs": "গানগুলি জুড়ুন / সরান"
+	"addRemoveSongs": "গানগুলি জুড়ুন / সরান",
+	"choosePsarcFile": ".psarc ফাইল (গুলি) চয়ন করুন",
+	"choosePsarcDirectory": ".psarc ডিরেক্টরি চয়ন করুন",
+	"stopProcessing": "প্রসেসিং বন্ধ করুন",
+	"forceGenerateView": "ফোর্স জেনারেট ভিউ",
+	"updateSongsOwned": "আপডেট গান> মালিকানাধীন",
+	"markAllAsCDLC": "সমস্ত সিডিএলসি হিসাবে চিহ্নিত করুন",
+	"File Name": "ফাইলের নাম",
+	"Size": "আয়তন",
+	"Created At": "এ নির্মিত"
 }

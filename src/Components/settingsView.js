@@ -476,11 +476,11 @@ export default class SettingsView extends React.Component {
   }
 
   enterPrfldb = async () => {
-    const prfldbs = remote.dialog.showOpenDialog({
+    const prfldbs = await remote.dialog.showOpenDialog({
       properties: ["openFile"],
     });
-    if (prfldbs == null) { return; }
-    if (prfldbs.length > 0) {
+    if (prfldbs == null || prfldbs.canceled) { return; }
+    if (prfldbs.filePaths.length > 0) {
       this.setState({ prfldb: prfldbs[0] });
       this.props.handleChange();
     }

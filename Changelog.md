@@ -1,3 +1,6 @@
+v2.3.0
+- translate all views
+- update showOpenDialog and showSaveDialog to async
 v2.2.0
 - update all packages to latest released version (aug 2019)
 - react-datepicker pinned to 1.8 since it depends on moment

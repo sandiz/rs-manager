@@ -6,7 +6,7 @@ var FileWriter = require('wav').FileWriter;
 
 let ai = null;
 let writestream = null;
-function startRecording(errcb, fincb) {
+async function startRecording(errcb, fincb) {
     if (ai != null) ai.quit();
     const devices = portAudio.getDevices();
     const rsDevice = {
@@ -36,17 +36,17 @@ function startRecording(errcb, fincb) {
     }
 
     const ts = new Date().getTime();
-    const dirs = remote.dialog.showOpenDialog({
+    const dirs = await remote.dialog.showOpenDialog({
         properties: ["openDirectory", "createDirectory"],
         message: "Choose directory to save the recording to..",
         title: "Choose directory to save the recording to..",
         buttonLabel: "Save"
     });
-    if (!dirs) {
+    if (!dirs || dirs.canceled || dirs.filePaths <= 0) {
         rsDevice.index = -2;
         return rsDevice;
     }
-    const results = dirs[0];
+    const results = dirs.filePaths[0];
     const file = window.path.join(results, "/rocksmith_raw_" + ts + ".wav");
     rsDevice.fileName = file;
 
