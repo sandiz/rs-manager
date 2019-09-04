@@ -126,5 +126,14 @@
 	"export": "Exportar",
 	"settings": "Configuraciones",
 	"updateFavorites": "Actualizar favoritos",
-	"addRemoveSongs": "Agregar / quitar canciones"
+	"addRemoveSongs": "Agregar / quitar canciones",
+	"choosePsarcFile": "Elija archivos .psarc",
+	"choosePsarcDirectory": "Elija el directorio .psarc",
+	"stopProcessing": "Detener el procesamiento",
+	"forceGenerateView": "Force Generate VIew",
+	"updateSongsOwned": "Actualizar canciones> Propiedad",
+	"markAllAsCDLC": "Marcar todo como CDLC",
+	"File Name": "Nombre del archivo",
+	"Size": "tamaño",
+	"Created At": "Creado en"
 }
