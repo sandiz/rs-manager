@@ -1513,3 +1513,9 @@ hr {
 .setlistHeaderClass th > label {
     width: 67%;
 }
+
+.ellipsify-text {
+  white-space: nowrap; 
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

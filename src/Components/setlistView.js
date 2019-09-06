@@ -839,9 +839,9 @@ class SetlistView extends React.Component {
 
     render = () => {
         const { songs, sizePerPage, page } = this.state;
-        const choosepsarchstyle = "extraPadding download " + (this.state.totalSize <= 0 ? "isDisabled" : "");
+        const choosepsarchstyle = "extraPadding download ellipsify-text" + (this.state.totalSize <= 0 ? "isDisabled" : "");
         const choosesettingsstyle = (this.state.isDeleted === false)
-            ? "extraPadding download" : "hidden"
+            ? "extraPadding download ellipsify-text " : "hidden"
         const setlistinitclass = this.state.showOptions ? "" : "hidden";
         let sacolwidth = "col-sm-3";
         if (this.state.scdTrueLength > 2) sacolwidth = "col-sm-2-2"
