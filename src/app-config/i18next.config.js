@@ -1,14 +1,14 @@
 const i18n = require('i18next');
 const i18nextBackend = require('i18next-node-fs-backend');
-
+const path = require('path');
 const languages = require('./base-config').languages;
 const i18nextOptions = {
     backend: {
         // path where resources get loaded from
-        loadPath: './locales/{{lng}}/{{ns}}.json',
+        loadPath: path.resolve(__dirname, '../../', './locales/{{lng}}/{{ns}}.json'),
 
         // path to post missing resources
-        addPath: './locales/{{lng}}/{{ns}}.missing.json',
+        addPath: path.resolve(__dirname, '../../', './locales/{{lng}}/{{ns}}.missing.json'),
 
         // jsonIndent to use when storing json files
         jsonIndent: 2,
@@ -25,14 +25,17 @@ const i18nextOptions = {
     },
     namespace: 'translation',
 };
-
+//console.log(__dirname);
+//console.log(i18nextOptions.backend.loadPath)
 i18n
     .use(i18nextBackend);
 
 // initialize if not already initialized
 if (!i18n.isInitialized) {
-    i18n
-        .init(i18nextOptions);
+    i18n.init(i18nextOptions, (err, t) => {
+        if (err)
+            console.log(err);
+    });
 }
 
 module.exports.i18n = i18n;
