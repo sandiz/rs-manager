@@ -89,6 +89,7 @@ function createMenu() {
     },
     ];
 
+    /*
     const languageMenu = languages.map((languageCode) => {
         return {
             label: i18n.t(languageCode),
@@ -104,6 +105,7 @@ function createMenu() {
         label: i18n.t('Language'),
         submenu: languageMenu
     });
+    */
 
     Menu.setApplicationMenu(Menu.buildFromTemplate(template));
 }
@@ -179,9 +181,8 @@ async function createWindow() {
 }
 
 app.on("ready", () => {
-    createWindow();
     currentLocale = app.getLocale();
-    // console.log('currentLocale: ' + currentLocale);
+    //console.log('electron-ready currentLocale: ' + currentLocale);
     // currentLocale = 'bn';
 });
 
@@ -192,33 +193,63 @@ app.on("window-all-closed", () => {
 });
 
 app.on("activate", () => {
+    //console.log('electron-activate');
     if (mainWindow === null) {
         createWindow();
     }
 });
+i18n.on('initialized', function (options) {
+    //console.log("i18n-initialized");
+});
 
 i18n.on('loaded', (loaded) => {
     //console.log('i18n-loaded');
+    createWindow();
     i18n.changeLanguage(currentLocale);
     i18n.off('loaded');
 });
 
 i18n.on('languageChanged', (lng) => {
+    //console.log('languageChanged: ' + lng)
     createMenu();
-    mainWindow.webContents.send('language-changed', {
-        language: lng,
-        namespace: 'translation',
-        resource: i18n.getResourceBundle(lng, 'translation')
-    });
+    if (mainWindow) {
+        mainWindow.webContents.on('did-finish-load', () => {
+            mainWindow.webContents.send('language-changed', {
+                language: lng,
+                namespace: 'translation',
+                resource: getResourceBundle(lng, 'translation')
+            });
+        });
+    }
 });
+i18n.on('missingKey', (lngs, namespace, key, res) => {
+    console.log(`missing key: lng: ${lngs} namespace: ${namespace} key: ${key}`);
+    console.log("resource: " + res);
+})
 
 ipcMain.on('get-initial-translations', (event, arg) => {
     const loc = currentLocale;
+    console.log('get-initial-translations: ' + loc);
     i18n.loadLanguages(loc, (err, t) => {
         const initial = {};
         initial[loc] = {
-            'translation': i18n.getResourceBundle(loc, 'translation')
+            'translation': getResourceBundle(loc, 'translation')
         }
+        //const keys = Object.keys(initial[loc]['translation'])
+        //console.log('get-initial-translations: ' + loc + " keys: " + keys.length);
         event.returnValue = initial;
     });
 });
+
+function getResourceBundle(lang, namespace = 'translation') {
+    if (i18n.hasResourceBundle(lang, namespace)) {
+        return i18n.getResourceBundle(lang, namespace);
+    }
+    else if (lang.includes("-")) {
+        const newlang = lang.split("-")[0];
+        console.log(`no resource bundle found for ${lang} trying with ${newlang}`)
+        return getResourceBundle(newlang, namespace);
+    }
+    console.log("no resource bundle found for " + lang)
+    return {}
+}

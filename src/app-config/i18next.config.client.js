@@ -13,7 +13,7 @@ const i18nextOptions = {
     },
     //debug: true,
     saveMissing: false,
-    lng: 'bn',
+    lng: 'en',
     fallbackLng: 'en',
     whitelist: languages,
     react: {

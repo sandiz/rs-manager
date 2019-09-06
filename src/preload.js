@@ -298,12 +298,12 @@ window.remote.app.on("quit", () => {
     exp.close();
 })
 
-/*
+
 process.once('loaded', () => {
-    global.electron = require('electron')
+    global.window = window;
     //electron.webFrame.setZoomFactor(defaultZoom);
 })
-*/
+
 
 
 window.pDownload = (url, dest) => {
