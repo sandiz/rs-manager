@@ -153,8 +153,10 @@ class SongAvailableView extends React.Component {
           //console.log(tags);
           //console.log(row.tags);
           const tags = [];
+          let count = 0;
           if (row.tags) {
             const splittags = row.tags.split("|");
+            count = splittags.length;
             for (let i = 0; i < splittags.length; i += 1) {
               const tag = splittags[i];
               tags.push(<a
@@ -178,6 +180,7 @@ class SongAvailableView extends React.Component {
               <span style={{
                 textAlign: 'right',
                 float: 'right',
+                marginTop: (count > 6) ? '10px' : '0px',
               }}> {tags} </span>
             </div>
           );

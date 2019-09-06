@@ -858,7 +858,7 @@ class DashboardView extends React.Component {
             }}
             ref={this.infoRef}
             className={infostyle}>
-            <Trans i18nKey="generateInfographic">
+            <Trans i18nKey="generateInfographic ellipsify-text">
               Generate Infographic
             </Trans>
           </button>
@@ -868,7 +868,7 @@ class DashboardView extends React.Component {
             style={{
               width: 15 + '%',
             }}
-            className="extraPadding download">
+            className="extraPadding download ellipsify-text">
             <Trans i18nKey="refreshStats">
               Refresh Stats from Profile
             </Trans>
@@ -877,7 +877,7 @@ class DashboardView extends React.Component {
         <br />
         <div className="row justify-content-md-center" style={{ marginTop: -38 + 'px' }}>
           <div className="col col-md-3 ta-center dashboard-top dashboard-header">
-            <div>
+            <div className="ellipsify-text">
               <a onClick={() => this.fetchRandomStats(false, true)}>
                 <Trans i18nKey="randomPurchasableDLC">
                   Random Purchasable DLC
@@ -910,7 +910,7 @@ class DashboardView extends React.Component {
             </div>
           </div>
           <div className="col col-md-3 ta-center dashboard-top dashboard-header">
-            <div>
+            <div className="ellipsify-text">
               <a
                 onClick={() => { window.shell.openExternal(this.state.weeklysongspotlight.url) }}>
                 <Trans i18nKey="redditWeekly">
@@ -946,7 +946,7 @@ class DashboardView extends React.Component {
             </div>
           </div>
           <div className="col col-md-3 ta-center dashboard-top dashboard-header">
-            <div>
+            <div className="ellipsify-text">
               <a onClick={() => this.fetchRandomStats(true, false)}>
                 <Trans i18nKey="randomLAS">
                   Random Learn a Song
