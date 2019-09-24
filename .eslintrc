@@ -64,7 +64,11 @@
         "max-classes-per-file": "off",
         "prefer-object-spread": "off",
         "no-mixed-operators": "off",
-        "no-async-promise-executor": "off"
+        "no-async-promise-executor": "off",
+        "no-underscore-dangle": "off",
+        "no-multi-spaces": "off",
+        "no-trailing-spaces": "off",
+        "class-methods-use-this": "off"
     },
     "parser": "babel-eslint",
     "extends": "airbnb",

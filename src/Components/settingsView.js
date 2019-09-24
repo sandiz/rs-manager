@@ -32,7 +32,7 @@ import readProfile, {
   getSteamProfiles, getProfileName,
 } from '../steamprofileService';
 import { sortOrderCustomStyles, createOption } from './setlistOptions';
-import { DispatcherService, DispatchEvents } from '../lib/libDispatcher'
+import { DispatcherService, DispatchEvents } from '../lib/libdispatcher'
 
 import steam from '../assets/tree-icons/catalog.svg'
 import * as rsicon from '../assets/icons/icon-1024x1024-gray.png'

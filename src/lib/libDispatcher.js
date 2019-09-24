@@ -62,5 +62,4 @@ export const DispatchEvents = {
     SIDEBAR_GOTO: "sidebar_goto",
 }
 
-
 export const DispatcherService = new Dispatcher();

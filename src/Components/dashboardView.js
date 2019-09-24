@@ -21,6 +21,7 @@ import {
 import { replaceRocksmithTerms } from './songavailableView';
 import SongDetailView from './songdetailView';
 import { getBadgeName } from './songlistView';
+import { profileWorker } from '../lib/libworker';
 
 const { path } = window;
 const Steam = require('steam-webapi');
@@ -612,9 +613,22 @@ class DashboardView extends React.Component {
   }
 
   refreshStats = async () => {
-    await this.updateRecentlyPlayed();
-    await this.updateMastery();
-    await this.fetchStats();
+    const _finishCb = (workerMgr, msg) => {
+      console.log(msg);
+      workerMgr.destroy();
+    }
+
+    const _errCb = (workerMgr, err) => {
+      console.log(err);
+      workerMgr.destroy();
+    }
+    const pw = new profileWorker(_finishCb, _errCb);
+    const data = [[1, 2], [1, 1, 1], [0], [4], [1, 1, 1, 1, 1], [2, 2], [-1, 1], [0], [12]];
+    pw.setData(data).startWork();
+
+    //await this.updateRecentlyPlayed();
+    //await this.updateMastery();
+    //await this.fetchStats();
   }
 
   showInfoOptions = async () => {

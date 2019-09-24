@@ -4,7 +4,7 @@ import TreeView from '../lib/deni-react-treeview'
 import { createRSSongList } from '../sqliteService';
 import { getShowPSStatsConfig } from '../configService';
 import { getState, saveState } from '../stateService';
-import { DispatcherService, DispatchEvents } from '../lib/libDispatcher'
+import { DispatcherService, DispatchEvents } from '../lib/libdispatcher'
 import steam from '../assets/tree-icons/catalog.svg'
 import * as rsicon from '../assets/icons/icon-1024x1024-gray.png'
 
