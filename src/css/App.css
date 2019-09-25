@@ -1519,3 +1519,15 @@ hr {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+.toast-msg {
+    margin-left: 5px;
+    font-family: "Roboto Condensed", sans-serif;
+}
+
+.toast-msg-success {
+    color: black;
+}
+.toast-msg-failure {
+    color: crimson;
+}

@@ -182,7 +182,7 @@ class WorkersManager {
 }
 
 class profileWorker {
-    constructor(c = (w, m) => { }, e = (w, e) => { }) {
+    constructor(c = (w, m) => { }, e = (w, err) => { }) {
         this._receivedMsg = c;
         this._receivedErr = e;
         this._init();
@@ -214,5 +214,20 @@ class profileWorker {
 export {
     profileWorker,
 }
+
+/*
+const _finishCb = (workerMgr, msg) => {
+  console.log(msg);
+  workerMgr.destroy();
+}
+
+const _errCb = (workerMgr, err) => {
+  console.log(err);
+  workerMgr.destroy();
+}
+const pw = new profileWorker(_finishCb, _errCb);
+const data = [[1, 2], [1, 1, 1], [0], [4], [1, 1, 1, 1, 1], [2, 2], [-1, 1], [0], [12]];
+pw.setData(data).startWork();
+*/
 
 export default WorkersManager;

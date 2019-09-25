@@ -1,11 +1,13 @@
-import React, { Component } from 'react'
+import React, { Component } from 'react';
 import { withI18n } from 'react-i18next';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.min.css';
 
-import Sidebar from './Components/Sidebar'
-import PSARCView from './Components/psarcView'
-import SonglistView from './Components/songlistView'
-import FolderEditView from './Components/folderEditView'
-import DashboardView from './Components/dashboardView'
+import Sidebar from './Components/Sidebar';
+import PSARCView from './Components/psarcView';
+import SonglistView from './Components/songlistView';
+import FolderEditView from './Components/folderEditView';
+import DashboardView from './Components/dashboardView';
 import getProfileConfig, {
   getShowSetlistOverlayAlwaysConfig,
   getCurrentZoomFactorConfig, getImportRSMConfig, updateImportRSMPath, getSteamNameFromSteamID,
@@ -19,7 +21,7 @@ import {
   getAllSetlist, initSongsOwnedDB,
   getStarredSetlists, getChildOfSetlistFolder,
 } from './sqliteService';
-import './css/App.css'
+import './css/App.css';
 import HelpView from './Components/HelpView';
 import { getState } from './stateService';
 import { enableScroll, forceNoScroll } from './Components/songdetailView';
@@ -27,6 +29,11 @@ import { getProfileName } from './steamprofileService';
 import { detectImportRSMPath } from './rsrtoolservice';
 
 const csvparse = require('csv-parse/lib/es5/sync');
+
+export const toasterError = (msg) => {
+  const d = <div><i className="fas fa-exclamation-circle" /><span className="toast-msg">{msg}</span></div>
+  toast.error(d);
+}
 
 class App extends Component {
   constructor(props) {
@@ -580,6 +587,17 @@ class App extends Component {
             </div>
           </div>
         </div>
+        <ToastContainer
+          position="bottom-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnVisibilityChange
+          draggable
+          pauseOnHover
+        />
       </div>
     );
   }

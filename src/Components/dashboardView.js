@@ -1,6 +1,7 @@
 import React from 'react'
 import { withI18n, Trans } from 'react-i18next';
 import PropTypes from 'prop-types';
+import { toast } from 'react-toastify';
 
 import StatsTableView, { getStatsWidth } from './statsTableView';
 import getProfileConfig, {
@@ -16,12 +17,12 @@ import {
   getRhythmStats, getBassStats, getRandomSongOwned,
   getRandomSongAvailable, getSAStats,
   updateScoreAttackStats, getLastNSongs,
-  getPathBreakdown, updateRecentlyPlayedSongs,
+  getPathBreakdown, updateRecentlyPlayedSongs, updateRecentlyPlayedSongsV2,
 } from '../sqliteService';
 import { replaceRocksmithTerms } from './songavailableView';
 import SongDetailView from './songdetailView';
 import { getBadgeName } from './songlistView';
-import { profileWorker } from '../lib/libworker';
+import { toasterError } from '../App';
 
 const { path } = window;
 const Steam = require('steam-webapi');
@@ -612,19 +613,82 @@ class DashboardView extends React.Component {
     }
   }
 
-  refreshStats = async () => {
-    const _finishCb = (workerMgr, msg) => {
-      console.log(msg);
-      workerMgr.destroy();
+  refreshToaster = (toastID = null, progress = 0, success = true) => {
+    const successmsg = success ? "toast-msg-success" : "toast-msg-failure";
+    const successicon = success ? "fa-check-circle" : "fa-times-circle";
+    const iconclass = (pr) => (<i className={"fas " + (progress >= pr ? successicon : "fa-circle-notch fa-spin")} />);
+    const spanclass = (pr, name) => (
+      <span className={(progress >= pr ? successmsg : "") + " toast-msg"}>
+        {name}
+      </span>
+    )
+    const total = 4;
+    const d = (
+      <div>
+        <span className="toast-msg toast-msg-success"> Refreshing Stats... </span>
+        <hr style={{ marginBottom: 7 + 'px' }} />
+        <div>
+          {iconclass(1)}
+          {spanclass(1, "RecentlyPlayed")}
+        </div>
+        <div>
+          <i className="fas fa-circle-notch fa-spin" />
+          <span className={(progress >= 2 ? successmsg : "") + " toast-msg"}>
+            Mastery
+          </span>
+        </div>
+        <div>
+          <i className="fas fa-circle-notch fa-spin" />
+          <span className={(progress >= 3 ? successmsg : "") + " toast-msg"}>
+            Song Stats
+          </span>
+        </div>
+      </div>
+    )
+    if (toastID == null) {
+      return toast(d, {
+        progress,
+      });
     }
+    else {
+      return toast.update(toastID, {
+        render: d,
+        progress: progress / total,
+      })
+    }
+  }
 
-    const _errCb = (workerMgr, err) => {
-      console.log(err);
-      workerMgr.destroy();
+  refreshStats = async () => {
+    let progress = 0;
+    const prfldb = await getProfileConfig();
+    if (prfldb === '' || prfldb === null) {
+      toasterError("Error fetching profile info, no profile selected!");
+      return;
     }
-    const pw = new profileWorker(_finishCb, _errCb);
-    const data = [[1, 2], [1, 1, 1], [0], [4], [1, 1, 1, 1, 1], [2, 2], [-1, 1], [0], [12]];
-    pw.setData(data).startWork();
+    if (prfldb.length > 0) {
+      const toastID = this.refreshToaster();
+      const steamProfile = await readProfile(prfldb);
+      const stats = steamProfile.Songs;
+      const sastats = steamProfile.SongsSA;
+      await initSongsOwnedDB();
+
+      const rpsongs = async (type, progreas) => {
+        const idDateArray = [];
+        const keys = Object.keys(type === "las" ? stats : sastats);
+        for (let i = 0; i < keys.length; i += 1) {
+          const stat = type === "las" ? stats[keys[i]] : sastats[keys[i]];
+          const ts = stat.TimeStamp;
+          idDateArray.push([keys[i], ts]);
+        }
+        return updateRecentlyPlayedSongsV2(idDateArray, type);
+      }
+
+      const changes = await rpsongs("las")
+      const changes2 = await rpsongs("sa");
+      progress += 1;
+      if (changes === -1 || changes2 === -1) { this.refreshToaster(toastID, progress, false); }
+      else { this.refreshToaster(toastID, progress, true); }
+    }
 
     //await this.updateRecentlyPlayed();
     //await this.updateMastery();

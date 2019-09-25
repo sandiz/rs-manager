@@ -456,6 +456,33 @@ export async function updateRecentlyPlayedSongs(id, date, type = "las" /* las or
     return op.changes;
   }
 }
+export async function updateRecentlyPlayedSongsV2(idDateArray = [], type = "las") {
+  const field = ((type === "las") ? "date_las" : "date_sa");
+  let items = "";
+
+  for (let i = 0; i < idDateArray.length; i += 1) {
+    const item = idDateArray[i]
+    items += `('${item[0]}', '${item[1]}')`;
+    if (i < idDateArray.length - 1) {
+      items += ',';
+    }
+  }
+
+  let sql = "";
+  sql = `with tmp(id, ${field}) as (values ${items}) `
+  sql += `update songs_owned set ${field} = (select ${field} from tmp where songs_owned.id = tmp.id) `
+  sql += `where id in (select id from tmp)`;
+
+  try {
+    const op = await db.run(sql);
+    return op.changes;
+  }
+  catch (e) {
+    console.error(e);
+    return -1;
+  }
+}
+
 export async function updateScoreAttackStats(stat, badgeHighest, id) {
   const op = await db.run(
     "UPDATE songs_owned SET sa_playcount=?, sa_ts=?, sa_hs_easy=?, sa_hs_medium=?, sa_hs_hard=?, sa_hs_master=?, sa_badge_easy=?, sa_badge_medium=?, sa_badge_hard=?, sa_badge_master=?, sa_highest_badge= ? where id=?",
