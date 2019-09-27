@@ -6,7 +6,7 @@ import { DispatcherService, DispatchEvents } from './libdispatcher';
 import {
     initSongsOwnedDB, updateRecentlyPlayedSongsV2,
     updateMasteryandPlayedV2, updateScoreAttackStatsV2,
-    saveHistoryV2, addToFavoritesV2, initSetlistPlaylistDB, createRSSongList,
+    saveHistoryV2, addToFavoritesV2, initSetlistPlaylistDB, createRSSongList, resetRSSongList,
 } from '../sqliteService';
 import { toasterError } from '../App';
 import getProfileConfig, { updateProfileConfig } from '../configService'
@@ -463,28 +463,40 @@ class profileWorker {
             const info = { changes: 0, name: setlist, id: '' }
             const steamProfile = await readProfile(prfldb);
 
+            let toastID = null;
             if (setlist === 'favorites') {
                 info.name = "Favorites";
                 info.id = "setlist_favorites";
                 await initSetlistPlaylistDB(info.id);
+                await resetRSSongList(info.id);
+                toastID = this.importToaster(null, 0, info);
+
+                const stats = steamProfile.FavoritesListRoot.FavoritesList;
+                const changes = await addToFavoritesV2(stats);
+                progress += 1;
+                info.changes = changes;
+                this.importToaster(toastID, progress, info);
             }
             else if (Number.isInteger(setlist) && (setlist > 0 && setlist < 7)) {
                 info.name = `RS Song List ${setlist}`;
                 info.id = `rs_song_list_${setlist}`;
                 await createRSSongList(info.id, info.name, false, false, false, true);
+                await resetRSSongList(info.id);
+
+                toastID = this.importToaster(null, 0, info);
+
+                const songRoot = steamProfile.SongListsRoot.SongLists;
+                const stats = songRoot[setlist - 1] === 'undefined' ? [] : songRoot[setlist - 1];
+
+                const changes = await addToFavoritesV2(stats, info.id);
+                progress += 1;
+                info.changes = changes;
+                this.importToaster(toastID, progress, info);
             }
             else {
                 toasterError("Invalid setlist: " + setlist);
                 return;
             }
-            const toastID = this.importToaster(null, 0, info);
-            const stats = steamProfile.FavoritesListRoot.FavoritesList;
-
-            const changes = await addToFavoritesV2(stats);
-            progress += 1;
-            info.changes = changes;
-            this.importToaster(toastID, progress, info);
-
             setTimeout(() => toast.dismiss(toastID), 2000);
         }
     }

@@ -25,9 +25,9 @@ import getProfileConfig, {
 } from '../configService';
 import {
   resetDB, createRSSongList, addtoRSSongList,
-  isTablePresent, deleteRSSongList, getSongByID, resetRSSongList,
+  isTablePresent, deleteRSSongList, getSongByID,
 } from '../sqliteService';
-import readProfile, {
+import {
   getAllProfiles, getSteamPathForRocksmith,
   getSteamProfiles, getProfileName,
 } from '../steamprofileService';
@@ -36,6 +36,7 @@ import { DispatcherService, DispatchEvents } from '../lib/libdispatcher'
 
 import steam from '../assets/tree-icons/catalog.svg'
 import * as rsicon from '../assets/icons/icon-1024x1024-gray.png'
+import { profileWorker } from '../lib/libworker';
 
 const parse = require('csv-parse/lib/es5/sync');
 
@@ -125,6 +126,14 @@ class SettingsView extends React.Component {
     this.loadState();
     this.sortfieldref = React.createRef();
     this.sortorderref = React.createRef();
+  }
+
+  componentDidMount = () => {
+    DispatcherService.on(DispatchEvents.SETLIST_IMPORTED, this.refresh);
+  }
+
+  componentWillUnmount = () => {
+    DispatcherService.off(DispatchEvents.SETLIST_IMPORTED, this.refresh);
   }
 
   loadState = async () => {
@@ -223,41 +232,22 @@ class SettingsView extends React.Component {
       this.setState({
         processingSetlist: false,
       });
+      this.refreshSetlist();
+      this.props.refreshTabs();
     }
     else if (method === "import") {
-      //import setlist
-      const tablename = "rs_song_list_" + (setlistnum + 1);
-      const displayname = "RS Song List " + (setlistnum + 1);
-      //set header to starting
-      this.props.updateHeader(this.tabname, `Importing Song List ${setlistnum + 1}`);
-      //set state to processing
       this.setState({
         processingSetlist: true,
       });
-
-      //create table for setlist
-      //insert setlist to setlist_meta
-      await createRSSongList(tablename, displayname, false, false, false, true);
-      const steamProfile = await readProfile(this.state.prfldb);
-      const songRoot = steamProfile.SongListsRoot.SongLists;
-      const currentSetlist = songRoot[setlistnum] === 'undefined' ? [] : songRoot[setlistnum];
-
-      await resetRSSongList(tablename);
-      //insert values to setlist (set header with item)
-      for (let i = 0; i < currentSetlist.length; i += 1) {
-        const songkey = currentSetlist[i];
-        this.props.updateHeader(this.tabname, `Importing Song List ${setlistnum + 1}: ${i}/${currentSetlist.length}`);
-        /* loop await */ // eslint-disable-next-line
-        await addtoRSSongList(tablename, songkey);
-      }
-      //set header with success + stats
-      this.props.updateHeader(this.tabname, `Finished importing Song List ${setlistnum + 1}!`);
-      //reset processing state
-      this.setState({
-        processingSetlist: false,
-      });
+      console.log("import setlist " + (setlistnum + 1))
+      profileWorker.startImport(setlistnum + 1);
     }
-    //set imported state to true
+  }
+
+  refresh = async () => {
+    this.setState({
+      processingSetlist: false,
+    });
     this.refreshSetlist();
     this.props.refreshTabs();
   }

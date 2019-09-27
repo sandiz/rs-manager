@@ -1257,7 +1257,7 @@ export async function saveSongByIDToSetlist(setlist, id) {
     await db.run(sql2);
   }
 }
-export async function addToFavoritesV2(idDateArray = []) {
+export async function addToFavoritesV2(idDateArray = [], setlistID = 'setlist_favorites') {
   const size = 500;
   let changes = 0;
   for (let k = 0; k < idDateArray.length; k += size) {
@@ -1273,7 +1273,7 @@ export async function addToFavoritesV2(idDateArray = []) {
       }
     }
 
-    sql = `replace into setlist_favorites (uniqkey) select uniqkey from songs_owned 
+    sql = `replace into ${setlistID} (uniqkey) select uniqkey from songs_owned 
     where songkey in (${items});`
 
     try {
