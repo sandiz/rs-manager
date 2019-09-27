@@ -227,13 +227,13 @@ class profileWorker {
         DispatcherService.dispatch(DispatchEvents.PROFILE_UPDATED, {});
     }
 
-    static refreshToaster = (toastID = null, progress = 0, success = true, info = {}) => {
-        const successmsg = success ? "toast-msg-success" : "toast-msg-failure";
-        const successicon = success ? "fa-check-circle" : "fa-times-circle";
-        const iconclass = (pr) => (<i className={"fas " + (progress >= pr ? successicon : "fa-circle-notch fa-spin")} />);
+    static refreshToaster = (toastID = null, progress = 0, info = {}) => {
+        const successmsg = (success) => (success ? "toast-msg-success" : "toast-msg-failure");
+        const successicon = (success) => (success ? "fa-check-circle" : "fa-times-circle");
+        const iconclass = (pr, success) => (<i className={"fas " + (progress >= pr ? successicon(success) : "fa-circle-notch fa-spin")} />);
 
-        const spanclass = (pr, name) => (
-            <span className={(progress >= pr ? successmsg : "") + " toast-msg"}>
+        const spanclass = (pr, name, success) => (
+            <span className={(progress >= pr ? successmsg(success) : "") + " toast-msg"}>
                 {name}
             </span>
         )
@@ -245,18 +245,18 @@ class profileWorker {
                 }
                 <hr style={{ marginBottom: 7 + 'px' }} />
                 <div>
-                    {iconclass(1)}
-                    {spanclass(1, "Recently Played")}
+                    {iconclass(1, !(info.rpchanges === -1 || info.rpchanges2 === -1))}
+                    {spanclass(1, "Recently Played", !(info.rpchanges === -1 || info.rpchanges2 === -1))}
                     <span className="toast-msg toast-msg-info ta-right">{info.rpchanges} entries</span>
                 </div>
                 <div>
-                    {iconclass(2)}
-                    {spanclass(2, "Learn A Song")}
+                    {iconclass(2, !(info.laschanges === -1))}
+                    {spanclass(2, "Learn A Song", !(info.laschanges === -1))}
                     <span className="toast-msg toast-msg-info ta-right">{info.laschanges} entries</span>
                 </div>
                 <div>
-                    {iconclass(3)}
-                    {spanclass(3, "Score Attack")}
+                    {iconclass(3, !(info.scoreattackchanges === -1))}
+                    {spanclass(3, "Score Attack", !(info.scoreattackchanges === -1))}
                     <span className="toast-msg toast-msg-info ta-right">{info.scoreattackchanges} entries</span>
                 </div>
             </div>
@@ -361,27 +361,28 @@ class profileWorker {
                 return updateScoreAttackStatsV2(idDateArray);
             }
 
-            const info = { rpchanges: 0, laschanges: 0, scoreattackchanges: 0 };
+            const info = {
+                rpchanges: 0,
+                rpchanges2: 0,
+                laschanges: 0,
+                scoreattackchanges: 0,
+            };
             let changes = await rpsongs("las")
             const changes2 = await rpsongs("sa");
             progress += 1;
-            info.rpchanges = changes + changes2;
-            if (changes === -1 || changes2 === -1) {
-                this.refreshToaster(toastID, progress, false, info);
-            }
-            else this.refreshToaster(toastID, progress, true, info);
+            info.rpchanges = changes;
+            info.rpchanges2 = changes2;
+            this.refreshToaster(toastID, progress, info);
 
             changes = await lassongs();
             progress += 1;
             info.laschanges = changes;
-            if (changes === -1) this.refreshToaster(toastID, progress, false, info);
-            else this.refreshToaster(toastID, progress, true, info);
+            this.refreshToaster(toastID, progress, info);
 
             changes = await scoreattacksongs();
             progress += 1;
             info.scoreattackchanges = changes;
-            if (changes === -1) this.refreshToaster(toastID, progress, false, info);
-            else this.refreshToaster(toastID, progress, true, info);
+            this.refreshToaster(toastID, progress, info);
 
             setTimeout(() => toast.done(toastID), 2000);
         }

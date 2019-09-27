@@ -923,7 +923,7 @@ export default class RSLiveView extends React.Component {
       timeTotal,
       totalNotes,
       timeCurrent: memoryReadout ? memoryReadout.songTimer : 0,
-      songKey: memoryReadout ? memoryReadout.songID : "TESTSONGKEY",
+      songKey: memoryReadout ? memoryReadout.songID : "",
       currentStreak: memoryReadout ? memoryReadout.currentHitStreak : 0,
       highestStreak,
       notesHit,
