@@ -6,7 +6,7 @@ import { DispatcherService, DispatchEvents } from './libdispatcher';
 import {
     initSongsOwnedDB, updateRecentlyPlayedSongsV2,
     updateMasteryandPlayedV2, updateScoreAttackStatsV2,
-    saveHistoryV2, addToFavoritesV2, initSetlistPlaylistDB,
+    saveHistoryV2, addToFavoritesV2, initSetlistPlaylistDB, createRSSongList,
 } from '../sqliteService';
 import { toasterError } from '../App';
 import getProfileConfig, { updateProfileConfig } from '../configService'
@@ -458,27 +458,28 @@ class profileWorker {
             return;
         }
         if (prfldb.length > 0) {
+            await initSongsOwnedDB();
+            await updateProfileConfig(prfldb);
             const info = { changes: 0, name: setlist, id: '' }
+            const steamProfile = await readProfile(prfldb);
+
             if (setlist === 'favorites') {
                 info.name = "Favorites";
                 info.id = "setlist_favorites";
+                await initSetlistPlaylistDB(info.id);
             }
-            else if (Number.isInteger(setlist) && (setlist > 0 && setlist < 8)) {
+            else if (Number.isInteger(setlist) && (setlist > 0 && setlist < 7)) {
                 info.name = `RS Song List ${setlist}`;
                 info.id = `rs_song_list_${setlist}`;
+                await createRSSongList(info.id, info.name, false, false, false, true);
             }
             else {
                 toasterError("Invalid setlist: " + setlist);
                 return;
             }
             const toastID = this.importToaster(null, 0, info);
-            const steamProfile = await readProfile(prfldb);
-
-            await initSongsOwnedDB();
-            await updateProfileConfig(prfldb);
             const stats = steamProfile.FavoritesListRoot.FavoritesList;
 
-            await initSetlistPlaylistDB(info.id);
             const changes = await addToFavoritesV2(stats);
             progress += 1;
             info.changes = changes;

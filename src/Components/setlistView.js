@@ -339,10 +339,12 @@ class SetlistView extends React.Component {
 
     componentDidMount = () => {
         DispatcherService.on(DispatchEvents.PROFILE_UPDATED, this.refresh);
+        DispatcherService.on(DispatchEvents.SETLIST_IMPORTED, this.setlistImported);
     }
 
     componentWillUnmount = () => {
         DispatcherService.off(DispatchEvents.PROFILE_UPDATED, this.refresh);
+        DispatcherService.off(DispatchEvents.SETLIST_IMPORTED, this.setlistImported);
     }
 
     getSortOptions = async () => {
@@ -650,6 +652,10 @@ class SetlistView extends React.Component {
         this.setState({ songs: output, page: 1, totalSize: output[0].acount });
     }
 
+    setlistImported = (setlist) => {
+        this.refreshView()
+    }
+
     refreshView = async () => {
         this.handleTableChange("cdm", {
             page: this.state.page,
@@ -721,8 +727,7 @@ class SetlistView extends React.Component {
     }
 
     updateFavs = async () => {
-        await profileWorker.startImport();
-        this.refreshView();
+        profileWorker.startImport();
     }
 
     removeFromSetlistByID = async (songData) => {
