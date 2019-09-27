@@ -427,14 +427,10 @@ export async function saveSongsOwnedDB() {
   //await db.close();
 }
 export async function updateMasteryandPlayed(id, mastery, playedcount) {
-  // console.log("__db_call__: updateMasteryandPlayed");
-  //await db.close();
   const op = await db.run("UPDATE songs_owned SET mastery=?,count=? where id=?", mastery, playedcount, id);
   return op.changes;
 }
 export async function updateNotes(id, note) {
-  // console.log("__db_call__: updateMasteryandPlayed");
-  //await db.close();
   const op = await db.run("UPDATE songs_owned SET local_note=? where id=?", escape(note), id);
   return op.changes;
 }
@@ -443,18 +439,6 @@ export async function getNotes(id) {
   //await db.close();
   const op = await db.get("select local_note from  songs_owned where id=?", id);
   return op;
-}
-export async function updateRecentlyPlayedSongs(id, date, type = "las" /* las or sa */) {
-  // console.log("__db_call__: updateRecentlyPlayed");
-  //await db.close();
-  if (type === "las") {
-    const op = await db.run("UPDATE songs_owned SET date_las=? where id=?", date, id);
-    return op.changes;
-  }
-  else {
-    const op = await db.run("UPDATE songs_owned SET date_sa=? where id=?", date, id);
-    return op.changes;
-  }
 }
 export async function updateRecentlyPlayedSongsV2(idDateArray = [], type = "las") {
   const size = 500; // sql stmt length has limits, update at max 500 items at a time
@@ -568,27 +552,12 @@ export async function updateScoreAttackStatsV2(idDateArray = []) {
   return changes;
 }
 
-export async function updateScoreAttackStats(stat, badgeHighest, id) {
-  const op = await db.run(
-    "UPDATE songs_owned SET sa_playcount=?, sa_ts=?, sa_hs_easy=?, sa_hs_medium=?, sa_hs_hard=?, sa_hs_master=?, sa_badge_easy=?, sa_badge_medium=?, sa_badge_hard=?, sa_badge_master=?, sa_highest_badge= ? where id=?",
-    stat.PlayCount, stat.TimeStamp,
-    stat.HighScores.Easy, stat.HighScores.Medium, stat.HighScores.Hard, stat.HighScores.Master,
-    stat.Badges.Easy, stat.Badges.Medium, stat.Badges.Hard, stat.Badges.Master,
-    badgeHighest,
-    id,
-  );
-  return op.changes;
-}
 export async function updateAcquiredDate(date, item) {
-  // console.log("__db_call__: updateMasteryandPlayed");
-  //await db.close();
   const sql = `UPDATE songs_available SET acquired_date='${date}' where name LIKE "%${item}"`
   const op = await db.run(sql);
   return op.changes;
 }
 export async function updateAcquiredDateByAppID(appid, date) {
-  // console.log("__db_call__: updateMasteryandPlayed");
-  //await db.close();
   const sql = `UPDATE songs_available SET acquired_date='${date}' where appid LIKE '${appid}'`
   const op = await db.run(sql);
   return op.changes;
