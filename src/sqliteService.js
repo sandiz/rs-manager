@@ -426,10 +426,6 @@ export async function saveSongsOwnedDB() {
   //console.log("__db_call__: saveSongsOwnedDB");
   //await db.close();
 }
-export async function updateMasteryandPlayed(id, mastery, playedcount) {
-  const op = await db.run("UPDATE songs_owned SET mastery=?,count=? where id=?", mastery, playedcount, id);
-  return op.changes;
-}
 export async function updateNotes(id, note) {
   const op = await db.run("UPDATE songs_owned SET local_note=? where id=?", escape(note), id);
   return op.changes;
@@ -1261,11 +1257,36 @@ export async function saveSongByIDToSetlist(setlist, id) {
     await db.run(sql2);
   }
 }
-export async function addToFavorites(songkey) {
-  // console.log("__db_call__: addToFavorites");
-  const sql = `replace into setlist_favorites (uniqkey) select uniqkey from songs_owned where songkey like '%${songkey}%'`
-  const op = await db.run(sql)
-  return op.changes;
+export async function addToFavoritesV2(idDateArray = []) {
+  const size = 500;
+  let changes = 0;
+  for (let k = 0; k < idDateArray.length; k += size) {
+    const sliced = idDateArray.slice(k, k + size);
+
+    let sql = "";
+    let items = "";
+    for (let i = 0; i < sliced.length; i += 1) {
+      const item = sliced[i]
+      items += `'${item}'`;
+      if (i < sliced.length - 1) {
+        items += ',';
+      }
+    }
+
+    sql = `replace into setlist_favorites (uniqkey) select uniqkey from songs_owned 
+    where songkey in (${items});`
+
+    try {
+      //eslint-disable-next-line
+      const op = await db.run(sql);
+      changes += op.changes;
+    }
+    catch (e) {
+      console.error(e);
+      changes = -1;
+    }
+  }
+  return changes;
 }
 export async function getRandomSongOwned() {
   //console.log("__db_call__: getRandomSongOwned");

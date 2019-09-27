@@ -5,10 +5,11 @@ import sumWorker from './workers/sum.worker';
 import { DispatcherService, DispatchEvents } from './libdispatcher';
 import {
     initSongsOwnedDB, updateRecentlyPlayedSongsV2,
-    updateMasteryandPlayedV2, updateScoreAttackStatsV2, saveHistoryV2,
+    updateMasteryandPlayedV2, updateScoreAttackStatsV2,
+    saveHistoryV2, addToFavoritesV2, initSetlistPlaylistDB,
 } from '../sqliteService';
 import { toasterError } from '../App';
-import getProfileConfig from '../configService'
+import getProfileConfig, { updateProfileConfig } from '../configService'
 import readProfile from '../steamprofileService';
 
 const Events = require('events-es5');
@@ -296,6 +297,7 @@ class profileWorker {
             const steamProfile = await readProfile(prfldb);
 
             await initSongsOwnedDB();
+            await updateProfileConfig(prfldb);
             const rpsongs = async (type) => {
                 const stats = steamProfile.Songs;
                 const sastats = steamProfile.SongsSA;
@@ -385,6 +387,38 @@ class profileWorker {
             this.refreshToaster(toastID, progress, info);
 
             setTimeout(() => toast.done(toastID), 2000);
+        }
+    }
+
+    static startImport = async (setlist = "favorites") => {
+        await this.importSetlist(setlist);
+        DispatcherService.dispatch(DispatchEvents.SETLIST_IMPORTED, setlist)
+    }
+
+    static importToaster = () => {
+        return null;
+    }
+
+    static importSetlist = async (setlist) => {
+        let progress = 0;
+        const prfldb = await getProfileConfig();
+        if (prfldb === '' || prfldb === null) {
+            toasterError("Error fetching profile info, no profile selected!");
+            return;
+        }
+        if (prfldb.length > 0) {
+            const toastID = this.importToaster();
+            const steamProfile = await readProfile(prfldb);
+
+            await initSongsOwnedDB();
+            await updateProfileConfig(prfldb);
+            const stats = steamProfile.FavoritesListRoot.FavoritesList;
+
+            await initSetlistPlaylistDB('setlist_favorites');
+            const changes = await addToFavoritesV2(stats);
+            progress += 1;
+            const info = { changes };
+            this.importToaster(toastID, progress, info);
         }
     }
 }
