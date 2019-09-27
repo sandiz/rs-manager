@@ -12,15 +12,13 @@ import {
 } from './songlistView';
 import SongDetailView from './songdetailView';
 import {
-  getSongBySongKey, initSongsOwnedDB, updateMasteryandPlayed,
-  getSongsOwned, updateRecentlyPlayedSongs, getSongByID,
-  updateScoreAttackStats,
-  saveHistory,
-  getHistory,
+  getSongBySongKey, getSongsOwned,
+  getHistory, getSongByID,
 } from '../sqliteService'
-import readProfile from '../steamprofileService';
-import getProfileConfig, { readFile, writeFile, getIsSudoWhitelistedConfig } from '../configService';
+import { readFile, writeFile, getIsSudoWhitelistedConfig } from '../configService';
 import { psarcToJSON } from '../psarcService';
+import { profileWorker } from '../lib/libworker';
+import { DispatcherService, DispatchEvents } from '../lib/libdispatcher';
 
 const albumArt = require('./../lib/album-art');
 
@@ -640,6 +638,7 @@ export default class RSLiveView extends React.Component {
   }
 
   componentDidMount = async () => {
+    DispatcherService.on(DispatchEvents.PROFILE_UPDATED, this.refresh);
     await this.refreshRPTable();
     try {
       if (!this.enablefakedata) await window.fetch("http://127.0.0.1:9938");
@@ -657,6 +656,7 @@ export default class RSLiveView extends React.Component {
 
   componentWillUnmount = async () => {
     //this.stopTracking(false);
+    DispatcherService.off(DispatchEvents.PROFILE_UPDATED, this.refresh);
     if (this.fetchrstimer) clearInterval(this.fetchrstimer);
     window.libRecord.stopRecording(); //stop recording if necessary
   }
@@ -923,7 +923,7 @@ export default class RSLiveView extends React.Component {
       timeTotal,
       totalNotes,
       timeCurrent: memoryReadout ? memoryReadout.songTimer : 0,
-      songKey: memoryReadout ? memoryReadout.songID : "",
+      songKey: memoryReadout ? memoryReadout.songID : "TESTSONGKEY",
       currentStreak: memoryReadout ? memoryReadout.currentHitStreak : 0,
       highestStreak,
       notesHit,
@@ -1216,7 +1216,7 @@ export default class RSLiveView extends React.Component {
         if (seconds >= 15) {
           this.lastUpdateTS = new Date();
           if (this.state.songKey.length > 0) {
-            await this.updateMastery();
+            await this.refreshStats();
             //console.log("Updated Mastery for ", this.state.songKey);
           }
         }
@@ -1332,178 +1332,15 @@ export default class RSLiveView extends React.Component {
     this.props.resetHeader(this.tabname);
   }
 
-  updateMastery = async () => {
-    const prfldb = await getProfileConfig();
-    if (prfldb === '' || prfldb === null) {
-      this.props.updateHeader(
-        this.tabname,
-        `No Profile found, please update it in Settings!`,
-      );
-      return;
-    }
-    if (this.state.songKey.length <= 0) { return }
-
-    if (prfldb.length > 0) {
-      this.props.updateHeader(
-        this.tabname,
-        `Decrypting ${window.path.basename(prfldb)}`,
-      );
-      const steamProfile = await readProfile(prfldb);
-      const stats = steamProfile.Stats.Songs;
-      const sastats = steamProfile.SongsSA;
-      await initSongsOwnedDB();
-      const output = await getSongBySongKey(this.state.songKey);
-      let updatedRows = 0;
-      if (output.length > 0) {
-        let keys = Object.keys(stats);
-        const ids = []
-        output.forEach((element) => {
-          ids.push(element.id);
-        });
-        //find mastery stats
-        for (let i = 0; i < keys.length; i += 1) {
-          if (!ids.includes(keys[i])) { continue; }
-          const stat = stats[keys[i]];
-          const mastery = stat.MasteryPeak;
-          const played = stat.PlayedCount;
-          const masteryLast = stat.MasteryLast;
-          const dateLAS = stat.DateLAS;
-          const dateLASts = moment(dateLAS).unix();
-          //console.log(masteryLast, dateLASts);
-          this.props.updateHeader(
-            this.tabname,
-            `Updating Stat for SongID:  ${keys[i]} (${i}/${keys.length})`,
-          );
-          //console.log(masteryLast, dateLAS);
-          /*loop await */ // eslint-disable-next-line
-          await saveHistory(keys[i], masteryLast, dateLASts);
-          /*loop await */ // eslint-disable-next-line
-          const rows = await updateMasteryandPlayed(keys[i], mastery, played);
-          if (rows === 0) {
-            console.log("Missing ID: " + keys[i]);
-          }
-          updatedRows += rows;
-        }
-        //find score attack stats
-        keys = Object.keys(sastats);
-        for (let i = 0; i < keys.length; i += 1) {
-          if (!ids.includes(keys[i])) { continue; }
-          const stat = sastats[keys[i]];
-          let highestBadge = 0;
-          if (stat.Badges.Easy > 0) {
-            stat.Badges.Easy += 10;
-            highestBadge = stat.Badges.Easy;
-          }
-          if (stat.Badges.Medium > 0) {
-            stat.Badges.Medium += 20;
-            highestBadge = stat.Badges.Medium;
-          }
-          if (stat.Badges.Hard > 0) {
-            stat.Badges.Hard += 30;
-            highestBadge = stat.Badges.Hard;
-          }
-          if (stat.Badges.Master > 0) {
-            stat.Badges.Master += 40;
-            highestBadge = stat.Badges.Master;
-          }
-          this.props.updateHeader(
-            this.tabname,
-            `Updating Stat for SongID:  ${keys[i]} (${i}/${keys.length})`,
-          );
-          /* loop await */ // eslint-disable-next-line
-          const rows = await updateScoreAttackStats(stat, highestBadge, keys[i]);
-          if (rows === 0) {
-            console.log("Missing ID: " + keys[i]);
-          }
-          updatedRows += rows;
-        }
-      }
-      this.props.updateHeader(
-        this.tabname,
-        `Stats maching songkey (${this.state.songKey}): ` + updatedRows,
-      );
-      if (this.state.tracking === 2) {
-        setTimeout(() => {
-          this.props.updateHeader(
-            this.tabname,
-            "Tracking: Active",
-          );
-        }, 5000);
-        this.handleTracking();
-      }
-
-      // refresh view
-      this.refreshTable();
-    }
+  refreshStats = async () => {
+    profileWorker.startWork();
   }
 
-  updateRecentlyPlayed = async () => {
-    const prfldb = await getProfileConfig();
-    if (prfldb === '' || prfldb === null) {
-      this.props.updateHeader(
-        this.tabname,
-        `No Profile found, please update it in Settings!`,
-      );
-      return;
-    }
-    if (prfldb.length > 0) {
-      this.props.updateHeader(
-        this.tabname,
-        `Decrypting ${window.path.basename(prfldb)}`,
-      );
-      const steamProfile = await readProfile(prfldb);
-      const stats = steamProfile.Songs;
-      const sastats = steamProfile.SongsSA;
-      await initSongsOwnedDB();
-      let keys = Object.keys(stats);
-      let updatedRows = 0;
-      //find mastery stats
-      for (let i = 0; i < keys.length; i += 1) {
-        const stat = stats[keys[i]];
-        const ts = stat.TimeStamp;
-        this.props.updateHeader(
-          this.tabname,
-          `Updating Stat for SongID:  ${keys[i]} (${i}/${keys.length})`,
-        );
-        /*loop await */ // eslint-disable-next-line
-        const rows = await updateRecentlyPlayedSongs(keys[i], ts, "las");
-        if (rows === 0) {
-          console.log("Missing ID: " + keys[i]);
-        }
-        updatedRows += rows;
-      }
-      //find score attack stats
-      keys = Object.keys(sastats);
-      for (let i = 0; i < keys.length; i += 1) {
-        const stat = sastats[keys[i]];
-        const ts = stat.TimeStamp;
-        this.props.updateHeader(
-          this.tabname,
-          `Updating Stat for SongID:  ${keys[i]} (${i}/${keys.length})`,
-        );
-        /* loop await */ // eslint-disable-next-line
-        const rows = await updateRecentlyPlayedSongs(keys[i], ts, "sa");
-        if (rows === 0) {
-          console.log("Missing ID: " + keys[i]);
-        }
-        updatedRows += rows;
-      }
-
-      this.props.updateHeader(
-        this.tabname,
-        "Finished updating recently played songs: " + updatedRows,
-      );
-      if (this.state.tracking === 2) {
-        setTimeout(() => {
-          this.props.updateHeader(
-            this.tabname,
-            "Tracking: Active",
-          );
-        }, 5000);
-      }
-
-      // refresh view
-      this.refreshRPTable();
+  refresh = async () => {
+    this.refreshTable();
+    this.refreshRPTable();
+    if (this.state.tracking === 2) {
+      this.handleTracking();
     }
   }
 
@@ -1757,15 +1594,9 @@ export default class RSLiveView extends React.Component {
           {trackingButton}
           <button
             type="button"
-            onClick={this.updateMastery}
+            onClick={this.refreshStats}
             className={updateMasteryclass}>
-            Update Mastery/History
-          </button>
-          <button
-            type="button"
-            onClick={this.updateRecentlyPlayed}
-            className={buttonclass}>
-            Update Recently Played
+            Refresh Stats
           </button>
         </div>
         <br />

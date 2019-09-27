@@ -1061,14 +1061,35 @@ export async function addtoRSSongList(tablename, songkey) {
   const op = await db.run(sql)
   return op.changes;
 }
-export async function saveHistory(id, mastery, timestamp) {
-  const flt = parseFloat(mastery);
-  if (!Number.isNaN(flt) && flt > 0) {
-    const sql = `replace into history VALUES('${id}', '${flt}', '${timestamp}')`
-    const op = await db.run(sql)
-    return op.changes;
+export async function saveHistoryV2(idDateArray) {
+  const size = 500;
+  let changes = 0;
+  for (let k = 0; k < idDateArray.length; k += size) {
+    const sliced = idDateArray.slice(k, k + size);
+
+    let sql = "";
+    let items = "";
+    for (let i = 0; i < sliced.length; i += 1) {
+      const item = sliced[i]
+      items += `('${item[0]}', '${item[1]}', ${item[2]})`;
+      if (i < sliced.length - 1) {
+        items += ',';
+      }
+    }
+
+    sql = `replace into history values ${items};`
+
+    try {
+      //eslint-disable-next-line
+      const op = await db.run(sql);
+      changes += op.changes;
+    }
+    catch (e) {
+      console.error(e);
+      changes = -1;
+    }
   }
-  return 0;
+  return changes;
 }
 export async function getHistory(id, limit = 10) {
   const sql = `select * from history where id='${id}' group by mastery order by timestamp asc limit ${limit}`;

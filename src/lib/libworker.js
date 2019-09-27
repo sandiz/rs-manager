@@ -1,10 +1,11 @@
 import { toast } from 'react-toastify';
-import React from 'react'
+import moment from 'moment';
+import React from 'react';
 import sumWorker from './workers/sum.worker';
 import { DispatcherService, DispatchEvents } from './libdispatcher';
 import {
     initSongsOwnedDB, updateRecentlyPlayedSongsV2,
-    updateMasteryandPlayedV2, updateScoreAttackStatsV2,
+    updateMasteryandPlayedV2, updateScoreAttackStatsV2, saveHistoryV2,
 } from '../sqliteService';
 import { toasterError } from '../App';
 import getProfileConfig from '../configService'
@@ -313,14 +314,22 @@ class profileWorker {
                 //const sastats = steamProfile.SongsSA;
                 const keys = Object.keys(stats);
                 const idDateArray = [];
+                const historyArray = [];
                 for (let i = 0; i < keys.length; i += 1) {
                     const stat = stats[keys[i]];
                     if ("MasteryPeak" in stat && "PlayedCount" in stat) {
                         const mastery = stat.MasteryPeak;
                         const played = stat.PlayedCount;
+                        if ("MasteryLast" in stat && "DateLAS" in stat) {
+                            const masteryLast = stat.MasteryLast;
+                            const dateLAS = stat.DateLAS;
+                            const dateLASts = moment(dateLAS).unix();
+                            historyArray.push([keys[i], masteryLast, dateLASts]);
+                        }
                         idDateArray.push([keys[i], mastery, played]);
                     }
                 }
+                await saveHistoryV2(historyArray);
                 return updateMasteryandPlayedV2(idDateArray);
             }
 
