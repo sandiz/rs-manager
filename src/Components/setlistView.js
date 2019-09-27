@@ -721,7 +721,7 @@ class SetlistView extends React.Component {
     }
 
     updateFavs = async () => {
-        await profileWorker.importSetlist('favorites');
+        await profileWorker.startImport();
         this.refreshView();
     }
 

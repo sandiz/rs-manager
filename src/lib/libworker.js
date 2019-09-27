@@ -242,7 +242,9 @@ class profileWorker {
         const d = (
             <div>
                 {
-                    <span className="toast-msg toast-msg-success"> Refreshing Stats... </span>
+                    progress === total
+                        ? <span className="toast-msg toast-msg-success"> Refresh Complete </span>
+                        : <span className="toast-msg toast-msg-success"> Refreshing Stats... </span>
                 }
                 <hr style={{ marginBottom: 7 + 'px' }} />
                 <div>
@@ -266,6 +268,7 @@ class profileWorker {
             return toast(d, {
                 progress,
                 autoClose: false,
+                className: "toast-bg",
             });
         }
         else {
@@ -395,10 +398,58 @@ class profileWorker {
         DispatcherService.dispatch(DispatchEvents.SETLIST_IMPORTED, setlist)
     }
 
-    static importToaster = () => {
-        return null;
+    static importToaster = (toastID = null, progress = 0, info = {}) => {
+        const setlist = info.name;
+        const successmsg = (success) => (success ? "toast-msg-success" : "toast-msg-failure");
+        const successicon = (success) => (success ? "fa-check-circle" : "fa-times-circle");
+        const iconclass = (pr, success) => (<i className={"fas " + (progress >= pr ? successicon(success) : "fa-circle-notch fa-spin")} />);
+
+        const spanclass = (pr, name, success) => (
+            <span className={(progress >= pr ? successmsg(success) : "") + " toast-msg"}>
+                {name}
+            </span>
+        )
+        const total = 1;
+        const d = (
+            <div>
+                {
+                    progress === total
+                        ? <span className="toast-msg toast-msg-success"> Import Complete </span>
+                        : <span className="toast-msg toast-msg-success"> Importing Song list... </span>
+                }
+                <hr style={{ marginBottom: 7 + 'px' }} />
+                <div>
+                    {iconclass(1, !(info.changes === -1))}
+                    {spanclass(1, setlist, !(info.changes === -1))}
+                    <span className="toast-msg toast-msg-info ta-right">{info.changes} entries</span>
+                </div>
+            </div>
+        )
+        if (toastID == null) {
+            return toast(d, {
+                progress,
+                autoClose: false,
+                className: "toast-bg",
+            });
+        }
+        else {
+            if (progress === total) {
+                return toast.update(toastID, {
+                    render: d,
+                    progress: 0.95,
+                });
+            }
+            else {
+                return toast.update(toastID, {
+                    render: d,
+                    progress: progress / total,
+                    autoClose: false,
+                });
+            }
+        }
     }
 
+    /* accepts 'favorites' or a number between 1-7 */
     static importSetlist = async (setlist) => {
         let progress = 0;
         const prfldb = await getProfileConfig();
@@ -407,18 +458,33 @@ class profileWorker {
             return;
         }
         if (prfldb.length > 0) {
-            const toastID = this.importToaster();
+            const info = { changes: 0, name: setlist, id: '' }
+            if (setlist === 'favorites') {
+                info.name = "Favorites";
+                info.id = "setlist_favorites";
+            }
+            else if (Number.isInteger(setlist) && (setlist > 0 && setlist < 8)) {
+                info.name = `RS Song List ${setlist}`;
+                info.id = `rs_song_list_${setlist}`;
+            }
+            else {
+                toasterError("Invalid setlist: " + setlist);
+                return;
+            }
+            const toastID = this.importToaster(null, 0, info);
             const steamProfile = await readProfile(prfldb);
 
             await initSongsOwnedDB();
             await updateProfileConfig(prfldb);
             const stats = steamProfile.FavoritesListRoot.FavoritesList;
 
-            await initSetlistPlaylistDB('setlist_favorites');
+            await initSetlistPlaylistDB(info.id);
             const changes = await addToFavoritesV2(stats);
             progress += 1;
-            const info = { changes };
+            info.changes = changes;
             this.importToaster(toastID, progress, info);
+
+            setTimeout(() => toast.dismiss(toastID), 2000);
         }
     }
 }
