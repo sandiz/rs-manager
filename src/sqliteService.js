@@ -457,30 +457,115 @@ export async function updateRecentlyPlayedSongs(id, date, type = "las" /* las or
   }
 }
 export async function updateRecentlyPlayedSongsV2(idDateArray = [], type = "las") {
-  const field = ((type === "las") ? "date_las" : "date_sa");
-  let items = "";
+  const size = 500; // sql stmt length has limits, update at max 500 items at a time
+  let changes = 0;
+  for (let k = 0; k < idDateArray.length; k += size) {
+    const sliced = idDateArray.slice(k, k + size);
+    const field = type === "las" ? "date_las" : "date_sa";
+    let sql = "";
+    let items = "";
+    for (let i = 0; i < sliced.length; i += 1) {
+      const item = sliced[i]
+      items += `('${item[0]}', '${item[1]}')`;
+      if (i < sliced.length - 1) {
+        items += ',';
+      }
+    }
 
-  for (let i = 0; i < idDateArray.length; i += 1) {
-    const item = idDateArray[i]
-    items += `('${item[0]}', '${item[1]}')`;
-    if (i < idDateArray.length - 1) {
-      items += ',';
+    sql = `with tmp(id, ${field}) as (values ${items}) `
+    sql += `update songs_owned set ${field} = (select ${field} from tmp where songs_owned.id = tmp.id) `
+    sql += `where id in (select id from tmp)`;
+
+    try {
+      //eslint-disable-next-line
+      const op = await db.run(sql);
+      changes += op.changes;
+    }
+    catch (e) {
+      console.error(e);
+      changes = -1;
     }
   }
+  return changes;
+}
 
-  let sql = "";
-  sql = `with tmp(id, ${field}) as (values ${items}) `
-  sql += `update songs_owned set ${field} = (select ${field} from tmp where songs_owned.id = tmp.id) `
-  sql += `where id in (select id from tmp)`;
+export async function updateMasteryandPlayedV2(idDateArray = []) {
+  const size = 500;
+  let changes = 0;
+  for (let k = 0; k < idDateArray.length; k += size) {
+    const sliced = idDateArray.slice(k, k + size);
 
-  try {
-    const op = await db.run(sql);
-    return op.changes;
+    let sql = "";
+    let items = "";
+    for (let i = 0; i < sliced.length; i += 1) {
+      const item = sliced[i]
+      items += `('${item[0]}', '${item[1]}', ${item[2]})`;
+      if (i < sliced.length - 1) {
+        items += ',';
+      }
+    }
+
+    sql = `with tmp(id, mastery, count) as (values ${items}) `
+    sql += `update songs_owned set mastery = (select mastery from tmp where songs_owned.id = tmp.id), `
+    sql += `count = (select count from tmp where songs_owned.id = tmp.id) `
+    sql += `where id in (select id from tmp)`;
+
+    try {
+      //eslint-disable-next-line
+      const op = await db.run(sql);
+      changes += op.changes;
+    }
+    catch (e) {
+      console.error(e);
+      changes = -1;
+    }
   }
-  catch (e) {
-    console.error(e);
-    return -1;
+  return changes;
+}
+
+export async function updateScoreAttackStatsV2(idDateArray = []) {
+  const size = 500;
+  let changes = 0;
+  for (let k = 0; k < idDateArray.length; k += size) {
+    const sliced = idDateArray.slice(k, k + size);
+    let sql = "";
+    let items = "";
+    for (let i = 0; i < sliced.length; i += 1) {
+      const item = sliced[i];
+      const key = item[0];
+      const stat = item[1];
+      const highestBadge = item[2];
+      items += `('${key}', '${stat.PlayCount}', '${stat.TimeStamp}', '${stat.HighScores.Easy}', '${stat.HighScores.Medium}', '${stat.HighScores.Hard}', '${stat.HighScores.Master}', '${stat.Badges.Easy}', '${stat.Badges.Medium}', '${stat.Badges.Hard}', '${stat.Badges.Master}', '${highestBadge}')`;
+      if (i < sliced.length - 1) {
+        items += ',';
+      }
+    }
+
+    sql = `with tmp(id, sa_playcount, sa_ts, sa_hs_easy, sa_hs_medium, sa_hs_hard, sa_hs_master, sa_badge_easy, sa_badge_medium, sa_badge_hard, sa_badge_master, sa_highest_badge) as (values ${items}) `
+    sql += `update songs_owned set `;
+    sql += `sa_playcount = (select sa_playcount from tmp where songs_owned.id = tmp.id), `
+    sql += `sa_ts = (select sa_ts from tmp where songs_owned.id = tmp.id), `
+    sql += `sa_hs_easy = (select sa_hs_easy from tmp where songs_owned.id = tmp.id), `
+    sql += `sa_hs_medium = (select sa_hs_medium from tmp where songs_owned.id = tmp.id), `
+    sql += `sa_hs_hard = (select sa_hs_hard from tmp where songs_owned.id = tmp.id), `
+    sql += `sa_hs_master = (select sa_hs_master from tmp where songs_owned.id = tmp.id), `
+    sql += `sa_badge_easy = (select sa_badge_easy from tmp where songs_owned.id = tmp.id), `
+    sql += `sa_badge_medium = (select sa_badge_medium from tmp where songs_owned.id = tmp.id), `
+    sql += `sa_badge_hard = (select sa_badge_hard from tmp where songs_owned.id = tmp.id), `
+    sql += `sa_badge_master = (select sa_badge_master from tmp where songs_owned.id = tmp.id), `
+    sql += `sa_highest_badge = (select sa_highest_badge from tmp where songs_owned.id = tmp.id) `
+    sql += `where id in (select id from tmp)`;
+    try {
+      //eslint-disable-next-line
+      const op = await db.run(sql);
+      changes += op.changes;
+    }
+    catch (e) {
+      console.error(e);
+      changes = -1;
+    }
   }
+  return changes;
 }
 
 export async function updateScoreAttackStats(stat, badgeHighest, id) {
@@ -737,7 +822,7 @@ export async function getSAStats(type = "sa_badge_hard", fctype = "sa_fc_hard", 
   const sqlstr = `select sa.count as satotal, \
   saplat.count as saplat, sagold.count as sagold, sasilver.count as sasilver,\
   sabronze.count as sabronze, safailed.count as safailed, safcs.count as safcs from \
-  (select count(*) as count from ${table} where ${cdlcSql} ${fctype} is not null) safcs, \
+  (select count(*) as count from ${table} where ${cdlcSql} ${fctype} is not null AND ${fctype} <> 0) safcs, \
   (select count(*) as count from ${table} where ${cdlcSql} sa_playcount > 0 AND ${type} > ${badgeRating}) sa, \
   (select count(*) as count from ${table} where ${cdlcSql} sa_playcount > 0 AND (${type} == ${badgeRating + 1})) safailed,
   (select count(*) as count from ${table} where ${cdlcSql} sa_playcount > 0 AND (${type} == ${badgeRating + 2})) sabronze, \
@@ -1303,7 +1388,9 @@ export async function getPathBreakdown(path = "lead") {
   const op = [await db.get(smsql), await db.get(spsql), await db.get(tsql)]
   return op;
 }
-window.remote.app.on('window-all-closed', async () => {
+const _f = async () => {
+  window.remote.app.off('window-all-closed', _f);
   await saveSongsOwnedDB();
   console.log("Saved to db..");
-})
+};
+window.remote.app.on('window-all-closed', _f);

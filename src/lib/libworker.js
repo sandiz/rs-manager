@@ -1,5 +1,14 @@
-
+import { toast } from 'react-toastify';
+import React from 'react'
 import sumWorker from './workers/sum.worker';
+import { DispatcherService, DispatchEvents } from './libdispatcher';
+import {
+    initSongsOwnedDB, updateRecentlyPlayedSongsV2,
+    updateMasteryandPlayedV2, updateScoreAttackStatsV2,
+} from '../sqliteService';
+import { toasterError } from '../App';
+import getProfileConfig from '../configService'
+import readProfile from '../steamprofileService';
 
 const Events = require('events-es5');
 
@@ -181,7 +190,7 @@ class WorkersManager {
     }
 }
 
-class profileWorker {
+class psarcWorker {
     constructor(c = (w, m) => { }, e = (w, err) => { }) {
         this._receivedMsg = c;
         this._receivedErr = e;
@@ -190,7 +199,7 @@ class profileWorker {
 
     _init() {
         this._workerMgr = new WorkersManager();             // Initialize WorkersManager.
-        this._workerMgr.setType('profile')      // Set file path.
+        this._workerMgr.setType('psarc')      // Set file path.
             .setNumOfWorkers(navigator.hardwareConcurrency || 2)     // Default is 1.
             .events.bind('message', this._receivedMsg)    // Bind events.
             .bind('error', this._receivedErr);   // Chainable.
@@ -211,8 +220,168 @@ class profileWorker {
     }
 }
 
+class profileWorker {
+    static startWork = async () => {
+        await this.refreshStats();
+        DispatcherService.dispatch(DispatchEvents.PROFILE_UPDATED, {});
+    }
+
+    static refreshToaster = (toastID = null, progress = 0, success = true, info = {}) => {
+        const successmsg = success ? "toast-msg-success" : "toast-msg-failure";
+        const successicon = success ? "fa-check-circle" : "fa-times-circle";
+        const iconclass = (pr) => (<i className={"fas " + (progress >= pr ? successicon : "fa-circle-notch fa-spin")} />);
+
+        const spanclass = (pr, name) => (
+            <span className={(progress >= pr ? successmsg : "") + " toast-msg"}>
+                {name}
+            </span>
+        )
+        const total = 3;
+        const d = (
+            <div>
+                {
+                    <span className="toast-msg toast-msg-success"> Refreshing Stats... </span>
+                }
+                <hr style={{ marginBottom: 7 + 'px' }} />
+                <div>
+                    {iconclass(1)}
+                    {spanclass(1, "Recently Played")}
+                    <span className="toast-msg toast-msg-info ta-right">{info.rpchanges} entries</span>
+                </div>
+                <div>
+                    {iconclass(2)}
+                    {spanclass(2, "Learn A Song")}
+                    <span className="toast-msg toast-msg-info ta-right">{info.laschanges} entries</span>
+                </div>
+                <div>
+                    {iconclass(3)}
+                    {spanclass(3, "Score Attack")}
+                    <span className="toast-msg toast-msg-info ta-right">{info.scoreattackchanges} entries</span>
+                </div>
+            </div>
+        )
+        if (toastID == null) {
+            return toast(d, {
+                progress,
+                autoClose: false,
+            });
+        }
+        else {
+            if (progress === total) {
+                return toast.update(toastID, {
+                    render: d,
+                    progress: 0.95,
+                });
+            }
+            else {
+                return toast.update(toastID, {
+                    render: d,
+                    progress: progress / total,
+                    autoClose: false,
+                });
+            }
+        }
+    }
+
+    static refreshStats = async () => {
+        let progress = 0;
+        const prfldb = await getProfileConfig();
+        if (prfldb === '' || prfldb === null) {
+            toasterError("Error fetching profile info, no profile selected!");
+            return;
+        }
+        if (prfldb.length > 0) {
+            const toastID = this.refreshToaster();
+            const steamProfile = await readProfile(prfldb);
+
+            await initSongsOwnedDB();
+            const rpsongs = async (type) => {
+                const stats = steamProfile.Songs;
+                const sastats = steamProfile.SongsSA;
+                const idDateArray = [];
+                const keys = Object.keys(type === "las" ? stats : sastats);
+                for (let i = 0; i < keys.length; i += 1) {
+                    const stat = stats[keys[i]];
+                    const dateTS = stat.TimeStamp;
+                    idDateArray.push([keys[i], dateTS]);
+                }
+                return updateRecentlyPlayedSongsV2(idDateArray, type);
+            }
+
+            const lassongs = async () => {
+                const stats = steamProfile.Stats.Songs;
+                //const sastats = steamProfile.SongsSA;
+                const keys = Object.keys(stats);
+                const idDateArray = [];
+                for (let i = 0; i < keys.length; i += 1) {
+                    const stat = stats[keys[i]];
+                    if ("MasteryPeak" in stat && "PlayedCount" in stat) {
+                        const mastery = stat.MasteryPeak;
+                        const played = stat.PlayedCount;
+                        idDateArray.push([keys[i], mastery, played]);
+                    }
+                }
+                return updateMasteryandPlayedV2(idDateArray);
+            }
+
+            const scoreattacksongs = async () => {
+                const idDateArray = [];
+                const sastats = steamProfile.SongsSA;
+                const keys = Object.keys(sastats);
+                for (let i = 0; i < keys.length; i += 1) {
+                    const stat = sastats[keys[i]];
+                    let highestBadge = 0;
+                    if (stat.Badges.Easy > 0) {
+                        stat.Badges.Easy += 10;
+                        highestBadge = stat.Badges.Easy;
+                    }
+                    if (stat.Badges.Medium > 0) {
+                        stat.Badges.Medium += 20;
+                        highestBadge = stat.Badges.Medium;
+                    }
+                    if (stat.Badges.Hard > 0) {
+                        stat.Badges.Hard += 30;
+                        highestBadge = stat.Badges.Hard;
+                    }
+                    if (stat.Badges.Master > 0) {
+                        stat.Badges.Master += 40;
+                        highestBadge = stat.Badges.Master;
+                    }
+                    idDateArray.push([keys[i], stat, highestBadge]);
+                }
+                return updateScoreAttackStatsV2(idDateArray);
+            }
+
+            const info = { rpchanges: 0, laschanges: 0, scoreattackchanges: 0 };
+            let changes = await rpsongs("las")
+            const changes2 = await rpsongs("sa");
+            progress += 1;
+            info.rpchanges = changes + changes2;
+            if (changes === -1 || changes2 === -1) {
+                this.refreshToaster(toastID, progress, false, info);
+            }
+            else this.refreshToaster(toastID, progress, true, info);
+
+            changes = await lassongs();
+            progress += 1;
+            info.laschanges = changes;
+            if (changes === -1) this.refreshToaster(toastID, progress, false, info);
+            else this.refreshToaster(toastID, progress, true, info);
+
+            changes = await scoreattacksongs();
+            progress += 1;
+            info.scoreattackchanges = changes;
+            if (changes === -1) this.refreshToaster(toastID, progress, false, info);
+            else this.refreshToaster(toastID, progress, true, info);
+
+            setTimeout(() => toast.done(toastID), 2000);
+        }
+    }
+}
+
 export {
     profileWorker,
+    psarcWorker,
 }
 
 /*

@@ -1531,3 +1531,9 @@ hr {
 .toast-msg-failure {
     color: crimson;
 }
+.toast-msg-info {
+    color: gray;
+}
+.toast-bg {
+    background: azure;
+}

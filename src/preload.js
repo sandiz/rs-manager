@@ -167,7 +167,8 @@ exp.get('/verify-steam', async (req, res) => {
 
 /* make cookies set by steam not expire */
 var cookies = window.remote.session.defaultSession.cookies;
-cookies.on('changed', function (event, cookie, cause, removed) {
+ch = (event, cookie, cause, removed) => {
+    cookies.off('changed', ch);
     if (cookie.session && !removed) {
         var url = util.format('%s://%s%s', (!cookie.httpOnly && cookie.secure) ? 'https' : 'http', cookie.domain, cookie.path);
         cookies.set({
@@ -185,7 +186,8 @@ cookies.on('changed', function (event, cookie, cause, removed) {
             }
         });
     }
-});
+}
+cookies.on('changed', ch);
 
 window.steamAuth = async () => {
     const windowParams = {

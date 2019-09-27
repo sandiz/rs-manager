@@ -60,6 +60,7 @@ export const DispatchEvents = {
     SETLIST_REFRESH: "setlist_refresh",
     SETLIST_EXPORT: "setlist_export",
     SIDEBAR_GOTO: "sidebar_goto",
+    PROFILE_UPDATED: "profile_updated",
 }
 
 export const DispatcherService = new Dispatcher();

@@ -597,6 +597,7 @@ class App extends Component {
           pauseOnVisibilityChange
           draggable
           pauseOnHover
+          toastClassName="toast-bg"
         />
       </div>
     );
