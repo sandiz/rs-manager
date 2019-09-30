@@ -15,6 +15,7 @@ import readProfile from '../steamprofileService';
 
 const parse = require("csv-parse/lib/sync");
 const Events = require('events-es5');
+const albumArt = require('./../lib/album-art');
 
 class WorkersManager {
     constructor() {
@@ -651,9 +652,37 @@ class profileWorker {
     }
 }
 
+class imageWorker {
+    static fetchCover = async (artist, albumortrack, usealbum = true, data = {}) => {
+        const a1 = artist.split("feat.")[0].trim();
+        let url = "https://raw.githubusercontent.com/sandiz/rs-manager/master/screenshots/nothumb.jpg";
+        const options = {
+            size: 'large',
+        }
+        if (usealbum) options.album = albumortrack
+        else options.track = albumortrack
+        url = await albumArt(
+            a1,
+            options,
+        );
+        if (url.toString().toLowerCase().includes("error:")) {
+            url = await albumArt(
+                a1,
+                { size: 'large' },
+            );
+        }
+        if (!url.toString().includes("http") || url.toString().toLowerCase().includes('rate limit exceeded')) {
+            console.warn(url);
+            url = "https://raw.githubusercontent.com/sandiz/rs-manager/master/screenshots/nothumb.jpg";
+        }
+        DispatcherService.dispatch(DispatchEvents.ALBUM_COVER_QUERY, { url, ...data });
+    }
+}
+
 export {
     profileWorker,
     psarcWorker,
+    imageWorker,
 }
 
 /*

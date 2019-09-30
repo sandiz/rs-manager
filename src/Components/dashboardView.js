@@ -20,7 +20,7 @@ import { replaceRocksmithTerms } from './songavailableView';
 import SongDetailView from './songdetailView';
 import { getBadgeName } from './songlistView';
 import { DispatcherService, DispatchEvents } from '../lib/libdispatcher';
-import { profileWorker } from '../lib/libworker';
+import { profileWorker, imageWorker } from '../lib/libworker';
 
 const Steam = require('steam-webapi');
 const albumArt = require('./../lib/album-art');
@@ -81,19 +81,21 @@ class DashboardView extends React.Component {
   }
 
   cdmasync = async () => {
-    await this.fetchStats();
-    await this.fetchRandomStats();
-    await this.fetchWeeklySpotlight();
+    this.fetchStats();
+    this.fetchRandomStats();
+    this.fetchWeeklySpotlight();
     this.props.handleChange();
   }
 
   componentDidMount = async () => {
     this.cdmasync();
     DispatcherService.on(DispatchEvents.PROFILE_UPDATED, this.fetchStats);
+    DispatcherService.on(DispatchEvents.ALBUM_COVER_QUERY, this.setImage);
   }
 
   componentWillUnmount = () => {
     DispatcherService.off(DispatchEvents.PROFILE_UPDATED, this.fetchStats);
+    DispatcherService.off(DispatchEvents.ALBUM_COVER_QUERY, this.setImage);
   }
 
   changeTimeFormat = async () => {
@@ -416,6 +418,15 @@ class DashboardView extends React.Component {
     }
   }
 
+  setImage = (data) => {
+    if ('type' in data && 'url' in data) {
+      const obj = {};
+      const type = data.type;
+      obj[type] = data.url;
+      this.setState(obj);
+    }
+  }
+
   fetchRandomStats = async (changesong = true, changepack = true) => {
     if (changesong) {
       const rsong = await getRandomSongOwned();
@@ -428,11 +439,9 @@ class DashboardView extends React.Component {
         randomartist: unescape(rsong.artist),
         randomarr: unescape(rsong.arrangement),
         randommastery: mastery,
-      })
-      setTimeout(async () => {
-        const url = await this.fetchCover(this.state.randomartist, this.state.randomalbum);
-        this.setState({ coverlas: url });
-      }, 1000);
+      }, () => {
+        imageWorker.fetchCover(this.state.randomartist, this.state.randomalbum, true, { type: 'coverlas' });
+      });
     }
     if (changepack) {
       const rpack = await getRandomSongAvailable();
@@ -440,12 +449,10 @@ class DashboardView extends React.Component {
       this.setState({
         randompackappid: unescape(rpack.appid),
         randompack: replaceRocksmithTerms(unescape(rpack.name)),
-      });
-      setTimeout(async () => {
+      }, () => {
         const [artist, title] = this.state.randompack.split(" - ");
-        const url = await this.fetchCover(artist ? artist.trim() : "", title ? title.trim() : "", false);
-        this.setState({ coversteam: url });
-      }, 1000)
+        imageWorker.fetchCover(artist ? artist.trim() : "", title ? title.trim() : "", false, { type: 'coversteam' });
+      });
     }
   }
 
@@ -466,8 +473,8 @@ class DashboardView extends React.Component {
       const title = weekly.title.split("by");
       const artist = title[1] ? unescape(title[1]).trim() : ""
       const track = title[0] ? unescape(title[0]).trim() : ""
-      const url = await this.fetchCover(artist, track, false); //use trackname
-      this.setState({ weeklysongspotlight: weekly, coverreddit: url });
+      imageWorker.fetchCover(artist, track, false, { type: 'coverreddit' }); //use trackname
+      this.setState({ weeklysongspotlight: weekly });
     }
     catch (e) {
       console.log(e)

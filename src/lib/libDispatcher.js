@@ -63,6 +63,7 @@ export const DispatchEvents = {
     PROFILE_UPDATED: "profile_updated", /* fired when rocksmith profile info is saved to db */
     SETLIST_IMPORTED: "setlist_imported", /* fired when a rocksmith setlist has been imported to db */
     DLC_CATALOG_UPDATED: "dlc_catalog_updated", /* fired when dlc catalog is updated */
+    ALBUM_COVER_QUERY: "album_cover_query", /* fired when album cover has been queried */
 }
 
 export const DispatcherService = new Dispatcher();
