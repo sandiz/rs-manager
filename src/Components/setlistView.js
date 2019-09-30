@@ -709,18 +709,34 @@ class SetlistView extends React.Component {
             )
         }
         if (output.length > 0) {
+            const msg = (
+                <span>
+                    Setlist: <span style={{ fontWeight: 'bolder' }}>
+                        {this.props.currentChildTab.name}
+                    </span>,
+                    Songs: {output[0].songcount}, Arrangements: {output[0].acount}
+                </span>
+            )
             this.props.updateHeader(
                 this.tabname,
                 this.lastChildID,
-                `Songs: ${output[0].songcount}, Arrangements: ${output[0].acount}`,
+                msg,
             );
             this.setState({ songs: output, page, totalSize: output[0].acount });
         }
         else {
+            const msg = (
+                <span>
+                    Setlist: <span style={{ fontWeight: 'bolder' }}>
+                        {this.props.currentChildTab.name}
+                    </span>,
+                    Songs: 0, Arrangements: 0
+                </span>
+            )
             this.props.updateHeader(
                 this.tabname,
                 this.lastChildID,
-                `Songs: 0, Arrangements: 0`,
+                msg,
             );
             this.setState({ songs: output, page, totalSize: 0 });
         }
@@ -851,7 +867,7 @@ class SetlistView extends React.Component {
                     }
                     <button
                         type="button"
-                        style={{ width: 15 + '%' }}
+                        style={{ width: 13 + '%' }}
                         onClick={this.updateMastery}
                         className={choosepsarchstyle}>
                         <Trans i18nKey="updateMastery">

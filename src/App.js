@@ -107,13 +107,15 @@ class App extends Component {
     //this.selectedTab = null;
     this.sidebarRef = React.createRef();
     this.navbarRef = React.createRef();
+    this.tabCache = {};
+    this.tabChildCache = {};
   }
 
   cwmasync = async () => {
     await initSongsOwnedDB("tab-dashboard", this.updateHeader);
-    await this.updateProfile();
-    await this.refreshTabs();
-    await this.getGlobalNotes();
+    this.updateProfile();
+    this.refreshTabs();
+    this.getGlobalNotes();
     // default tabs on startup
     //sthis.handleChange(this.state.TabsData[0]);
     //this.props.handleChange(TabsData[2], TabsData[2].child[0])
@@ -178,10 +180,107 @@ class App extends Component {
     //this.refreshTabs();
   }
 
+  getTab = (tab, child) => {
+    if (tab.id in this.tabCache) return this.tabCache[tab.id];
+    else {
+      switch (tab.id) {
+        default:
+        case "tab-dashboard":
+          this.tabCache[tab.id] = (
+            <DashboardView
+              currentTab={tab}
+              updateHeader={this.updateHeader}
+              resetHeader={this.resetHeader}
+              handleChange={this.updateProfile}
+            />
+          );
+          break;
+        case "tab-psarc":
+          this.tabCache[tab.id] = (
+            <PSARCView
+              currentTab={tab}
+              updateHeader={this.updateHeader}
+              resetHeader={this.resetHeader}
+            />
+          )
+          break;
+        case "tab-settings":
+          this.tabCache[tab.id] = (
+            <SettingsView
+              currentTab={tab}
+              updateHeader={this.updateHeader}
+              resetHeader={this.resetHeader}
+              handleChange={this.updateProfile}
+              refreshTabs={this.refreshTabs}
+              saveSearch={this.saveSearchHistory}
+              getSearch={this.getSearchHistory}
+            />
+          )
+          break;
+        case "tab-help":
+          this.tabCache[tab.id] = (
+            <HelpView
+              currentTab={tab}
+              updateHeader={this.updateHeader}
+            />
+          );
+          break;
+        case "tab-rslive":
+          this.tabCache[tab.id] = (
+            <RSLiveView
+              currentTab={tab}
+              updateHeader={this.updateHeader}
+              resetHeader={this.resetHeader}
+            />
+          )
+          break;
+        case "tab-songs":
+          if (child.id in this.tabChildCache) return this.tabChildCache[child.id];
+          switch (child.id) {
+            default:
+            case "songs-owned":
+              this.tabChildCache[child.id] = (
+                <SonglistView
+                  updateHeader={this.updateChildHeader}
+                  resetHeader={this.resetHeader}
+                  handleChange={this.updateProfile}
+                  saveSearch={this.saveSearchHistory}
+                  getSearch={this.getSearchHistory}
+                  globalNotes={this.state.globalNotes}
+                />
+              )
+              break;
+            case "songs-available":
+              this.tabChildCache[child.id] = (
+                <SongAvailableView
+                  currentTab={tab}
+                  currentChildTab={child}
+                  requiredTab={tab.id}
+                  requiredChildTab={child.id}
+                  updateHeader={this.updateChildHeader}
+                  resetHeader={this.resetHeader}
+                  handleChange={this.updateProfile}
+                  saveSearch={this.saveSearchHistory}
+                  getSearch={this.getSearchHistory}
+                />
+              )
+              break;
+          }
+          return this.tabChildCache[child.id];
+      }
+      return this.tabCache[tab.id];
+    }
+  }
+
   handleChange = async (tab, child, dontcheckoverlay = false) => {
-    const text = (tab == null) ? "" : tab.name
-      + (child == null ? "" : ` >  ${child.name}`);
     if (this.state.readytorender === false) return;
+
+    let text = (tab == null) ? "" : tab.name
+      + (child == null ? "" : `: Fetching songs from ${child.name}`);
+
+    if (child && child.isFolder === true) {
+      text = `Folder: ${child.name}`
+    }
 
     let showModalStats = this.state.showModalStats;
     if (child && !dontcheckoverlay) {
@@ -199,48 +298,17 @@ class App extends Component {
     else {
       this.switchNavbarColor("black")
     }
+
     let selectedTab = null;
     switch (tab.id) {
       default:
       case "tab-dashboard":
-        selectedTab = (
-          <DashboardView
-            currentTab={tab}
-            updateHeader={this.updateHeader}
-            resetHeader={this.resetHeader}
-            handleChange={this.updateProfile}
-          />
-        )
-        break;
       case "tab-psarc":
-        selectedTab = (
-          <PSARCView
-            currentTab={tab}
-            updateHeader={this.updateHeader}
-            resetHeader={this.resetHeader}
-          />
-        )
-        break;
       case "tab-settings":
-        selectedTab = (
-          <SettingsView
-            currentTab={tab}
-            updateHeader={this.updateHeader}
-            resetHeader={this.resetHeader}
-            handleChange={this.updateProfile}
-            refreshTabs={this.refreshTabs}
-            saveSearch={this.saveSearchHistory}
-            getSearch={this.getSearchHistory}
-          />
-        )
-        break;
       case "tab-help":
-        selectedTab = (
-          <HelpView
-            currentTab={tab}
-            updateHeader={this.updateHeader}
-          />
-        )
+      case "tab-rslive":
+      case "tab-songs":
+        selectedTab = this.getTab(tab, child);
         break;
       case "tab-setlist":
         if (child && child.isFolder === true) {
@@ -278,47 +346,6 @@ class App extends Component {
             />
           )
         }
-        break;
-      case "tab-songs":
-        switch (child.id) {
-          default:
-          case "songs-owned":
-            selectedTab = (
-              <SonglistView
-                updateHeader={this.updateChildHeader}
-                resetHeader={this.resetHeader}
-                handleChange={this.updateProfile}
-                saveSearch={this.saveSearchHistory}
-                getSearch={this.getSearchHistory}
-                globalNotes={this.state.globalNotes}
-              />
-            )
-            break;
-          case "songs-available":
-            selectedTab = (
-              <SongAvailableView
-                currentTab={tab}
-                currentChildTab={child}
-                requiredTab={tab.id}
-                requiredChildTab={child.id}
-                updateHeader={this.updateChildHeader}
-                resetHeader={this.resetHeader}
-                handleChange={this.updateProfile}
-                saveSearch={this.saveSearchHistory}
-                getSearch={this.getSearchHistory}
-              />
-            )
-            break;
-        }
-        break;
-      case "tab-rslive":
-        selectedTab = (
-          <RSLiveView
-            currentTab={tab}
-            updateHeader={this.updateHeader}
-            resetHeader={this.resetHeader}
-          />
-        )
         break;
     }
 

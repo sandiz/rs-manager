@@ -240,7 +240,10 @@ export default class FolderEditView extends React.Component {
                       </td>
                     </tr>
                     <tr style={{ backgroundColor: 'inherit', border: 'none', color: 'black' }}>
-                      <td style={{ border: 'none', width: 20 + '%', borderRight: '1px solid' }}>All Setlists</td>
+                      <td style={{ border: 'none', width: 20 + '%', borderRight: '1px solid' }}>
+                        <span style={{ fontWeight: 'lighter' }}>Add/Remove</span>
+                        <br />Setlists
+                      </td>
                       <td style={{ border: 'none', width: 80 + '%', textAlign: 'left' }}>
                         <div style={{
                           marginLeft: 30 + 'px',
