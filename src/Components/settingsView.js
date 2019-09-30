@@ -24,8 +24,7 @@ import getProfileConfig, {
   getSteamNameFromSteamID,
 } from '../configService';
 import {
-  resetDB, createRSSongList, addtoRSSongList,
-  isTablePresent, deleteRSSongList, getSongByID,
+  resetDB, isTablePresent, deleteRSSongList,
 } from '../sqliteService';
 import {
   getAllProfiles, getSteamPathForRocksmith,
@@ -37,8 +36,6 @@ import { DispatcherService, DispatchEvents } from '../lib/libdispatcher'
 import steam from '../assets/tree-icons/catalog.svg'
 import * as rsicon from '../assets/icons/icon-1024x1024-gray.png'
 import { profileWorker } from '../lib/libworker';
-
-const parse = require('csv-parse/lib/es5/sync');
 
 const { remote } = window.require('electron')
 const Fragment = React.Fragment;
@@ -130,10 +127,12 @@ class SettingsView extends React.Component {
 
   componentDidMount = () => {
     DispatcherService.on(DispatchEvents.SETLIST_IMPORTED, this.refresh);
+    DispatcherService.on(DispatchEvents.SETLIST_REFRESH, this.refresh);
   }
 
   componentWillUnmount = () => {
     DispatcherService.off(DispatchEvents.SETLIST_IMPORTED, this.refresh);
+    DispatcherService.off(DispatchEvents.SETLIST_REFRESH, this.refresh);
   }
 
   loadState = async () => {
@@ -253,70 +252,10 @@ class SettingsView extends React.Component {
   }
 
   importDLCPack = async () => {
-    this.props.updateHeader(this.tabname, "Downloading dlc pack data from github...");
-
     this.setState({
       processingSetlist: true,
     })
-
-    const filePath = window.os.tmpdir() + "/dlcs.csv"
-    const datasrc = "https://gist.githubusercontent.com/JustinAiken/0cba27a4161a2ed3ad54fb6a58da2e70/raw";
-    await window.pDownload(datasrc, filePath);
-    const stat = window.electronFS.statSync(filePath);
-    if (stat.size < 1024) { /* basic integrity check */
-      console.log("dlc.csv size < 1024");
-      this.props.updateHeader(this.tabname, "dlc.csv failed integrity check..")
-      this.setState({
-        processingSetlist: false,
-      })
-      return;
-    }
-    const lr = new window.linereader(filePath);
-
-    await createRSSongList("folder_dlcpack_import", "DLC Pack Setlists",
-      false, false, false, false, false, true);
-
-    let lastSongKey = "";
-    lr.on('error', (err) => {
-      console.log(err);
-      this.setState({
-        processingSetlist: false,
-      })
-    });
-
-    lr.on('line', async (line) => {
-      // pause emitting of lines...
-      lr.pause();
-
-      const l2 = line.replace(/'/gi, "_");
-      const items = parse(l2)[0];
-      const release = items[0]
-      const name = items[1]
-      const pid = items[4];
-      const dbOutput = await getSongByID(pid);
-      if (dbOutput !== '' && lastSongKey !== dbOutput.songkey) {
-        const tableName = `setlist_${release}_${name}`.replace(/-/gi, "_").replace(/ /g, "_").replace(/\W/g, '');
-        await createRSSongList(tableName, `${release} - ${name}`,
-          false, true, false, false, false, false, "folder_dlcpack_import");
-        await addtoRSSongList(tableName, dbOutput.songkey);
-        lastSongKey = dbOutput.songkey;
-      }
-
-      this.props.updateHeader(
-        this.tabname,
-        `Processing pack: ${name} (${release})`,
-      )
-      lr.resume();
-    });
-
-    lr.on('end', async () => {
-      // All lines are read, file is closed now.
-      this.setState({
-        processingSetlist: false,
-      })
-      this.props.updateHeader(this.tabname, "Finished creating dlc setlists");
-      DispatcherService.dispatch(DispatchEvents.SETLIST_REFRESH);
-    });
+    profileWorker.startDLCPackImport();
   }
 
   handleScoreAttack = (event) => {

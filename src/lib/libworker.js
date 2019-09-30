@@ -6,12 +6,14 @@ import { DispatcherService, DispatchEvents } from './libdispatcher';
 import {
     initSongsOwnedDB, updateRecentlyPlayedSongsV2,
     updateMasteryandPlayedV2, updateScoreAttackStatsV2,
-    saveHistoryV2, addToFavoritesV2, initSetlistPlaylistDB, createRSSongList, resetRSSongList,
+    saveHistoryV2, addToFavoritesV2, initSetlistPlaylistDB,
+    createRSSongList, resetRSSongList, createSetlistFromDLCPack,
 } from '../sqliteService';
 import { toasterError } from '../App';
 import getProfileConfig, { updateProfileConfig } from '../configService'
 import readProfile from '../steamprofileService';
 
+const parse = require("csv-parse/lib/sync");
 const Events = require('events-es5');
 
 class WorkersManager {
@@ -499,6 +501,113 @@ class profileWorker {
             }
             setTimeout(() => toast.dismiss(toastID), 2000);
         }
+    }
+
+    static startDLCPackImport = async () => {
+        await this.dlcPackImport();
+        DispatcherService.dispatch(DispatchEvents.SETLIST_REFRESH);
+    }
+
+    static dlcImportToaster = (toastID = null, progress = 0, info = {}) => {
+        const successmsg = (success) => (success ? "toast-msg-success" : "toast-msg-failure");
+        const successicon = (success) => (success ? "fa-check-circle" : "fa-times-circle");
+        const iconclass = (pr, success) => (<i className={"fas " + (progress >= pr ? successicon(success) : "fa-circle-notch fa-spin")} />);
+
+        const spanclass = (pr, name, success) => (
+            <span className={(progress >= pr ? successmsg(success) : "") + " toast-msg"}>
+                {name}
+            </span>
+        )
+        const total = 2;
+        const d = (
+            <div>
+                {
+                    progress === total
+                        ? <span className="toast-msg toast-msg-success"> Import Complete </span>
+                        : <span className="toast-msg toast-msg-success"> Importing DLC Packs as Setlists  </span>
+                }
+                <hr style={{ marginBottom: 7 + 'px' }} />
+                <div>
+                    {iconclass(1, !(info.grouped === -1))}
+                    {spanclass(1, "DLC Packs", !(info.grouped === -1))}
+                    <span className="toast-msg toast-msg-info ta-right">{info.grouped} entries</span>
+                </div>
+                <div>
+                    {iconclass(2, !(info.changes === -1))}
+                    {spanclass(2, "Setlists", !(info.changes === -1))}
+                    <span className="toast-msg toast-msg-info ta-right">{info.changes} entries</span>
+                </div>
+            </div>
+        )
+        if (toastID == null) {
+            return toast(d, {
+                progress,
+                autoClose: false,
+                className: "toast-bg",
+            });
+        }
+        else {
+            if (progress === total) {
+                return toast.update(toastID, {
+                    render: d,
+                    progress: 0.95,
+                });
+            }
+            else {
+                return toast.update(toastID, {
+                    render: d,
+                    progress: progress / total,
+                    autoClose: false,
+                });
+            }
+        }
+    }
+
+    static dlcPackImport = async () => {
+        let progress = 0;
+        const info = { changes: 0, grouped: 0 };
+        const toastID = this.dlcImportToaster(null, 0, info);
+        const datasrc = "https://gist.githubusercontent.com/JustinAiken/0cba27a4161a2ed3ad54fb6a58da2e70/raw";
+        const data = await fetch(datasrc);
+        const body = await data.text();
+        const lines = body.split("\n");
+
+        const getPartsFromLine = (line) => {
+            const l2 = line.replace(/'/gi, "_");
+            const items = parse(l2)[0];
+            const release = items[0];
+            const name = items[1];
+            const pid = items[4];
+            return { release, name, pid };
+        }
+        const grouped = [];
+        for (let i = 0; i < lines.length; i += 1) {
+            const parts = getPartsFromLine(lines[i]);
+            const obj = { release: parts.release, name: parts.name, pid: [parts.pid] };
+            for (let j = i + 1; j < lines.length; j += 1) {
+                const checkparts = getPartsFromLine(lines[j]);
+                if (parts.name === checkparts.name && parts.release === checkparts.release) {
+                    obj.pid.push(checkparts.pid);
+                    i += 1;
+                }
+                else {
+                    break;
+                }
+            }
+            grouped.push(obj);
+        }
+
+        progress += 1
+        info.grouped = grouped.length;
+        this.dlcImportToaster(toastID, progress, info);
+        await createRSSongList("folder_dlcpack_import", "DLC Pack Setlists",
+            false, false, false, false, false, true);
+        const changes = await createSetlistFromDLCPack(grouped, "folder_dlcpack_import");
+        progress += 1
+        info.changes = changes;
+        this.dlcImportToaster(toastID, progress, info);
+
+        setTimeout(() => toast.done(toastID), 2000);
     }
 }
 

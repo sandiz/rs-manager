@@ -1021,6 +1021,55 @@ export async function createRSSongList(
     );`
   await db.run(sql);
 }
+export async function createSetlistFromDLCPack(
+  idDateArray = [], parentFolder = "",
+) {
+  let validReleases = 0;
+  const size = 500;
+  for (let k = 0; k < idDateArray.length; k += size) {
+    const sliced = idDateArray.slice(k, k + size);
+
+    let csql = "";
+    for (let i = 0; i < sliced.length; i += 1) {
+      const item = sliced[i];
+      const release = item.release;
+      const name = item.name;
+      const pids = item.pid;
+
+      //eslint-disable-next-line
+      const ids = await getSongByIDs(pids);
+      if (ids.length === 0) {
+        console.info(`skipping release: ${release} - ${name}`);
+        continue;
+      }
+
+      validReleases += 1;
+      const tableName = `setlist_${release}_${name}`.replace(/-/gi, "_").replace(/ /g, "_").replace(/\W/g, '');
+      const displayName = `${release} - ${name}`;
+      const items = pids.map(pid => `'${pid}'`).join(',');
+
+      csql += `CREATE TABLE IF NOT EXISTS ${tableName} (uniqkey char UNIQUE primary key, FOREIGN KEY(uniqkey) REFERENCES songs_owned(uniqkey));`;
+      csql += `REPLACE INTO setlist_meta VALUES ('${tableName}', '${escape(displayName)}', 'true', 'false', '', 'false', 'false', 'false', '${parentFolder}', "[]");`;
+      csql += `REPLACE INTO ${tableName} (uniqkey) select uniqkey from songs_owned where id in (${items});`
+    }
+
+    try {
+      csql = `BEGIN TRANSACTION; ${csql}; COMMIT;`
+      //eslint-disable-next-line
+      await db.exec(csql);
+    }
+    catch (e) {
+      console.error(e);
+      validReleases = -1;
+    }
+  }
+  return validReleases;
+}
+export async function getSongByIDs(ids = []) {
+  const items = ids.map(pid => `'${pid}'`).join(',');
+  const sql = `select * from songs_owned where id in (${items})`
+  return db.all(sql);
+}
 export async function addtoRSSongList(tablename, songkey) {
   const sql = `replace into '${tablename}' (uniqkey) select uniqkey from songs_owned where songkey like '%${songkey}%'`
   const op = await db.run(sql)
