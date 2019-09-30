@@ -7,7 +7,7 @@ import {
     initSongsOwnedDB, updateRecentlyPlayedSongsV2,
     updateMasteryandPlayedV2, updateScoreAttackStatsV2,
     saveHistoryV2, addToFavoritesV2, initSetlistPlaylistDB,
-    createRSSongList, resetRSSongList, createSetlistFromDLCPack,
+    createRSSongList, resetRSSongList, createSetlistFromDLCPack, addToSteamDLCCatalogV2,
 } from '../sqliteService';
 import { toasterError } from '../App';
 import getProfileConfig, { updateProfileConfig } from '../configService'
@@ -225,6 +225,7 @@ class psarcWorker {
 }
 
 class profileWorker {
+    /* copies stats from rocksmith profile */
     static startWork = async () => {
         await this.refreshStats();
         DispatcherService.dispatch(DispatchEvents.PROFILE_UPDATED, {});
@@ -395,6 +396,8 @@ class profileWorker {
         }
     }
 
+    /* imports a rocksmith songlist as a setlist */
+    /* accepts 'favorites' or a number between 1-7 */
     static startImport = async (setlist = "favorites") => {
         await this.importSetlist(setlist);
         DispatcherService.dispatch(DispatchEvents.SETLIST_IMPORTED, setlist)
@@ -451,7 +454,6 @@ class profileWorker {
         }
     }
 
-    /* accepts 'favorites' or a number between 1-7 */
     static importSetlist = async (setlist) => {
         let progress = 0;
         const prfldb = await getProfileConfig();
@@ -503,6 +505,7 @@ class profileWorker {
         }
     }
 
+    /* imports dlc packs as setlist */
     static startDLCPackImport = async () => {
         await this.dlcPackImport();
         DispatcherService.dispatch(DispatchEvents.SETLIST_REFRESH);
@@ -608,6 +611,43 @@ class profileWorker {
         this.dlcImportToaster(toastID, progress, info);
 
         setTimeout(() => toast.done(toastID), 2000);
+    }
+
+    static startSteamDLCCatalogImport = async () => {
+        await this.dlcCatalogImport();
+        DispatcherService.dispatch(DispatchEvents.DLC_CATALOG_UPDATED);
+    }
+
+    static dlcToaster = (entries, type) => {
+        const iconclass = () => <i className="fas fa-check-circle" />;
+        const spanclass = (name) => (
+            <span className="toast-msg-success toast-msg">
+                {name}
+            </span>
+        )
+        const d = (
+            <div>
+                <span className="toast-msg toast-msg-success"> DLC Catalog Updated  </span>
+                <hr style={{ marginBottom: 7 + 'px' }} />
+                <div>
+                    {iconclass()}
+                    {spanclass(type)}
+                    <span className="toast-msg toast-msg-info ta-right">{entries} entries</span>
+                </div>
+            </div>
+        )
+        toast(d, {
+            autoClose: true,
+            className: "toast-bg",
+        });
+    }
+
+    static dlcCatalogImport = async () => {
+        const data = window.electronFS.readFileSync(window.dirname + "/../songs_available_steam.csv");
+        const lines = data.toString().split("\n");
+
+        await addToSteamDLCCatalogV2(lines);
+        this.dlcToaster(lines.length, "Offline Copy");
     }
 }
 

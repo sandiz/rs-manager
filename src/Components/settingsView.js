@@ -441,6 +441,11 @@ class SettingsView extends React.Component {
     this.props.updateHeader(this.tabname, "Songs Owned collection is now reset!");
   }
 
+  resetDLCCatalog = async () => {
+    await resetDB('songs_available');
+    this.props.updateHeader(this.tabname, "DLC Catalog is now reset!");
+  }
+
   resetSidebarState = async () => {
     await updateConfig("state", {});
     await this.props.refreshTabs();
@@ -1238,6 +1243,27 @@ loading setlists into Rocksmith 2014.
                     </button>
                   </span>
                   <br /> <br />
+                  <span style={{ float: 'left', color: 'red', marginTop: 18 + 'px' }}>
+                    <a>
+                      Reset DLC Catalog
+                    </a>
+                  </span>
+                  <span style={{
+                    float: 'right',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    width: 50 + '%',
+                    textAlign: 'right',
+                    height: 62 + 'px',
+                    marginTop: -5 + 'px',
+                  }}>
+                    <button
+                      type="button"
+                      onClick={this.resetDLCCatalog}
+                      className="extraPadding download">
+                      Reset
+                    </button>
+                  </span>
                 </Collapsible>
                 <br />
               </div>

@@ -62,6 +62,7 @@ export const DispatchEvents = {
     SIDEBAR_GOTO: "sidebar_goto",       /* used for automatic sidebar tab change args: tab_name */
     PROFILE_UPDATED: "profile_updated", /* fired when rocksmith profile info is saved to db */
     SETLIST_IMPORTED: "setlist_imported", /* fired when a rocksmith setlist has been imported to db */
+    DLC_CATALOG_UPDATED: "dlc_catalog_updated", /* fired when dlc catalog is updated */
 }
 
 export const DispatcherService = new Dispatcher();

@@ -1,6 +1,9 @@
 import { generateSql } from "./Components/setlistOptions";
 import { getMasteryThresholdConfig } from "./configService";
 import { generateOrderSql } from "./Components/setlistView";
+import { replaceRocksmithTerms } from "./Components/songavailableView";
+
+const parse = require("csv-parse/lib/sync");
 
 let db = null;
 export async function getUserVersion() {
@@ -281,6 +284,46 @@ export async function addToSteamDLCCatalog(dlc, name, releaseDate, dontparseDate
   //});
   //console.log(sqlstr);
   await db.run(sqlstr); // Run the query without returning anything
+}
+export async function addToSteamDLCCatalogV2(dlcArray = []) {
+  const getPartsFromLine = (line) => {
+    const items = parse(line)[0];
+    const appid = items[0];
+    const name = replaceRocksmithTerms(items[1]);
+    const rdate = Math.trunc(items[2]);
+    const owned = false;
+    return {
+      appid, name, rdate, owned,
+    };
+  }
+  const size = 500;
+  let changes = 0;
+  for (let k = 0; k < dlcArray.length; k += size) {
+    const sliced = dlcArray.slice(k, k + size);
+
+    let sql = "";
+    let items = "";
+    for (let i = 0; i < sliced.length; i += 1) {
+      const item = sliced[i]
+      const parts = getPartsFromLine(item);
+      items += `('${parts.appid}', '${parts.name}', '${parts.rdate}', '${parts.owned}')`;
+      if (i < sliced.length - 1) {
+        items += ',';
+      }
+    }
+    sql += `replace into songs_available (appid, name, release_date, owned) values ${items};`
+
+    try {
+      //eslint-disable-next-line
+      const op = await db.run(sql);
+      changes += op.changes;
+    }
+    catch (e) {
+      console.error(e);
+      changes = -1;
+    }
+  }
+  return changes;
 }
 export async function getDLCDetails(start = 0, count = 10, sortField = "release_date", sortOrder = "desc", search = "", owned = "", tags = []) {
   // console.log("__db_call__: getDLCDetails");
