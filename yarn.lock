@@ -4619,11 +4619,6 @@ eventie@^1:
   resolved "https://registry.yarnpkg.com/eventie/-/eventie-1.0.6.tgz#d4ffc8b0c2b5e493c2aa1b22cbe918d3aee74437"
   integrity sha1-1P/IsMK15JPCqhsiy+kY067nRDc=
 
-events-es5@^1.1.6:
-  version "1.1.6"
-  resolved "https://registry.yarnpkg.com/events-es5/-/events-es5-1.1.6.tgz#9345ba4894a2587aedcf9218475fab9308447aba"
-  integrity sha1-k0W6SJSiWHrtz5IYR1+rkwhEero=
-
 events@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/events/-/events-3.0.0.tgz#9a0a0dfaf62893d92b875b8f2698ca4114973e88"

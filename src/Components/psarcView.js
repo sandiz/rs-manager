@@ -6,6 +6,7 @@ import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
 import PropTypes from 'prop-types';
 import readPSARC, { psarcToJSON, extractFile } from '../psarcService';
 import updateSongsOwned, { initSongsOwnedDB, saveSongsOwnedDB } from '../sqliteService';
+import { psarcWorker } from '../lib/libworker';
 
 const { path } = window;
 const { remote } = window.require('electron')
@@ -167,27 +168,7 @@ class PSARCView extends React.Component {
   }
 
   openFileDialog = async () => {
-    let files = await remote.dialog.showOpenDialog({
-      properties: ["openFile", "multiSelections"],
-      filters: [
-        { name: 'PSARC', extensions: ['psarc'] },
-      ],
-    });
-    if (files === null || typeof files === 'undefined' || files.filePaths.length <= 0 || files.canceled) {
-      return;
-    }
-    files = files.filePaths;
-    const results = [];
-    const fs = remote.require("fs");
-    for (let i = 0; i < files.length; i += 1) {
-      const statres = fs.statSync(files[i]);
-      results.push([files[i], statres]);
-    }
-    console.log("psarc found: " + results.length);
-    if (results.length > 0) {
-      this.setState({ processing: true });
-      this.psarcRead(results);
-    }
+    psarcWorker.importFiles();
   }
 
   walkSync = (dir, results) => {

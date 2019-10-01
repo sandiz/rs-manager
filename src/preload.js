@@ -296,17 +296,16 @@ window.openInfographic = async (path) => {
     return authWindow;
 }
 
-window.remote.app.on("quit", () => {
+_exp = () => {
+    window.remote.app.off('quit', _exp);
     exp.close();
-})
-
+}
+window.remote.app.on("quit", _exp);
 
 process.once('loaded', () => {
     global.window = window;
     //electron.webFrame.setZoomFactor(defaultZoom);
 })
-
-
 
 window.pDownload = (url, dest) => {
     var file = window.electronFS.createWriteStream(dest);
