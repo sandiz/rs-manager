@@ -17,6 +17,9 @@ const { remote } = window.require('electron');
 const parse = require("csv-parse/lib/sync");
 const albumArt = require('./../lib/album-art');
 
+const fs = remote.require('fs').promises;
+const path = remote.require('path');
+
 class psarcWorker {
     static importFiles = async () => {
         let files = await remote.dialog.showOpenDialog({
@@ -26,7 +29,8 @@ class psarcWorker {
             ],
         });
         if (files === null || typeof files === 'undefined' || files.filePaths.length <= 0 || files.canceled) {
-            return [];
+            DispatcherService.dispatch(DispatchEvents.PSARCS_IMPORTED, []);
+            return;
         }
         files = files.filePaths;
         console.log("psarcs selected: " + files.length);
@@ -38,11 +42,62 @@ class psarcWorker {
         const ret = await Promise.all(promises);
         const end = window.performance.now();
         console.log('time taken', end - start, "avg", (end - start) / files.length);
-        return ret.flat();
+        DispatcherService.dispatch(DispatchEvents.PSARCS_IMPORTED, ret.flat());
     }
 
-    static importDirectory() {
+    static importDirectory = async () => {
+        let dirs = await remote.dialog.showOpenDialog({
+            properties: ["openDirectory"],
+        });
+        if (dirs === null || typeof dirs === 'undefined' || dirs.filePaths.length <= 0 || dirs.canceled) {
+            DispatcherService.dispatch(DispatchEvents.PSARCS_IMPORTED, []);
+            return;
+        }
+        dirs = dirs.filePaths;
+        const results = await this.walk(dirs[0]);
+        console.log("psarcs found: " + results.length);
+        if (results.length > 0) {
+            const promises = []
+            for (let i = 0; i < results.length; i += 1) {
+                promises.push(readPSARC(results[i]));
+            }
+            const start = window.performance.now();
+            const ret = await Promise.all(promises);
+            const end = window.performance.now();
+            console.log('time taken', end - start, "avg", (end - start) / results.length);
+            DispatcherService.dispatch(DispatchEvents.PSARCS_IMPORTED, ret.flat());
+        }
+        else {
+            DispatcherService.dispatch(DispatchEvents.PSARCS_IMPORTED, []);
+        }
+    }
 
+    static walk = async (dir, filelist = []) => {
+        const files = await fs.readdir(dir);
+
+        for (let i = 0; i < files.length; i += 1) {
+            const file = files[i];
+            const filepath = path.join(dir, file);
+            //eslint-disable-next-line
+            const stat = await fs.stat(filepath);
+
+            if (stat.isDirectory()) {
+                //eslint-disable-next-line
+                filelist = await walk(filepath, filelist);
+            } else {
+                if (file.includes("/tmp/")) { continue }
+                else if (window.os.platform() === 'darwin' && file.endsWith("_m.psarc")) {
+                    filelist.push(filepath);
+                }
+                else if (window.os.platform() === 'win32' && file.endsWith("_p.psarc")) {
+                    filelist.push(filepath);
+                }
+                else if (file.endsWith("songs.psarc")) {
+                    filelist.push(filepath);
+                }
+            }
+        }
+        return filelist;
     }
 }
 

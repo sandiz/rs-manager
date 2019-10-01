@@ -64,6 +64,7 @@ export const DispatchEvents = {
     SETLIST_IMPORTED: "setlist_imported", /* fired when a rocksmith setlist has been imported to db */
     DLC_CATALOG_UPDATED: "dlc_catalog_updated", /* fired when dlc catalog is updated */
     ALBUM_COVER_QUERY: "album_cover_query", /* fired when album cover has been queried */
+    PSARCS_IMPORTED: "psarcs_imported", /* fired when psarc import finishes */
 }
 
 export const DispatcherService = new Dispatcher();

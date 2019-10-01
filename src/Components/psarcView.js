@@ -7,8 +7,8 @@ import PropTypes from 'prop-types';
 import { psarcToJSON, extractFile } from '../psarcService';
 import updateSongsOwned, { initSongsOwnedDB, saveSongsOwnedDB } from '../sqliteService';
 import { psarcWorker } from '../lib/libworker';
+import { DispatcherService, DispatchEvents } from '../lib/libdispatcher';
 
-const { remote } = window.require('electron')
 function sizeFormatter(cell, row) {
   return (
     <span>
@@ -149,52 +149,24 @@ class PSARCView extends React.Component {
     ];
   }
 
-  openDirDialog = async () => {
-    let dirs = await remote.dialog.showOpenDialog({
-      properties: ["openDirectory"],
-    });
-    if (dirs === null || typeof dirs === 'undefined' || dirs.filePaths.length <= 0 || dirs.canceled) {
-      return;
-    }
-    dirs = dirs.filePaths;
-    const results = this.walkSync(dirs[0] + "/", null);
-    console.log("psarc found: " + results.length);
-    if (results.length > 0) {
-      this.setState({ processing: true, files: [] });
-      this.psarcRead(results);
-    }
+  componentDidMount = () => {
+    DispatcherService.on(DispatchEvents.PSARCS_IMPORTED, this.onPsarcImportComplete);
   }
 
-  openFileDialog = async () => {
-    const results = await psarcWorker.importFiles();
+  componentWillUnmount = () => {
+    DispatcherService.on(DispatchEvents.PSARCS_IMPORTED, this.onPsarcImportComplete);
+  }
+
+  onPsarcImportComplete = (results) => {
     this.setState({ files: results, processing: false });
   }
 
-  walkSync = (dir, results) => {
-    const fs = remote.require("fs");
-    const files = fs.readdirSync(dir);
+  openDirDialog = async () => {
+    psarcWorker.importDirectory();
+  }
 
-    results = results || [];
-    for (let i = 0; i < files.length; i += 1) {
-      const file = files[i];
-      const statres = fs.statSync(dir + file);
-      if (statres.isDirectory()) {
-        //filelist = this.walkSync(dir + file + "/", filelist);
-        results = this.walkSync(dir + file + "/", results);
-      } else {
-        if (file.includes("/tmp/")) { continue }
-        else if (window.os.platform() === 'darwin' && file.endsWith("_m.psarc")) {
-          results.push([dir + file, statres]);
-        }
-        else if (window.os.platform() === 'win32' && file.endsWith("_p.psarc")) {
-          results.push([dir + file, statres]);
-        }
-        else if (file.endsWith("songs.psarc")) {
-          results.push([dir + file, statres]);
-        }
-      }
-    }
-    return results;
+  openFileDialog = async () => {
+    psarcWorker.importFiles();
   }
 
   noData = () => {
