@@ -21,6 +21,61 @@ const fs = remote.require('fs').promises;
 const path = remote.require('path');
 
 class psarcWorker {
+    static psarcToaster = (toastID = null, progress = 0, info = {}) => {
+        const successmsg = (success) => (success ? "toast-msg-success" : "toast-msg-failure");
+        const successicon = (success) => (success ? "fa-check-circle" : "fa-times-circle");
+        const iconclass = (pr, success) => (<i className={"fas " + (progress >= pr ? successicon(success) : "fa-circle-notch fa-spin")} />);
+
+        const spanclass = (pr, name, success) => (
+            <span className={(progress >= pr ? successmsg(success) : "") + " toast-msg"}>
+                {name}
+            </span>
+        )
+        const total = 2;
+        const d = (
+            <div>
+                {
+                    progress === total
+                        ? <span className="toast-msg toast-msg-success"> PSARC import complete </span>
+                        : <span className="toast-msg toast-msg-success"> Importing PSARCs... </span>
+                }
+                <hr style={{ marginBottom: 7 + 'px' }} />
+                <div>
+                    {iconclass(1, !(info.files === -1))}
+                    {spanclass(1, "Files found", !(info.files === -1))}
+                    <span className="toast-msg toast-msg-info ta-right">{info.files}</span>
+                </div>
+                <div>
+                    {iconclass(2, !(info.imports === -1))}
+                    {spanclass(2, "PSARCs imported", !(info.imports === -1))}
+                    <span className="toast-msg toast-msg-info ta-right">{info.imports}</span>
+                </div>
+            </div>
+        )
+        if (toastID == null) {
+            return toast(d, {
+                progress,
+                autoClose: false,
+                className: "toast-bg",
+            });
+        }
+        else {
+            if (progress === total) {
+                return toast.update(toastID, {
+                    render: d,
+                    progress: 0.95,
+                });
+            }
+            else {
+                return toast.update(toastID, {
+                    render: d,
+                    progress: progress / total,
+                    autoClose: false,
+                });
+            }
+        }
+    }
+
     static importFiles = async () => {
         let files = await remote.dialog.showOpenDialog({
             properties: ["openFile", "multiSelections"],
@@ -33,7 +88,15 @@ class psarcWorker {
             return;
         }
         files = files.filePaths;
+        const info = { files: 0, imports: 0 };
+        let progress = 0;
+        const toastID = this.psarcToaster(null, 0, info);
+
         console.log("psarcs selected: " + files.length);
+        progress += 1;
+        info.files = files.length;
+        this.psarcToaster(toastID, progress, info);
+
         const promises = [];
         for (let i = 0; i < files.length; i += 1) {
             promises.push(readPSARC(files[i]));
@@ -41,35 +104,15 @@ class psarcWorker {
         const start = window.performance.now();
         const ret = await Promise.all(promises);
         const end = window.performance.now();
+
+        progress += 1;
+        info.imports = ret.length;
+        this.psarcToaster(toastID, progress, info);
+
         console.log('time taken', end - start, "avg", (end - start) / files.length);
         DispatcherService.dispatch(DispatchEvents.PSARCS_IMPORTED, ret.flat());
-    }
 
-    static importDirectory = async () => {
-        let dirs = await remote.dialog.showOpenDialog({
-            properties: ["openDirectory"],
-        });
-        if (dirs === null || typeof dirs === 'undefined' || dirs.filePaths.length <= 0 || dirs.canceled) {
-            DispatcherService.dispatch(DispatchEvents.PSARCS_IMPORTED, []);
-            return;
-        }
-        dirs = dirs.filePaths;
-        const results = await this.walk(dirs[0]);
-        console.log("psarcs found: " + results.length);
-        if (results.length > 0) {
-            const promises = []
-            for (let i = 0; i < results.length; i += 1) {
-                promises.push(readPSARC(results[i]));
-            }
-            const start = window.performance.now();
-            const ret = await Promise.all(promises);
-            const end = window.performance.now();
-            console.log('time taken', end - start, "avg", (end - start) / results.length);
-            DispatcherService.dispatch(DispatchEvents.PSARCS_IMPORTED, ret.flat());
-        }
-        else {
-            DispatcherService.dispatch(DispatchEvents.PSARCS_IMPORTED, []);
-        }
+        setTimeout(() => toast.done(toastID), 2000);
     }
 
     static walk = async (dir, filelist = []) => {
@@ -83,9 +126,9 @@ class psarcWorker {
 
             if (stat.isDirectory()) {
                 //eslint-disable-next-line
-                filelist = await walk(filepath, filelist);
+                filelist = await this.walk(filepath, filelist);
             } else {
-                if (file.includes("/tmp/")) { continue }
+                if (filepath.toLowerCase().includes("/tmp/")) { continue; }
                 else if (window.os.platform() === 'darwin' && file.endsWith("_m.psarc")) {
                     filelist.push(filepath);
                 }
@@ -98,6 +141,52 @@ class psarcWorker {
             }
         }
         return filelist;
+    }
+
+    static importDirectory = async () => {
+        let dirs = await remote.dialog.showOpenDialog({
+            properties: ["openDirectory"],
+        });
+        if (dirs === null || typeof dirs === 'undefined' || dirs.filePaths.length <= 0 || dirs.canceled) {
+            DispatcherService.dispatch(DispatchEvents.PSARCS_IMPORTED, []);
+            return;
+        }
+        dirs = dirs.filePaths;
+        const info = { files: 0, imports: 0 };
+        let progress = 0;
+        const toastID = this.psarcToaster(null, 0, info);
+
+        const results = await this.walk(dirs[0]);
+        console.log("psarcs found: " + results.length);
+        console.log(results);
+
+        progress += 1;
+        info.files = results.length;
+        this.psarcToaster(toastID, progress, info);
+
+        if (results.length > 0) {
+            const promises = []
+            for (let i = 0; i < results.length; i += 1) {
+                promises.push(readPSARC(results[i]));
+            }
+            const start = window.performance.now();
+            const ret = await Promise.all(promises);
+            const end = window.performance.now();
+            console.log('time taken', end - start, "avg", (end - start) / results.length);
+            DispatcherService.dispatch(DispatchEvents.PSARCS_IMPORTED, ret.flat());
+
+            progress += 1;
+            info.imports = ret.length;
+            this.psarcToaster(toastID, progress, info);
+        }
+        else {
+            progress += 1;
+            info.imports = -1;
+            this.psarcToaster(toastID, progress, info);
+            DispatcherService.dispatch(DispatchEvents.PSARCS_IMPORTED, []);
+        }
+
+        setTimeout(() => toast.done(toastID), 2000);
     }
 }
 
