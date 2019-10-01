@@ -3,6 +3,10 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 */
+const fs = window.require('fs');
+const util = window.require('util');
+const fileStatAsync = util.promisify(fs.stat);
+
 async function getSongDetails(psarc) {
   const arrangementarr = [];
   try {
@@ -60,9 +64,9 @@ export async function extractFile(psarc, file) {
   }
   return null;
 }
-export default async function readPSARC(psarc, statResult, sleepms) {
-  //await sleep(sleepms);
+export default async function readPSARC(psarc) {
   const ret = await getSongDetails(psarc);
+  const statResult = await fileStatAsync(psarc);
   const psarcData = []
   ret.forEach((item) => {
     const psarcBlurb = item;

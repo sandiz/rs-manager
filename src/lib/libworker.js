@@ -11,17 +11,13 @@ import {
 import { toasterError } from '../App';
 import getProfileConfig, { updateProfileConfig } from '../configService'
 import readProfile from '../steamprofileService';
+import readPSARC from '../psarcService';
 
 const { remote } = window.require('electron');
 const parse = require("csv-parse/lib/sync");
 const albumArt = require('./../lib/album-art');
 
 class psarcWorker {
-    constructor(c = (w, m) => { }, e = (w, err) => { }) {
-        this._receivedMsg = c;
-        this._receivedErr = e;
-    }
-
     static importFiles = async () => {
         let files = await remote.dialog.showOpenDialog({
             properties: ["openFile", "multiSelections"],
@@ -30,19 +26,22 @@ class psarcWorker {
             ],
         });
         if (files === null || typeof files === 'undefined' || files.filePaths.length <= 0 || files.canceled) {
-            return;
+            return [];
         }
         files = files.filePaths;
-        const results = [];
-        const fs = remote.require("fs");
+        console.log("psarcs selected: " + files.length);
+        const promises = [];
         for (let i = 0; i < files.length; i += 1) {
-            const statres = fs.statSync(files[i]);
-            results.push([files[i], statres]);
+            promises.push(readPSARC(files[i]));
         }
-        console.log("psarcs found: " + results.length);
+        const start = window.performance.now();
+        const ret = await Promise.all(promises);
+        const end = window.performance.now();
+        console.log('time taken', end - start, "avg", (end - start) / files.length);
+        return ret.flat();
     }
 
-    importDirectory() {
+    static importDirectory() {
 
     }
 }

@@ -869,6 +869,10 @@ tbody tr:hover {
     background-size: 50%;
 }
 
+.smallIcon2 {
+    background-size: 34%;
+}
+
 .ta-center {
     text-align: center;
 }

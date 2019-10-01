@@ -4,11 +4,10 @@ import BootstrapTable from 'react-bootstrap-table-next'
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
 import PropTypes from 'prop-types';
-import readPSARC, { psarcToJSON, extractFile } from '../psarcService';
+import { psarcToJSON, extractFile } from '../psarcService';
 import updateSongsOwned, { initSongsOwnedDB, saveSongsOwnedDB } from '../sqliteService';
 import { psarcWorker } from '../lib/libworker';
 
-const { path } = window;
 const { remote } = window.require('electron')
 function sizeFormatter(cell, row) {
   return (
@@ -32,7 +31,6 @@ class PSARCView extends React.Component {
     this.state = {
       files: [],
       processing: false,
-      abortprocessing: false,
       showpsarcDetail: false,
       selectedpsarcData: null,
       selectedFileName: "",
@@ -168,7 +166,8 @@ class PSARCView extends React.Component {
   }
 
   openFileDialog = async () => {
-    psarcWorker.importFiles();
+    const results = await psarcWorker.importFiles();
+    this.setState({ files: results, processing: false });
   }
 
   walkSync = (dir, results) => {
@@ -198,41 +197,6 @@ class PSARCView extends React.Component {
     return results;
   }
 
-  psarcRead = async (results) => {
-    const count = results.length;
-    const start = window.performance.now();
-
-    let index = 1;
-    this.setState({
-      files: [],
-    });
-    this.processedFiles = [];
-    for (let i = 0; i < results.length; i += 1) {
-      const prObj = results[i];
-      /* loop await */ // eslint-disable-next-line
-      const currentResults = await readPSARC(prObj[0], prObj[1], (500 + (index * 100)))
-      if (currentResults === null || currentResults === 'undefined' || currentResults.length === 0) {
-        this.props.updateHeader(this.tabname, "Failed to read " + path.basename(prObj[0]));
-        index += 1
-        continue;
-      }
-      this.processedFiles = this.processedFiles.concat(currentResults);
-      this.props.updateHeader(this.tabname, `Processing PSARC:  ${currentResults[0].psarc} (${index}/${count})`);
-      if (index >= count) {
-        this.props.updateHeader(this.tabname, `Processed ${count} PSARC's, ${this.processedFiles.length} arrangements found.`);
-        this.setState({ files: this.processedFiles, processing: false });
-      }
-      if (this.state.abortprocessing) {
-        this.props.updateHeader(this.tabname, `Processed ${index} PSARC's, ${this.processedFiles.length} arrangements found.`);
-        this.setState({ files: this.processedFiles, processing: false, abortprocessing: false });
-        break;
-      }
-      index += 1
-    }
-    const end = window.performance.now();
-    console.log("avg psarcRead: ", (end - start) / results.length);
-  }
-
   noData = () => {
     if (this.state.processing) {
       return "Processing...";
@@ -242,10 +206,6 @@ class PSARCView extends React.Component {
 
   forceViewUpdate = () => {
     this.setState({ files: this.processedFiles });
-  }
-
-  stopProcessing = async () => {
-    this.setState({ abortprocessing: true });
   }
 
   extract = async (file, psarc) => {
@@ -324,15 +284,6 @@ class PSARCView extends React.Component {
           </button>
           <button
             type="button"
-            onClick={this.stopProcessing}
-            className="extraPadding download"
-            style={{ display: `${stopprocessingstyle}` }}>
-            <Trans i18nKey="stopProcessing">
-              Stop Processing
-            </Trans>
-          </button>
-          <button
-            type="button"
             onClick={this.forceViewUpdate}
             className="extraPadding download"
             style={{ display: `${stopprocessingstyle}` }}>
@@ -367,7 +318,7 @@ class PSARCView extends React.Component {
         </div>
         <div>
           <BootstrapTable
-            keyField="uniquekey"
+            keyField="id"
             data={this.state.files}
             columns={this.columns}
             classes="psarcTable"
@@ -455,7 +406,7 @@ class PSARCView extends React.Component {
                   },
                   {
                     classes: (cell, row, rowIndex, colIndex) => {
-                      const def = "iconPreview smallIcon difficulty ";
+                      const def = "iconPreview smallIcon2 difficulty ";
                       let diff = "";
                       if (cell <= 20) {
                         diff = "diff_0"
@@ -517,7 +468,7 @@ class PSARCView extends React.Component {
                     <h1> Arrangements: {this.state.selectedpsarcData.arrangements.length}</h1>
                     <div className="psarcFiles">
                       <BootstrapTable
-                        keyField="fullName"
+                        keyField="id"
                         data={this.state.selectedpsarcData.arrangements}
                         columns={arrcolumns}
                         classes="psarcTable"
