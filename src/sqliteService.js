@@ -1,6 +1,9 @@
 import { generateSql } from "./Components/setlistOptions";
 import { getMasteryThresholdConfig } from "./configService";
 import { generateOrderSql } from "./Components/setlistView";
+import { replaceRocksmithTerms } from "./Components/songavailableView";
+
+const parse = require("csv-parse/lib/sync");
 
 let db = null;
 export async function getUserVersion() {
@@ -282,6 +285,46 @@ export async function addToSteamDLCCatalog(dlc, name, releaseDate, dontparseDate
   //console.log(sqlstr);
   await db.run(sqlstr); // Run the query without returning anything
 }
+export async function addToSteamDLCCatalogV2(dlcArray = []) {
+  const getPartsFromLine = (line) => {
+    const items = parse(line)[0];
+    const appid = items[0];
+    const name = replaceRocksmithTerms(items[1]);
+    const rdate = Math.trunc(items[2]);
+    const owned = false;
+    return {
+      appid, name, rdate, owned,
+    };
+  }
+  const size = 500;
+  let changes = 0;
+  for (let k = 0; k < dlcArray.length; k += size) {
+    const sliced = dlcArray.slice(k, k + size);
+
+    let sql = "";
+    let items = "";
+    for (let i = 0; i < sliced.length; i += 1) {
+      const item = sliced[i]
+      const parts = getPartsFromLine(item);
+      items += `('${parts.appid}', '${parts.name}', '${parts.rdate}', '${parts.owned}')`;
+      if (i < sliced.length - 1) {
+        items += ',';
+      }
+    }
+    sql += `replace into songs_available (appid, name, release_date, owned) values ${items};`
+
+    try {
+      //eslint-disable-next-line
+      const op = await db.run(sql);
+      changes += op.changes;
+    }
+    catch (e) {
+      console.error(e);
+      changes = -1;
+    }
+  }
+  return changes;
+}
 export async function getDLCDetails(start = 0, count = 10, sortField = "release_date", sortOrder = "desc", search = "", owned = "", tags = []) {
   // console.log("__db_call__: getDLCDetails");
   search = search.replace(/'/g, "");
@@ -426,15 +469,7 @@ export async function saveSongsOwnedDB() {
   //console.log("__db_call__: saveSongsOwnedDB");
   //await db.close();
 }
-export async function updateMasteryandPlayed(id, mastery, playedcount) {
-  // console.log("__db_call__: updateMasteryandPlayed");
-  //await db.close();
-  const op = await db.run("UPDATE songs_owned SET mastery=?,count=? where id=?", mastery, playedcount, id);
-  return op.changes;
-}
 export async function updateNotes(id, note) {
-  // console.log("__db_call__: updateMasteryandPlayed");
-  //await db.close();
   const op = await db.run("UPDATE songs_owned SET local_note=? where id=?", escape(note), id);
   return op.changes;
 }
@@ -444,39 +479,124 @@ export async function getNotes(id) {
   const op = await db.get("select local_note from  songs_owned where id=?", id);
   return op;
 }
-export async function updateRecentlyPlayedSongs(id, date, type = "las" /* las or sa */) {
-  // console.log("__db_call__: updateRecentlyPlayed");
-  //await db.close();
-  if (type === "las") {
-    const op = await db.run("UPDATE songs_owned SET date_las=? where id=?", date, id);
-    return op.changes;
+export async function updateRecentlyPlayedSongsV2(idDateArray = [], type = "las") {
+  const size = 500; // sql stmt length has limits, update at max 500 items at a time
+  let changes = 0;
+  for (let k = 0; k < idDateArray.length; k += size) {
+    const sliced = idDateArray.slice(k, k + size);
+    const field = type === "las" ? "date_las" : "date_sa";
+    let sql = "";
+    let items = "";
+    for (let i = 0; i < sliced.length; i += 1) {
+      const item = sliced[i]
+      items += `('${item[0]}', '${item[1]}')`;
+      if (i < sliced.length - 1) {
+        items += ',';
+      }
+    }
+
+    sql = `with tmp(id, ${field}) as (values ${items}) `
+    sql += `update songs_owned set ${field} = (select ${field} from tmp where songs_owned.id = tmp.id) `
+    sql += `where id in (select id from tmp)`;
+
+    try {
+      //eslint-disable-next-line
+      const op = await db.run(sql);
+      changes += op.changes;
+    }
+    catch (e) {
+      console.error(e);
+      changes = -1;
+    }
   }
-  else {
-    const op = await db.run("UPDATE songs_owned SET date_sa=? where id=?", date, id);
-    return op.changes;
+  return changes;
+}
+
+export async function updateMasteryandPlayedV2(idDateArray = []) {
+  const size = 500;
+  let changes = 0;
+  for (let k = 0; k < idDateArray.length; k += size) {
+    const sliced = idDateArray.slice(k, k + size);
+
+    let sql = "";
+    let items = "";
+    for (let i = 0; i < sliced.length; i += 1) {
+      const item = sliced[i]
+      items += `('${item[0]}', '${item[1]}', ${item[2]})`;
+      if (i < sliced.length - 1) {
+        items += ',';
+      }
+    }
+
+    sql = `with tmp(id, mastery, count) as (values ${items}) `
+    sql += `update songs_owned set mastery = (select mastery from tmp where songs_owned.id = tmp.id), `
+    sql += `count = (select count from tmp where songs_owned.id = tmp.id) `
+    sql += `where id in (select id from tmp)`;
+
+    try {
+      //eslint-disable-next-line
+      const op = await db.run(sql);
+      changes += op.changes;
+    }
+    catch (e) {
+      console.error(e);
+      changes = -1;
+    }
   }
+  return changes;
 }
-export async function updateScoreAttackStats(stat, badgeHighest, id) {
-  const op = await db.run(
-    "UPDATE songs_owned SET sa_playcount=?, sa_ts=?, sa_hs_easy=?, sa_hs_medium=?, sa_hs_hard=?, sa_hs_master=?, sa_badge_easy=?, sa_badge_medium=?, sa_badge_hard=?, sa_badge_master=?, sa_highest_badge= ? where id=?",
-    stat.PlayCount, stat.TimeStamp,
-    stat.HighScores.Easy, stat.HighScores.Medium, stat.HighScores.Hard, stat.HighScores.Master,
-    stat.Badges.Easy, stat.Badges.Medium, stat.Badges.Hard, stat.Badges.Master,
-    badgeHighest,
-    id,
-  );
-  return op.changes;
+
+export async function updateScoreAttackStatsV2(idDateArray = []) {
+  const size = 500;
+  let changes = 0;
+  for (let k = 0; k < idDateArray.length; k += size) {
+    const sliced = idDateArray.slice(k, k + size);
+    let sql = "";
+    let items = "";
+    for (let i = 0; i < sliced.length; i += 1) {
+      const item = sliced[i];
+      const key = item[0];
+      const stat = item[1];
+      const highestBadge = item[2];
+      items += `('${key}', '${stat.PlayCount}', '${stat.TimeStamp}', '${stat.HighScores.Easy}', '${stat.HighScores.Medium}', '${stat.HighScores.Hard}', '${stat.HighScores.Master}', '${stat.Badges.Easy}', '${stat.Badges.Medium}', '${stat.Badges.Hard}', '${stat.Badges.Master}', '${highestBadge}')`;
+      if (i < sliced.length - 1) {
+        items += ',';
+      }
+    }
+
+    sql = `with tmp(id, sa_playcount, sa_ts, sa_hs_easy, sa_hs_medium, sa_hs_hard, sa_hs_master, sa_badge_easy, sa_badge_medium, sa_badge_hard, sa_badge_master, sa_highest_badge) as (values ${items}) `
+    sql += `update songs_owned set `;
+    sql += `sa_playcount = (select sa_playcount from tmp where songs_owned.id = tmp.id), `
+    sql += `sa_ts = (select sa_ts from tmp where songs_owned.id = tmp.id), `
+    sql += `sa_hs_easy = (select sa_hs_easy from tmp where songs_owned.id = tmp.id), `
+    sql += `sa_hs_medium = (select sa_hs_medium from tmp where songs_owned.id = tmp.id), `
+    sql += `sa_hs_hard = (select sa_hs_hard from tmp where songs_owned.id = tmp.id), `
+    sql += `sa_hs_master = (select sa_hs_master from tmp where songs_owned.id = tmp.id), `
+    sql += `sa_badge_easy = (select sa_badge_easy from tmp where songs_owned.id = tmp.id), `
+    sql += `sa_badge_medium = (select sa_badge_medium from tmp where songs_owned.id = tmp.id), `
+    sql += `sa_badge_hard = (select sa_badge_hard from tmp where songs_owned.id = tmp.id), `
+    sql += `sa_badge_master = (select sa_badge_master from tmp where songs_owned.id = tmp.id), `
+    sql += `sa_highest_badge = (select sa_highest_badge from tmp where songs_owned.id = tmp.id) `
+    sql += `where id in (select id from tmp)`;
+    try {
+      //eslint-disable-next-line
+      const op = await db.run(sql);
+      changes += op.changes;
+    }
+    catch (e) {
+      console.error(e);
+      changes = -1;
+    }
+  }
+  return changes;
 }
+
 export async function updateAcquiredDate(date, item) {
-  // console.log("__db_call__: updateMasteryandPlayed");
-  //await db.close();
   const sql = `UPDATE songs_available SET acquired_date='${date}' where name LIKE "%${item}"`
   const op = await db.run(sql);
   return op.changes;
 }
 export async function updateAcquiredDateByAppID(appid, date) {
-  // console.log("__db_call__: updateMasteryandPlayed");
-  //await db.close();
   const sql = `UPDATE songs_available SET acquired_date='${date}' where appid LIKE '${appid}'`
   const op = await db.run(sql);
   return op.changes;
@@ -498,6 +618,104 @@ export async function removeFromSongsOwned(songid) {
 export async function addToIgnoreArrangements(songid) {
   const sql = `insert or ignore into ignored_arrangements (id) VALUES('${songid}');`;
   await db.run(sql);
+}
+export function getSongItems(item, isCDLC) {
+  const album = escape(item.album);
+  const artist = escape(item.artist);
+  const song = escape(item.song);
+  const arrangement = escape(item.arrangement);
+  const json = escape(item.json);
+  const psarc = escape(item.psarc);
+  const dlc = escape(item.dlc);
+  const sku = escape(item.sku);
+  const difficulty = escape(item.difficulty);
+  const dlckey = escape(item.dlckey);
+  const songkey = escape(item.songkey);
+  const id = escape(item.id);
+  const uniqkey = escape(item.uniquekey);
+  const lct = escape(item.lastConversionTime);
+  const ap = escape(item.arrangementProperties);
+  const capo = item.capofret;
+  const cent = item.centoffset;
+  const tuning = escape(item.tuning);
+  const tuningJSON = JSON.parse(item.tuning)
+  const tuningWeight = Math.abs(tuningJSON.string0) + Math.abs(tuningJSON.string1)
+    + Math.abs(tuningJSON.string2) + Math.abs(tuningJSON.string3)
+    + Math.abs(tuningJSON.string4) + Math.abs(tuningJSON.string5)
+  const {
+    pathLead, pathRhythm, pathBass, bonusArr, represent,
+  } = JSON.parse(item.arrangementProperties);
+  const notes = item.maxNotes;
+  const tempo = item.tempo;
+  const length = item.songLength;
+  const mastery = 0;
+  const count = 0;
+
+  return `(
+    '${album}', '${artist}', '${song}', '${arrangement}', '${json}', '${psarc}', '${dlc}', '${sku}',
+    '${difficulty}','${dlckey}', '${songkey}', '${id}', '${uniqkey}', '${lct}', '${mastery}', '${count}',
+    '${ap}', '${capo}', '${cent}', '${tuning}', '${length}', '${notes}', '${tempo}', '${isCDLC}', 
+    '${tuningWeight}', '${pathLead}', '${pathRhythm}', '${pathBass}', '${bonusArr}', '${represent}'
+  )`;
+}
+export async function updateSongsOwnedV2(songs, isCDLC = false) {
+  const size = 500; // sql stmt length has limits, update at max 500 items at a time
+  let changes = 0;
+  for (let k = 0; k < songs.length; k += size) {
+    const sliced = songs.slice(k, k + size);
+    let sql = "";
+    let items = "";
+    for (let i = 0; i < sliced.length; i += 1) {
+      const item = sliced[i];
+      items += getSongItems(item, isCDLC);
+      if (i < sliced.length - 1) {
+        items += ',';
+      }
+    }
+    sql = `INSERT OR IGNORE INTO songs_owned (album, artist, song, arrangement, json, psarc, dlc, sku, difficulty, dlckey, songkey, id,uniqkey, lastConversionTime, mastery, count, arrangementProperties, capofret, centoffset, tuning, songLength, maxNotes, tempo, is_cdlc, tuning_weight, path_lead, path_rhythm, path_bass, bonus_arr, represent) VALUES ${items}`;
+    try {
+      //eslint-disable-next-line
+      const op = await db.run(sql);
+      changes += op.changes;
+    }
+    catch (e) {
+      console.error(e);
+      changes = -1;
+    }
+  }
+  return changes;
+}
+export async function removeIgnoredArrangements() {
+  const sql = "DELETE from songs_owned where id in (select id from ignored_arrangements);"
+  const op = await db.run(sql);
+  return op.changes;
+}
+export async function updateCDLCStatV2(songs = []) {
+  const size = 500; // sql stmt length has limits, update at max 500 items at a time
+  let changes = 0;
+  for (let k = 0; k < songs.length; k += size) {
+    const sliced = songs.slice(k, k + size);
+    let sql = "";
+    let items = "";
+    for (let i = 0; i < sliced.length; i += 1) {
+      const item = sliced[i];
+      items += `'${escape(item.id)}'`
+      if (i < sliced.length - 1) {
+        items += ',';
+      }
+    }
+    sql = `UPDATE songs_owned set is_cdlc = 'true' where id in (${items})`;
+    try {
+      //eslint-disable-next-line
+      const op = await db.run(sql);
+      changes += op.changes;
+    }
+    catch (e) {
+      console.error(e);
+      changes = -1;
+    }
+  }
+  return changes;
 }
 export default async function updateSongsOwned(psarcResult, isCDLC = false) {
   // console.log("__db_call__: updateSongsOwned");
@@ -710,7 +928,7 @@ export async function getSAStats(type = "sa_badge_hard", fctype = "sa_fc_hard", 
   const sqlstr = `select sa.count as satotal, \
   saplat.count as saplat, sagold.count as sagold, sasilver.count as sasilver,\
   sabronze.count as sabronze, safailed.count as safailed, safcs.count as safcs from \
-  (select count(*) as count from ${table} where ${cdlcSql} ${fctype} is not null) safcs, \
+  (select count(*) as count from ${table} where ${cdlcSql} ${fctype} is not null AND ${fctype} <> 0) safcs, \
   (select count(*) as count from ${table} where ${cdlcSql} sa_playcount > 0 AND ${type} > ${badgeRating}) sa, \
   (select count(*) as count from ${table} where ${cdlcSql} sa_playcount > 0 AND (${type} == ${badgeRating + 1})) safailed,
   (select count(*) as count from ${table} where ${cdlcSql} sa_playcount > 0 AND (${type} == ${badgeRating + 2})) sabronze, \
@@ -944,19 +1162,89 @@ export async function createRSSongList(
     );`
   await db.run(sql);
 }
+export async function createSetlistFromDLCPack(
+  idDateArray = [], parentFolder = "",
+) {
+  let validReleases = 0;
+  const size = 500;
+  for (let k = 0; k < idDateArray.length; k += size) {
+    const sliced = idDateArray.slice(k, k + size);
+
+    let csql = "";
+    for (let i = 0; i < sliced.length; i += 1) {
+      const item = sliced[i];
+      const release = item.release;
+      const name = item.name;
+      const pids = item.pid;
+
+      //eslint-disable-next-line
+      const ids = await getSongByIDs(pids);
+      if (ids.length === 0) {
+        console.info(`skipping release: ${release} - ${name}`);
+        continue;
+      }
+
+      validReleases += 1;
+      const tableName = `setlist_${release}_${name}`.replace(/-/gi, "_").replace(/ /g, "_").replace(/\W/g, '');
+      const displayName = `${release} - ${name}`;
+      const items = pids.map(pid => `'${pid}'`).join(',');
+
+      csql += `CREATE TABLE IF NOT EXISTS ${tableName} (uniqkey char UNIQUE primary key, FOREIGN KEY(uniqkey) REFERENCES songs_owned(uniqkey));`;
+      csql += `REPLACE INTO setlist_meta VALUES ('${tableName}', '${escape(displayName)}', 'true', 'false', '', 'false', 'false', 'false', '${parentFolder}', "[]");`;
+      csql += `REPLACE INTO ${tableName} (uniqkey) select uniqkey from songs_owned where id in (${items});`
+    }
+
+    try {
+      csql = `BEGIN TRANSACTION; ${csql}; COMMIT;`
+      //eslint-disable-next-line
+      await db.exec(csql);
+    }
+    catch (e) {
+      console.error(e);
+      validReleases = -1;
+    }
+  }
+  return validReleases;
+}
+export async function getSongByIDs(ids = []) {
+  const items = ids.map(pid => `'${pid}'`).join(',');
+  const sql = `select * from songs_owned where id in (${items})`
+  return db.all(sql);
+}
 export async function addtoRSSongList(tablename, songkey) {
   const sql = `replace into '${tablename}' (uniqkey) select uniqkey from songs_owned where songkey like '%${songkey}%'`
   const op = await db.run(sql)
   return op.changes;
 }
-export async function saveHistory(id, mastery, timestamp) {
-  const flt = parseFloat(mastery);
-  if (!Number.isNaN(flt) && flt > 0) {
-    const sql = `replace into history VALUES('${id}', '${flt}', '${timestamp}')`
-    const op = await db.run(sql)
-    return op.changes;
+export async function saveHistoryV2(idDateArray) {
+  const size = 500;
+  let changes = 0;
+  for (let k = 0; k < idDateArray.length; k += size) {
+    const sliced = idDateArray.slice(k, k + size);
+
+    let sql = "";
+    let items = "";
+    for (let i = 0; i < sliced.length; i += 1) {
+      const item = sliced[i]
+      items += `('${item[0]}', '${item[1]}', ${item[2]})`;
+      if (i < sliced.length - 1) {
+        items += ',';
+      }
+    }
+
+    sql = `replace into history values ${items};`
+
+    try {
+      //eslint-disable-next-line
+      const op = await db.run(sql);
+      changes += op.changes;
+    }
+    catch (e) {
+      console.error(e);
+      changes = -1;
+    }
   }
-  return 0;
+  return changes;
 }
 export async function getHistory(id, limit = 10) {
   const sql = `select * from history where id='${id}' group by mastery order by timestamp asc limit ${limit}`;
@@ -1159,11 +1447,36 @@ export async function saveSongByIDToSetlist(setlist, id) {
     await db.run(sql2);
   }
 }
-export async function addToFavorites(songkey) {
-  // console.log("__db_call__: addToFavorites");
-  const sql = `replace into setlist_favorites (uniqkey) select uniqkey from songs_owned where songkey like '%${songkey}%'`
-  const op = await db.run(sql)
-  return op.changes;
+export async function addToFavoritesV2(idDateArray = [], setlistID = 'setlist_favorites') {
+  const size = 500;
+  let changes = 0;
+  for (let k = 0; k < idDateArray.length; k += size) {
+    const sliced = idDateArray.slice(k, k + size);
+
+    let sql = "";
+    let items = "";
+    for (let i = 0; i < sliced.length; i += 1) {
+      const item = sliced[i]
+      items += `'${item}'`;
+      if (i < sliced.length - 1) {
+        items += ',';
+      }
+    }
+
+    sql = `replace into ${setlistID} (uniqkey) select uniqkey from songs_owned 
+    where songkey in (${items});`
+
+    try {
+      //eslint-disable-next-line
+      const op = await db.run(sql);
+      changes += op.changes;
+    }
+    catch (e) {
+      console.error(e);
+      changes = -1;
+    }
+  }
+  return changes;
 }
 export async function getRandomSongOwned() {
   //console.log("__db_call__: getRandomSongOwned");
@@ -1276,7 +1589,9 @@ export async function getPathBreakdown(path = "lead") {
   const op = [await db.get(smsql), await db.get(spsql), await db.get(tsql)]
   return op;
 }
-window.remote.app.on('window-all-closed', async () => {
+const _f = async () => {
+  window.remote.app.off('window-all-closed', _f);
   await saveSongsOwnedDB();
   console.log("Saved to db..");
-})
+};
+window.remote.app.on('window-all-closed', _f);

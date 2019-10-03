@@ -869,6 +869,10 @@ tbody tr:hover {
     background-size: 50%;
 }
 
+.smallIcon2 {
+    background-size: 34%;
+}
+
 .ta-center {
     text-align: center;
 }
@@ -1518,4 +1522,22 @@ hr {
   white-space: nowrap; 
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.toast-msg {
+    margin-left: 5px;
+    font-family: "Roboto Condensed", sans-serif;
+}
+
+.toast-msg-success {
+    color: black;
+}
+.toast-msg-failure {
+    color: crimson;
+}
+.toast-msg-info {
+    color: gray;
+}
+.toast-bg {
+    background: azure;
 }
