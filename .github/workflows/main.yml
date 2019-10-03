@@ -14,7 +14,10 @@ jobs:
     runs-on: macOS-10.14    
     steps:
     - uses: actions/checkout@v1
-    - name: Run a multi-line script
+    - uses: actions/setup-node@v1
+      with:
+        node-version: '12.x'
+    - name: Run build script (mac)
       run: |
         yarn install
         yarn dist-mac
@@ -24,6 +27,9 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v1
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
       - name: Run build script (windows)
         run: |
           yarn install
