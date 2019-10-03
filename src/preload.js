@@ -266,7 +266,7 @@ function electronSteamAuth(config, windowParams) {
                     }
                 }
 
-                window.remote.session.defaultSession.webRequest.onBeforeRedirect({}, (details, callback) => {
+                window.remote.session.defaultSession.webRequest.onBeforeRedirect({ urls: [] }, (details, callback) => {
                     onCallback(details.redirectURL)
                 })
 

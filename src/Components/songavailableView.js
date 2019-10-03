@@ -278,7 +278,7 @@ class SongAvailableView extends React.Component {
         },
         sort: true,
         formatter: (cell, row) => {
-          return cell === true ? this.props.t("yes") : this.props.t("no");
+          return cell === "true" ? this.props.t("yes") : this.props.t("no");
         },
       },
     ]
