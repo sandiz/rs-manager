@@ -277,9 +277,12 @@ class profileWorker {
                 const keys = Object.keys(type === "las" ? stats : sastats);
                 for (let i = 0; i < keys.length; i += 1) {
                     const stat = stats[keys[i]];
-                    const dateTS = stat.TimeStamp;
-                    idDateArray.push([keys[i], dateTS]);
+                    if ("TimeStamp" in stat) {
+                        const dateTS = stat.TimeStamp;
+                        idDateArray.push([keys[i], dateTS]);
+                    }
                 }
+                console.log("rp songs: ", idDateArray.length);
                 return updateRecentlyPlayedSongsV2(idDateArray, type);
             }
 
@@ -304,6 +307,7 @@ class profileWorker {
                     }
                 }
                 await saveHistoryV2(historyArray);
+                console.log("las items: ", idDateArray.length);
                 return updateMasteryandPlayedV2(idDateArray);
             }
 
@@ -314,24 +318,27 @@ class profileWorker {
                 for (let i = 0; i < keys.length; i += 1) {
                     const stat = sastats[keys[i]];
                     let highestBadge = 0;
-                    if (stat.Badges.Easy > 0) {
-                        stat.Badges.Easy += 10;
-                        highestBadge = stat.Badges.Easy;
+                    if ("Badges" in stat) {
+                        if ("Easy" in stat.Badges && stat.Badges.Easy > 0) {
+                            stat.Badges.Easy += 10;
+                            highestBadge = stat.Badges.Easy;
+                        }
+                        if ("Medium" in stat.Badges && stat.Badges.Medium > 0) {
+                            stat.Badges.Medium += 20;
+                            highestBadge = stat.Badges.Medium;
+                        }
+                        if ("Hard" in stat.Badges && stat.Badges.Hard > 0) {
+                            stat.Badges.Hard += 30;
+                            highestBadge = stat.Badges.Hard;
+                        }
+                        if ("Master" in stat.Badges && stat.Badges.Master > 0) {
+                            stat.Badges.Master += 40;
+                            highestBadge = stat.Badges.Master;
+                        }
+                        idDateArray.push([keys[i], stat, highestBadge]);
                     }
-                    if (stat.Badges.Medium > 0) {
-                        stat.Badges.Medium += 20;
-                        highestBadge = stat.Badges.Medium;
-                    }
-                    if (stat.Badges.Hard > 0) {
-                        stat.Badges.Hard += 30;
-                        highestBadge = stat.Badges.Hard;
-                    }
-                    if (stat.Badges.Master > 0) {
-                        stat.Badges.Master += 40;
-                        highestBadge = stat.Badges.Master;
-                    }
-                    idDateArray.push([keys[i], stat, highestBadge]);
                 }
+                console.log("sa items: ", idDateArray.length)
                 return updateScoreAttackStatsV2(idDateArray);
             }
 
