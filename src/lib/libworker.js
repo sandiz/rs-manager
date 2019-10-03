@@ -6,7 +6,8 @@ import {
     initSongsOwnedDB, updateRecentlyPlayedSongsV2,
     updateMasteryandPlayedV2, updateScoreAttackStatsV2,
     saveHistoryV2, addToFavoritesV2, initSetlistPlaylistDB,
-    createRSSongList, resetRSSongList, createSetlistFromDLCPack, addToSteamDLCCatalogV2,
+    createRSSongList, resetRSSongList, createSetlistFromDLCPack,
+    addToSteamDLCCatalogV2, updateSongsOwnedV2, removeIgnoredArrangements, updateCDLCStatV2,
 } from '../sqliteService';
 import { toasterError } from '../App';
 import getProfileConfig, { updateProfileConfig } from '../configService'
@@ -158,7 +159,6 @@ class psarcWorker {
 
         const results = await this.walk(dirs[0]);
         console.log("psarcs found: " + results.length);
-        console.log(results);
 
         progress += 1;
         info.files = results.length;
@@ -579,6 +579,7 @@ class profileWorker {
         setTimeout(() => toast.done(toastID), 2000);
     }
 
+    /* imports offline dlc catalog */
     static startSteamDLCCatalogImport = async () => {
         await this.dlcCatalogImport();
         DispatcherService.dispatch(DispatchEvents.DLC_CATALOG_UPDATED);
@@ -614,6 +615,114 @@ class profileWorker {
 
         await addToSteamDLCCatalogV2(lines);
         this.dlcToaster(lines.length, "Offline Copy");
+    }
+
+    /* ypdates song_owned with results from psarc import */
+    static songListToaster = (toastID = null, progress = 0, info = {}) => {
+        const successmsg = (success) => (success ? "toast-msg-success" : "toast-msg-failure");
+        const successicon = (success) => (success ? "fa-check-circle" : "fa-times-circle");
+        const iconclass = (pr, success) => (<i className={"fas " + (progress >= pr ? successicon(success) : "fa-circle-notch fa-spin")} />);
+
+        const spanclass = (pr, name, success) => (
+            <span className={(progress >= pr ? successmsg(success) : "") + " toast-msg"}>
+                {name}
+            </span>
+        )
+        const total = info.cdlc ? 3 : 2;
+        const d = (
+            <div>
+                {
+                    progress === total
+                        ? <span className="toast-msg toast-msg-success"> Update Complete</span>
+                        : <span className="toast-msg toast-msg-success"> Updating Songs Owned   </span>
+                }
+                <hr style={{ marginBottom: 7 + 'px' }} />
+                <div>
+                    {iconclass(1, !(info.arrangements === -1))}
+                    {spanclass(1, "Arrangements Found", !(info.arrangements === -1))}
+                    <span className="toast-msg toast-msg-info ta-right">{info.arrangements}</span>
+                </div>
+                <div>
+                    {iconclass(2, !(info.inserts === -1))}
+                    {spanclass(2, "Arrangements Added", !(info.inserts === -1))}
+                    <span className="toast-msg toast-msg-info ta-right">{info.inserts}</span>
+                </div>
+                {
+                    info.cdlc ? (
+                        <div>
+                            {iconclass(2, !(info.cdlcupdates === -1))}
+                            {spanclass(2, "Marked as cdlc", !(info.cdlcupdates === -1))}
+                            <span className="toast-msg toast-msg-info ta-right">{info.cdlcupdates}</span>
+                        </div>
+                    ) : null
+                }
+            </div>
+        )
+        if (toastID == null) {
+            return toast(d, {
+                progress,
+                autoClose: false,
+                className: "toast-bg",
+            });
+        }
+        else {
+            if (progress === total) {
+                return toast.update(toastID, {
+                    render: d,
+                    progress: 0.95,
+                });
+            }
+            else {
+                return toast.update(toastID, {
+                    render: d,
+                    progress: progress / total,
+                    autoClose: false,
+                });
+            }
+        }
+    }
+
+    static startSongListUpdate = async (songs = [], markAsCDLC = false) => {
+        await this.songListUpdate(songs, markAsCDLC);
+        DispatcherService.dispatch(DispatchEvents.SONG_LIST_UPDATED);
+    }
+
+    static songListUpdate = async (songs, markAsCDLC) => {
+        console.log("--start songlist update--");
+        let progress = 0;
+        const info = {
+            arrangements: 0, inserts: 0, cdlc: markAsCDLC, cdlcupdates: 0,
+        };
+        console.log("arrangements:", songs.length);
+        console.log("mark as cdlc:", markAsCDLC);
+
+        const toastID = this.songListToaster(null, 0, info);
+        const filtered = songs.filter(item => (!item.song.startsWith("RS2 Test")
+            && !item.song.startsWith("RS2 Chord")))
+        console.log("filtered: " + filtered.length);
+
+        progress += 1
+        info.arrangements = filtered.length;
+        this.songListToaster(toastID, progress, info);
+        await initSongsOwnedDB();
+        let changes = await updateSongsOwnedV2(filtered, markAsCDLC);
+        console.log("inserts: " + changes);
+
+        progress += 1
+        info.inserts = changes;
+        this.songListToaster(toastID, progress, info);
+        changes = await removeIgnoredArrangements();
+        console.log("removeIgnored: " + changes);
+
+        if (markAsCDLC) {
+            changes = await updateCDLCStatV2(filtered);
+            progress += 1
+            info.cdlcupdates = changes;
+            this.songListToaster(toastID, progress, info);
+            console.log("updateCDLCStat: " + changes);
+        }
+        setTimeout(() => toast.dismiss(toastID), 2000);
+        console.log("--end songlist update--");
     }
 }
 

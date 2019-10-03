@@ -619,6 +619,104 @@ export async function addToIgnoreArrangements(songid) {
   const sql = `insert or ignore into ignored_arrangements (id) VALUES('${songid}');`;
   await db.run(sql);
 }
+export function getSongItems(item, isCDLC) {
+  const album = escape(item.album);
+  const artist = escape(item.artist);
+  const song = escape(item.song);
+  const arrangement = escape(item.arrangement);
+  const json = escape(item.json);
+  const psarc = escape(item.psarc);
+  const dlc = escape(item.dlc);
+  const sku = escape(item.sku);
+  const difficulty = escape(item.difficulty);
+  const dlckey = escape(item.dlckey);
+  const songkey = escape(item.songkey);
+  const id = escape(item.id);
+  const uniqkey = escape(item.uniquekey);
+  const lct = escape(item.lastConversionTime);
+  const ap = escape(item.arrangementProperties);
+  const capo = item.capofret;
+  const cent = item.centoffset;
+  const tuning = escape(item.tuning);
+  const tuningJSON = JSON.parse(item.tuning)
+  const tuningWeight = Math.abs(tuningJSON.string0) + Math.abs(tuningJSON.string1)
+    + Math.abs(tuningJSON.string2) + Math.abs(tuningJSON.string3)
+    + Math.abs(tuningJSON.string4) + Math.abs(tuningJSON.string5)
+  const {
+    pathLead, pathRhythm, pathBass, bonusArr, represent,
+  } = JSON.parse(item.arrangementProperties);
+  const notes = item.maxNotes;
+  const tempo = item.tempo;
+  const length = item.songLength;
+  const mastery = 0;
+  const count = 0;
+
+  return `(
+    '${album}', '${artist}', '${song}', '${arrangement}', '${json}', '${psarc}', '${dlc}', '${sku}',
+    '${difficulty}','${dlckey}', '${songkey}', '${id}', '${uniqkey}', '${lct}', '${mastery}', '${count}',
+    '${ap}', '${capo}', '${cent}', '${tuning}', '${length}', '${notes}', '${tempo}', '${isCDLC}', 
+    '${tuningWeight}', '${pathLead}', '${pathRhythm}', '${pathBass}', '${bonusArr}', '${represent}'
+  )`;
+}
+export async function updateSongsOwnedV2(songs, isCDLC = false) {
+  const size = 500; // sql stmt length has limits, update at max 500 items at a time
+  let changes = 0;
+  for (let k = 0; k < songs.length; k += size) {
+    const sliced = songs.slice(k, k + size);
+    let sql = "";
+    let items = "";
+    for (let i = 0; i < sliced.length; i += 1) {
+      const item = sliced[i];
+      items += getSongItems(item, isCDLC);
+      if (i < sliced.length - 1) {
+        items += ',';
+      }
+    }
+    sql = `INSERT OR IGNORE INTO songs_owned (album, artist, song, arrangement, json, psarc, dlc, sku, difficulty, dlckey, songkey, id,uniqkey, lastConversionTime, mastery, count, arrangementProperties, capofret, centoffset, tuning, songLength, maxNotes, tempo, is_cdlc, tuning_weight, path_lead, path_rhythm, path_bass, bonus_arr, represent) VALUES ${items}`;
+    try {
+      //eslint-disable-next-line
+      const op = await db.run(sql);
+      changes += op.changes;
+    }
+    catch (e) {
+      console.error(e);
+      changes = -1;
+    }
+  }
+  return changes;
+}
+export async function removeIgnoredArrangements() {
+  const sql = "DELETE from songs_owned where id in (select id from ignored_arrangements);"
+  const op = await db.run(sql);
+  return op.changes;
+}
+export async function updateCDLCStatV2(songs = []) {
+  const size = 500; // sql stmt length has limits, update at max 500 items at a time
+  let changes = 0;
+  for (let k = 0; k < songs.length; k += size) {
+    const sliced = songs.slice(k, k + size);
+    let sql = "";
+    let items = "";
+    for (let i = 0; i < sliced.length; i += 1) {
+      const item = sliced[i];
+      items += `'${escape(item.id)}'`
+      if (i < sliced.length - 1) {
+        items += ',';
+      }
+    }
+    sql = `UPDATE songs_owned set is_cdlc = 'true' where id in (${items})`;
+    try {
+      //eslint-disable-next-line
+      const op = await db.run(sql);
+      changes += op.changes;
+    }
+    catch (e) {
+      console.error(e);
+      changes = -1;
+    }
+  }
+  return changes;
+}
 export default async function updateSongsOwned(psarcResult, isCDLC = false) {
   // console.log("__db_call__: updateSongsOwned");
   let sqlstr = "";

@@ -73,7 +73,7 @@ export default async function readPSARC(psarc) {
     psarcBlurb.size = statResult.size;
     psarcBlurb.created = statResult.ctimeMs;
     psarcBlurb.filename = psarc;
-    psarcBlurb.uniquekey = psarcBlurb.filename + "_" + item.fullName
+    psarcBlurb.uniquekey = psarcBlurb.filename + "_" + item.fullName + "_" + item.id
     /*{
       filename: psarc,
       name: path.basename(psarc, ".psarc"),

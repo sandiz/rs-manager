@@ -3,10 +3,8 @@ import { withI18n, Trans } from 'react-i18next';
 import BootstrapTable from 'react-bootstrap-table-next'
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
-import PropTypes from 'prop-types';
 import { psarcToJSON, extractFile } from '../psarcService';
-import updateSongsOwned, { initSongsOwnedDB, saveSongsOwnedDB } from '../sqliteService';
-import { psarcWorker } from '../lib/libworker';
+import { psarcWorker, profileWorker } from '../lib/libworker';
 import { DispatcherService, DispatchEvents } from '../lib/libdispatcher';
 
 function sizeFormatter(cell, row) {
@@ -48,17 +46,6 @@ class PSARCView extends React.Component {
     }
     this.markAsCDLC = null;
     this.columns = [
-      {
-        dataField: "id",
-        text: this.props.t("ID"),
-        style: (cell, row, rowIndex, colIndex) => {
-          return {
-            width: '25%',
-            cursor: 'pointer',
-          };
-        },
-        hidden: true,
-      },
       {
         dataField: "song",
         text: this.props.t("Song"),
@@ -146,6 +133,17 @@ class PSARCView extends React.Component {
         },
         sort: true,
       },
+      {
+        dataField: "id",
+        text: this.props.t("ID"),
+        style: (cell, row, rowIndex, colIndex) => {
+          return {
+            width: '25%',
+            cursor: 'pointer',
+          };
+        },
+        hidden: false,
+      },
     ];
   }
 
@@ -154,7 +152,7 @@ class PSARCView extends React.Component {
   }
 
   componentWillUnmount = () => {
-    DispatcherService.on(DispatchEvents.PSARCS_IMPORTED, this.onPsarcImportComplete);
+    DispatcherService.off(DispatchEvents.PSARCS_IMPORTED, this.onPsarcImportComplete);
   }
 
   onPsarcImportComplete = (results) => {
@@ -162,10 +160,12 @@ class PSARCView extends React.Component {
   }
 
   openDirDialog = async () => {
+    this.setState({ processing: true });
     psarcWorker.importDirectory();
   }
 
   openFileDialog = async () => {
+    this.setState({ processing: true });
     psarcWorker.importFiles();
   }
 
@@ -200,38 +200,10 @@ class PSARCView extends React.Component {
   }
 
   updateSongList = async () => {
-    await initSongsOwnedDB();
-    console.log("arrangments: " + this.state.files.length);
-    console.log("mark as cdlc: " + this.markAsCDLC.checked);
-    let count = 0;
-    let fcount = 0;
-    let filtered = "";
-    const start = window.performance.now();
-    for (let i = 0; i < this.state.files.length; i += 1) {
-      this.props.updateHeader(this.tabname, `Updating Songlist with PSARC:  ${this.state.files[i].psarc} (${i}/${this.state.files.length})`);
-      const { song } = this.state.files[i];
-
-      if (song.startsWith("RS2 Test")
-        || song.startsWith("RS2 Chord")) {
-        console.log("Skipped song: " + song);
-        fcount += 1;
-        continue;
-      }
-      count += 1
-      /* loop await */ // eslint-disable-next-line
-      await updateSongsOwned(this.state.files[i], this.markAsCDLC.checked);
-    }
-    await saveSongsOwnedDB();
-    if (fcount > 0) {
-      filtered = `(Filtered: ${fcount})`
-    }
-    this.props.updateHeader(this.tabname, "Updated Songlist with " + count + " Arrangements. " + filtered);
-    const end = window.performance.now();
-    console.log("avg updateSongList: ", (end - start) / this.state.files.length);
+    profileWorker.songListUpdate(this.state.files, this.markAsCDLC.checked);
   }
 
   render = () => {
-    const stopprocessingstyle = this.state.processing ? "" : "none";
     const hasdatastyle = this.state.processing === false && this.state.files.length > 0 ? "" : "none";
     const choosepsarchstyle = "extraPadding download " + (this.state.processing ? "isDisabled" : "");
     const psarcdetailsstyle = "modal-window " + (this.state.showpsarcDetail ? "" : "hidden");
@@ -252,15 +224,6 @@ class PSARCView extends React.Component {
             className={choosepsarchstyle}>
             <Trans i18nKey="choosePsarcDirectory">
               Choose .psarc Directory
-            </Trans>
-          </button>
-          <button
-            type="button"
-            onClick={this.forceViewUpdate}
-            className="extraPadding download"
-            style={{ display: `${stopprocessingstyle}` }}>
-            <Trans i18nKey="forceGenerateView">
-              Force Generate View
             </Trans>
           </button>
           <button
@@ -463,12 +426,12 @@ class PSARCView extends React.Component {
 }
 PSARCView.propTypes = {
   //currentTab: PropTypes.object,
-  updateHeader: PropTypes.func,
+  //updateHeader: PropTypes.func,
   //resetHeader: PropTypes.func,
 }
 PSARCView.defaultProps = {
   //currentTab: null,
-  updateHeader: () => { },
+  //updateHeader: () => { },
   //resetHeader: () => { },
 }
 
