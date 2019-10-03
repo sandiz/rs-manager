@@ -113,7 +113,7 @@ class psarcWorker {
         console.log('time taken', end - start, "avg", (end - start) / files.length);
         DispatcherService.dispatch(DispatchEvents.PSARCS_IMPORTED, ret.flat());
 
-        setTimeout(() => toast.done(toastID), 2000);
+        setTimeout(() => toast.done(toastID), 5000);
     }
 
     static walk = async (dir, filelist = []) => {
@@ -186,7 +186,7 @@ class psarcWorker {
             DispatcherService.dispatch(DispatchEvents.PSARCS_IMPORTED, []);
         }
 
-        setTimeout(() => toast.done(toastID), 2000);
+        setTimeout(() => toast.done(toastID), 5000);
     }
 }
 
@@ -358,7 +358,7 @@ class profileWorker {
             info.scoreattackchanges = changes;
             this.refreshToaster(toastID, progress, info);
 
-            setTimeout(() => toast.done(toastID), 2000);
+            setTimeout(() => toast.done(toastID), 5000);
         }
     }
 
@@ -467,7 +467,7 @@ class profileWorker {
                 toasterError("Invalid setlist: " + setlist);
                 return;
             }
-            setTimeout(() => toast.dismiss(toastID), 2000);
+            setTimeout(() => toast.dismiss(toastID), 5000);
         }
     }
 
@@ -576,7 +576,7 @@ class profileWorker {
         info.changes = changes;
         this.dlcImportToaster(toastID, progress, info);
 
-        setTimeout(() => toast.done(toastID), 2000);
+        setTimeout(() => toast.done(toastID), 5000);
     }
 
     /* imports offline dlc catalog */
@@ -721,7 +721,7 @@ class profileWorker {
             this.songListToaster(toastID, progress, info);
             console.log("updateCDLCStat: " + changes);
         }
-        setTimeout(() => toast.dismiss(toastID), 2000);
+        setTimeout(() => toast.dismiss(toastID), 5000);
         console.log("--end songlist update--");
     }
 }
