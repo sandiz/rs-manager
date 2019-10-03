@@ -1,3 +1,9 @@
+v2.4.0
+- performance improvements for sqlite and psarc operations
+    - batch all sqlite inserts
+    - psarc reads are now parallelized
+- tabs are now cached instead of getting created on switch
+- async operations are now independent of tabs (uses message passing via dispatcher service)
 v2.3.0
 - translated most views (todo: rslive, settings options)
 - updated showOpenDialog and showSaveDialog to async

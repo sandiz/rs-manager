@@ -9,23 +9,23 @@ import {
     countFormmatter, badgeFormatter, arrangmentFormatter, tuningFormatter,
 } from './songlistView';
 import SongDetailView from './songdetailView';
-import readProfile from '../steamprofileService';
 import {
-    addToFavorites, initSetlistPlaylistDB, getSongsFromPlaylistDB,
-    removeSongFromSetlist, updateMasteryandPlayed, initSongsOwnedDB,
-    getSetlistMetaInfo, getSongsFromGeneratedPlaylist, removeSongFromSetlistByUniqKey,
+    getSongsFromPlaylistDB,
+    removeSongFromSetlist, getSetlistMetaInfo,
+    getSongsFromGeneratedPlaylist, removeSongFromSetlistByUniqKey,
     executeRawSql, getLeadStats, getRhythmStats, getBassStats, countSongsOwned,
     getSAStats,
 } from '../sqliteService';
-import getProfileConfig, {
-    updateProfileConfig, getScoreAttackConfig,
+import {
+    getScoreAttackConfig,
     getDefaultSortOptionConfig, getScoreAttackDashboardConfig,
 } from '../configService';
 import SetlistOptions, { generateSql } from './setlistOptions';
 import ExportSetlistModal from './modalExportSetlist';
 import AddSongModal from './modalAddSong';
+import { DispatcherService, DispatchEvents } from '../lib/libdispatcher';
+import { profileWorker } from '../lib/libworker';
 
-const { path } = window;
 const options = [
     { value: 'pathLead', label: 'Lead' },
     { value: 'pathRhythm', label: 'Rhythm' },
@@ -337,6 +337,16 @@ class SetlistView extends React.Component {
         return true;
     }
 
+    componentDidMount = () => {
+        DispatcherService.on(DispatchEvents.PROFILE_UPDATED, this.refresh);
+        DispatcherService.on(DispatchEvents.SETLIST_IMPORTED, this.setlistImported);
+    }
+
+    componentWillUnmount = () => {
+        DispatcherService.off(DispatchEvents.PROFILE_UPDATED, this.refresh);
+        DispatcherService.off(DispatchEvents.SETLIST_IMPORTED, this.setlistImported);
+    }
+
     getSortOptions = async () => {
         try {
             let sortOptions = JSON.parse(this.state.setlistMeta.sort_options);
@@ -606,85 +616,44 @@ class SetlistView extends React.Component {
     }
 
     updateMastery = async () => {
-        const prfldb = await getProfileConfig();
-        if (prfldb === '' || prfldb === null) {
-            this.props.updateHeader(
-                this.tabname,
+        profileWorker.startWork();
+    }
+
+    refresh = async () => {
+        let output = []
+        const isgen = this.state.setlistMeta.is_generated === "true";
+        const sortOptions = await this.getSortOptions();
+        if (isgen) {
+            const joinedoutput = await getSongsFromGeneratedPlaylist(
+                this.state.setlistMeta,
+                0,
+                this.state.sizePerPage,
+                "",
+                "",
+                sortOptions,
+            )
+            output = joinedoutput[0]
+            output[0].acount = joinedoutput[1].acount
+            output[0].songcount = joinedoutput[1].songcount
+        } else {
+            output = await getSongsFromPlaylistDB(
                 this.lastChildID,
-                `No Profile found, please update it in Settings!`,
-            );
-            return;
+                0,
+                this.state.sizePerPage,
+                "",
+                "",
+                this.search.value,
+                document.getElementById("search_field")
+                    ? document.getElementById("search_field").value : "",
+                [],
+                sortOptions,
+            )
         }
-        if (prfldb.length > 0) {
-            this.props.updateHeader(
-                this.tabname,
-                this.lastChildID,
-                `Decrypting ${path.basename(prfldb)}`,
-            );
-            const steamProfile = await readProfile(prfldb);
-            const stats = steamProfile.Stats.Songs;
-            await updateProfileConfig(prfldb);
-            this.props.handleChange();
-            this.props.updateHeader(
-                this.tabname,
-                this.lastChildID,
-                `Song Stats Found: ${Object.keys(stats).length}`,
-            );
-            await initSongsOwnedDB();
-            const keys = Object.keys(stats);
-            let updatedRows = 0;
-            for (let i = 0; i < keys.length; i += 1) {
-                const stat = stats[keys[i]];
-                const mastery = stat.MasteryPeak;
-                const played = stat.PlayedCount;
-                this.props.updateHeader(
-                    this.tabname,
-                    this.lastChildID,
-                    `Updating Stat for SongID:  ${keys[i]} (${i}/${keys.length})`,
-                );
-                /* loop await */ // eslint-disable-next-line
-                const rows = await updateMasteryandPlayed(keys[i], mastery, played);
-                if (rows === 0) {
-                    console.log("Missing ID: " + keys[i]);
-                }
-                updatedRows += rows;
-            }
-            this.props.updateHeader(
-                this.tabname,
-                this.lastChildID,
-                "Stats Found: " + updatedRows + ", Total Stats: " + keys.length,
-            );
-            let output = []
-            const isgen = this.state.setlistMeta.is_generated === "true";
-            const sortOptions = await this.getSortOptions();
-            if (isgen) {
-                const joinedoutput = await getSongsFromGeneratedPlaylist(
-                    this.state.setlistMeta,
-                    0,
-                    this.state.sizePerPage,
-                    "",
-                    "",
-                    sortOptions,
-                )
-                output = joinedoutput[0]
-                output[0].acount = joinedoutput[1].acount
-                output[0].songcount = joinedoutput[1].songcount
-            } else {
-                output = await getSongsFromPlaylistDB(
-                    this.lastChildID,
-                    0,
-                    this.state.sizePerPage,
-                    "",
-                    "",
-                    this.search.value,
-                    document.getElementById("search_field")
-                        ? document.getElementById("search_field").value : "",
-                    [],
-                    sortOptions,
-                )
-            }
-            this.setState({ songs: output, page: 1, totalSize: output[0].acount });
-        }
+        this.setState({ songs: output, page: 1, totalSize: output[0].acount });
+    }
+
+    setlistImported = (setlist) => {
+        this.refreshView()
     }
 
     refreshView = async () => {
@@ -740,71 +709,41 @@ class SetlistView extends React.Component {
             )
         }
         if (output.length > 0) {
+            const msg = (
+                <span>
+                    Setlist: <span style={{ fontWeight: 'bolder' }}>
+                        {this.props.currentChildTab.name}
+                    </span>,
+                    Songs: {output[0].songcount}, Arrangements: {output[0].acount}
+                </span>
+            )
             this.props.updateHeader(
                 this.tabname,
                 this.lastChildID,
-                `Songs: ${output[0].songcount}, Arrangements: ${output[0].acount}`,
+                msg,
             );
             this.setState({ songs: output, page, totalSize: output[0].acount });
         }
         else {
+            const msg = (
+                <span>
+                    Setlist: <span style={{ fontWeight: 'bolder' }}>
+                        {this.props.currentChildTab.name}
+                    </span>,
+                    Songs: 0, Arrangements: 0
+                </span>
+            )
             this.props.updateHeader(
                 this.tabname,
                 this.lastChildID,
-                `Songs: 0, Arrangements: 0`,
+                msg,
             );
             this.setState({ songs: output, page, totalSize: 0 });
         }
     }
 
     updateFavs = async () => {
-        const prfldb = await getProfileConfig();
-        if (prfldb === '' || prfldb === null) {
-            this.props.updateHeader(
-                this.tabname,
-                this.lastChildID,
-                `No Profile found, please update it in Settings!`,
-            );
-            return;
-        }
-        if (prfldb.length > 0) {
-            this.props.updateHeader(
-                this.tabname,
-                this.lastChildID,
-                `Decrypting ${path.basename(prfldb)}`,
-            );
-            const steamProfile = await readProfile(prfldb);
-            const stats = steamProfile.FavoritesListRoot.FavoritesList;
-            await updateProfileConfig(prfldb);
-            this.props.handleChange();
-            this.props.updateHeader(
-                this.tabname,
-                this.lastChildID,
-                `Favorites Found: ${stats.length}`,
-            );
-            await initSetlistPlaylistDB('setlist_favorites');
-            let updatedRows = 0;
-            for (let i = 0; i < stats.length; i += 1) {
-                const stat = stats[i];
-                this.props.updateHeader(
-                    this.tabname,
-                    this.lastChildID,
-                    `Updating Favorite for SongKey:  ${stat} (${i}/${stats.length})`,
-                );
-                /* loop await */ // eslint-disable-next-line
-                const rows = await addToFavorites(stat);
-                if (rows === 0) {
-                    console.log("Missing ID: " + stat);
-                }
-                updatedRows += rows;
-            }
-            this.props.updateHeader(
-                this.tabname,
-                this.lastChildID,
-                "Favorites Found: " + updatedRows,
-            );
-            this.refreshView();
-        }
+        profileWorker.startImport();
     }
 
     removeFromSetlistByID = async (songData) => {
@@ -928,11 +867,11 @@ class SetlistView extends React.Component {
                     }
                     <button
                         type="button"
-                        style={{ width: 170 + 'px' }}
+                        style={{ width: 13 + '%' }}
                         onClick={this.updateMastery}
                         className={choosepsarchstyle}>
                         <Trans i18nKey="updateMastery">
-                            Update Mastery
+                            Refresh Stats from Profile
                         </Trans>
                     </button>
                     <button
@@ -1135,7 +1074,7 @@ SetlistView.propTypes = {
     currentChildTab: PropTypes.object,
     updateHeader: PropTypes.func,
     //resetHeader: PropTypes.func,
-    handleChange: PropTypes.func,
+    //handleChange: PropTypes.func,
     refreshTabs: PropTypes.func,
     saveSearch: PropTypes.func,
     getSearch: PropTypes.func,
@@ -1147,7 +1086,7 @@ SetlistView.defaultProps = {
     currentChildTab: null,
     updateHeader: () => { },
     //resetHeader: () => { },
-    handleChange: () => { },
+    //handleChange: () => { },
     refreshTabs: () => { },
     saveSearch: () => { },
     getSearch: () => { },

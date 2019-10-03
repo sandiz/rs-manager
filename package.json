@@ -2,7 +2,7 @@
   "name": "rs-manager",
   "description": "Manage Rocksmith playlists, songs, stats and dlc's",
   "author": "sandiz",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "license": "GPL-3.0",
   "private": true,
   "dependencies": {
@@ -52,6 +52,7 @@
     "react-dom": "^16.5.2",
     "react-i18next": "^9.0.10",
     "react-select": "^3.0.4",
+    "react-toastify": "^5.3.2",
     "react-tooltip": "^3.11.0",
     "registry-js": "^1.4.0",
     "request": "^2.34",
@@ -65,7 +66,8 @@
     "tmp": "^0.1.0",
     "wav": "^1.0.2",
     "wavefile": "^8.4.4",
-    "whatwg-fetch": "^3.0.0"
+    "whatwg-fetch": "^3.0.0",
+    "worker-loader": "^2.0.0"
   },
   "scripts": {
     "start": "nf start -p 3000",

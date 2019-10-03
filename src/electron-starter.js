@@ -140,6 +140,7 @@ async function createWindow() {
             webSecurity: false,
             nodeIntegration: true,
             contextIsolation: false,
+            nodeIntegrationInWorker: true
         },
     });
     // Let us register listeners on the window, so we can update the state

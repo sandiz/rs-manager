@@ -11,18 +11,17 @@ import getProfileConfig, {
 } from '../configService';
 import readProfile from '../steamprofileService';
 import {
-  updateMasteryandPlayed, initSongsOwnedDB, getSongByID,
-  countSongsOwned, getArrangmentsMastered, getLeadStats,
+  getSongByID, countSongsOwned, getArrangmentsMastered, getLeadStats,
   getRhythmStats, getBassStats, getRandomSongOwned,
   getRandomSongAvailable, getSAStats,
-  updateScoreAttackStats, getLastNSongs,
-  getPathBreakdown, updateRecentlyPlayedSongs,
+  getLastNSongs, getPathBreakdown,
 } from '../sqliteService';
 import { replaceRocksmithTerms } from './songavailableView';
 import SongDetailView from './songdetailView';
 import { getBadgeName } from './songlistView';
+import { DispatcherService, DispatchEvents } from '../lib/libdispatcher';
+import { profileWorker, imageWorker } from '../lib/libworker';
 
-const { path } = window;
 const Steam = require('steam-webapi');
 const albumArt = require('./../lib/album-art');
 
@@ -82,14 +81,21 @@ class DashboardView extends React.Component {
   }
 
   cdmasync = async () => {
-    await this.fetchStats();
-    await this.fetchRandomStats();
-    await this.fetchWeeklySpotlight();
+    this.fetchStats();
+    this.fetchRandomStats();
+    this.fetchWeeklySpotlight();
     this.props.handleChange();
   }
 
   componentDidMount = async () => {
     this.cdmasync();
+    DispatcherService.on(DispatchEvents.PROFILE_UPDATED, this.fetchStats);
+    DispatcherService.on(DispatchEvents.ALBUM_COVER_QUERY, this.setImage);
+  }
+
+  componentWillUnmount = () => {
+    DispatcherService.off(DispatchEvents.PROFILE_UPDATED, this.fetchStats);
+    DispatcherService.off(DispatchEvents.ALBUM_COVER_QUERY, this.setImage);
   }
 
   changeTimeFormat = async () => {
@@ -412,6 +418,15 @@ class DashboardView extends React.Component {
     }
   }
 
+  setImage = (data) => {
+    if ('type' in data && 'url' in data) {
+      const obj = {};
+      const type = data.type;
+      obj[type] = data.url;
+      this.setState(obj);
+    }
+  }
+
   fetchRandomStats = async (changesong = true, changepack = true) => {
     if (changesong) {
       const rsong = await getRandomSongOwned();
@@ -424,11 +439,9 @@ class DashboardView extends React.Component {
         randomartist: unescape(rsong.artist),
         randomarr: unescape(rsong.arrangement),
         randommastery: mastery,
-      })
-      setTimeout(async () => {
-        const url = await this.fetchCover(this.state.randomartist, this.state.randomalbum);
-        this.setState({ coverlas: url });
-      }, 1000);
+      }, () => {
+        imageWorker.fetchCover(this.state.randomartist, this.state.randomalbum, true, { type: 'coverlas' });
+      });
     }
     if (changepack) {
       const rpack = await getRandomSongAvailable();
@@ -436,12 +449,10 @@ class DashboardView extends React.Component {
       this.setState({
         randompackappid: unescape(rpack.appid),
         randompack: replaceRocksmithTerms(unescape(rpack.name)),
-      });
-      setTimeout(async () => {
+      }, () => {
         const [artist, title] = this.state.randompack.split(" - ");
-        const url = await this.fetchCover(artist ? artist.trim() : "", title ? title.trim() : "", false);
-        this.setState({ coversteam: url });
-      }, 1000)
+        imageWorker.fetchCover(artist ? artist.trim() : "", title ? title.trim() : "", false, { type: 'coversteam' });
+      });
     }
   }
 
@@ -462,159 +473,16 @@ class DashboardView extends React.Component {
       const title = weekly.title.split("by");
       const artist = title[1] ? unescape(title[1]).trim() : ""
       const track = title[0] ? unescape(title[0]).trim() : ""
-      const url = await this.fetchCover(artist, track, false); //use trackname
-      this.setState({ weeklysongspotlight: weekly, coverreddit: url });
+      imageWorker.fetchCover(artist, track, false, { type: 'coverreddit' }); //use trackname
+      this.setState({ weeklysongspotlight: weekly });
     }
     catch (e) {
       console.log(e)
     }
   }
 
-  updateRecentlyPlayed = async () => {
-    const prfldb = await getProfileConfig();
-    if (prfldb === '' || prfldb === null) {
-      this.props.updateHeader(
-        this.tabname,
-        `No Profile found, please update it in Settings!`,
-      );
-      return;
-    }
-    if (prfldb.length > 0) {
-      this.props.updateHeader(
-        this.tabname,
-        `Decrypting ${window.path.basename(prfldb)}`,
-      );
-      const steamProfile = await readProfile(prfldb);
-      const stats = steamProfile.Songs;
-      const sastats = steamProfile.SongsSA;
-      await initSongsOwnedDB();
-      let keys = Object.keys(stats);
-      let updatedRows = 0;
-      //find mastery stats
-      for (let i = 0; i < keys.length; i += 1) {
-        const stat = stats[keys[i]];
-        const ts = stat.TimeStamp;
-        this.props.updateHeader(
-          this.tabname,
-          `Updating RecentlyPlayed for SongID:  ${keys[i]} (${i}/${keys.length})`,
-        );
-        /*loop await */ // eslint-disable-next-line
-        const rows = await updateRecentlyPlayedSongs(keys[i], ts, "las");
-        if (rows === 0) {
-          console.log("Missing ID: " + keys[i]);
-        }
-        updatedRows += rows;
-      }
-      //find score attack stats
-      keys = Object.keys(sastats);
-      for (let i = 0; i < keys.length; i += 1) {
-        const stat = sastats[keys[i]];
-        const ts = stat.TimeStamp;
-        this.props.updateHeader(
-          this.tabname,
-          `Updating Stat for SongID:  ${keys[i]} (${i}/${keys.length})`,
-        );
-        /* loop await */ // eslint-disable-next-line
-        const rows = await updateRecentlyPlayedSongs(keys[i], ts, "sa");
-        if (rows === 0) {
-          console.log("Missing ID: " + keys[i]);
-        }
-        updatedRows += rows;
-      }
-      this.props.updateHeader(
-        this.tabname,
-        "Finished updating recently played songs: " + updatedRows,
-      );
-    }
-  }
-
-  updateMastery = async () => {
-    const prfldb = await getProfileConfig();
-    if (prfldb === '' || prfldb === null) {
-      this.props.updateHeader(
-        this.tabname,
-        `No Profile found, please update it in Settings!`,
-      );
-      return;
-    }
-    if (prfldb.length > 0) {
-      this.props.updateHeader(
-        this.tabname,
-        `Decrypting ${path.basename(prfldb)}`,
-      );
-      console.time("decryptReadProfile")
-      const steamProfile = await readProfile(prfldb);
-      console.timeEnd("decryptReadProfile")
-      const stats = steamProfile.Stats.Songs;
-      const sastats = steamProfile.SongsSA;
-      const total = Object.keys(stats).length + Object.keys(sastats).length;
-      await updateProfileConfig(prfldb);
-      this.props.handleChange();
-      this.props.updateHeader(
-        this.tabname,
-        `Song Stats Found: ${total}`,
-      );
-      const start = window.performance.now();
-      await initSongsOwnedDB();
-      let keys = Object.keys(stats);
-      let updatedRows = 0;
-      for (let i = 0; i < keys.length; i += 1) {
-        const stat = stats[keys[i]];
-        const mastery = stat.MasteryPeak;
-        const played = stat.PlayedCount;
-        this.props.updateHeader(
-          this.tabname,
-          `Updating Stat for SongID:  ${keys[i]} (${i}/${keys.length})`,
-        );
-        /* loop await */ // eslint-disable-next-line
-        const rows = await updateMasteryandPlayed(keys[i], mastery, played);
-        updatedRows += rows;
-      }
-      //find score attack stats
-      keys = Object.keys(sastats);
-      for (let i = 0; i < keys.length; i += 1) {
-        const stat = sastats[keys[i]];
-        let highestBadge = 0;
-        if (stat.Badges.Easy > 0) {
-          stat.Badges.Easy += 10;
-          highestBadge = stat.Badges.Easy;
-        }
-        if (stat.Badges.Medium > 0) {
-          stat.Badges.Medium += 20;
-          highestBadge = stat.Badges.Medium;
-        }
-        if (stat.Badges.Hard > 0) {
-          stat.Badges.Hard += 30;
-          highestBadge = stat.Badges.Hard;
-        }
-        if (stat.Badges.Master > 0) {
-          stat.Badges.Master += 40;
-          highestBadge = stat.Badges.Master;
-        }
-        this.props.updateHeader(
-          this.tabname,
-          this.childtabname,
-          `Updating Stat for SongID:  ${keys[i]} (${i}/${keys.length})`,
-        );
-        /* loop await */ // eslint-disable-next-line
-        const rows = await updateScoreAttackStats(stat, highestBadge, keys[i]);
-        updatedRows += rows;
-      }
-
-      this.props.updateHeader(
-        this.tabname,
-        this.childtabname,
-        "Stats Found: " + updatedRows,
-      );
-      const end = window.performance.now();
-      console.log("avg updateMastery: ", (end - start) / (keys.length * 2)); //two loops
-    }
-  }
-
   refreshStats = async () => {
-    await this.updateRecentlyPlayed();
-    await this.updateMastery();
-    await this.fetchStats();
+    profileWorker.startWork();
   }
 
   showInfoOptions = async () => {

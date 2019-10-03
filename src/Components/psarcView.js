@@ -3,12 +3,10 @@ import { withI18n, Trans } from 'react-i18next';
 import BootstrapTable from 'react-bootstrap-table-next'
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
-import PropTypes from 'prop-types';
-import readPSARC, { psarcToJSON, extractFile } from '../psarcService';
-import updateSongsOwned, { initSongsOwnedDB, saveSongsOwnedDB } from '../sqliteService';
+import { psarcToJSON, extractFile } from '../psarcService';
+import { psarcWorker, profileWorker } from '../lib/libworker';
+import { DispatcherService, DispatchEvents } from '../lib/libdispatcher';
 
-const { path } = window;
-const { remote } = window.require('electron')
 function sizeFormatter(cell, row) {
   return (
     <span>
@@ -31,7 +29,6 @@ class PSARCView extends React.Component {
     this.state = {
       files: [],
       processing: false,
-      abortprocessing: false,
       showpsarcDetail: false,
       selectedpsarcData: null,
       selectedFileName: "",
@@ -49,17 +46,6 @@ class PSARCView extends React.Component {
     }
     this.markAsCDLC = null;
     this.columns = [
-      {
-        dataField: "id",
-        text: this.props.t("ID"),
-        style: (cell, row, rowIndex, colIndex) => {
-          return {
-            width: '25%',
-            cursor: 'pointer',
-          };
-        },
-        hidden: true,
-      },
       {
         dataField: "song",
         text: this.props.t("Song"),
@@ -147,109 +133,40 @@ class PSARCView extends React.Component {
         },
         sort: true,
       },
+      {
+        dataField: "id",
+        text: this.props.t("ID"),
+        style: (cell, row, rowIndex, colIndex) => {
+          return {
+            width: '25%',
+            cursor: 'pointer',
+          };
+        },
+        hidden: false,
+      },
     ];
   }
 
+  componentDidMount = () => {
+    DispatcherService.on(DispatchEvents.PSARCS_IMPORTED, this.onPsarcImportComplete);
+  }
+
+  componentWillUnmount = () => {
+    DispatcherService.off(DispatchEvents.PSARCS_IMPORTED, this.onPsarcImportComplete);
+  }
+
+  onPsarcImportComplete = (results) => {
+    this.setState({ files: results, processing: false });
+  }
+
   openDirDialog = async () => {
-    let dirs = await remote.dialog.showOpenDialog({
-      properties: ["openDirectory"],
-    });
-    if (dirs === null || typeof dirs === 'undefined' || dirs.filePaths.length <= 0 || dirs.canceled) {
-      return;
-    }
-    dirs = dirs.filePaths;
-    const results = this.walkSync(dirs[0] + "/", null);
-    console.log("psarc found: " + results.length);
-    if (results.length > 0) {
-      this.setState({ processing: true, files: [] });
-      this.psarcRead(results);
-    }
+    this.setState({ processing: true });
+    psarcWorker.importDirectory();
   }
 
   openFileDialog = async () => {
-    let files = await remote.dialog.showOpenDialog({
-      properties: ["openFile", "multiSelections"],
-      filters: [
-        { name: 'PSARC', extensions: ['psarc'] },
-      ],
-    });
-    if (files === null || typeof files === 'undefined' || files.filePaths.length <= 0 || files.canceled) {
-      return;
-    }
-    files = files.filePaths;
-    const results = [];
-    const fs = remote.require("fs");
-    for (let i = 0; i < files.length; i += 1) {
-      const statres = fs.statSync(files[i]);
-      results.push([files[i], statres]);
-    }
-    console.log("psarc found: " + results.length);
-    if (results.length > 0) {
-      this.setState({ processing: true });
-      this.psarcRead(results);
-    }
-  }
-
-  walkSync = (dir, results) => {
-    const fs = remote.require("fs");
-    const files = fs.readdirSync(dir);
-
-    results = results || [];
-    for (let i = 0; i < files.length; i += 1) {
-      const file = files[i];
-      const statres = fs.statSync(dir + file);
-      if (statres.isDirectory()) {
-        //filelist = this.walkSync(dir + file + "/", filelist);
-        results = this.walkSync(dir + file + "/", results);
-      } else {
-        if (file.includes("/tmp/")) { continue }
-        else if (window.os.platform() === 'darwin' && file.endsWith("_m.psarc")) {
-          results.push([dir + file, statres]);
-        }
-        else if (window.os.platform() === 'win32' && file.endsWith("_p.psarc")) {
-          results.push([dir + file, statres]);
-        }
-        else if (file.endsWith("songs.psarc")) {
-          results.push([dir + file, statres]);
-        }
-      }
-    }
-    return results;
-  }
-
-  psarcRead = async (results) => {
-    const count = results.length;
-    const start = window.performance.now();
-
-    let index = 1;
-    this.setState({
-      files: [],
-    });
-    this.processedFiles = [];
-    for (let i = 0; i < results.length; i += 1) {
-      const prObj = results[i];
-      /* loop await */ // eslint-disable-next-line
-      const currentResults = await readPSARC(prObj[0], prObj[1], (500 + (index * 100)))
-      if (currentResults === null || currentResults === 'undefined' || currentResults.length === 0) {
-        this.props.updateHeader(this.tabname, "Failed to read " + path.basename(prObj[0]));
-        index += 1
-        continue;
-      }
-      this.processedFiles = this.processedFiles.concat(currentResults);
-      this.props.updateHeader(this.tabname, `Processing PSARC:  ${currentResults[0].psarc} (${index}/${count})`);
-      if (index >= count) {
-        this.props.updateHeader(this.tabname, `Processed ${count} PSARC's, ${this.processedFiles.length} arrangements found.`);
-        this.setState({ files: this.processedFiles, processing: false });
-      }
-      if (this.state.abortprocessing) {
-        this.props.updateHeader(this.tabname, `Processed ${index} PSARC's, ${this.processedFiles.length} arrangements found.`);
-        this.setState({ files: this.processedFiles, processing: false, abortprocessing: false });
-        break;
-      }
-      index += 1
-    }
-    const end = window.performance.now();
-    console.log("avg psarcRead: ", (end - start) / results.length);
+    this.setState({ processing: true });
+    psarcWorker.importFiles();
   }
 
   noData = () => {
@@ -261,10 +178,6 @@ class PSARCView extends React.Component {
 
   forceViewUpdate = () => {
     this.setState({ files: this.processedFiles });
-  }
-
-  stopProcessing = async () => {
-    this.setState({ abortprocessing: true });
   }
 
   extract = async (file, psarc) => {
@@ -287,38 +200,10 @@ class PSARCView extends React.Component {
   }
 
   updateSongList = async () => {
-    await initSongsOwnedDB();
-    console.log("arrangments: " + this.state.files.length);
-    console.log("mark as cdlc: " + this.markAsCDLC.checked);
-    let count = 0;
-    let fcount = 0;
-    let filtered = "";
-    const start = window.performance.now();
-    for (let i = 0; i < this.state.files.length; i += 1) {
-      this.props.updateHeader(this.tabname, `Updating Songlist with PSARC:  ${this.state.files[i].psarc} (${i}/${this.state.files.length})`);
-      const { song } = this.state.files[i];
-
-      if (song.startsWith("RS2 Test")
-        || song.startsWith("RS2 Chord")) {
-        console.log("Skipped song: " + song);
-        fcount += 1;
-        continue;
-      }
-      count += 1
-      /* loop await */ // eslint-disable-next-line
-      await updateSongsOwned(this.state.files[i], this.markAsCDLC.checked);
-    }
-    await saveSongsOwnedDB();
-    if (fcount > 0) {
-      filtered = `(Filtered: ${fcount})`
-    }
-    this.props.updateHeader(this.tabname, "Updated Songlist with " + count + " Arrangements. " + filtered);
-    const end = window.performance.now();
-    console.log("avg updateSongList: ", (end - start) / this.state.files.length);
+    profileWorker.songListUpdate(this.state.files, this.markAsCDLC.checked);
   }
 
   render = () => {
-    const stopprocessingstyle = this.state.processing ? "" : "none";
     const hasdatastyle = this.state.processing === false && this.state.files.length > 0 ? "" : "none";
     const choosepsarchstyle = "extraPadding download " + (this.state.processing ? "isDisabled" : "");
     const psarcdetailsstyle = "modal-window " + (this.state.showpsarcDetail ? "" : "hidden");
@@ -339,24 +224,6 @@ class PSARCView extends React.Component {
             className={choosepsarchstyle}>
             <Trans i18nKey="choosePsarcDirectory">
               Choose .psarc Directory
-            </Trans>
-          </button>
-          <button
-            type="button"
-            onClick={this.stopProcessing}
-            className="extraPadding download"
-            style={{ display: `${stopprocessingstyle}` }}>
-            <Trans i18nKey="stopProcessing">
-              Stop Processing
-            </Trans>
-          </button>
-          <button
-            type="button"
-            onClick={this.forceViewUpdate}
-            className="extraPadding download"
-            style={{ display: `${stopprocessingstyle}` }}>
-            <Trans i18nKey="forceGenerateView">
-              Force Generate View
             </Trans>
           </button>
           <button
@@ -386,7 +253,7 @@ class PSARCView extends React.Component {
         </div>
         <div>
           <BootstrapTable
-            keyField="uniquekey"
+            keyField="id"
             data={this.state.files}
             columns={this.columns}
             classes="psarcTable"
@@ -474,7 +341,7 @@ class PSARCView extends React.Component {
                   },
                   {
                     classes: (cell, row, rowIndex, colIndex) => {
-                      const def = "iconPreview smallIcon difficulty ";
+                      const def = "iconPreview smallIcon2 difficulty ";
                       let diff = "";
                       if (cell <= 20) {
                         diff = "diff_0"
@@ -536,7 +403,7 @@ class PSARCView extends React.Component {
                     <h1> Arrangements: {this.state.selectedpsarcData.arrangements.length}</h1>
                     <div className="psarcFiles">
                       <BootstrapTable
-                        keyField="fullName"
+                        keyField="id"
                         data={this.state.selectedpsarcData.arrangements}
                         columns={arrcolumns}
                         classes="psarcTable"
@@ -559,12 +426,12 @@ class PSARCView extends React.Component {
 }
 PSARCView.propTypes = {
   //currentTab: PropTypes.object,
-  updateHeader: PropTypes.func,
+  //updateHeader: PropTypes.func,
   //resetHeader: PropTypes.func,
 }
 PSARCView.defaultProps = {
   //currentTab: null,
-  updateHeader: () => { },
+  //updateHeader: () => { },
   //resetHeader: () => { },
 }
 

@@ -12,7 +12,7 @@ import {
 } from '../sqliteService';
 import { getDefaultSortOptionConfig, getMasteryThresholdConfig } from '../configService';
 import { generateSql } from './setlistOptions';
-import { DispatcherService, DispatchEvents } from '../lib/libDispatcher'
+import { DispatcherService, DispatchEvents } from '../lib/libdispatcher'
 import ExportSetlistModal from './modalExportSetlist';
 
 const i18n = require('i18next');

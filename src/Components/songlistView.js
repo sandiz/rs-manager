@@ -6,14 +6,13 @@ import filterFactory from 'react-bootstrap-table2-filter';
 import ReactTooltip from 'react-tooltip'
 import PropTypes from 'prop-types';
 import moment from 'moment';
-import readProfile from '../steamprofileService';
 import {
-  initSetlistPlaylistDB, getSongsOwned, countSongsOwned, updateMasteryandPlayed,
-  initSongsOwnedDB, addToFavorites, updateScoreAttackStats,
+  getSongsOwned, countSongsOwned,
+  initSongsOwnedDB,
   removeFromSongsOwned, addToIgnoreArrangements,
 } from '../sqliteService';
-import getProfileConfig, {
-  updateProfileConfig, getScoreAttackConfig, getDefaultSortOptionConfig,
+import {
+  getScoreAttackConfig, getDefaultSortOptionConfig,
 } from '../configService';
 import SongDetailView from './songdetailView';
 import { defaultSortOption } from './settingsView';
@@ -23,8 +22,9 @@ import diff1 from '../assets/diff-icons/diff_1.svg';
 import diff2 from '../assets/diff-icons/diff_2.svg';
 import diff3 from '../assets/diff-icons/diff_3.svg';
 import diff4 from '../assets/diff-icons/diff_4.svg';
+import { profileWorker } from '../lib/libworker';
+import { DispatcherService, DispatchEvents } from '../lib/libdispatcher';
 
-const { path } = window;
 const Fragment = React.Fragment;
 
 export const allTunings = {
@@ -841,9 +841,11 @@ class SonglistView extends React.Component {
         sortOptions,
       })
     }
+    DispatcherService.on(DispatchEvents.PROFILE_UPDATED, this.refresh);
   }
 
   componentWillUnmount = () => {
+    DispatcherService.off(DispatchEvents.PROFILE_UPDATED, this.refresh);
     const searchData = {
       tabname: this.tabname,
       childtabname: this.childtabname,
@@ -862,154 +864,21 @@ class SonglistView extends React.Component {
   }
 
   updateMastery = async () => {
-    const prfldb = await getProfileConfig();
-    if (prfldb === '' || prfldb === null) {
-      this.props.updateHeader(
-        this.tabname,
-        this.childtabname,
-        `No Profile found, please update it in Settings!`,
-      );
-      return;
-    }
-
-    if (prfldb.length > 0) {
-      this.props.updateHeader(
-        this.tabname,
-        this.childtabname,
-        `Decrypting ${path.basename(prfldb)}`,
-      );
-      const steamProfile = await readProfile(prfldb);
-      const stats = steamProfile.Stats.Songs;
-      const sastats = steamProfile.SongsSA;
-      const total = Object.keys(stats).length + Object.keys(sastats).length;
-      await updateProfileConfig(prfldb);
-      this.props.handleChange();
-      this.props.updateHeader(
-        this.tabname,
-        this.childtabname,
-        `Song Stats Found: ${total}`,
-      );
-      await initSongsOwnedDB();
-      let keys = Object.keys(stats);
-      let updatedRows = 0;
-      //find mastery stats
-      for (let i = 0; i < keys.length; i += 1) {
-        const stat = stats[keys[i]];
-        const mastery = stat.MasteryPeak;
-        const played = stat.PlayedCount;
-        this.props.updateHeader(
-          this.tabname,
-          this.childtabname,
-          `Updating Stat for SongID:  ${keys[i]} (${i}/${keys.length})`,
-        );
-        /* loop await */ // eslint-disable-next-line
-        const rows = await updateMasteryandPlayed(keys[i], mastery, played);
-        if (rows === 0) {
-          console.log("Missing ID: " + keys[i]);
-        }
-        updatedRows += rows;
-      }
-      //find score attack stats
-      keys = Object.keys(sastats);
-      for (let i = 0; i < keys.length; i += 1) {
-        const stat = sastats[keys[i]];
-        let highestBadge = 0;
-        if (stat.Badges.Easy > 0) {
-          stat.Badges.Easy += 10;
-          highestBadge = stat.Badges.Easy;
-        }
-        if (stat.Badges.Medium > 0) {
-          stat.Badges.Medium += 20;
-          highestBadge = stat.Badges.Medium;
-        }
-        if (stat.Badges.Hard > 0) {
-          stat.Badges.Hard += 30;
-          highestBadge = stat.Badges.Hard;
-        }
-        if (stat.Badges.Master > 0) {
-          stat.Badges.Master += 40;
-          highestBadge = stat.Badges.Master;
-        }
-        this.props.updateHeader(
-          this.tabname,
-          this.childtabname,
-          `Updating Stat for SongID:  ${keys[i]} (${i}/${keys.length})`,
-        );
-        /* loop await */ // eslint-disable-next-line
-        const rows = await updateScoreAttackStats(stat, highestBadge, keys[i]);
-        if (rows === 0) {
-          console.log("Missing ID: " + keys[i]);
-        }
-        updatedRows += rows;
-      }
-
-      this.props.updateHeader(
-        this.tabname,
-        this.childtabname,
-        "Stats Found: " + updatedRows,
-      );
-
-      // refresh view
-      const output = await getSongsOwned(
-        0,
-        this.state.sizePerPage,
-        "",
-        "",
-        this.search.value,
-        document.getElementById("search_field") ? document.getElementById("search_field").value : "",
-        this.state.sortOptions,
-      )
-      this.setState({ songs: output, page: 1, totalSize: output[0].acount });
-    }
+    profileWorker.startWork();
   }
 
-  updateFavs = async () => {
-    const prfldb = await getProfileConfig();
-    if (prfldb === '' || prfldb === null) {
-      this.props.updateHeader(
-        this.tabname,
-        this.childtabname,
-        `No Profile found, please update it in Settings!`,
-      );
-      return;
-    }
-    if (prfldb.length > 0) {
-      this.props.updateHeader(
-        this.tabname,
-        this.childtabname,
-        `Decrypting ${path.basename(prfldb)}`,
-      );
-      const steamProfile = await readProfile(prfldb);
-      const stats = steamProfile.FavoritesListRoot.FavoritesList;
-      await updateProfileConfig(prfldb);
-      this.props.handleChange();
-      this.props.updateHeader(
-        this.tabname,
-        this.childtabname,
-        `Favorites Found: ${stats.length}`,
-      );
-      await initSetlistPlaylistDB('setlist_favorites');
-      let updatedRows = 0;
-      for (let i = 0; i < stats.length; i += 1) {
-        const stat = stats[i];
-        this.props.updateHeader(
-          this.tabname,
-          this.childtabname,
-          `Updating Favorite for SongKey:  ${stat} (${i}/${stats.length})`,
-        );
-        /* loop await */ // eslint-disable-next-line
-        const rows = await addToFavorites(stat);
-        if (rows === 0) {
-          console.log("Missing ID: " + stat);
-        }
-        updatedRows += rows;
-      }
-      this.props.updateHeader(
-        this.tabname,
-        this.childtabname,
-        "Favorites Found: " + updatedRows,
-      );
-    }
+  refresh = async () => {
+    // refresh view
+    const output = await getSongsOwned(
+      0,
+      this.state.sizePerPage,
+      "",
+      "",
+      this.search.value,
+      document.getElementById("search_field") ? document.getElementById("search_field").value : "",
+      this.state.sortOptions,
+    )
+    this.setState({ songs: output, page: 1, totalSize: output[0].acount });
   }
 
   refreshView = async () => {
@@ -1100,9 +969,12 @@ class SonglistView extends React.Component {
           <button
             type="button"
             onClick={this.updateMastery}
+            style={{
+              width: 15 + '%',
+            }}
             className={choosepsarchstyle}>
             <Trans i18nKey="updateMasteryFromProfile">
-              Update Mastery from Profile
+              Refresh Stats from Profile
             </Trans>
           </button>
         </div>
@@ -1140,7 +1012,7 @@ class SonglistView extends React.Component {
 SonglistView.propTypes = {
   updateHeader: PropTypes.func,
   //resetHeader: PropTypes.func,
-  handleChange: PropTypes.func,
+  //handleChange: PropTypes.func,
   saveSearch: PropTypes.func,
   getSearch: PropTypes.func,
   globalNotes: PropTypes.object,
@@ -1148,7 +1020,7 @@ SonglistView.propTypes = {
 SonglistView.defaultProps = {
   updateHeader: () => { },
   //resetHeader: () => { },
-  handleChange: () => { },
+  //handleChange: () => { },
   saveSearch: () => { },
   getSearch: () => { },
   globalNotes: {},

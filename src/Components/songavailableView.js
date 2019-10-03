@@ -16,6 +16,8 @@ import { RemoteAll } from './songlistView';
 import { getOwnedPackages, getOwnedHistory, getTrackTags } from '../steamprofileService';
 import SongDetailView from './songdetailView';
 import { getSteamLoginSecureCookie, getSessionIDConfig } from '../configService'
+import { profileWorker } from '../lib/libworker';
+import { DispatcherService, DispatchEvents } from '../lib/libdispatcher';
 
 const parse = require('csv-parse/lib/es5/sync');
 
@@ -276,59 +278,23 @@ class SongAvailableView extends React.Component {
         },
         sort: true,
         formatter: (cell, row) => {
-          return cell === true ? this.props.t("yes") : this.props.t("no");
+          return cell === "true" ? this.props.t("yes") : this.props.t("no");
         },
       },
     ]
   }
 
   componentDidMount = async () => {
+    DispatcherService.on(DispatchEvents.DLC_CATALOG_UPDATED, this.dlcCatalogUpdated);
     await initSongsAvailableDB();
-    let so = await countSongsAvailable();
+    const so = await countSongsAvailable();
     if (so.count === 0) {
       this.props.updateHeader(
         this.tabname,
         this.childtabname,
         `Initializing Steam DLC List with offline copy, Please Wait...`,
       );
-      const lr = new window.linereader(window.dirname + "/../songs_available_steam.csv");
-      lr.on('error', (err) => {
-        console.log(err);
-      });
-
-      lr.on('line', async (line) => {
-        // pause emitting of lines...
-        lr.pause();
-
-        const items = parse(line)[0];
-        const appid = items[0]
-        const name = items[1]
-        const rdate = Math.trunc(items[2]);
-        this.props.updateHeader(
-          this.tabname,
-          this.childtabname,
-          "Updating from offline copy, Song: " + name,
-        )
-        await addToSteamDLCCatalog(appid, replaceRocksmithTerms(name), rdate, true);
-        lr.resume();
-      });
-
-      lr.on('end', async () => {
-        // All lines are read, file is closed now.
-        so = await countSongsAvailable();
-        this.props.updateHeader(
-          this.tabname,
-          this.childtabname,
-          `DLC's: ${so.count} Excluding SongPacks: ${so.count}`,
-        );
-        this.setState({ totalSize: so.count });
-        this.handleTableChange("cdm", {
-          page: this.state.page,
-          sizePerPage: this.state.sizePerPage,
-          filters: {},
-        })
-      });
-
+      profileWorker.startSteamDLCCatalogImport();
       return;
     }
     this.props.updateHeader(
@@ -357,7 +323,18 @@ class SongAvailableView extends React.Component {
     }
   }
 
+  dlcCatalogUpdated = async () => {
+    const so = await countSongsAvailable();
+    this.setState({ totalSize: so.count });
+    this.handleTableChange("cdm", {
+      page: this.state.page,
+      sizePerPage: this.state.sizePerPage,
+      filters: {},
+    })
+  }
+
   componentWillUnmount = () => {
+    DispatcherService.off(DispatchEvents.DLC_CATALOG_UPDATED, this.dlcCatalogUpdated);
     const search = {
       tabname: this.tabname,
       childtabname: this.childtabname,
@@ -465,23 +442,24 @@ class SongAvailableView extends React.Component {
         }
       }
       console.log(newDLC + " dlcs added");
+      profileWorker.dlcToaster(newDLC, "Steam");
       if (!error) {
         this.props.updateHeader(
           this.tabname,
           this.childtabname,
           "New DLC Found: " + newDLC + ", Total DLC's " + e.length,
         );
+        const results = await getDLCDetails(
+          0,
+          this.state.sizePerPage,
+          "release_date",
+          "desc",
+          this.search.value,
+        )
+        const { output, rows } = results;
+        this.setState({ dlcs: output, page: 1, totalSize: rows });
+        this.updateSongTags();
       }
-      const results = await getDLCDetails(
-        0,
-        this.state.sizePerPage,
-        "release_date",
-        "desc",
-        this.search.value,
-      )
-      const { output, rows } = results;
-      this.setState({ dlcs: output, page: 1, totalSize: rows });
-      this.updateSongTags();
     }
     catch (e) {
       console.log(e);

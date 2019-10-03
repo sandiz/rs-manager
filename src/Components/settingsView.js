@@ -24,20 +24,18 @@ import getProfileConfig, {
   getSteamNameFromSteamID,
 } from '../configService';
 import {
-  resetDB, createRSSongList, addtoRSSongList,
-  isTablePresent, deleteRSSongList, getSongByID, resetRSSongList,
+  resetDB, isTablePresent, deleteRSSongList,
 } from '../sqliteService';
-import readProfile, {
+import {
   getAllProfiles, getSteamPathForRocksmith,
   getSteamProfiles, getProfileName,
 } from '../steamprofileService';
 import { sortOrderCustomStyles, createOption } from './setlistOptions';
-import { DispatcherService, DispatchEvents } from '../lib/libDispatcher'
+import { DispatcherService, DispatchEvents } from '../lib/libdispatcher'
 
 import steam from '../assets/tree-icons/catalog.svg'
 import * as rsicon from '../assets/icons/icon-1024x1024-gray.png'
-
-const parse = require('csv-parse/lib/es5/sync');
+import { profileWorker } from '../lib/libworker';
 
 const { remote } = window.require('electron')
 const Fragment = React.Fragment;
@@ -125,6 +123,16 @@ class SettingsView extends React.Component {
     this.loadState();
     this.sortfieldref = React.createRef();
     this.sortorderref = React.createRef();
+  }
+
+  componentDidMount = () => {
+    DispatcherService.on(DispatchEvents.SETLIST_IMPORTED, this.refresh);
+    DispatcherService.on(DispatchEvents.SETLIST_REFRESH, this.refresh);
+  }
+
+  componentWillUnmount = () => {
+    DispatcherService.off(DispatchEvents.SETLIST_IMPORTED, this.refresh);
+    DispatcherService.off(DispatchEvents.SETLIST_REFRESH, this.refresh);
   }
 
   loadState = async () => {
@@ -223,110 +231,31 @@ class SettingsView extends React.Component {
       this.setState({
         processingSetlist: false,
       });
+      this.refreshSetlist();
+      this.props.refreshTabs();
     }
     else if (method === "import") {
-      //import setlist
-      const tablename = "rs_song_list_" + (setlistnum + 1);
-      const displayname = "RS Song List " + (setlistnum + 1);
-      //set header to starting
-      this.props.updateHeader(this.tabname, `Importing Song List ${setlistnum + 1}`);
-      //set state to processing
       this.setState({
         processingSetlist: true,
       });
-
-      //create table for setlist
-      //insert setlist to setlist_meta
-      await createRSSongList(tablename, displayname, false, false, false, true);
-      const steamProfile = await readProfile(this.state.prfldb);
-      const songRoot = steamProfile.SongListsRoot.SongLists;
-      const currentSetlist = songRoot[setlistnum] === 'undefined' ? [] : songRoot[setlistnum];
-
-      await resetRSSongList(tablename);
-      //insert values to setlist (set header with item)
-      for (let i = 0; i < currentSetlist.length; i += 1) {
-        const songkey = currentSetlist[i];
-        this.props.updateHeader(this.tabname, `Importing Song List ${setlistnum + 1}: ${i}/${currentSetlist.length}`);
-        /* loop await */ // eslint-disable-next-line
-        await addtoRSSongList(tablename, songkey);
-      }
-      //set header with success + stats
-      this.props.updateHeader(this.tabname, `Finished importing Song List ${setlistnum + 1}!`);
-      //reset processing state
-      this.setState({
-        processingSetlist: false,
-      });
+      console.log("import setlist " + (setlistnum + 1))
+      profileWorker.startImport(setlistnum + 1);
     }
-    //set imported state to true
+  }
+
+  refresh = async () => {
+    this.setState({
+      processingSetlist: false,
+    });
     this.refreshSetlist();
     this.props.refreshTabs();
   }
 
   importDLCPack = async () => {
-    this.props.updateHeader(this.tabname, "Downloading dlc pack data from github...");
-
     this.setState({
       processingSetlist: true,
     })
-
-    const filePath = window.os.tmpdir() + "/dlcs.csv"
-    const datasrc = "https://gist.githubusercontent.com/JustinAiken/0cba27a4161a2ed3ad54fb6a58da2e70/raw";
-    await window.pDownload(datasrc, filePath);
-    const stat = window.electronFS.statSync(filePath);
-    if (stat.size < 1024) { /* basic integrity check */
-      console.log("dlc.csv size < 1024");
-      this.props.updateHeader(this.tabname, "dlc.csv failed integrity check..")
-      this.setState({
-        processingSetlist: false,
-      })
-      return;
-    }
-    const lr = new window.linereader(filePath);
-
-    await createRSSongList("folder_dlcpack_import", "DLC Pack Setlists",
-      false, false, false, false, false, true);
-
-    let lastSongKey = "";
-    lr.on('error', (err) => {
-      console.log(err);
-      this.setState({
-        processingSetlist: false,
-      })
-    });
-
-    lr.on('line', async (line) => {
-      // pause emitting of lines...
-      lr.pause();
-
-      const l2 = line.replace(/'/gi, "_");
-      const items = parse(l2)[0];
-      const release = items[0]
-      const name = items[1]
-      const pid = items[4];
-      const dbOutput = await getSongByID(pid);
-      if (dbOutput !== '' && lastSongKey !== dbOutput.songkey) {
-        const tableName = `setlist_${release}_${name}`.replace(/-/gi, "_").replace(/ /g, "_").replace(/\W/g, '');
-        await createRSSongList(tableName, `${release} - ${name}`,
-          false, true, false, false, false, false, "folder_dlcpack_import");
-        await addtoRSSongList(tableName, dbOutput.songkey);
-        lastSongKey = dbOutput.songkey;
-      }
-
-      this.props.updateHeader(
-        this.tabname,
-        `Processing pack: ${name} (${release})`,
-      )
-      lr.resume();
-    });
-
-    lr.on('end', async () => {
-      // All lines are read, file is closed now.
-      this.setState({
-        processingSetlist: false,
-      })
-      this.props.updateHeader(this.tabname, "Finished creating dlc setlists");
-      DispatcherService.dispatch(DispatchEvents.SETLIST_REFRESH);
-    });
+    profileWorker.startDLCPackImport();
   }
 
   handleScoreAttack = (event) => {
@@ -510,6 +439,11 @@ class SettingsView extends React.Component {
   resetdb = async () => {
     await resetDB('songs_owned');
     this.props.updateHeader(this.tabname, "Songs Owned collection is now reset!");
+  }
+
+  resetDLCCatalog = async () => {
+    await resetDB('songs_available');
+    this.props.updateHeader(this.tabname, "DLC Catalog is now reset!");
   }
 
   resetSidebarState = async () => {
@@ -1309,6 +1243,27 @@ loading setlists into Rocksmith 2014.
                     </button>
                   </span>
                   <br /> <br />
+                  <span style={{ float: 'left', color: 'red', marginTop: 18 + 'px' }}>
+                    <a>
+                      Reset DLC Catalog
+                    </a>
+                  </span>
+                  <span style={{
+                    float: 'right',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    width: 50 + '%',
+                    textAlign: 'right',
+                    height: 62 + 'px',
+                    marginTop: -5 + 'px',
+                  }}>
+                    <button
+                      type="button"
+                      onClick={this.resetDLCCatalog}
+                      className="extraPadding download">
+                      Reset
+                    </button>
+                  </span>
                 </Collapsible>
                 <br />
               </div>

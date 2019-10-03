@@ -36,7 +36,7 @@ const util = require('util')
 const https = require('https');
 window.isDev = isDev;
 
-const exp = express()
+const exp = express();
 window.PROD_YT_PORT = 8000;
 window.DEV_YT_PORT = 9000;
 window.YT_PORT = isDev ? window.DEV_YT_PORT : window.PROD_YT_PORT;
@@ -89,7 +89,6 @@ window.request = async function (uri, cookies, cookieurl, qs, form, method = "GE
         return "{\"html\": \"\"}";
     }
 }
-
 
 if (isDev) {
     window.configPath = path.resolve(window.dirname + "/../config.dev.json");
@@ -163,11 +162,18 @@ exp.get('/verify-steam', async (req, res) => {
             res.end();
         }
     });
-})
+});
+
+_exp = () => {
+    window.remote.app.off('quit', _exp);
+    exp.close();
+}
+window.remote.app.on("quit", _exp);
 
 /* make cookies set by steam not expire */
 var cookies = window.remote.session.defaultSession.cookies;
-cookies.on('changed', function (event, cookie, cause, removed) {
+ch = (event, cookie, cause, removed) => {
+    cookies.off('changed', ch);
     if (cookie.session && !removed) {
         var url = util.format('%s://%s%s', (!cookie.httpOnly && cookie.secure) ? 'https' : 'http', cookie.domain, cookie.path);
         cookies.set({
@@ -185,7 +191,8 @@ cookies.on('changed', function (event, cookie, cause, removed) {
             }
         });
     }
-});
+}
+cookies.on('changed', ch);
 
 window.steamAuth = async () => {
     const windowParams = {
@@ -259,7 +266,7 @@ function electronSteamAuth(config, windowParams) {
                     }
                 }
 
-                window.remote.session.defaultSession.webRequest.onBeforeRedirect({}, (details, callback) => {
+                window.remote.session.defaultSession.webRequest.onBeforeRedirect({ urls: [] }, (details, callback) => {
                     onCallback(details.redirectURL)
                 })
 
@@ -294,35 +301,7 @@ window.openInfographic = async (path) => {
     return authWindow;
 }
 
-window.remote.app.on("quit", () => {
-    exp.close();
-})
-
-
 process.once('loaded', () => {
     global.window = window;
     //electron.webFrame.setZoomFactor(defaultZoom);
 })
-
-
-
-window.pDownload = (url, dest) => {
-    var file = window.electronFS.createWriteStream(dest);
-    return new Promise((resolve, reject) => {
-        var responseSent = false; // flag to make sure that response is sent only once.
-        https.get(url, response => {
-            response.pipe(file);
-            file.on('finish', () => {
-                file.close(() => {
-                    if (responseSent) return;
-                    responseSent = true;
-                    resolve();
-                });
-            });
-        }).on('error', err => {
-            if (responseSent) return;
-            responseSent = true;
-            reject(err);
-        });
-    });
-}
