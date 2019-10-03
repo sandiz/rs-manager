@@ -277,6 +277,8 @@ class profileWorker {
                 const keys = Object.keys(type === "las" ? stats : sastats);
                 for (let i = 0; i < keys.length; i += 1) {
                     const stat = stats[keys[i]];
+                    if (!stat || typeof stat === 'undefined') continue;
+
                     if ("TimeStamp" in stat) {
                         const dateTS = stat.TimeStamp;
                         idDateArray.push([keys[i], dateTS]);
@@ -294,6 +296,7 @@ class profileWorker {
                 const historyArray = [];
                 for (let i = 0; i < keys.length; i += 1) {
                     const stat = stats[keys[i]];
+                    if (!stat || typeof stat === 'undefined') continue;
                     if ("MasteryPeak" in stat && "PlayedCount" in stat) {
                         const mastery = stat.MasteryPeak;
                         const played = stat.PlayedCount;
@@ -317,6 +320,8 @@ class profileWorker {
                 const keys = Object.keys(sastats);
                 for (let i = 0; i < keys.length; i += 1) {
                     const stat = sastats[keys[i]];
+                    if (!stat || typeof stat === 'undefined') continue;
+
                     let highestBadge = 0;
                     if ("Badges" in stat) {
                         if ("Easy" in stat.Badges && stat.Badges.Easy > 0) {
