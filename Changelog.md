@@ -15,3 +15,4 @@ v2.2.0
 - electron-rebuild deprecated, electron upgraded to 6, node to 12
 - electron-builder now builds dmg, zip, nsis
 - setZoomFactor removed from preload.js to fix ready-to-show regression
+
