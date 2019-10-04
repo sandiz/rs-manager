@@ -24,6 +24,12 @@ jobs:
       run: |
         yarn install
         yarn dist-mac
+    - uses: sandiz/upload-release-action@releases/v1
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: release-builds/Rocksmith*
+        tag: 'github-ci-build'
+        overwrite: true
   
   build-win:
     name: "Windows build"
