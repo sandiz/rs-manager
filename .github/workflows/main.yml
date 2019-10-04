@@ -27,7 +27,8 @@ jobs:
     - uses: sandiz/upload-release-action@releases/v1
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: release-builds/Rocksmith*
+        file: 'release-builds/Rocksmith*'
+        file_glob: true
         tag: 'github-ci-build'
         overwrite: true
   
