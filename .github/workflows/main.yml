@@ -31,7 +31,7 @@ jobs:
         file_glob: true
         tag: 'github-ci-build'
         overwrite: true
-  
+        draft: true
   build-win:
     name: "Windows build"
     env:
