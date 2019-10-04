@@ -11,6 +11,9 @@ on:
 jobs:
   build-mac:
     name: "MacOS build"
+    env:
+      LASTFM_API_KEY: ${{ secrets.LASTFM_API_KEY }}
+      YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
     runs-on: macOS-10.14    
     steps:
     - uses: actions/checkout@v1
@@ -24,6 +27,9 @@ jobs:
   
   build-win:
     name: "Windows build"
+    env:
+      LASTFM_API_KEY: ${{ secrets.LASTFM_API_KEY }}
+      YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v1
