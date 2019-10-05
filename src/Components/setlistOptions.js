@@ -46,7 +46,7 @@ function generateAnyTuningSql(filter) {
   const allOpenJSON = allOpenTunings.map(e => tunings[e]);
 
   const allDropTunings = [
-    "Drop D", "Eb Drop Db", "D Drop C",
+    "Drop D", "Eb Drop Db", "D Drop C", "C Drop Bb",
     "C# Drop B", "B Drop A",
   ]
   const allDropJSON = allDropTunings.map(e => tunings[e]);
