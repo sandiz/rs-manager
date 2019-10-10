@@ -160,11 +160,13 @@ class FTUEView extends React.Component {
         <div className=" justify-content-lg-center">
           <br />
           <div className="ftue-body">
-            <h3><Trans i18nKey="exportSetlistAs">Welcome!</Trans></h3>
+            <h3><Trans i18nKey="welcome">Welcome!</Trans></h3>
             <hr />
             <div>
-              This app uses Rocksmith and Steam data to consolidate stats/mastery/dlc/songlists
-              under one roof. To get started, please select your accounts below:
+              <Trans i18nKey="ftueMessage">
+                This app uses Rocksmith and Steam data to consolidate stats/mastery/dlc/songlists
+                  under one roof. To get started, please select your accounts below
+              </Trans>:
             </div>
             <div className="d-flex flex-row justify-content-center" style={{ margin: '0 auto', width: 80 + '%' }}>
               <div style={{ width: 100 + '%', margin: 20 + 'px' }}>
@@ -183,7 +185,7 @@ class FTUEView extends React.Component {
                       )
                       : (
                         <div className="ta-center profile-text overflowellipsis">
-                          <span className="pointer" style={{ borderBottom: "1px dotted" }} onClick={this.resetProfileState}>
+                          <span className="pointer" style={{ borderBottom: "1px dotted" }}>
                             {this.state.currentSteamProfile}
                           </span>
                         </div>
@@ -210,7 +212,7 @@ class FTUEView extends React.Component {
                       )
                       : (
                         <div className="ta-center profile-text overflowellipsis">
-                          <span className="pointer" style={{ borderBottom: "1px dotted" }} onClick={() => this.resetProfileState(true)}>
+                          <span className="pointer" style={{ borderBottom: "1px dotted" }}>
                             {this.state.currentRSProfile}
                           </span>
                         </div>
@@ -240,7 +242,7 @@ class FTUEView extends React.Component {
                       type="button"
                       onClick={this.saveProfileSettings}
                       className={buttonclass}>
-                      <Trans i18nKey="save">
+                      <Trans i18nKey="saveAndImport">
                         Save & Import
                       </Trans>
                     </button>

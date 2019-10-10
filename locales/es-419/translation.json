@@ -148,5 +148,10 @@
 	"clickToImport": "Haga clic para importar",
 	"Processing": "Tratamiento",
 	"Reset Collection": "Restablecer colección",
-	"Advanced": "Avanzado"
+	"Advanced": "Avanzado",
+	"ftueProcessingComplete": "Importación completa, ahora puede ver sus estadísticas en el Tablero y su colección en Canciones> Propiedad",
+	"ftueFailedProcessing": "Error al importar datos, intente manualmente a través de PSARC Explorer",
+	"welcome": "¡Bienvenidos!",
+	"ftueMessage": "Esta aplicación utiliza datos de Rocksmith y Steam para consolidar estadísticas / dominio / dlc / songlists bajo un mismo techo. Para comenzar, seleccione sus cuentas a continuación",
+	"saveAndImport": "Guardar e importar"
 }
