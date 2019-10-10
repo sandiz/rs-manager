@@ -2,11 +2,18 @@ import React from 'react'
 import PropTypes from 'prop-types';
 import { withI18n, Trans } from 'react-i18next';
 import Select from 'react-select';
-import getProfileConfig, { getSteamNameFromSteamID } from '../configService';
-import { getSteamProfiles, getProfileName } from '../steamprofileService';
+import getProfileConfig, { getSteamNameFromSteamID, updateProfileConfig, updateSteamIDConfig } from '../configService';
+import {
+  getSteamProfiles, getProfileName,
+  getAllProfiles, getSteamPathForRocksmith, getRocksmithInstallFolder,
+} from '../steamprofileService';
 
 import steam from '../assets/tree-icons/catalog.svg'
 import * as rsicon from '../assets/icons/icon-1024x1024-gray.png'
+import { metaWorker } from '../lib/libworker';
+import { DispatchEvents, DispatcherService } from '../lib/libdispatcher';
+
+const { remote } = window.require('electron');
 
 class FTUEView extends React.Component {
   constructor(props) {
@@ -16,6 +23,11 @@ class FTUEView extends React.Component {
       steamProfileOptions: [],
       currentRSProfile: '',
       rsProfileOptions: [],
+      steamID: '',
+      prfldb: '',
+      dlcPath: '',
+      pleaseWait: false,
+      pleaseWaitMsg: null,
     }
   }
 
@@ -29,11 +41,118 @@ class FTUEView extends React.Component {
       steamProfileOptions,
       currentRSProfile,
     })
+    if (currentRSProfile !== '' && prfldb !== '') {
+      const name = await getProfileName(prfldb);
+      this.handleRSProfileChange({ value: prfldb, label: name });
+    }
+  }
+
+  handleSteamProfileChange = async (so) => {
+    const split = so.value.split(":");
+    const name = split[1] + " [" + split[2] + "]";
+    this.setState({ currentSteamProfile: name });
+    const uid = window.BigInt(split[0])
+    //eslint-disable-next-line
+    const uid32 = uid & window.BigInt(0xFFFFFFFF);
+    const prfldbdir = getSteamPathForRocksmith(uid32);
+
+    if (window.electronFS.existsSync(prfldbdir)) {
+      const profiles = await getAllProfiles(prfldbdir);
+      const options = []
+      for (let i = 0; i < profiles.length; i += 1) {
+        const profile = profiles[i];
+        options.push({
+          value: `${prfldbdir}/${profile.UniqueID}_PRFLDB`,
+          label: profile.PlayerName,
+        })
+      }
+      this.setState({ rsProfileOptions: options, steamID: split[0] });
+    }
+  }
+
+  selectDLCFolder = async () => {
+    let dirs = await remote.dialog.showOpenDialog({
+      properties: ["openDirectory"],
+    });
+    if (dirs === null || typeof dirs === 'undefined' || dirs.filePaths.length <= 0 || dirs.canceled) {
+      return;
+    }
+    dirs = dirs.filePaths;
+    if (dirs.length > 0) {
+      const dir = dirs[0];
+      this.setState({ dlcPath: dir, showPicker: false });
+    }
+  }
+
+  handleRSProfileChange = async (so) => {
+    const rsInstallDir = await getRocksmithInstallFolder();
+    let dlcPath = '';
+    if (rsInstallDir) {
+      dlcPath = window.path.join(rsInstallDir);
+    }
+    else {
+      dlcPath = (
+        <span>
+          Failed to find rocksmith install location, &nbsp;
+           <a className="song-detail-option" onClick={this.selectDLCFolder}>
+            click here to select one.
+          </a>
+        </span>
+      );
+    }
+
+    const prfldb = so.value;
+    this.setState({
+      dlcPath, currentRSProfile: so.label, prfldb,
+    })
+  }
+
+  saveProfileSettings = async () => {
+    if (this.state.prfldb !== "" && this.state.prfldb != null) {
+      await updateProfileConfig(this.state.prfldb);
+    }
+    if (this.state.steamID !== "" && this.state.steamID != null) {
+      await updateSteamIDConfig(this.state.steamID);
+    }
+    let pleaseWaitMsg = (
+      <Trans i18nKey="processingPleaseWait">
+        Processing, please wait...
+      </Trans>
+    );
+    this.setState({ pleaseWait: true, pleaseWaitMsg });
+
+    if (typeof this.state.dlcPath === 'string') {
+      DispatcherService.on(DispatchEvents.PROFILE_UPDATED, this.profileUpdated);
+      metaWorker.importDLCandStats(this.state.dlcPath);
+    }
+    else {
+      pleaseWaitMsg = (
+        <Trans i18nKey="ftueFailedProcessing">
+          Failed to import data, please try it manually via PSARC Explorer
+      </Trans>
+      );
+      this.setState({ pleaseWaitMsg });
+    }
+  }
+
+  profileUpdated = async () => {
+    DispatcherService.off(DispatchEvents.PROFILE_UPDATED, this.profileUpdated);
+    const pleaseWaitMsg = (
+      <Trans i18nKey="ftueProcessingComplete">
+        Profile and DLC data imported succesfully, you can now view your stats in Dashboard
+        and your collection in Songs &gt; Owned
+      </Trans>
+    );
+    this.setState({ pleaseWaitMsg });
   }
 
   render = () => {
+    const dlcpathclass = this.state.dlcPath === '' ? "hidden" : "";
     const buttonclass = "extraPadding download "
-      + ((this.state.currentRSProfile.length === 0 || this.state.currentSteamProfile.length === 0) ? "isDisabled" : "")
+      + ((this.state.currentRSProfile.length === 0
+        || this.state.currentSteamProfile.length === 0
+        || (this.state.dlcPath.length > 0 && this.state.showPicker === true)
+      ) ? "isDisabled" : "")
     if (!this.props.showFTUE) return null
     return (
       <React.Fragment>
@@ -101,16 +220,32 @@ class FTUEView extends React.Component {
               </div>
             </div>
             <br />
+            <div className={dlcpathclass}>
+              Rocksmith Path: {this.state.dlcPath}
+            </div>
+            <br />
             <div>
-              <button
-                style={{ width: 50 + '%' }}
-                type="button"
-                onClick={this.saveProfileSettings}
-                className={buttonclass}>
-                <Trans i18nKey="save">
-                  Save & Import
-                </Trans>
-              </button>
+              {
+                this.state.pleaseWait
+                  ? (
+                    <div className="alert alert-info" style={{ marginTop: 15 + 'px' }}>
+                      <span>
+                        {this.state.pleaseWaitMsg}
+                      </span>
+                    </div>
+                  )
+                  : (
+                    <button
+                      style={{ width: 50 + '%' }}
+                      type="button"
+                      onClick={this.saveProfileSettings}
+                      className={buttonclass}>
+                      <Trans i18nKey="save">
+                        Save & Import
+                      </Trans>
+                    </button>
+                  )
+              }
             </div>
           </div>
         </div>

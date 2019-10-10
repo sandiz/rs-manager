@@ -289,6 +289,23 @@ export function getSteamPathForRocksmith(uid32) {
     );
   }
 }
+export function getRocksmithInstallFolder() {
+  //check for LibraryFolders.vdf for 
+  if (window.process.platform === "darwin") {
+    return window.path.join(
+      window.os.homedir(),
+      "Library/Application Support/Steam", //fixed
+      `steamapps/common/Rocksmith2014`, // fixed install dir in mac
+    );
+  }
+  else {
+    //verify windows
+    return window.path.join(
+      getWinSteamPath(),
+      `steamapps/common/Rocksmith2014`, // fixed install dir in mac
+    );
+  }
+}
 
 export async function getSteamProfiles() {
   const options = []

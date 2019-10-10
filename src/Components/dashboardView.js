@@ -89,12 +89,12 @@ class DashboardView extends React.Component {
 
   componentDidMount = async () => {
     this.cdmasync();
-    DispatcherService.on(DispatchEvents.PROFILE_UPDATED, this.fetchStats);
+    DispatcherService.on(DispatchEvents.PROFILE_UPDATED, this.cdmasync);
     DispatcherService.on(DispatchEvents.ALBUM_COVER_QUERY, this.setImage);
   }
 
   componentWillUnmount = () => {
-    DispatcherService.off(DispatchEvents.PROFILE_UPDATED, this.fetchStats);
+    DispatcherService.off(DispatchEvents.PROFILE_UPDATED, this.cdmasync);
     DispatcherService.off(DispatchEvents.ALBUM_COVER_QUERY, this.setImage);
   }
 
