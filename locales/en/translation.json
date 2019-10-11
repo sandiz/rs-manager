@@ -147,5 +147,10 @@
 	"clickToImport": "Click to Import",
 	"Processing": "Processing",
 	"Reset Collection": "Reset Collection",
-	"Advanced": "Advanced"
+	"Advanced": "Advanced",
+	"ftueProcessingComplete": "Import Complete, You can now view your stats in Dashboard and your collection in Songs > Owned",
+	"ftueFailedProcessing": "Failed to import data, please try it manually via PSARC Explorer",
+	"welcome": "Welcome!",
+	"ftueMessage": " This app uses Rocksmith and Steam data to consolidate stats/mastery/dlc/songlists under one roof. To get started, please select your accounts below",
+	"saveAndImport": "Save & Import"
 }

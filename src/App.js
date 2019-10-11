@@ -19,10 +19,11 @@ import RSLiveView from './Components/rsliveView';
 import SetlistSearchView from './Components/setlistSearchView';
 import {
   getAllSetlist, initSongsOwnedDB,
-  getStarredSetlists, getChildOfSetlistFolder,
+  getStarredSetlists, getChildOfSetlistFolder, countSongsOwned,
 } from './sqliteService';
 import './css/App.css';
 import HelpView from './Components/HelpView';
+import FTUEView from './Components/FTUEView';
 import { getState } from './stateService';
 import { enableScroll, forceNoScroll } from './Components/songdetailView';
 import { getProfileName } from './steamprofileService';
@@ -98,6 +99,7 @@ class App extends Component {
       selectedTab: null,
       readme: 'getting-started',
       showhelp: false,
+      showFTUE: false,
       readytorender: false,
       showModalStats: false,
       globalNotes: {},
@@ -142,6 +144,8 @@ class App extends Component {
         await updateImportRSMPath(rsmPath);
       }
     }
+    const songs = await countSongsOwned(true);
+    if (songs.count === 0) this.openFTUE();
   }
 
   getGlobalNotes = async () => {
@@ -494,6 +498,16 @@ class App extends Component {
     enableScroll();
   }
 
+  openFTUE = () => {
+    this.setState({ showFTUE: true });
+    forceNoScroll();
+  }
+
+  closeFTUE = () => {
+    this.setState({ showFTUE: false });
+    enableScroll();
+  }
+
   switchNavbarColor = (color) => {
     this.navbarRef.current.style.color = color;
   }
@@ -501,7 +515,8 @@ class App extends Component {
   render = () => {
     const profile = this.state.rsProfileName.length > 0 ? this.state.rsProfileName : "-";
     const cookie = this.state.currentCookie.length > 0 ? this.state.currentCookie : "-";
-    const showhelpstyle = "modal-window-help " + (this.state.showhelp ? "" : "hidden")
+    const showhelpstyle = "modal-window-help " + (this.state.showhelp ? "" : "hidden");
+    const showftuestyle = (this.state.showFTUE ? "modal-window-ftue" : "hidden");
     const helpstyle = (this.state.currentTab !== null && (this.state.currentTab.id === "tab-settings" || this.state.currentTab.id === "tab-help")) ? "hidden" : ""
     let showmstat = (this.state.currentTab !== null && this.state.currentTab.id === "tab-setlist") ? "" : "hidden";
     if (this.state.currentChildTab !== null
@@ -609,6 +624,14 @@ class App extends Component {
                   showHelp={this.state.showhelp}
                   defaultReadme={this.state.readme}
                   closeHelp={this.closeHelp}
+                />
+              </div>
+            </div>
+            <div id="open-modal" style={{ opacity: 1, pointerEvents: "auto" }} className={showftuestyle}>
+              <div id="modal-info" className="width-ftue modal-ftue-content">
+                <FTUEView
+                  showFTUE={this.state.showFTUE}
+                  closeFTUE={this.closeFTUE}
                 />
               </div>
             </div>

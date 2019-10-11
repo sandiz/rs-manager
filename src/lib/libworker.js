@@ -144,15 +144,21 @@ class psarcWorker {
         return filelist;
     }
 
-    static importDirectory = async () => {
-        let dirs = await remote.dialog.showOpenDialog({
-            properties: ["openDirectory"],
-        });
-        if (dirs === null || typeof dirs === 'undefined' || dirs.filePaths.length <= 0 || dirs.canceled) {
-            DispatcherService.dispatch(DispatchEvents.PSARCS_IMPORTED, []);
-            return;
+    static importDirectory = async (externalDir = []) => {
+        let dirs = []
+        if (externalDir.length === 0) {
+            dirs = await remote.dialog.showOpenDialog({
+                properties: ["openDirectory"],
+            });
+            if (dirs === null || typeof dirs === 'undefined' || dirs.filePaths.length <= 0 || dirs.canceled) {
+                DispatcherService.dispatch(DispatchEvents.PSARCS_IMPORTED, []);
+                return;
+            }
+            dirs = dirs.filePaths;
         }
-        dirs = dirs.filePaths;
+        else {
+            dirs = externalDir;
+        }
         const info = { files: 0, imports: 0 };
         let progress = 0;
         const toastID = this.psarcToaster(null, 0, info);
@@ -765,8 +771,23 @@ class imageWorker {
     }
 }
 
+
+class metaWorker {
+    static importDLCandStats = async (dir) => {
+        DispatcherService.on(DispatchEvents.PSARCS_IMPORTED, this.importFinished);
+        psarcWorker.importDirectory([dir]);
+    }
+
+    static importFinished = async (results) => {
+        DispatcherService.off(DispatchEvents.PSARCS_IMPORTED, this.importFinished);
+        await profileWorker.songListUpdate(results, false);
+        await profileWorker.startWork();
+    }
+}
+
 export {
     profileWorker,
     psarcWorker,
     imageWorker,
+    metaWorker,
 }

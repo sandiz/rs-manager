@@ -56,7 +56,16 @@ async function getTranslations() {
             continue;
         const toTranslateArr = toTranslate.map(v => Object.values(v)[0]);
         let translations = [];
-        translations = await translate(toTranslateArr, lang);
+        try {
+            translations = await translate(toTranslateArr, lang);
+        }
+        catch (e) {
+            console.log("exception when trying to translate: " + e);
+        }
+        if (translations.length === 0) {
+            console.log("no translations available, bailing");
+            return;
+        }
         for (let i = 0; i < toTranslate.length; i += 1) {
             const key = Object.keys(toTranslate[i])[0];
             let translated = "";

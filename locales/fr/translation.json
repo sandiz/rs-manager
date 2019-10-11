@@ -148,5 +148,10 @@
 	"clickToImport": "Cliquez pour importer",
 	"Processing": "En traitement",
 	"Reset Collection": "Réinitialiser la collection",
-	"Advanced": "Avancée"
+	"Advanced": "Avancée",
+	"ftueProcessingComplete": "Importation terminée, vous pouvez maintenant afficher vos statistiques dans Dashboard et votre collection dans Songs> Owned",
+	"ftueFailedProcessing": "Échec de l'importation des données. Veuillez essayer manuellement via l'explorateur PSARC.",
+	"welcome": "Bienvenue!",
+	"ftueMessage": "Cette application utilise les données Rocksmith et Steam pour consolider les statistiques / maîtrise / dlc / listes de chansons sous un même toit. Pour commencer, veuillez sélectionner vos comptes ci-dessous",
+	"saveAndImport": "Enregistrer et importer"
 }
