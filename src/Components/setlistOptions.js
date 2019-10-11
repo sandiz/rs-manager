@@ -204,6 +204,33 @@ export const createOption = label => ({
   value: label,
 });
 
+export const customColumnsCustomStyles = {
+  container: styles => ({
+    ...styles, marginLeft: 20 + 'px',
+  }),
+  control: styles => ({
+    ...styles, backgroundColor: 'white', color: 'black', width: 100 + '%', fontSize: 15 + 'px',
+  }),
+  option: (styles, {
+    data, isDisabled, isFocused, isSelected,
+  }) => {
+    return {
+      ...styles,
+      color: 'black',
+    };
+  },
+  multiValue: (styles, { data }) => {
+    return {
+      ...styles,
+    };
+  },
+  multiValueLabel: (styles, { data }) => ({
+    ...styles,
+  }),
+  multiValueRemove: (styles, { data }) => ({
+    ...styles,
+  }),
+}
 export const sortOrderCustomStyles = {
   container: styles => ({
     ...styles, marginLeft: 20 + 'px',

@@ -1,4 +1,4 @@
-import { defaultSortOption } from "./Components/settingsView";
+import { defaultSortOption, defaultCustomColumns } from "./Components/settingsView";
 import { getAllProfiles, getSteamProfiles } from "./steamprofileService";
 
 export const writeFile = (filePath, data) => new Promise((resolve, reject) => {
@@ -39,6 +39,7 @@ function getDefaultSettings() {
   obj.isSudoWhitelisted = false;
   obj.currentZoomFactor = 1;
   obj.pathToImportRSM = '';
+  obj.customColumns = defaultCustomColumns;
   return obj;
 }
 export async function getConfig(type) {
@@ -113,6 +114,9 @@ export async function updateSteamAPIKey(current) {
 export async function updateDefaultSortOption(current) {
   await updateConfig("defaultSortOption", current);
 }
+export async function updateCustomColumnConfig(current) {
+  await updateConfig("customColumns", current);
+}
 export async function updateShowSetlistOverlayAlways(current) {
   await updateConfig("showSetlistOverlayAlways", current);
 }
@@ -186,6 +190,11 @@ export async function getSteamAPIKeyConfig() {
 export async function getDefaultSortOptionConfig() {
   const d = await getConfig("defaultSortOption");
   if (d === '') return defaultSortOption; //default value
+  return d;
+}
+export async function getCustomCulumnsConfig() {
+  const d = await getConfig("customColumns");
+  if (d === '') return defaultCustomColumns; //default value
   return d;
 }
 export async function getShowSetlistOverlayAlwaysConfig() {
