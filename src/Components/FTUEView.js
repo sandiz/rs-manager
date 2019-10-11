@@ -86,7 +86,7 @@ class FTUEView extends React.Component {
 
   handleRSProfileChange = async (so) => {
     let rsInstallDir = await getRocksmithInstallFolder();
-    if (!window.electronFS.existsSync(rsInstallDir)) rsInstallDir = null;
+    if (rsInstallDir && !window.electronFS.existsSync(rsInstallDir)) rsInstallDir = null;
     let dlcPath = '';
     if (rsInstallDir) {
       dlcPath = window.path.join(rsInstallDir);

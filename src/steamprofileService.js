@@ -289,7 +289,7 @@ export function getSteamPathForRocksmith(uid32) {
     );
   }
 }
-export function getRocksmithInstallFolder() {
+export async function getRocksmithInstallFolder() {
   //check for LibraryFolders.vdf for 
   if (window.process.platform === "darwin") {
     return window.path.join(
@@ -300,11 +300,43 @@ export function getRocksmithInstallFolder() {
   }
   else {
     //verify windows
-    return window.path.join(
+    const basic = window.path.join(
       getWinSteamPath(),
       `steamapps/common/Rocksmith2014`, // fixed install dir in mac
+    )
+    if (window.electronFS.existsSync(basic)) return basic;
+
+    /* check LibraryFolders */
+    /* thanks to BuongiornoTexas & https://github.com/BuongiornoTexas/rsrtools/blob/master/rsrtools/songlists/scanner.py#L111 */
+    const LibraryVDF = window.path.join(
+      getWinSteamPath(),
+      "steamapps/libraryfolders.vdf",
     );
+    if (!window.electronFS.existsSync(LibraryVDF)) return null;
+    try {
+      const data = await readFile(LibraryVDF);
+      const vdfdata = vdf.parse(data.toString());
+      if (!vdfdata) return null;
+
+      for (let i = 1; i < 8; i += 1) {
+        if ("LibraryFolders" in vdfdata) {
+          if (i.toString() in vdfdata.LibraryFolders) {
+            const lFolder = vdfdata.LibraryFolders[i.toString()];
+            const t = window.path.join(
+              lFolder,
+              `steamapps/common/Rocksmith2014`, // fixed install dir in mac
+            )
+            if (window.electronFS.existsSync(t)) return t;
+          }
+        }
+      }
+    }
+    catch (e) {
+      console.log("vdf exception: " + e)
+      return null;
+    }
   }
+  return null;
 }
 
 export async function getSteamProfiles() {
