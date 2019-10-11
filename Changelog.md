@@ -1,3 +1,7 @@
+v2.5.0
+- add ftue wizard for new users (triggers when songcount == 0)
+- metaWorker for (import psarc, update songs db and update stats) task.
+- add getRocksmithInstallFolder to detect rs install folder
 v2.4.0
 - performance improvements for sqlite and psarc operations
     - batch all sqlite inserts
