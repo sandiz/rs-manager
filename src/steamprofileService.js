@@ -290,7 +290,6 @@ export function getSteamPathForRocksmith(uid32) {
   }
 }
 export async function getRocksmithInstallFolder() {
-  //check for LibraryFolders.vdf for 
   if (window.process.platform === "darwin") {
     return window.path.join(
       window.os.homedir(),
