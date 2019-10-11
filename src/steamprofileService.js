@@ -317,14 +317,13 @@ export async function getRocksmithInstallFolder() {
       const data = await readFile(LibraryVDF);
       const vdfdata = vdf.parse(data.toString());
       if (!vdfdata) return null;
-
       for (let i = 1; i < 8; i += 1) {
         if ("LibraryFolders" in vdfdata) {
           if (i.toString() in vdfdata.LibraryFolders) {
             const lFolder = vdfdata.LibraryFolders[i.toString()];
             const t = window.path.join(
               lFolder,
-              `steamapps/common/Rocksmith2014`, // fixed install dir in mac
+              `steamapps/common/Rocksmith2014`,
             )
             if (window.electronFS.existsSync(t)) return t;
           }
