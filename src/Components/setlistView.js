@@ -4,9 +4,7 @@ import PropTypes from 'prop-types';
 import { withI18n, Trans } from 'react-i18next';
 import StatsTableView, { getStatsWidth } from './statsTableView';
 import {
-    RemoteAll,
-    unescapeFormatter, difficultyFormatter, difficultyClass, round100Formatter,
-    countFormmatter, badgeFormatter, arrangmentFormatter, tuningFormatter,
+    RemoteAll, BaseColumnDefs, generateColumns,
 } from './songlistView';
 import SongDetailView from './songdetailView';
 import {
@@ -18,7 +16,7 @@ import {
 } from '../sqliteService';
 import {
     getScoreAttackConfig,
-    getDefaultSortOptionConfig, getScoreAttackDashboardConfig,
+    getDefaultSortOptionConfig, getScoreAttackDashboardConfig, getCustomCulumnsConfig,
 } from '../configService';
 import SetlistOptions, { generateSql } from './setlistOptions';
 import ExportSetlistModal from './modalExportSetlist';
@@ -93,6 +91,7 @@ class SetlistView extends React.Component {
             isDeleted: false,
             selectedPathOption: [],
             songData: {},
+            columns: BaseColumnDefs,
 
             scoreAttackDashboard: [false, false, false, false],
             scdTrueLength: 0,
@@ -126,185 +125,6 @@ class SetlistView extends React.Component {
             showAddOptions: false,
         };
         this.search = null;
-        this.columns = [
-            {
-                dataField: "id",
-                text: this.props.t("ID"),
-                style: (cell, row, rowIndex, colIndex) => {
-                    return {
-                        width: '20%',
-                        cursor: 'pointer',
-                    };
-                },
-                hidden: true,
-            },
-            {
-                dataField: "song",
-                text: this.props.t("Song"),
-                style: (cell, row, rowIndex, colIndex) => {
-                    return {
-                        width: '20%',
-                        cursor: 'pointer',
-                    };
-                },
-                sort: true,
-                formatter: unescapeFormatter,
-                formatExtraData: {
-                    globalNotes: this.props.globalNotes,
-                },
-            },
-            {
-                dataField: "artist",
-                text: this.props.t("Artist"),
-                style: (cell, row, rowIndex, colIndex) => {
-                    return {
-                        width: '19%',
-                        cursor: 'pointer',
-                    };
-                },
-                sort: true,
-                formatter: unescapeFormatter,
-            },
-            {
-                dataField: "album",
-                text: this.props.t("Album"),
-                style: (cell, row, rowIndex, colIndex) => {
-                    return {
-                        width: '20%',
-                        cursor: 'pointer',
-                    };
-                },
-                sort: true,
-                formatter: unescapeFormatter,
-            },
-            {
-                dataField: "json",
-                text: 'JSON',
-                hidden: true,
-            },
-            {
-                dataField: "arrangement",
-                text: this.props.t("Arrangement"),
-                style: (cell, row, rowIndex, colIndex) => {
-                    return {
-                        width: '5%',
-                        cursor: 'pointer',
-                    };
-                },
-                sort: true,
-                formatter: arrangmentFormatter,
-            },
-            {
-                dataField: "mastery",
-                text: this.props.t("Mastery"),
-                style: (cell, row, rowIndex, colIndex) => {
-                    return {
-                        width: '15%',
-                        cursor: 'pointer',
-                    };
-                },
-                sort: true,
-                formatter: round100Formatter,
-            },
-            {
-                dataField: "tuning_weight",
-                text: this.props.t("Tuning"),
-                style: (cell, row, rowIndex, colIndex) => {
-                    return {
-                        width: '5%',
-                        cursor: 'pointer',
-                    };
-                },
-                sort: true,
-                formatter: tuningFormatter,
-            },
-            {
-                dataField: "count",
-                text: this.props.t("Count"),
-                style: (cell, row, rowIndex, colIndex) => {
-                    return {
-                        width: '5%',
-                    };
-                },
-                sort: true,
-                formatter: countFormmatter,
-            },
-            {
-                classes: difficultyClass,
-                dataField: "difficulty",
-                text: this.props.t("Difficulty"),
-                style: (cell, row, rowIndex, colIndex) => {
-                    return {
-                        width: '5%',
-                    };
-                },
-                sort: true,
-                formatter: difficultyFormatter,
-            },
-            {
-                dataField: "sa_playcount",
-                text: 'Play Count',
-                hidden: true,
-            },
-            {
-                dataField: "sa_hs_easy",
-                text: 'High Score (Easy)',
-                hidden: true,
-            },
-            {
-                dataField: "sa_hs_medium",
-                text: 'High Score (Medium)',
-                hidden: true,
-            },
-            {
-                dataField: "sa_hs_hard",
-                text: 'High Score (Hard)',
-                hidden: true,
-            },
-            {
-                dataField: "sa_hs_master",
-                text: 'High Score (Master)',
-                hidden: true,
-            },
-            {
-                dataField: "sa_badge_master",
-                text: 'Badge (Master)',
-                hidden: true,
-            },
-            {
-                dataField: "sa_highest_badge",
-                text: 'Badges',
-                sort: true,
-                style: (cell, row, rowIndex, colIndex) => {
-                    return {
-                        width: '20%',
-                        display: this.state.showSAStats ? "" : "none",
-                    };
-                },
-                headerStyle: (cell, row, rowIndex, colIndex) => {
-                    return {
-                        width: '20%',
-                        display: this.state.showSAStats ? "" : "none",
-                    };
-                },
-                formatter: badgeFormatter,
-            },
-            {
-                dataField: "arrangementProperties",
-                text: 'ArrProp',
-                hidden: true,
-            },
-            {
-                dataField: "capofret",
-                text: 'Capo',
-                hidden: true,
-            },
-            {
-                dataField: "centoffset",
-                text: 'Cent',
-                hidden: true,
-            },
-        ];
         this.rowEvents = {
             onClick: (e, row, rowIndex) => {
                 this.setState({
@@ -337,9 +157,16 @@ class SetlistView extends React.Component {
         return true;
     }
 
-    componentDidMount = () => {
+    componentDidMount = async () => {
         DispatcherService.on(DispatchEvents.PROFILE_UPDATED, this.refresh);
         DispatcherService.on(DispatchEvents.SETLIST_IMPORTED, this.setlistImported);
+
+        const showSAStats = await getScoreAttackConfig();
+        const customColumns = await getCustomCulumnsConfig();
+        const columns = generateColumns(customColumns,
+            { globalNotes: this.props.globalNotes, showSAStats },
+            this.props.t);
+        this.setState({ columns });
     }
 
     componentWillUnmount = () => {
@@ -1008,7 +835,7 @@ class SetlistView extends React.Component {
                         sizePerPage={sizePerPage}
                         totalSize={this.state.totalSize}
                         onTableChange={this.handleTableChange}
-                        columns={this.columns}
+                        columns={this.state.columns}
                         rowEvents={this.rowEvents}
                     />
                 </div>

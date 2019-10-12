@@ -98,7 +98,7 @@ export const defaultCustomColumns = [
   { label: 'album', value: 'album' },
   { label: 'arrangement', value: 'arrangement' },
   { label: 'mastery', value: 'mastery' },
-  { label: 'tuning', value: 'tuning' },
+  { label: 'tuning_weight', value: 'tuning_weight' },
   { label: 'count', value: 'count' },
   { label: 'difficulty', value: 'difficulty' },
   { label: 'sa_highest_badge', value: 'sa_highest_badge' },
@@ -1186,7 +1186,7 @@ loading setlists into Rocksmith 2014.
                           <option value="artist">Artist</option>
                           <option value="album">Album</option>
                           <option value="mastery">Mastery</option>
-                          <option value="tuning">Tuning</option>
+                          <option value="tuning_weight">Tuning</option>
                           <option value="count">Playcount</option>
                           <option value="difficulty">Difficulty</option>
                           <option value="arrangement">Arrangement</option>

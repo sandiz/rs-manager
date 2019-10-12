@@ -144,7 +144,7 @@ class StatsTableView extends React.Component {
             : (
               <tbody>
                 <tr>
-                  <td style={{ width: 18 + '%' }}><Trans i18nKey="total">Total</Trans></td>
+                  <td style={{ width: 22 + '%' }}><Trans i18nKey="total">Total</Trans></td>
                   <td className="">
                     <span id="lead_total" className="ta-right right-align header-top">
                       {this.props.total}

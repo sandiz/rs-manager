@@ -246,7 +246,7 @@ export function round100Formatter(cell, row) {
     <span>
       <span className="mastery">{cell}%</span>
       <span>
-        <svg height="65%">
+        <svg height="65%" width="95%">
           <rect width={width} height="100%" style={{ fill: color, strokeWidth: 2, stroke: 'rgb(0, 0, 0)' }} />
           <text x="40%" y="18" fontSize="15px">{cell} %</text>
         </svg>
@@ -592,13 +592,13 @@ export function arrClass(cell, row, rowIndex, colIndex) {
 }
 export function tuningClass(cell, row, rowIndex, colIndex) {
   return {
-    width: '12%',
+    width: '8%',
     cursor: 'pointer',
   };
 }
 export function masteryClass(cell, row, rowIndex, colIndex) {
   return {
-    width: '20%',
+    width: '30%',
     cursor: 'pointer',
   };
 }
@@ -710,9 +710,16 @@ export const generateColumns = (customColumns, customData = {}, t) => {
   const columns = [];
   const inCustomColumns = (dataField) => {
     for (let i = 0; i < customColumns.length; i += 1) {
-      if (customColumns[i].value === dataField) return true;
+      if (customColumns[i].value === dataField) return i;
     }
-    return false;
+    return -1;
+  }
+
+  const getDefIndex = (dataField, c) => {
+    for (let i = 0; i < c.length; i += 1) {
+      if (c[i].dataField === dataField) return i;
+    }
+    return -1;
   }
 
   for (let i = 0; i < BaseColumnDefs.length; i += 1) {
@@ -724,7 +731,7 @@ export const generateColumns = (customColumns, customData = {}, t) => {
     item.style = "style" in matrix ? matrix.style : null;
     item.sort = "sort" in matrix ? matrix.sort : false;
     item.hidden = "hidden" in matrix ? matrix.hidden : false;
-    item.hidden = !inCustomColumns(dataField);
+    item.hidden = (inCustomColumns(dataField) === -1);
     item.formatter = "formatter" in matrix ? matrix.formatter : null;
     switch (dataField) {
       case "song":
@@ -741,7 +748,19 @@ export const generateColumns = (customColumns, customData = {}, t) => {
     }
     columns.push(item);
   }
-  return columns;
+
+  const tmp = [...columns];
+  let sorted = [];
+  for (let i = 0; i < customColumns.length; i += 1) {
+    const value = customColumns[i].value;
+    const idx = getDefIndex(value, tmp);
+    if (idx !== -1) {
+      const item = tmp.splice(idx, 1);
+      sorted.push(item[0]);
+    }
+  }
+  sorted = sorted.concat(tmp);
+  return sorted;
 }
 class SonglistView extends React.Component {
   constructor(props) {
