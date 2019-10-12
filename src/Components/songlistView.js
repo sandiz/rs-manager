@@ -12,7 +12,7 @@ import {
   removeFromSongsOwned, addToIgnoreArrangements,
 } from '../sqliteService';
 import {
-  getScoreAttackConfig, getDefaultSortOptionConfig,
+  getScoreAttackConfig, getDefaultSortOptionConfig, getCustomCulumnsConfig,
 } from '../configService';
 import SongDetailView from './songdetailView';
 import { defaultSortOption } from './settingsView';
@@ -72,6 +72,23 @@ export const techniqueNames = {
   twoFingerPicking: "Two Finger Picking",
   unpitchedSlides: "Unpitched Slides",
   vibrato: "Vibrato",
+}
+export function secondsToTime(secs) {
+  secs = Math.round(secs);
+  const hours = Math.floor(secs / (60 * 60));
+
+  const dfm = secs % (60 * 60);
+  const minutes = Math.floor(dfm / 60);
+
+  const dfs = dfm % 60;
+  const seconds = Math.ceil(dfs);
+
+  const obj = {
+    h: hours,
+    m: minutes,
+    s: seconds,
+  };
+  return obj;
 }
 export function getBadgeName(num, retClass = false) {
   switch (num) {
@@ -229,7 +246,7 @@ export function round100Formatter(cell, row) {
     <span>
       <span className="mastery">{cell}%</span>
       <span>
-        <svg height="100%">
+        <svg height="65%">
           <rect width={width} height="100%" style={{ fill: color, strokeWidth: 2, stroke: 'rgb(0, 0, 0)' }} />
           <text x="40%" y="18" fontSize="15px">{cell} %</text>
         </svg>
@@ -279,7 +296,7 @@ export function badgeFormatter(cell, row) {
   }
   if (badgeClasses.length > 0) {
     return (
-      <div>
+      <div className="badge-icon-div">
         <ReactTooltip
           id={row.id + "_badge"}
           aria-haspopup="true"
@@ -299,8 +316,9 @@ export function badgeFormatter(cell, row) {
                 badgeClasses.map(([badgeCount, highScore,
                   badgeType, badgeClass, badgeName], index) => {
                   const divclass = "iconPreview gp_icon_small " + badgeClass;
+                  const key = window.shortid.generate();
                   return (
-                    <tr className="row" key={badgeClass}>
+                    <tr className="row" key={key}>
                       <td style={{ width: 26 + '%', textAlign: 'right' }} className="tooltip-td-pad"><b>{badgeType}: </b></td>
                       <td style={{ width: 14 + '%' }} className="tooltip-td-low-pad"><div key={badgeClass} className={divclass} alt="" /></td>
                       <td style={{ width: 30 + '%', textAlign: 'left' }} className="tooltip-td-pad">{badgeName}</td>
@@ -319,8 +337,9 @@ export function badgeFormatter(cell, row) {
                 let divclass = badgeClassDefault + badgeClass;
                 if (badgeClasses.length > 3) divclass += " gp_small";
                 else if (badgeClasses.length > 2) divclass += " gp_med";
+                const key = window.shortid.generate();
                 return (
-                  <div key={badgeClass} className={divclass} alt="" />
+                  <div key={key} className={divclass} alt="" />
                 );
               })
             }
@@ -410,7 +429,7 @@ export function arrangmentFormatter(cell, row) {
                 if (val > 0 && ignoreProp.indexOf(key) === -1) {
                   return (
                     <tr className="row" key={key + row.id}>
-                      <td style={{ width: 100 + '%', textAlign: 'center' }}>{properkey}</td>
+                      <td className="tooltip-technique-td" style={{ width: 100 + '%', textAlign: 'center' }}>{properkey}</td>
                     </tr>
                   );
                 }
@@ -537,6 +556,64 @@ export function dateFormatter(cell, row) {
   const m = moment.unix(cell)
   return <span>{m.fromNow()}</span>
 }
+export function songLengthFormatter(cell, row) {
+  if (cell == null || cell === 0) {
+    return <span>-</span>
+  }
+  const time = secondsToTime(cell)
+  return <span title={cell}>{time.m}m {time.s}s</span>
+}
+export function lastPlayedFormatter(cell, row) {
+  const dateLas = row.date_las;
+  const dateSA = row.date_sa;
+  if ((dateLas == null && dateSA == null) || (dateLas === 0 && dateSA === 0)) {
+    return <span>-</span>
+  }
+  if (dateSA > dateLas) {
+    const m = moment.unix(dateSA);
+    return <span>{m.fromNow()} (SA) </span>
+  }
+  else {
+    const m = moment.unix(dateLas);
+    return <span>{m.fromNow()}</span>
+  }
+}
+export function idClass(cell, row, rowIndex, colIndex) {
+  return {
+    width: '20%',
+    cursor: 'pointer',
+  };
+}
+export function arrClass(cell, row, rowIndex, colIndex) {
+  return {
+    width: '8%',
+    cursor: 'pointer',
+  };
+}
+export function tuningClass(cell, row, rowIndex, colIndex) {
+  return {
+    width: '12%',
+    cursor: 'pointer',
+  };
+}
+export function masteryClass(cell, row, rowIndex, colIndex) {
+  return {
+    width: '20%',
+    cursor: 'pointer',
+  };
+}
+export function showHighestBadge(cell, row, rowIndex, colIndex) {
+  return {
+    width: '10%',
+  };
+}
+export function hideHighestBadge(cell, row, rowIndex, colIndex) {
+  return {
+    width: '20%',
+    display: "none",
+  };
+}
+
 export const RemoteAll = ({
   keyField,
   columns,
@@ -599,6 +676,73 @@ RemoteAll.defaultProps = {
   noDataIndication: "No Songs",
   classes: "psarcTable",
 }
+/* eslint-disable */
+export const BaseColumnDefs = [
+  { dataField: "id", text: "ID", hidden: false, sort: false, style: idClass },
+  { dataField: "song", text: "Song", hidden: true, sort: true, style: idClass, formatter: unescapeFormatter },
+  { dataField: "artist", text: "Artist", hidden: true, sort: true, style: idClass, formatter: unescapeFormatter, },
+  { dataField: "album", text: "Album", hidden: true, sort: true, style: idClass, formatter: unescapeFormatter, },
+  { dataField: "json", text: "json", hidden: true, sort: false },
+  { dataField: "arrangement", text: "Arrangement", hidden: true, sort: true, style: arrClass, formatter: arrangmentFormatter },
+  { dataField: "mastery", text: "Mastery", hidden: true, sort: true, style: masteryClass, formatter: round100Formatter, },
+  { dataField: "tuning_weight", text: "Tuning", hidden: true, sort: true, style: tuningClass, formatter: tuningFormatter, },
+  { dataField: "count", text: "Count", hidden: true, sort: true, formatter: countFormmatter, },
+  { dataField: "difficulty", text: "Difficulty", hidden: true, sort: true, classes: difficultyClass, formatter: difficultyFormatter },
+  { dataField: "sa_playcount", text: "Play Count", hidden: true, sort: true },
+  { dataField: "sa_hs_easy", text: "sa_hs_easy", hidden: true, sort: true },
+  { dataField: "sa_hs_medium", text: "sa_hs_medium", hidden: true, sort: true },
+  { dataField: "sa_hs_hard", text: "sa_hs_hard", hidden: true, sort: true },
+  { dataField: "sa_hs_master", text: "sa_hs_master", hidden: true, sort: true },
+  { dataField: "is_cdlc", text: "is_cdlc", hidden: true, sort: true },
+  { dataField: "sa_highest_badge", text: "Badges", hidden: true, sort: true, style: showHighestBadge, headerStyle: showHighestBadge, formatter: badgeFormatter },
+  { dataField: "arrangementProperties", text: "arrProp", hidden: true, sort: true },
+  { dataField: "capofret", text: "capofret", hidden: true, sort: true },
+  { dataField: "centoffset", text: "centoffset", hidden: true, sort: true },
+  { dataField: "songLength", text: "Length", hidden: true, sort: true, formatter: songLengthFormatter },
+  { dataField: "maxNotes", text: "Notes", hidden: true, sort: true },
+  { dataField: "tempo", text: "BPM", hidden: true, sort: true },
+  { dataField: "date_las", text: "LastPlayed", hidden: true, sort: true, formatter: lastPlayedFormatter },
+  { dataField: "date_sa", text: "LastPlayed", hidden: true, sort: true },
+];
+/* eslint-enable */
+
+export const generateColumns = (customColumns, customData = {}, t) => {
+  const columns = [];
+  const inCustomColumns = (dataField) => {
+    for (let i = 0; i < customColumns.length; i += 1) {
+      if (customColumns[i].value === dataField) return true;
+    }
+    return false;
+  }
+
+  for (let i = 0; i < BaseColumnDefs.length; i += 1) {
+    const matrix = BaseColumnDefs[i];
+    const dataField = matrix.dataField;
+    const item = {};
+    item.dataField = dataField;
+    item.text = t(matrix.text);
+    item.style = "style" in matrix ? matrix.style : null;
+    item.sort = "sort" in matrix ? matrix.sort : false;
+    item.hidden = "hidden" in matrix ? matrix.hidden : false;
+    item.hidden = !inCustomColumns(dataField);
+    item.formatter = "formatter" in matrix ? matrix.formatter : null;
+    switch (dataField) {
+      case "song":
+      case "artist":
+      case "album":
+        item.formatExtraData = { globalNotes: customData.globalNotes };
+        break;
+      case "sa_highest_badge":
+        item.style = customData.showSAStats ? showHighestBadge : hideHighestBadge;
+        item.headerStyle = customData.showSAStats ? showHighestBadge : hideHighestBadge;
+        break;
+      default:
+        break;
+    }
+    columns.push(item);
+  }
+  return columns;
+}
 class SonglistView extends React.Component {
   constructor(props) {
     super(props);
@@ -610,196 +754,12 @@ class SonglistView extends React.Component {
       showDetail: false,
       showSong: '',
       showArtist: '',
-      showSAStats: true,
       sortOptions: defaultSortOption,
+      columns: BaseColumnDefs,
     };
     this.tabname = "tab-songs"
     this.childtabname = "songs-owned"
     this.search = "";
-    this.columns = [
-      {
-        dataField: "id",
-        text: this.props.t("ID"),
-        style: (cell, row, rowIndex, colIndex) => {
-          return {
-            width: '20%',
-            cursor: 'pointer',
-          };
-        },
-        hidden: true,
-      },
-      {
-        dataField: "song",
-        text: this.props.t("Song"),
-        style: (cell, row, rowIndex, colIndex) => {
-          return {
-            width: '20%',
-            cursor: 'pointer',
-          };
-        },
-        sort: true,
-        formatter: unescapeFormatter,
-        formatExtraData: {
-          globalNotes: this.props.globalNotes,
-        },
-      },
-      {
-        dataField: "artist",
-        text: this.props.t("Artist"),
-        style: (cell, row, rowIndex, colIndex) => {
-          return {
-            width: '19%',
-            cursor: 'pointer',
-          };
-        },
-        sort: true,
-        formatter: unescapeFormatter,
-      },
-      {
-        dataField: "album",
-        text: this.props.t("Album"),
-        style: (cell, row, rowIndex, colIndex) => {
-          return {
-            width: '20%',
-            cursor: 'pointer',
-          };
-        },
-        sort: true,
-        formatter: unescapeFormatter,
-      },
-      {
-        dataField: "json",
-        text: 'JSON',
-        hidden: true,
-      },
-      {
-        dataField: "arrangement",
-        text: this.props.t("Arrangement"),
-        style: (cell, row, rowIndex, colIndex) => {
-          return {
-            width: '5%',
-            cursor: 'pointer',
-          };
-        },
-        sort: true,
-        formatter: arrangmentFormatter,
-      },
-      {
-        dataField: "mastery",
-        text: this.props.t("Mastery"),
-        style: (cell, row, rowIndex, colIndex) => {
-          return {
-            width: '15%',
-            cursor: 'pointer',
-          };
-        },
-        sort: true,
-        formatter: round100Formatter,
-      },
-      {
-        dataField: "tuning_weight",
-        text: this.props.t("Tuning"),
-        style: (cell, row, rowIndex, colIndex) => {
-          return {
-            width: '5%',
-            cursor: 'pointer',
-          };
-        },
-        sort: true,
-        formatter: tuningFormatter,
-      },
-      {
-        dataField: "count",
-        text: this.props.t("Count"),
-        style: (cell, row, rowIndex, colIndex) => {
-          return {
-            width: '5%',
-          };
-        },
-        sort: true,
-        formatter: countFormmatter,
-      },
-      {
-        classes: difficultyClass,
-        dataField: "difficulty",
-        text: this.props.t("Difficulty"),
-        style: (cell, row, rowIndex, colIndex) => {
-          return {
-            width: '5%',
-          };
-        },
-        sort: true,
-        formatter: difficultyFormatter,
-      },
-      {
-        dataField: "sa_playcount",
-        text: 'Play Count',
-        hidden: true,
-      },
-      {
-        dataField: "sa_hs_easy",
-        text: 'High Score (Easy)',
-        hidden: true,
-      },
-      {
-        dataField: "sa_hs_medium",
-        text: 'High Score (Medium)',
-        hidden: true,
-      },
-      {
-        dataField: "sa_hs_hard",
-        text: 'High Score (Hard)',
-        hidden: true,
-      },
-      {
-        dataField: "sa_hs_master",
-        text: 'High Score (Master)',
-        hidden: true,
-      },
-      {
-        dataField: "sa_badge_master",
-        text: 'Badge (Master)',
-        hidden: true,
-      },
-      {
-        dataField: "is_cdlc",
-        text: 'IS CDLC',
-        hidden: true,
-      },
-      {
-        dataField: "sa_highest_badge",
-        text: this.props.t('Badges'),
-        sort: true,
-        style: (cell, row, rowIndex, colIndex) => {
-          return {
-            width: '20%',
-            display: this.state.showSAStats ? "" : "none",
-          };
-        },
-        headerStyle: (cell, row, rowIndex, colIndex) => {
-          return {
-            width: '20%',
-            display: this.state.showSAStats ? "" : "none",
-          };
-        },
-        formatter: badgeFormatter,
-      },
-      {
-        dataField: "arrangementProperties",
-        text: 'ArrProp',
-        hidden: true,
-      },
-      {
-        dataField: "capofret",
-        text: 'Capo',
-        hidden: true,
-      },
-      {
-        dataField: "centoffset",
-        text: 'Cent',
-        hidden: true,
-      },
-    ];
     this.rowEvents = {
       onClick: (e, row, rowIndex) => {
         this.setState({
@@ -823,7 +783,13 @@ class SonglistView extends React.Component {
     );
     const showSAStats = await getScoreAttackConfig();
     const sortOptions = await getDefaultSortOptionConfig();
-    this.setState({ totalSize: so.count, showSAStats, sortOptions });
+    const customColumns = await getCustomCulumnsConfig();
+    const columns = generateColumns(customColumns,
+      { globalNotes: this.props.globalNotes, showSAStats },
+      this.props.t);
+    this.setState({
+      totalSize: so.count, sortOptions, columns,
+    });
     const key = this.tabname + "-" + this.childtabname;
     const searchData = this.props.getSearch(key);
     if (searchData === null) {
@@ -942,7 +908,9 @@ class SonglistView extends React.Component {
   }
 
   render = () => {
-    const { songs, sizePerPage, page } = this.state;
+    const {
+      songs, sizePerPage, page, columns, totalSize,
+    } = this.state;
     const choosepsarchstyle = "extraPadding download " + (this.state.totalSize <= 0 ? "isDisabled" : "");
     return (
       <div>
@@ -985,9 +953,9 @@ class SonglistView extends React.Component {
             data={songs}
             page={page}
             sizePerPage={sizePerPage}
-            totalSize={this.state.totalSize}
+            totalSize={totalSize}
             onTableChange={this.handleTableChange}
-            columns={this.columns}
+            columns={columns}
             rowEvents={this.rowEvents}
           />
         </div>

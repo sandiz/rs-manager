@@ -101,7 +101,7 @@ export const defaultCustomColumns = [
   { label: 'tuning', value: 'tuning' },
   { label: 'count', value: 'count' },
   { label: 'difficulty', value: 'difficulty' },
-  { label: 'badges', value: 'badges' },
+  { label: 'sa_highest_badge', value: 'sa_highest_badge' },
 ]
 class SettingsView extends React.Component {
   constructor(props) {
@@ -1190,12 +1190,11 @@ loading setlists into Rocksmith 2014.
                           <option value="count">Playcount</option>
                           <option value="difficulty">Difficulty</option>
                           <option value="arrangement">Arrangement</option>
-                          <option value="badges">Badges</option>
-                          <option value="id">ID</option>
-                          <option value="length">Song Length</option>
-                          <option value="notes">Notes</option>
+                          <option value="sa_highest_badge">Badges</option>
+                          <option value="songLength">Song Length</option>
+                          <option value="maxNotes">Notes</option>
                           <option value="tempo">Tempo</option>
-                          <option value="lastPlayed">Last Played</option>
+                          <option value="date_las">Last Played</option>
                         </select>
                         <span
                           onClick={this.addCustomColumn}
