@@ -43,6 +43,17 @@
   color: #777777;
   font-weight: 300; }
 
+.img-ss {
+  width: 260%;
+  box-shadow: inset -1px 0px 2px rgba(0,0,0,.6), 0px 22px 71px 4px rgba(0,0,0,0.56), 0 0 0 -7px rgba(0, 0, 0, 0.3);
+  
+}
+
+.img-ss-div {
+  display: flex;
+  flex: 0 0 50%;
+}
+
 .logo {
   width:  10%;
   height: 10%;
@@ -54,7 +65,9 @@ body {
   font-size: 16px;
   font-weight: 400;
   line-height: 1.625em;
-  position: relative; }
+  position: relative;
+  overflow-x: hidden;
+ }
 
 ol, ul {
   margin: 0;
@@ -1640,7 +1653,7 @@ h1, h2, h3, h4, h5, h6 {
   z-index: 997; }
 
 .header-scrolled {
-  background: rgba(70, 219, 249, 0.9);
+  background: rgba(33, 33, 33, 0.9);
   transition: all 0.5s; }
 
 @media (max-width: 673px) {
