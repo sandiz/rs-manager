@@ -153,5 +153,9 @@
 	"ftueFailedProcessing": "Error al importar datos, intente manualmente a través de PSARC Explorer",
 	"welcome": "¡Bienvenidos!",
 	"ftueMessage": "Esta aplicación utiliza datos de Rocksmith y Steam para consolidar estadísticas / dominio / dlc / songlists bajo un mismo techo. Para comenzar, seleccione sus cuentas a continuación",
-	"saveAndImport": "Guardar e importar"
+	"saveAndImport": "Guardar e importar",
+	"Duration": "Duración",
+	"Notes": "Notas",
+	"BPM": "BPM",
+	"Last Played": "Última jugada"
 }

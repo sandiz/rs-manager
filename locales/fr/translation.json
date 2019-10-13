@@ -153,5 +153,9 @@
 	"ftueFailedProcessing": "Échec de l'importation des données. Veuillez essayer manuellement via l'explorateur PSARC.",
 	"welcome": "Bienvenue!",
 	"ftueMessage": "Cette application utilise les données Rocksmith et Steam pour consolider les statistiques / maîtrise / dlc / listes de chansons sous un même toit. Pour commencer, veuillez sélectionner vos comptes ci-dessous",
-	"saveAndImport": "Enregistrer et importer"
+	"saveAndImport": "Enregistrer et importer",
+	"Duration": "Durée",
+	"Notes": "Remarques",
+	"BPM": "BPM",
+	"Last Played": "Dernier joué"
 }

@@ -698,10 +698,10 @@ export const BaseColumnDefs = [
   { dataField: "arrangementProperties", text: "arrProp", hidden: true, sort: true },
   { dataField: "capofret", text: "capofret", hidden: true, sort: true },
   { dataField: "centoffset", text: "centoffset", hidden: true, sort: true },
-  { dataField: "songLength", text: "Length", hidden: true, sort: true, formatter: songLengthFormatter },
+  { dataField: "songLength", text: "Duration", hidden: true, sort: true, formatter: songLengthFormatter },
   { dataField: "maxNotes", text: "Notes", hidden: true, sort: true },
   { dataField: "tempo", text: "BPM", hidden: true, sort: true },
-  { dataField: "date_las", text: "LastPlayed", hidden: true, sort: true, formatter: lastPlayedFormatter },
+  { dataField: "date_las", text: "Last Played", hidden: true, sort: true, formatter: lastPlayedFormatter },
   { dataField: "date_sa", text: "LastPlayed", hidden: true, sort: true },
 ];
 /* eslint-enable */
