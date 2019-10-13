@@ -706,7 +706,7 @@ export const BaseColumnDefs = [
 ];
 /* eslint-enable */
 
-export const generateColumns = (customColumns, customData = {}, t) => {
+export const generateColumns = (customColumns, customData = {}, t, forceShow = []) => {
   const columns = [];
   const inCustomColumns = (dataField) => {
     for (let i = 0; i < customColumns.length; i += 1) {
@@ -730,8 +730,12 @@ export const generateColumns = (customColumns, customData = {}, t) => {
     item.text = t(matrix.text);
     item.style = "style" in matrix ? matrix.style : null;
     item.sort = "sort" in matrix ? matrix.sort : false;
+    // check base defsfirst
     item.hidden = "hidden" in matrix ? matrix.hidden : false;
+    // then check custom columns setting 
     item.hidden = (inCustomColumns(dataField) === -1);
+    // then check if it needs to be forceShown eg: rsLive
+    item.hidden = forceShow.includes(dataField) ? false : item.hidden;
     item.formatter = "formatter" in matrix ? matrix.formatter : null;
     switch (dataField) {
       case "song":

@@ -1,21 +1,23 @@
 import React from 'react'
 import PropTypes from 'prop-types';
+import { withI18n } from 'react-i18next';
 import AnimatedNumber from 'react-animated-number';
 import Highcharts from 'highcharts'
 import HighchartsReact from 'highcharts-react-official'
 import moment from 'moment';
 
 import {
-  RemoteAll,
-  unescapeFormatter, difficultyFormatter, difficultyClass, round100Formatter,
-  countFormmatter, badgeFormatter, arrangmentFormatter, tuningFormatter, dateFormatter,
+  RemoteAll, BaseColumnDefs, generateColumns,
 } from './songlistView';
 import SongDetailView from './songdetailView';
 import {
   getSongBySongKey, getSongsOwned,
   getHistory, getSongByID,
 } from '../sqliteService'
-import { readFile, writeFile, getIsSudoWhitelistedConfig } from '../configService';
+import {
+  readFile, writeFile, getIsSudoWhitelistedConfig,
+  getScoreAttackConfig, getCustomCulumnsConfig,
+} from '../configService';
 import { psarcToJSON } from '../psarcService';
 import { profileWorker } from '../lib/libworker';
 import { DispatcherService, DispatchEvents } from '../lib/libdispatcher';
@@ -32,7 +34,7 @@ export function getMinutesSecs(time) {
   const seconds = pad2(Math.round(time - (minutes * 60)));
   return ({ minutes, seconds });
 }
-export default class RSLiveView extends React.Component {
+class RSLiveView extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -64,149 +66,11 @@ export default class RSLiveView extends React.Component {
       showDetail: false,
       showSong: '',
       showArtist: '',
-      showSAStats: true,
       /* end table */
       recentlyplayedsongs: [],
       rptotalSize: 0,
       rpsizePerPage: 20,
       rpsrc: 'las', /*las or sa */
-      rpcolumns: [
-        {
-          dataField: "id",
-          text: "ID",
-          style: (cell, row, rowIndex, colIndex) => {
-            return {
-              width: '20%',
-              cursor: 'pointer',
-            };
-          },
-          hidden: true,
-        },
-        {
-          dataField: "song",
-          text: "Song",
-          style: (cell, row, rowIndex, colIndex) => {
-            return {
-              width: '20%',
-              cursor: 'pointer',
-            };
-          },
-          sort: true,
-          formatter: unescapeFormatter,
-        },
-        {
-          dataField: "artist",
-          text: "Artist",
-          style: (cell, row, rowIndex, colIndex) => {
-            return {
-              width: '19%',
-              cursor: 'pointer',
-            };
-          },
-          sort: true,
-          formatter: unescapeFormatter,
-        },
-        {
-          dataField: "json",
-          text: 'JSON',
-          hidden: true,
-        },
-        {
-          dataField: "arrangement",
-          text: "Arrangement",
-          style: (cell, row, rowIndex, colIndex) => {
-            return {
-              width: '5%',
-              cursor: 'pointer',
-            };
-          },
-          sort: true,
-          formatter: arrangmentFormatter,
-        },
-        {
-          dataField: "mastery",
-          text: "Current Mastery",
-          style: (cell, row, rowIndex, colIndex) => {
-            return {
-              width: '15%',
-              cursor: 'pointer',
-            };
-          },
-          sort: true,
-          formatter: round100Formatter,
-        },
-        {
-          dataField: "tuning_weight",
-          text: "Tuning",
-          style: (cell, row, rowIndex, colIndex) => {
-            return {
-              width: '5%',
-              cursor: 'pointer',
-            };
-          },
-          sort: true,
-          formatter: tuningFormatter,
-        },
-        {
-          dataField: "count",
-          text: "Count",
-          style: (cell, row, rowIndex, colIndex) => {
-            return {
-              width: '5%',
-            };
-          },
-          sort: true,
-          formatter: countFormmatter,
-        },
-        {
-          classes: difficultyClass,
-          dataField: "difficulty",
-          text: "Difficulty",
-          style: (cell, row, rowIndex, colIndex) => {
-            return {
-              width: '5%',
-            };
-          },
-          sort: true,
-          formatter: difficultyFormatter,
-        },
-        {
-          dataField: "sa_playcount",
-          text: 'Play Count',
-          hidden: true,
-        },
-        {
-          dataField: "date_las",
-          text: "Last Played",
-          style: (cell, row, rowIndex, colIndex) => {
-            return {
-              width: '25%',
-              cursor: 'pointer',
-            };
-          },
-          sort: true,
-          formatter: dateFormatter,
-        },
-        {
-          dataField: "sa_highest_badge",
-          text: 'Badges',
-          sort: true,
-          style: (cell, row, rowIndex, colIndex) => {
-            return {
-              width: '20%',
-              display: this.state.showSAStats ? "" : "none",
-            };
-          },
-          headerStyle: (cell, row, rowIndex, colIndex) => {
-            return {
-              width: '20%',
-              display: this.state.showSAStats ? "" : "none",
-            };
-          },
-          formatter: badgeFormatter,
-        },
-      ],
-
       /* chart data */
       chartOptions: {
         credits: {
@@ -407,187 +271,10 @@ export default class RSLiveView extends React.Component {
       trackingMode: 'hitp', //hitp, perp, hist, record
       recording: 0, //stopped, wait, started
       isSudoWhitelisted: false,
+      columns: BaseColumnDefs,
+      rpcolumns: BaseColumnDefs,
     }
     this.tabname = 'tab-rslive';
-    this.columns = [
-      {
-        dataField: "id",
-        text: "ID",
-        style: (cell, row, rowIndex, colIndex) => {
-          return {
-            width: '20%',
-            cursor: 'pointer',
-          };
-        },
-        hidden: true,
-      },
-      {
-        dataField: "song",
-        text: "Song",
-        style: (cell, row, rowIndex, colIndex) => {
-          return {
-            width: '20%',
-            cursor: 'pointer',
-          };
-        },
-        sort: true,
-        formatter: (cell, row) => {
-          const ret = unescapeFormatter(cell, row);
-          return ret;
-        },
-      },
-      {
-        dataField: "artist",
-        text: "Artist",
-        style: (cell, row, rowIndex, colIndex) => {
-          return {
-            width: '19%',
-            cursor: 'pointer',
-          };
-        },
-        sort: true,
-        formatter: unescapeFormatter,
-      },
-      {
-        dataField: "album",
-        text: "Album",
-        style: (cell, row, rowIndex, colIndex) => {
-          return {
-            width: '20%',
-            cursor: 'pointer',
-          };
-        },
-        sort: true,
-        formatter: unescapeFormatter,
-      },
-      {
-        dataField: "json",
-        text: 'JSON',
-        hidden: true,
-      },
-      {
-        dataField: "arrangement",
-        text: "Arrangement",
-        style: (cell, row, rowIndex, colIndex) => {
-          return {
-            width: '5%',
-            cursor: 'pointer',
-          };
-        },
-        sort: true,
-        formatter: arrangmentFormatter,
-      },
-      {
-        dataField: "mastery",
-        text: "Current Mastery",
-        style: (cell, row, rowIndex, colIndex) => {
-          return {
-            width: '15%',
-            cursor: 'pointer',
-          };
-        },
-        sort: true,
-        formatter: round100Formatter,
-      },
-      {
-        dataField: "tuning_weight",
-        text: "Tuning",
-        style: (cell, row, rowIndex, colIndex) => {
-          return {
-            width: '5%',
-            cursor: 'pointer',
-          };
-        },
-        sort: true,
-        formatter: tuningFormatter,
-      },
-      {
-        dataField: "count",
-        text: "Count",
-        style: (cell, row, rowIndex, colIndex) => {
-          return {
-            width: '5%',
-          };
-        },
-        sort: true,
-        formatter: countFormmatter,
-      },
-      {
-        classes: difficultyClass,
-        dataField: "difficulty",
-        text: "Difficulty",
-        style: (cell, row, rowIndex, colIndex) => {
-          return {
-            width: '5%',
-          };
-        },
-        sort: true,
-        formatter: difficultyFormatter,
-      },
-      {
-        dataField: "sa_playcount",
-        text: 'Play Count',
-        hidden: true,
-      },
-      {
-        dataField: "sa_hs_easy",
-        text: 'High Score (Easy)',
-        hidden: true,
-      },
-      {
-        dataField: "sa_hs_medium",
-        text: 'High Score (Medium)',
-        hidden: true,
-      },
-      {
-        dataField: "sa_hs_hard",
-        text: 'High Score (Hard)',
-        hidden: true,
-      },
-      {
-        dataField: "sa_hs_master",
-        text: 'High Score (Master)',
-        hidden: true,
-      },
-      {
-        dataField: "sa_badge_master",
-        text: 'Badge (Master)',
-        hidden: true,
-      },
-      {
-        dataField: "sa_highest_badge",
-        text: 'Badges',
-        sort: true,
-        style: (cell, row, rowIndex, colIndex) => {
-          return {
-            width: '20%',
-            display: this.state.showSAStats ? "" : "none",
-          };
-        },
-        headerStyle: (cell, row, rowIndex, colIndex) => {
-          return {
-            width: '20%',
-            display: this.state.showSAStats ? "" : "none",
-          };
-        },
-        formatter: badgeFormatter,
-      },
-      {
-        dataField: "arrangementProperties",
-        text: 'ArrProp',
-        hidden: true,
-      },
-      {
-        dataField: "capofret",
-        text: 'Capo',
-        hidden: true,
-      },
-      {
-        dataField: "centoffset",
-        text: 'Cent',
-        hidden: true,
-      },
-    ];
     this.rowEvents = {
       onClick: (e, row, rowIndex) => {
         this.setState({
@@ -651,7 +338,16 @@ export default class RSLiveView extends React.Component {
     }
     const isSudoWhitelisted = await getIsSudoWhitelistedConfig();
     console.log("is sudo whitelisted", isSudoWhitelisted);
-    this.setState({ isSudoWhitelisted });
+
+    const showSAStats = await getScoreAttackConfig();
+    const customColumns = await getCustomCulumnsConfig();
+    const columns = generateColumns(customColumns,
+      { globalNotes: {}, showSAStats },
+      this.props.t);
+    const rpcolumns = generateColumns(customColumns,
+      { globalNotes: {}, showSAStats },
+      this.props.t, ['date_las']);
+    this.setState({ isSudoWhitelisted, columns, rpcolumns });
   }
 
   componentWillUnmount = async () => {
@@ -981,147 +677,10 @@ export default class RSLiveView extends React.Component {
   }
 
   refreshRPTable = async () => {
-    const rpcolumns = [
-      {
-        dataField: "id",
-        text: "ID",
-        style: (cell, row, rowIndex, colIndex) => {
-          return {
-            width: '20%',
-            cursor: 'pointer',
-          };
-        },
-        hidden: true,
-      },
-      {
-        dataField: "song",
-        text: "Song",
-        style: (cell, row, rowIndex, colIndex) => {
-          return {
-            width: '20%',
-            cursor: 'pointer',
-          };
-        },
-        sort: true,
-        formatter: unescapeFormatter,
-      },
-      {
-        dataField: "artist",
-        text: "Artist",
-        style: (cell, row, rowIndex, colIndex) => {
-          return {
-            width: '19%',
-            cursor: 'pointer',
-          };
-        },
-        sort: true,
-        formatter: unescapeFormatter,
-      },
-      {
-        dataField: "json",
-        text: 'JSON',
-        hidden: true,
-      },
-      {
-        dataField: "arrangement",
-        text: "Arrangement",
-        style: (cell, row, rowIndex, colIndex) => {
-          return {
-            width: '5%',
-            cursor: 'pointer',
-          };
-        },
-        sort: true,
-        formatter: arrangmentFormatter,
-      },
-      {
-        dataField: "mastery",
-        text: "Current Mastery",
-        style: (cell, row, rowIndex, colIndex) => {
-          return {
-            width: '15%',
-            cursor: 'pointer',
-          };
-        },
-        sort: true,
-        formatter: round100Formatter,
-      },
-      {
-        dataField: "tuning_weight",
-        text: "Tuning",
-        style: (cell, row, rowIndex, colIndex) => {
-          return {
-            width: '5%',
-            cursor: 'pointer',
-          };
-        },
-        sort: true,
-        formatter: tuningFormatter,
-      },
-      {
-        dataField: "count",
-        text: "Count",
-        style: (cell, row, rowIndex, colIndex) => {
-          return {
-            width: '5%',
-          };
-        },
-        sort: true,
-        formatter: countFormmatter,
-      },
-      {
-        classes: difficultyClass,
-        dataField: "difficulty",
-        text: "Difficulty",
-        style: (cell, row, rowIndex, colIndex) => {
-          return {
-            width: '5%',
-          };
-        },
-        sort: true,
-        formatter: difficultyFormatter,
-      },
-      {
-        dataField: "sa_playcount",
-        text: 'Play Count',
-        hidden: true,
-      },
-      {
-        dataField: this.state.rpsrc === "las" ? "date_las" : "date_sa",
-        text: "Last Played",
-        style: (cell, row, rowIndex, colIndex) => {
-          return {
-            width: '25%',
-            cursor: 'pointer',
-          };
-        },
-        sort: true,
-        formatter: dateFormatter,
-      },
-      {
-        dataField: "sa_highest_badge",
-        text: 'Badges',
-        sort: true,
-        style: (cell, row, rowIndex, colIndex) => {
-          return {
-            width: '20%',
-            display: this.state.showSAStats ? "" : "none",
-          };
-        },
-        headerStyle: (cell, row, rowIndex, colIndex) => {
-          return {
-            width: '20%',
-            display: this.state.showSAStats ? "" : "none",
-          };
-        },
-        formatter: badgeFormatter,
-      },
-    ]
-    this.setState({ rpcolumns });
     this.handleRPTableChange("cdm", {
       page: this.state.page,
       sizePerPage: this.state.rpsizePerPage,
-      sortField: this.state.rpsrc === "las" ? "date_las" : "date_sa",
+      sortField: "date_las",
       sortOrder: "desc",
     })
   }
@@ -1824,7 +1383,7 @@ export default class RSLiveView extends React.Component {
             sizePerPage={this.state.sizePerPage}
             totalSize={this.state.totalSize}
             onTableChange={this.handleTableChange}
-            columns={this.columns}
+            columns={this.state.columns}
             rowEvents={this.rowEvents}
             rowStyle={this.rowStyle}
             paginate={false}
@@ -1833,17 +1392,7 @@ export default class RSLiveView extends React.Component {
         <br /> <br />
         <div>
           <h2 className="ta-left" style={{ color: 'wheat' }}>
-            Recently Played -&nbsp;
-            <span style={{
-              fontSize: 28 + 'px',
-              border: 'none',
-              borderBottom: 1 + 'px',
-              borderBottomStyle: 'dotted',
-            }}>
-              <a href="#" onClick={this.changeRPSrc}>
-                {this.state.rpsrc === "las" ? "Learn A Song" : "Score Attack"}
-              </a>
-            </span>
+            Recently Played
           </h2>
           <div>
             <RemoteAll
@@ -1884,3 +1433,4 @@ RSLiveView.defaultProps = {
   updateHeader: () => { },
   resetHeader: () => { },
 }
+export default withI18n('translation')(RSLiveView)
