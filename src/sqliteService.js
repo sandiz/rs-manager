@@ -672,7 +672,42 @@ export async function updateSongsOwnedV2(songs, isCDLC = false) {
         items += ',';
       }
     }
-    sql = `INSERT OR IGNORE INTO songs_owned (album, artist, song, arrangement, json, psarc, dlc, sku, difficulty, dlckey, songkey, id,uniqkey, lastConversionTime, mastery, count, arrangementProperties, capofret, centoffset, tuning, songLength, maxNotes, tempo, is_cdlc, tuning_weight, path_lead, path_rhythm, path_bass, bonus_arr, represent) VALUES ${items}`;
+    sql = `
+      INSERT OR IGNORE INTO songs_owned (
+        album, artist, song, arrangement, json, psarc, dlc, sku, difficulty, dlckey, songkey, id, uniqkey, lastConversionTime, mastery, count, arrangementProperties, capofret, centoffset, tuning, songLength, maxNotes, tempo, is_cdlc, tuning_weight, path_lead, path_rhythm, path_bass, bonus_arr, represent
+      ) VALUES ${items}
+      ON CONFLICT(id) DO UPDATE SET
+        album=excluded.album,
+        artist=excluded.artist,
+        song=excluded.song,
+        arrangement=excluded.arrangement,
+        json=excluded.json,
+        psarc=excluded.psarc,
+        dlc=excluded.dlc,
+        sku=excluded.sku,
+        difficulty=excluded.difficulty,
+        dlckey=excluded.dlckey,
+        songkey=excluded.songkey,
+        uniqkey=excluded.uniqkey,
+        lastConversionTime=excluded.lastConversionTime,
+        mastery=mastery,
+        count=count,
+        arrangementProperties=excluded.arrangementProperties,
+        capofret=excluded.capofret,
+        centoffset=excluded.centoffset,
+        tuning=excluded.tuning,
+        songLength=excluded.songLength,
+        maxNotes=excluded.maxNotes,
+        tempo=excluded.tempo,
+        is_cdlc=excluded.is_cdlc,
+        tuning_weight=excluded.tuning_weight,
+        path_lead=excluded.path_lead,
+        path_rhythm=excluded.path_rhythm,
+        path_bass=excluded.path_bass,
+        bonus_arr=excluded.bonus_arr,
+        represent=excluded.represent;
+      `;
+    // console.log(sql);
     try {
       //eslint-disable-next-line
       const op = await db.run(sql);
