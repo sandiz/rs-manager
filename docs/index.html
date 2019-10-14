@@ -114,15 +114,15 @@
 									<p>
 										<h3>Stats</h3>
 										<ul>
-											<li>High level mastery/completion/score attack <a href="javascript:void(0);"
+											<li>Track your mastery/completion/score attack <a href="javascript:void(0);"
 													onclick="javascript:goTo('dashboard-stats-2')">stats</a> of your
 												entire
-												collection / setlists</li>
-											<li>Low level stats ( <a href="javascript:void(0);"
+												collection and setlists</li>
+											<li>Track your per-song stats viz. <a href="javascript:void(0);"
 													onclick="javascript:goTo('songs-owned')">mastery</a>,
 												<a href="javascript:void(0);"
 													onclick="javascript:goTo('progress-history')">progress
-													history </a>)</li>
+													history </a>.</li>
 										</ul>
 									</p>
 								</div>
@@ -130,11 +130,12 @@
 									<p>
 										<h3>Steam</h3>
 										<ul>
-											<li>steam integration (dlc catalog + <a href="javascript:void(0);"
-													onclick="javascript:goTo('songs-available')">purchased stats</a>)
+											<li>integrates with steam, search dlcs and track your <a
+													href="javascript:void(0);"
+													onclick="javascript:goTo('songs-available')">purchased stats</a>.
 											</li>
-											<li>sort by acquired date</li>
-											<li>discover similar dlcs (genre based)</li>
+											<li>sort dlcs by acquired date</li>
+											<li>discover similar dlcs based on genre</li>
 										</ul>
 									</p>
 								</div>
@@ -143,8 +144,12 @@
 										<h3>Setlists</h3>
 										<ul>
 											<li>unlimited setlists to sort your collection</li>
-											<li>supports manual, filter based and rocksmith in-game song lists</li>
-											<li><a href="javascript:void(0);"
+											<li>add songs manually or <a href="javascript:void(0);"
+													onclick="javascript:goTo('setlist-filter')">generate</a> <a
+													href="javascript:void(0);"
+													onclick="javascript:goTo('setlist-filter-2')">setlists</a>
+												based on filters</li>
+											<li>import and <a href="javascript:void(0);"
 													onclick="javascript:goTo('export-setlist')">export</a> to
 												Rocksmith song list (integrates <a
 													href="https://pypi.org/project/rsrtools/" style="color:wheat"
@@ -224,7 +229,7 @@
 										alt="">
 									<div class="text-center">Setlists Filters</div>
 								</div>
-								<div class="item" data-tag="setlist-filter=2">
+								<div class="item" data-tag="setlist-filter-2">
 									<img class="img-carousel" src="screenshots/images/custom.setlist.filtertwo.jpg"
 										alt="">
 									<div class="text-center">Setlists Filter - 2</div>
