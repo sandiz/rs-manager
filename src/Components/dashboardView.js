@@ -20,7 +20,7 @@ import { replaceRocksmithTerms } from './songavailableView';
 import SongDetailView from './songdetailView';
 import { getBadgeName } from './songlistView';
 import { DispatcherService, DispatchEvents } from '../lib/libdispatcher';
-import { profileWorker, imageWorker } from '../lib/libworker';
+import { profileWorker, imageWorker, noThumbURL } from '../lib/libworker';
 
 const Steam = require('steam-webapi');
 const albumArt = require('./../lib/album-art');
@@ -74,9 +74,9 @@ class DashboardView extends React.Component {
       saeasywidth: [0, 0, 0, 0, 0, 0, 0],
       genInfoState: "default", // default,showoptions, generating
 
-      coverlas: 'https://raw.githubusercontent.com/sandiz/rs-manager/master/screenshots/nothumb.jpg',
-      coverreddit: 'https://raw.githubusercontent.com/sandiz/rs-manager/master/screenshots/nothumb.jpg',
-      coversteam: 'https://raw.githubusercontent.com/sandiz/rs-manager/master/screenshots/nothumb.jpg',
+      coverlas: noThumbURL,
+      coverreddit: noThumbURL,
+      coversteam: noThumbURL,
     }
   }
 
@@ -491,7 +491,7 @@ class DashboardView extends React.Component {
 
   fetchCover = async (artist, albumortrack, usealbum = true) => {
     const a1 = artist.split("feat.")[0].trim();
-    let url = "https://raw.githubusercontent.com/sandiz/rs-manager/master/screenshots/nothumb.jpg";
+    let url = noThumbURL;
     const options = {
       size: 'large',
     }
@@ -512,7 +512,7 @@ class DashboardView extends React.Component {
     }
     if (!url.toString().includes("http") || url.toString().toLowerCase().includes('rate limit exceeded')) {
       console.warn(url);
-      url = "https://raw.githubusercontent.com/sandiz/rs-manager/master/screenshots/nothumb.jpg";
+      url = noThumbURL;
     }
     //console.log("---")
     return url;

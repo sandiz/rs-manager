@@ -1,0 +1,117 @@
+/* =================================== */
+
+/*  Footer Styles
+/* =================================== */
+
+.footer-area {
+    background: $title-color;
+    .single-footer-widget {
+        @media(max-width: 991px) {
+            margin-bottom:30px;
+        }
+        h4 {
+            color: $white;
+            margin-bottom: 35px;
+            @media(max-width: 1024px) {
+                font-size: 18px;
+            }
+            @media(max-width: 991px) {
+                margin-bottom: 15px;
+            }
+        }
+        ul {
+            li {
+                margin-bottom: 15px;
+                a {
+                    @include transition();
+                    color: $text-color;
+                    &:hover {
+                        color: $white;
+                    }
+                }
+            }
+        }
+        .form-wrap {
+            margin-top: 25px;
+        }
+        input {
+            height: 40px;
+            border: none;
+            width: 80% !important;
+            font-weight: 300;
+            background: #f9f9ff;
+            color: $title-color;
+            padding-left: 20px;
+            border-radius: 0;
+            font-size: 14px;
+            padding: 10px;
+            &:focus {
+                outline: none;
+            }
+        }
+        .click-btn {
+            @extend .p1-gradient-bg;
+            color: $white;
+            border-radius: 0;
+            border-top-left-radius: 0px;
+            border-bottom-left-radius: 0px;
+            padding: 8px 12px;
+            border: 0;
+            span {
+                font-weight: 500;
+            }
+        }
+    }
+    .footer-bottom {
+        margin-top: 90px;
+        @media(max-width: 991px) {
+            margin-top: 20px;
+        }
+        .footer-text {
+            color: $white;
+            a,
+            span {
+                color: $primary-color;
+            }
+        }
+        span {
+            font-weight: 700;
+        }
+        .footer-social {
+            text-align: center;
+            @media(max-width: 991px) {
+                text-align:left;
+                margin-top: 30px;
+            }
+            a {
+                background: #3e4876;
+                margin-left: 5px;
+                width: 40px;
+                color: $white;
+                display: inline-grid;
+                text-align: center;
+                height: 40px;
+                align-content: center;
+                @include transition();
+                &:hover {
+                    @extend .p1-gradient-bg;
+                }
+            }
+        }
+        .social-link {
+            text-align: right;
+            @media(max-width: 991px) {
+                text-align: left;
+                margin-top: 30px;
+            }
+        }
+        .buttons {
+            p {
+                font-size: 12px;
+                span {
+                    font-size: 18px;
+                }
+            }
+        }
+    }
+}
