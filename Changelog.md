@@ -1,6 +1,9 @@
-v2.6.0
+v2.7.0
 - add custom columns settings option
 - add generateColumns api to generate columns based on the above setting
+v2.6.0
+- gh-pages 
+- move screenshots to docs/screenshots
 v2.5.0
 - add ftue wizard for new users (triggers when songcount == 0)
 - metaWorker for (import psarc, update songs db and update stats) task.

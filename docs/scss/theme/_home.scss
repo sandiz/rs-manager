@@ -1,0 +1,546 @@
+//--------- Start Banner Area -------------//
+.home-banner-area {
+    background: url(../img/home-banner-bg.jpg) center;
+    background-size: cover;
+    .banner-img {
+        text-align: right;
+        @media (max-width: 1440px) {
+            text-align: left;
+            img {
+                width: 60%;
+            }
+        }
+        @media (max-width: 991px) {
+            text-align: center;
+        }
+        @media (max-width: 767px) {
+            display: none;
+        }
+    }
+    .fullscreen {
+        @media (max-width: 991px) {
+            height: 700px !important;
+        }
+    }
+}
+
+.banner-area {
+    background: url(../img/banner.jpg) center;
+    background-size: cover;
+    .banner-content {
+        padding: 162px 0;
+        @media (max-width: 767px) {
+            padding: 150px 0 50px;
+        }
+        >.col-lg-12.d-flex {
+            @media (max-width: 767px) {
+                display: block !important;
+            }
+        }
+        .left-part {
+            h1 {
+                margin-bottom: 15px;
+            }
+            p {
+                max-width: 510px;
+            }
+        }
+        .right-part {
+            @media (max-width: 767px) {
+                margin-top: 100px;
+            }
+            a {
+                color: $white;
+                text-transform: uppercase;
+                font-size: 14px;
+                @media (max-width: 767px) {
+                    color: $title-color;
+                }
+            }
+            span {
+                margin: 0 10px;
+                color: $white;
+                font-size: 14px;
+                @media (max-width: 767px) {
+                    color: $title-color;
+                }
+            }
+        }
+    }
+}
+
+.home-banner-content {
+    h1 {
+        font-size: 60px;
+        margin-bottom: 25px;
+        @include media-breakpoint-down(md) {
+            font-size: 36px;
+        }
+        @include media-breakpoint-down (lg) {
+            font-size: 35px;
+        }
+        @media(max-width:767px) {
+            margin-top: 50px;
+        }
+    }
+    p {
+        margin-bottom: 45px;
+    }
+}
+
+//--------- End Banner Area -------------//
+//--------- Start home-about Area -------------//
+.about-area {
+    position: relative;
+    padding: 150px 0 70px;
+    @media (max-width: 991px) {
+        padding: 20px 0 70px;
+    }
+    .container {
+        &:after {
+            content: '';
+            position: absolute;
+            top: 10%;
+            right: 36%;
+            width: 68%;
+            height: 68%;
+            background: linear-gradient(to bottom right, transparent 0%, transparent 50%, #f8fcff 50%, #fcfdff 100%);
+            background: -webkit-linear-gradient(to bottom right, transparent 0%, transparent 50%, #f8fcff 50%, #fcfdff 100%);
+            background: -moz-linear-gradient(to bottom right, transparent 0%, transparent 50%, #f8fcff 50%, #fcfdff 100%);
+            background: -ms-linear-gradient(to bottom right, transparent 0%, transparent 50%, #f8fcff 50%, #fcfdff 100%);
+            background: -o-linear-gradient(to bottom right, transparent 0%, transparent 50%, #f8fcff 50%, #fcfdff 100%);
+            z-index: -1;
+            @media(max-width: 991px) {
+                content: none;
+            }
+        }
+    }
+}
+
+.home-about-left {
+    img {
+        width: 100%;
+        @media(max-width: 991px) {
+            display: none;
+        }
+    }
+}
+
+.home-about-right {
+    h1 {
+        padding: 20px 0;
+        @media(max-width: 413px) {
+            font-size: 30px;
+            br {
+                display: none;
+            }
+        }
+    }
+    p {
+        margin-bottom: 40px;
+    }
+}
+
+.home-about-right2 {
+    @media(max-width: 991px) {
+        margin-top: 50px;
+    }
+}
+
+//--------- End home-about Area -------------//
+//--------- Start about-video Area -------------//
+.about-video-area {
+    position: relative;
+    .vdo-bg {
+        &:before,
+        &:after {
+            content: '';
+            position: absolute;
+            top: 0;
+            height: 100%;
+            z-index: -1;
+        }
+        &:before {
+            left: 0;
+            width: 30%;
+            background: #f1f9ff;
+        }
+        &:after {
+            right: 0;
+            width: 70%;
+            background: #2f2f2f;
+        }
+    }
+}
+
+.about-video-right {
+    background: url(../img/video-bg.jpg) no-repeat center;
+    background-size: cover;
+    height: 645px;
+    .play-btn {
+        z-index: 2;
+    }
+}
+
+//--------- End about-video Area -------------//
+//--------- Start Feature Area -------------//
+.feature-area {
+    position: relative;
+    &:after {
+        content: "";
+        position: absolute;
+        right: 16%;
+        bottom: -100px;
+        z-index: -1;
+        width: 340px;
+        height: 340px;
+        background: linear-gradient(to bottom right, transparent 0%, transparent 50%, $primary-color 50%, $primary-color2 100%);
+        background: -webkit-linear-gradient(to bottom right, transparent 0%, transparent 50%, $primary-color 50%, $primary-color2 100%);
+        background: -moz-linear-gradient(to bottom right, transparent 0%, transparent 50%, $primary-color 50%, $primary-color2 100%);
+        background: -ms-linear-gradient(to bottom right, transparent 0%, transparent 50%, $primary-color 50%, $primary-color2 100%);
+        background: -o-linear-gradient(to bottom right, transparent 0%, transparent 50%, $primary-color 50%, $primary-color2 100%);
+        @media(max-width: 991px) {
+            display: none;
+        }
+    }
+    .single-feature {
+        background: $white;
+        padding: 40px 30px;
+        text-align: center;
+        box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
+        @media (max-width: 991px) {
+            margin-bottom: 30px;
+        }
+        h3 {
+            @include transition();
+            font-size: 21px;
+        }
+        .title {
+            .lnr {
+                @extend .p1-gradient-bg;
+                color: $white;
+                font-weight: 600;
+                font-size: 24px;
+                padding: 30px;
+                display: inline-block;
+                margin-bottom: 40px;
+            }
+        }
+        p {
+            margin-bottom: 0px;
+            margin-top: 20px;
+        }
+        &:hover {
+            cursor: pointer;
+            h3 {
+                color: $primary-color;
+            }
+        }
+    }
+}
+
+//--------- End Feature Area -------------//
+//--------- Start fact Area -------------//
+.fact-area {
+    .fact-box {
+        box-shadow: 0px 20px 50px rgba(153, 153, 153, 0.20);
+    }
+}
+
+.single-fact {
+    text-align: center;
+    margin: 45px 0;
+    padding: 8px 16px;
+    border-right: 1px solid #ddd;
+    @media (max-width: 991px) {
+        margin: 10px 0;
+        padding: 8px 32px;
+    }
+    &:last-child {
+        border-right: 0;
+    }
+    h2 {
+        font-size: 36px;
+        margin-bottom: 5px;
+        @media (max-width: 991px) {
+            font-size: 25px;
+        }
+    }
+    p {
+        margin: 0;
+        font-size: 14px;
+    }
+}
+
+//--------- End fact Area -------------//
+//--------- Testimonials Area -------------//
+.testimonials-area {
+    position: relative;
+    &.about-page {
+        .container {
+            &::before {
+                display: none;
+            }
+        }
+    }
+    .container {
+        &:before {
+            content: "";
+            position: absolute;
+            left: 17%;
+            bottom: 0;
+            z-index: -1;
+            width: 340px;
+            height: 340px;
+            background: linear-gradient(to bottom left, transparent 0%, transparent 50%, #46dbf9 50%, #204be3 100%);
+            background: -webkit-linear-gradient(to bottom left, transparent 0%, transparent 50%, #46dbf9 50%, #204be3 100%);
+            background: -moz-linear-gradient(to bottom left, transparent 0%, transparent 50%, #46dbf9 50%, #204be3 100%);
+            background: -ms-linear-gradient(to bottom left, transparent 0%, transparent 50%, #46dbf9 50%, #204be3 100%);
+            background: -o-linear-gradient(to bottom left, transparent 0%, transparent 50%, #46dbf9 50%, #204be3 100%);
+            @media(max-width: 991px) {
+                display: none;
+            }
+        }
+    }
+    .owl-thumb-item {
+        margin-right: 20px;
+        position: relative;
+        &:last-child {
+            margin-right: 0;
+        }
+        &.active {
+            .overlay-grad {
+                @extend .p1-gradient-bg;
+                opacity: .8;
+            }
+        }
+        .overlay-grad {
+            @include transition();
+            cursor: pointer;
+            &:hover {
+                @extend .p1-gradient-bg;
+                opacity: .8;
+            }
+        }
+    }
+}
+
+.testi-slider {
+    margin: auto;
+    .testi-item {
+        text-align: center;
+        img {
+            width: auto;
+            margin: auto;
+        }
+    }
+}
+
+.testi-item {
+    margin-bottom: 50px;
+    h4 {
+        font-size: 21px;
+        font-weight: 700;
+        margin-top: 40px;
+        margin-bottom: 10px;
+    }
+    .list {
+        margin-bottom: 35px;
+        li {
+            display: inline-block;
+            a {
+                color: #ffc000;
+                font-size: 14px;
+            }
+        }
+    }
+    p {
+        max-width: 605px;
+        margin: auto;
+    }
+}
+
+//--------- End Testimonials Area -------------//
+//--------- Screenshot Area -------------//
+.screenshot-area {
+    position: relative;
+    .container {
+        &:after {
+            content: '';
+            position: absolute;
+            top: 20%;
+            left: 31%;
+            width: 69%;
+            height: 188%;
+            background: linear-gradient(to bottom left, transparent 0%, transparent 50%, #f8fcff 50%, #fcfdff 100%);
+            background: -webkit-linear-gradient(to bottom left, transparent 0%, transparent 50%, #f8fcff 50%, #fcfdff 100%);
+            background: -moz-linear-gradient(to bottom left, transparent 0%, transparent 50%, #f8fcff 50%, #fcfdff 100%);
+            background: -ms-linear-gradient(to bottom left, transparent 0%, transparent 50%, #f8fcff 50%, #fcfdff 100%);
+            background: -o-linear-gradient(to bottom left, transparent 0%, transparent 50%, #f8fcff 50%, #fcfdff 100%);
+            z-index: -1;
+            @media(max-width: 991px) {
+                content: none;
+            }
+        }
+    }
+    .single-screenshot {
+        cursor: pointer;
+        @media(max-width: 991px) {
+            margin-bottom: 30px;
+        }
+        @media(max-width: 575px) {
+            padding: 30px;
+            text-align: center;
+        }
+    }
+}
+
+//--------- End Screenshot Area -------------//
+//--------- start price area -------------//
+.pricing-area {
+    padding: 150px 0;
+    @media(max-width: 991px) {
+        padding: 40px 0 70px;
+    }
+    position: relative;
+    &.pricing-page {
+        padding-bottom: 0;
+        &:after {
+            display: none;
+        }
+    }
+    &:after {
+        content: "";
+        position: absolute;
+        right: 16%;
+        bottom: 70px;
+        z-index: -1;
+        width: 340px;
+        height: 340px;
+        background: linear-gradient(to bottom right, transparent 0%, transparent 50%, $primary-color 50%, $primary-color2 100%);
+        background: -webkit-linear-gradient(to bottom right, transparent 0%, transparent 50%, $primary-color 50%, $primary-color2 100%);
+        background: -moz-linear-gradient(to bottom right, transparent 0%, transparent 50%, $primary-color 50%, $primary-color2 100%);
+        background: -ms-linear-gradient(to bottom right, transparent 0%, transparent 50%, $primary-color 50%, $primary-color2 100%);
+        background: -o-linear-gradient(to bottom right, transparent 0%, transparent 50%, $primary-color 50%, $primary-color2 100%);
+        @media(max-width: 991px) {
+            display: none;
+        }
+    }
+}
+
+.single-price {
+    background-color: $white;
+    text-align: center;
+    box-shadow: 0px 10px 30px 0px rgba(0, 0, 0, 0.08);
+    @media(max-width: 991px) {
+        margin-bottom: 30px;
+    }
+    .top-sec {
+        border-bottom: 1px solid #eeeeee;
+        padding: 40px 40px 22px 40px;
+        text-align: left;
+        @include transition();
+        br {
+            display: none;
+        }
+        @media(max-width:1024px) {
+            br {
+                display: block;
+            }
+        }
+    }
+    .end-sec {
+        @include transition();
+        padding: 40px;
+        ul li {
+            margin-bottom: 20px;
+        }
+    }
+    .price-btn {
+        background: #f9f9ff;
+        color: $title-color;
+        border-radius: 0;
+        box-shadow: none;
+        border: 1px solid #dddddd;
+        @include transition();
+    }
+    &:hover {
+        cursor: pointer;
+        .price-btn {
+            @extend .p1-gradient-bg;
+            color: $white;
+        }
+    }
+    @media(max-width:800px) {
+        margin-bottom: 30px;
+    }
+}
+
+//----------- Start Generic Page -------------//
+.whole-wrap {
+    background-color: $white;
+}
+
+.generic-banner {
+    margin-top: 60px;
+    background-color: $primary-color;
+    text-align: center;
+    .height {
+        height: 600px;
+        @include media-breakpoint-down (sm) {
+            height: 400px;
+        }
+    }
+    .generic-banner-content {
+        h2 {
+            line-height: 1.2em;
+            margin-bottom: 20px;
+            br {
+                @include media-breakpoint-down (md) {
+                    display: none;
+                }
+            }
+        }
+        p {
+            text-align: center;
+            font-size: 16px;
+            br {
+                @include media-breakpoint-down (md) {
+                    display: none;
+                }
+            }
+        }
+    }
+}
+
+.generic-content {
+    h1 {
+        font-weight: 600;
+    }
+}
+
+.about-generic-area {
+    background: $white;
+    .border-top-generic {}
+    p {
+        margin-bottom: 20px;
+    }
+}
+
+.white-bg {
+    background: $white;
+}
+
+.section-top-border {
+    padding: 50px 0;
+    border-top: 1px dotted #eee;
+}
+
+.switch-wrap {
+    margin-bottom: 10px;
+    p {
+        margin: 0;
+    }
+}
+
+//----------- End Generic Page -------------//

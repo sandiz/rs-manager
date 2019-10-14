@@ -20,6 +20,7 @@ const albumArt = require('./../lib/album-art');
 
 const fs = remote.require('fs').promises;
 const path = remote.require('path');
+export const noThumbURL = "https://raw.githubusercontent.com/sandiz/rs-manager/master/screenshots/nothumb.jpg";
 
 class psarcWorker {
     static psarcToaster = (toastID = null, progress = 0, info = {}) => {
@@ -747,7 +748,7 @@ class profileWorker {
 class imageWorker {
     static fetchCover = async (artist, albumortrack, usealbum = true, data = {}) => {
         const a1 = artist.split("feat.")[0].trim();
-        let url = "https://raw.githubusercontent.com/sandiz/rs-manager/master/screenshots/nothumb.jpg";
+        let url = noThumbURL;
         const options = {
             size: 'large',
         }
@@ -765,7 +766,7 @@ class imageWorker {
         }
         if (!url.toString().includes("http") || url.toString().toLowerCase().includes('rate limit exceeded')) {
             console.warn(url);
-            url = "https://raw.githubusercontent.com/sandiz/rs-manager/master/screenshots/nothumb.jpg";
+            url = noThumbURL;
         }
         DispatcherService.dispatch(DispatchEvents.ALBUM_COVER_QUERY, { url, ...data });
     }

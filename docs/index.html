@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="zxx" class="no-js">
+
+	<head>
+		<!-- Mobile Specific Meta -->
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<!-- Favicon-->
+		<link rel="shortcut icon" href="img/fav.png">
+		<!-- Author Meta -->
+		<meta name="author" content="codepixer">
+		<!-- Meta Description -->
+		<meta name="description" content="">
+		<!-- Meta Keyword -->
+		<meta name="keywords" content="">
+		<!-- meta character set -->
+		<meta charset="UTF-8">
+		<!-- Site Title -->
+		<title>rs-manager - Stats Manager for Rocksmith</title>
+
+		<link href="https://fonts.googleapis.com/css?family=Poppins:400,600|Roboto:400,400i,500" rel="stylesheet">
+		<!--
+			CSS
+			============================================= -->
+		<link rel="stylesheet" href="css/linearicons.css">
+		<link rel="stylesheet" href="css/font-awesome.min.css">
+		<link rel="stylesheet" href="css/bootstrap.css">
+		<link rel="stylesheet" href="css/magnific-popup.css">
+		<link rel="stylesheet" href="css/nice-select.css">
+		<link rel="stylesheet" href="css/hexagons.min.css">
+		<link rel="stylesheet" href="css/owl.carousel.css">
+		<link rel="stylesheet" href="css/main.css">
+	</head>
+
+	<body>
+		<!-- start header Area -->
+		<header id="header">
+			<div class="container main-menu">
+				<div class="row align-items-center justify-content-between d-flex">
+					<div id="logo">
+						<a href="index.html"><img class="logo" src="img/logo.png" alt="" title="" /></a>
+					</div>
+				</div>
+			</div>
+		</header>
+		<!-- end header Area -->
+
+		<!-- start banner Area -->
+		<section class="home-banner-area">
+			<div class="container">
+				<div class="row fullscreen d-flex align-items-center justify-content-between">
+					<div class="home-banner-content col-lg-6 col-md-6">
+						<h1>
+							rs-manager
+							<h5 style="margin-top: -25px">
+								Stats Manager for Rocksmith Remastered 2014
+							</h5>
+						</h1>
+
+						<div>
+							<br />
+							<p> Rocksmith is great but its UI leaves a lot to be desired
+								especially when you have a lot of songs in your collection. This app
+								uses Rocksmith + Steam data to consolidate stats, mastery, dlc and song lists under one
+								roof.
+							</p>
+						</div>
+						<div class="download-button d-flex flex-row justify-content-start">
+							<div class="buttons dark flex-row d-flex">
+								<i class="fa fa-windows" aria-hidden="true"></i>
+								<div class="desc">
+									<a id="win-dl" href="https://github.com/sandiz/rs-manager/releases/latest">
+										<p>
+											<span>Download</span> <br>
+											for Windows
+										</p>
+									</a>
+								</div>
+							</div>
+							<div class="buttons dark flex-row d-flex">
+								<i class="fa fa-apple" aria-hidden="true"></i>
+								<div class="desc">
+									<a id="mac-dl" href="https://github.com/sandiz/rs-manager/releases/latest">
+										<p>
+											<span>Download</span> <br>
+											for MacOS
+										</p>
+									</a>
+								</div>
+							</div>
+						</div>
+						<div style="margin-top: 4px">
+							<h5>Latest Version: <span id="version">-</span>
+							</h5>
+						</div>
+					</div>
+					<div class="img-ss-div">
+						<img class="img-ss" src="screenshots/images/dashboard.png" alt="">
+					</div>
+				</div>
+			</div>
+		</section>
+		<!-- End banner Area -->
+		<!-- End fact Area -->
+
+		<!-- Start feature Area -->
+		<section class="section-gap-top">
+			<div class="">
+				<div class="feature-row row d-flex justify-space-evenly">
+					<div style="width: 50%">
+						<div style="padding-left: 20%;" class="text-left">
+							<h2>Features</h2>
+							<div class="text-left">
+								<div>
+									<p>
+										<h3>Stats</h3>
+										<ul>
+											<li>High level mastery/completion/score attack <a href="javascript:void(0);"
+													onclick="javascript:goTo('dashboard-stats-2')">stats</a> of your
+												entire
+												collection / setlists</li>
+											<li>Low level stats ( <a href="javascript:void(0);"
+													onclick="javascript:goTo('songs-owned')">mastery</a>,
+												<a href="javascript:void(0);"
+													onclick="javascript:goTo('progress-history')">progress
+													history </a>)</li>
+										</ul>
+									</p>
+								</div>
+								<div>
+									<p>
+										<h3>Steam</h3>
+										<ul>
+											<li>steam integration (dlc catalog + <a href="javascript:void(0);"
+													onclick="javascript:goTo('songs-available')">purchased stats</a>)
+											</li>
+											<li>sort by acquired date</li>
+											<li>discover similar dlcs (genre based)</li>
+										</ul>
+									</p>
+								</div>
+								<div>
+									<p>
+										<h3>Setlists</h3>
+										<ul>
+											<li>unlimited setlists to sort your collection</li>
+											<li>supports manual, filter based and rocksmith in-game song lists</li>
+											<li><a href="javascript:void(0);"
+													onclick="javascript:goTo('export-setlist')">export</a> to
+												Rocksmith song list (integrates <a
+													href="https://pypi.org/project/rsrtools/" style="color:wheat"
+													target="_blank">rsrtools</a>)</li>
+										</ul>
+									</p>
+								</div>
+								<div>
+									<p>
+										<h3>Realtime Stats (integrates <a
+												href="https://github.com/kokolihapihvi/RockSniffer/" style="color:wheat"
+												target="_blank">RockSniffer</a>)</h3>
+										<ul>
+											<li><a href="javascript:void(0);"
+													onclick="javascript:goTo('hit-percent')">track</a>
+												note hit on a per phrase level</li>
+											<li><a href="javascript:void(0);"
+													onclick="javascript:goTo('perfect-percent')">track</a>
+												perfect hits on a per phrase level (score attack) </li>
+											<li><a href="javascript:void(0);"
+													onclick="javascript:goTo('raw-record')">record</a>
+												raw audio</li>
+										</ul>
+									</p>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div style="width: 50%">
+						<div class="text-left">
+							<h2 class="h2-screenshot">Screenshots</h2>
+							<div class="owl-screenshot owl-carousel owl-theme" style="padding-top: 2%">
+								<div class="item" data-tag="dashboard" data-msg="Dashboard">
+									<img class="img-carousel" src="screenshots/images/dashboard.png" alt="">
+									<div class="text-center">Dashboard</div>
+								</div>
+								<div class="item" data-tag="dashboard-stats-2">
+									<img class="img-carousel" src="screenshots/images/dashboard.stats-2.png" alt="">
+									<div class="text-center">High Level Stats</div>
+								</div>
+								<div class="item" data-tag="songs-owned">
+									<img class="img-carousel" src="screenshots/images/songs.owned.png" alt="">
+									<div class="text-center">Songs Collection</div>
+								</div>
+								<div class="item" data-tag="rs-live">
+									<img class="img-carousel" src="screenshots/images/rs-live.png" alt="">
+									<div class="text-center">Rocksmith Live</div>
+								</div>
+								<div class="item" data-tag="progress-history">
+									<img class="img-carousel" src="screenshots/images/progress-history.png" alt="">
+									<div class="text-center">Progress History</div>
+								</div>
+								<div class="item" data-tag="songs-available">
+									<img class="img-carousel" src="screenshots/images/songs.available.png" alt="">
+									<div class="text-center">DLC's available</div>
+								</div>
+								<div class="item" data-tag="export-setlist">
+									<img class="img-carousel" src="screenshots/images/exportsetlistmain.png" alt="">
+									<div class="text-center">Export Setlist to a Rocksmith Song List</div>
+								</div>
+								<div class="item" data-tag="hit-percent">
+									<img class="img-carousel" src="screenshots/images/hit-percent-chart-guitar.png"
+										alt="">
+									<div class="text-center">Hit Tracking</div>
+								</div>
+								<div class="item" data-tag="perfect-percent">
+									<img class="img-carousel" src="screenshots/images/perfect-percent-chart-guitar.png"
+										alt="">
+									<div class="text-center">Perfect Tracking</div>
+								</div>
+								<div class="item" data-tag="raw-record">
+									<img class="img-carousel" src="screenshots/images/raw-record-finish.png" alt="">
+									<div class="text-center">Record Rocksmith Session</div>
+								</div>
+								<div class="item" data-tag="setlist-filter">
+									<img class="img-carousel" src="screenshots/images/custom.setlist.filterone.jpg"
+										alt="">
+									<div class="text-center">Setlists Filters</div>
+								</div>
+								<div class="item" data-tag="setlist-filter=2">
+									<img class="img-carousel" src="screenshots/images/custom.setlist.filtertwo.jpg"
+										alt="">
+									<div class="text-center">Setlists Filter - 2</div>
+								</div>
+								<div class="item" data-tag="psarcExplorer">
+									<img class="img-carousel" src="screenshots/images/psarcExplorer.png" alt="">
+									<div class="text-center">PSARC Explorer</div>
+								</div>
+								<div class="item" data-tag="extractFromPsarc">
+									<img class="img-carousel" src="screenshots/images/extractFromPsarc.png" alt="">
+									<div class="text-center">Extract files from PSARC</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- End feature Area -->
+
+		<!-- Start Footer Area -->
+		<footer class="footer-area" style="margin-top: 10%">
+			<div style="margin-left: 43%; padding-top: 0.5%; padding-bottom: .5%;">
+				<div class="">
+					<p class="footer-text m-0 col-lg-6 col-md-12">
+						<!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+						This template
+						is made with <i class="fa fa-heart-o" aria-hidden="true"></i> by <a href="https://colorlib.com"
+							target="_blank">Colorlib</a>
+						<!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+					</p>
+				</div>
+			</div>
+		</footer>
+		<!-- End Footer Area -->
+
+		<script src="js/vendor/jquery-2.2.4.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+			integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+			crossorigin="anonymous"></script>
+		<script src="js/vendor/bootstrap.min.js"></script>
+		<script src="js/easing.min.js"></script>
+		<script src="js/hoverIntent.js"></script>
+		<script src="js/jquery.magnific-popup.min.js"></script>
+		<script src="js/owl.carousel.min.js"></script>
+		<script src="js/owl-carousel-thumb.min.js"></script>
+		<script src="js/hexagons.min.js"></script>
+		<script src="js/jquery.nice-select.min.js"></script>
+		<script src="js/main.js"></script>
+	</body>
+
+</html>
