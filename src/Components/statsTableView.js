@@ -22,7 +22,7 @@ class StatsTableView extends React.Component {
             ? (
               <tbody>
                 <tr>
-                  <td><Trans i18nKey="total">Total</Trans></td>
+                  <td style={{ width: 18 + '%' }}><Trans i18nKey="total">Total</Trans></td>
                   <td className="">
                     <span id="lead_total" className="ta-right right-align header-sa-top">
                       {this.props.total}
@@ -35,11 +35,11 @@ class StatsTableView extends React.Component {
                     title="Total Full Combos" />
                   <td className="ta-left skinny">
                     <span>
-                      <svg id="fcs_tier_1_svg" height="100%" width="100%" className="dashboardsvg">
+                      <svg id="fcs_tier_1_svg" width="100%" className="dashboardsvg">
                         <rect width={(this.props.tierWidths[6]) + "%"} height="100%" style={{ fill: 'lightgreen', strokeWidth: 2, stroke: 'rgb(0,0,0)' }} />
                       </svg>
                     </span>
-                    <span className="ta-right right-align">
+                    <span className="ta-right right-align score-pad">
                       {this.props.tierTotals[6]}
                     </span>
                   </td>
@@ -50,11 +50,11 @@ class StatsTableView extends React.Component {
                     title="Total Platinum Badges" />
                   <td className="ta-left skinny">
                     <span>
-                      <svg id="lead_tier_1_svg" height="100%" width="100%" className="dashboardsvg">
+                      <svg id="lead_tier_1_svg" width="100%" className="dashboardsvg">
                         <rect width={(this.props.tierWidths[0]) + "%"} height="100%" style={{ fill: 'lightgreen', strokeWidth: 2, stroke: 'rgb(0,0,0)' }} />
                       </svg>
                     </span>
-                    <span className="ta-right right-align">
+                    <span className="ta-right right-align score-pad">
                       {this.props.tierTotals[0]}
                     </span>
                   </td>
@@ -66,10 +66,10 @@ class StatsTableView extends React.Component {
                   />
                   <td className="ta-left skinny">
                     <span>
-                      <svg id="lead_tier_1_svg" height="100%" width="100%" className="dashboardsvg">
+                      <svg id="lead_tier_1_svg" width="100%" className="dashboardsvg">
                         <rect width={(this.props.tierWidths[1]) + "%"} height="100%" style={{ fill: '#C8F749', strokeWidth: 2, stroke: 'rgb(0,0,0)' }} />
                       </svg>
-                      <span className="ta-right right-align">
+                      <span className="ta-right right-align score-pad">
                         {this.props.tierTotals[1]}
                       </span>
                     </span>
@@ -82,11 +82,11 @@ class StatsTableView extends React.Component {
                   />
                   <td className="ta-left skinny">
                     <span>
-                      <svg id="lead_tier_1_svg" height="100%" width="100%" className="dashboardsvg">
+                      <svg id="lead_tier_1_svg" width="100%" className="dashboardsvg">
                         <rect width={(this.props.tierWidths[2]) + "%"} height="100%" style={{ fill: 'yellow', strokeWidth: 2, stroke: 'rgb(0,0,0)' }} />
                       </svg>
                     </span>
-                    <span className="ta-right right-align">
+                    <span className="ta-right right-align score-pad">
                       {this.props.tierTotals[2]}
                     </span>
                   </td>
@@ -97,11 +97,11 @@ class StatsTableView extends React.Component {
                     title="Total Bronze Badges" />
                   <td className="ta-left skinny">
                     <span>
-                      <svg id="lead_tier_1_svg" height="100%" width="100%" className="dashboardsvg">
+                      <svg id="lead_tier_1_svg" width="100%" className="dashboardsvg">
                         <rect width={(this.props.tierWidths[3]) + "%"} height="100%" style={{ fill: 'yellow', strokeWidth: 2, stroke: 'rgb(0,0,0)' }} />
                       </svg>
                     </span>
-                    <span className="ta-right right-align">
+                    <span className="ta-right right-align score-pad">
                       {this.props.tierTotals[3]}
                     </span>
                   </td>
@@ -112,11 +112,11 @@ class StatsTableView extends React.Component {
                     title="Total Failed" />
                   <td className="ta-left skinny">
                     <span>
-                      <svg id="lead_tier_1_svg" height="100%" width="100%" className="dashboardsvg">
+                      <svg id="lead_tier_1_svg" width="100%" className="dashboardsvg">
                         <rect width={(this.props.tierWidths[4]) + "%"} height="100%" style={{ fill: 'yellow', strokeWidth: 2, stroke: 'rgb(0,0,0)' }} />
                       </svg>
                     </span>
-                    <span className="ta-right right-align">
+                    <span className="ta-right right-align score-pad">
                       {this.props.tierTotals[4]}
                     </span>
                   </td>
@@ -130,11 +130,11 @@ class StatsTableView extends React.Component {
                   </td>
                   <td className="ta-left skinny">
                     <span>
-                      <svg id="lead_tier_1_svg" height="100%" width="100%" className="dashboardsvg">
+                      <svg id="lead_tier_1_svg" width="100%" className="dashboardsvg">
                         <rect width={(this.props.tierWidths[5]) + "%"} height="100%" style={{ fill: 'lightgray', strokeWidth: 2, stroke: 'rgb(0,0,0)' }} />
                       </svg>
                     </span>
-                    <span className="ta-right right-align">
+                    <span className="ta-right right-align score-pad">
                       {this.props.tierTotals[5]}
                     </span>
                   </td>
@@ -144,7 +144,7 @@ class StatsTableView extends React.Component {
             : (
               <tbody>
                 <tr>
-                  <td><Trans i18nKey="total">Total</Trans></td>
+                  <td style={{ width: 22 + '%' }}><Trans i18nKey="total">Total</Trans></td>
                   <td className="">
                     <span id="lead_total" className="ta-right right-align header-top">
                       {this.props.total}
@@ -159,11 +159,11 @@ class StatsTableView extends React.Component {
                   </td>
                   <td className="ta-left skinny">
                     <span>
-                      <svg id="lead_tier_1_svg" height="100%" width="100%" className="dashboardsvg">
+                      <svg id="lead_tier_1_svg" width="100%" className="dashboardsvg">
                         <rect width={(this.props.masteryWidths[0]) + "%"} height="100%" style={{ fill: '#26956A', strokeWidth: 2, stroke: 'rgb(0,0,0)' }} />
                       </svg>
                     </span>
-                    <span className="ta-right right-align">
+                    <span className="ta-right right-align score-pad">
                       {this.props.masteryTotals[0]}
                     </span>
                   </td>
@@ -176,11 +176,11 @@ class StatsTableView extends React.Component {
                   </td>
                   <td className="ta-left skinny">
                     <span>
-                      <svg id="lead_tier_1_svg" height="100%" width="100%" className="dashboardsvg">
+                      <svg id="lead_tier_1_svg" width="100%" className="dashboardsvg">
                         <rect width={(this.props.masteryWidths[1]) + "%"} height="100%" style={{ fill: 'lightgreen', strokeWidth: 2, stroke: 'rgb(0,0,0)' }} />
                       </svg>
                     </span>
-                    <span className="ta-right right-align">
+                    <span className="ta-right right-align score-pad">
                       {this.props.masteryTotals[1]}
                     </span>
                   </td>
@@ -193,11 +193,11 @@ class StatsTableView extends React.Component {
                   </td>
                   <td className="ta-left skinny">
                     <span>
-                      <svg id="lead_tier_1_svg" height="100%" width="100%" className="dashboardsvg">
+                      <svg id="lead_tier_1_svg" width="100%" className="dashboardsvg">
                         <rect width={(this.props.masteryWidths[2]) + "%"} height="100%" style={{ fill: 'lightgreen', strokeWidth: 2, stroke: 'rgb(0,0,0)' }} />
                       </svg>
                     </span>
-                    <span className="ta-right right-align">
+                    <span className="ta-right right-align score-pad">
                       {this.props.masteryTotals[2]}
                     </span>
                   </td>
@@ -210,11 +210,11 @@ class StatsTableView extends React.Component {
                   </td>
                   <td className="ta-left skinny">
                     <span>
-                      <svg id="lead_tier_1_svg" height="100%" width="100%" className="dashboardsvg">
+                      <svg id="lead_tier_1_svg" width="100%" className="dashboardsvg">
                         <rect width={(this.props.masteryWidths[3]) + "%"} height="100%" style={{ fill: '#C8F749', strokeWidth: 2, stroke: 'rgb(0,0,0)' }} />
                       </svg>
                     </span>
-                    <span className="ta-right right-align">
+                    <span className="ta-right right-align score-pad">
                       {this.props.masteryTotals[3]}
                     </span>
                   </td>
@@ -228,10 +228,10 @@ class StatsTableView extends React.Component {
                   </td>
                   <td className="ta-left skinny">
                     <span>
-                      <svg id="lead_tier_1_svg" height="100%" width="100%" className="dashboardsvg">
+                      <svg id="lead_tier_1_svg" width="100%" className="dashboardsvg">
                         <rect width={(this.props.masteryWidths[4]) + "%"} height="100%" style={{ fill: '#C8F749', strokeWidth: 2, stroke: 'rgb(0,0,0)' }} />
                       </svg>
-                      <span className="ta-right right-align">
+                      <span className="ta-right right-align score-pad">
                         {this.props.masteryTotals[4]}
                       </span>
                     </span>
@@ -246,11 +246,11 @@ class StatsTableView extends React.Component {
                   </td>
                   <td className="ta-left skinny">
                     <span>
-                      <svg id="lead_tier_1_svg" height="100%" width="100%" className="dashboardsvg">
+                      <svg id="lead_tier_1_svg" width="100%" className="dashboardsvg">
                         <rect width={(this.props.masteryWidths[5]) + "%"} height="100%" style={{ fill: 'yellow', strokeWidth: 2, stroke: 'rgb(0,0,0)' }} />
                       </svg>
                     </span>
-                    <span className="ta-right right-align">
+                    <span className="ta-right right-align score-pad">
                       {this.props.masteryTotals[5]}
                     </span>
                   </td>
@@ -264,11 +264,11 @@ class StatsTableView extends React.Component {
                   </td>
                   <td className="ta-left skinny">
                     <span>
-                      <svg id="lead_tier_1_svg" height="100%" width="100%" className="dashboardsvg">
+                      <svg id="lead_tier_1_svg" width="100%" className="dashboardsvg">
                         <rect width={(this.props.masteryWidths[6]) + "%"} height="100%" style={{ fill: 'lightgray', strokeWidth: 2, stroke: 'rgb(0,0,0)' }} />
                       </svg>
                     </span>
-                    <span className="ta-right right-align">
+                    <span className="ta-right right-align score-pad">
                       {this.props.masteryTotals[6]}
                     </span>
                   </td>

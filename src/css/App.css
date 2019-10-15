@@ -373,8 +373,8 @@ a {
 
 .row2 {
     display: flex;
-    margin-right: -8px;
-    margin-left: -8px;
+    margin-right: 5px;
+    margin-left: 5px;
 }
 
 .centerButton {
@@ -418,7 +418,7 @@ table th {
 
 table td {
     text-align: center;
-    padding: 7px !important;
+    padding: 0px !important;
     border: 1px solid black;
     /*width: 100px !important;
   max-width: 100px;*/
@@ -431,6 +431,7 @@ table td {
 
 table thead {
     border: 1px solid black !important;
+    line-height: 10px;
 }
 
 table tbody tr {
@@ -891,18 +892,19 @@ tbody tr:hover {
 }
 
 .skinny {
-    height: 38px !important;
+    height: 44px !important;
 }
 
 .right-align {
     position: absolute;
-    right: 18px;
+    right: 22px;
+    padding-top: 1px;
     font-size: 20px;
     color: black;
 }
 
 .header-top {
-    top: 36px;
+    top: 32px;
 }
 
 .header-sa-top {
@@ -1067,7 +1069,7 @@ hr {
 
 .col-md-34 {
     flex: 0 0 34% !important;
-    padding: 17px;
+    padding: 21px;
 }
 
 .tooltipMoreData {
@@ -1094,10 +1096,17 @@ hr {
 
 .tooltip-td-pad {
     padding-top: 13px !important;
+    padding-left: 7px !important;
+    padding-right: 7px !important;
 }
 
 .tooltip-td-low-pad {
     padding-top: 5px !important;
+    padding-left: 7px !important;
+    padding-right: 7px !important;
+}
+.tooltip-technique-td {
+    padding: 7px !important;
 }
 
 .tooltipTable tr {
@@ -1117,8 +1126,10 @@ hr {
 
 .dashboardsvg {
     margin-top: 3px;
-    margin-left: 3px;
     margin-bottom: -3px;
+    padding-right: 6px;
+    padding-left: 10px;
+    height: 60%;
 }
 
 #settingsExpand span {
@@ -1573,4 +1584,13 @@ hr {
     align-items: center;
     margin-left: 20px;
     margin-right: 20px;
+}
+
+.badge-icon-div {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.score-pad {
 }
