@@ -22,6 +22,8 @@ import getProfileConfig, {
   updateImportRSMPath,
   setStateAsync,
   getSteamNameFromSteamID,
+  getCustomCulumnsConfig,
+  updateCustomColumnConfig,
 } from '../configService';
 import {
   resetDB, isTablePresent, deleteRSSongList,
@@ -30,7 +32,7 @@ import {
   getAllProfiles, getSteamPathForRocksmith,
   getSteamProfiles, getProfileName,
 } from '../steamprofileService';
-import { sortOrderCustomStyles, createOption } from './setlistOptions';
+import { customColumnsCustomStyles, sortOrderCustomStyles, createOption } from './setlistOptions';
 import { DispatcherService, DispatchEvents } from '../lib/libdispatcher'
 
 import steam from '../assets/tree-icons/catalog.svg'
@@ -90,6 +92,17 @@ export const collapseButton = (text, size = 3) => {
   );
 }
 export const defaultSortOption = [{ label: 'mastery-desc', value: 'mastery-desc' }]
+export const defaultCustomColumns = [
+  { label: 'song', value: 'song' },
+  { label: 'artist', value: 'artist' },
+  { label: 'album', value: 'album' },
+  { label: 'arrangement', value: 'arrangement' },
+  { label: 'mastery', value: 'mastery' },
+  { label: 'tuning_weight', value: 'tuning_weight' },
+  { label: 'count', value: 'count' },
+  { label: 'difficulty', value: 'difficulty' },
+  { label: 'sa_highest_badge', value: 'sa_highest_badge' },
+]
 class SettingsView extends React.Component {
   constructor(props) {
     super(props);
@@ -108,6 +121,7 @@ class SettingsView extends React.Component {
       steamID: '',
       steamAPIKey: '',
       sortoptions: defaultSortOption,
+      customColumns: defaultCustomColumns,
       showSetlistOverlayAlways: false,
       isSudoWhitelisted: false,
       currentZoomFactor: 1,
@@ -123,6 +137,7 @@ class SettingsView extends React.Component {
     this.loadState();
     this.sortfieldref = React.createRef();
     this.sortorderref = React.createRef();
+    this.columnref = React.createRef();
   }
 
   componentDidMount = () => {
@@ -365,6 +380,7 @@ class SettingsView extends React.Component {
     const p = await getIsSudoWhitelistedConfig();
     const q = await getCurrentZoomFactorConfig();
     const r = await getImportRSMConfig();
+    const s = await getCustomCulumnsConfig();
     setStateAsync(this, {
       prfldb: d,
       steamLoginSecure: e,
@@ -381,6 +397,7 @@ class SettingsView extends React.Component {
       isSudoWhitelisted: p,
       currentZoomFactor: q,
       pathToImportRSM: r,
+      customColumns: s,
     });
   }
 
@@ -400,21 +417,26 @@ class SettingsView extends React.Component {
     await updateSteamAPIKey(this.state.steamAPIKey);
     await updateImportRSMPath(this.state.pathToImportRSM);
     if (this.state.sortoptions.length === 0) {
-      this.setState({ sortoptions: defaultSortOption }, async () => {
-        await updateDefaultSortOption(this.state.sortoptions)
-      })
+      await setStateAsync(this, { sortoptions: defaultSortOption });
+      await updateDefaultSortOption(this.state.sortoptions)
     }
     else {
       await updateDefaultSortOption(this.state.sortoptions)
+    }
+    if (this.state.customColumns === null || this.state.customColumns.length === 0) {
+      await setStateAsync(this, { customColumns: defaultCustomColumns });
+      await updateCustomColumnConfig(defaultCustomColumns)
+    }
+    else {
+      await updateCustomColumnConfig(this.state.customColumns)
     }
     await updateSteamIDConfig(this.state.steamID);
     await updateShowSetlistOverlayAlways(this.state.showSetlistOverlayAlways);
     await updateIsSudoWhitelisted(this.state.isSudoWhitelisted);
     const flt = parseFloat(this.state.currentZoomFactor);
     if (flt > 0 && flt <= 1) {
-      this.setState({ currentZoomFactor: flt });
+      await setStateAsync(this, { currentZoomFactor: flt });
       await updateCurrentZoomFactor(flt);
-      console.log("setting zoom factor to", flt);
       window.webFrame.setZoomFactor(flt);
     }
     this.props.handleChange();
@@ -527,8 +549,32 @@ class SettingsView extends React.Component {
     }
   }
 
+  addCustomColumn = async () => {
+    let existing = false
+    const { customColumns } = this.state;
+    for (let i = 0; i < customColumns.length; i += 1) {
+      const option = customColumns[i];
+      const { value } = option;
+      if (value === this.columnref.current.value) {
+        existing = true;
+        customColumns.splice(i, 1);
+        customColumns.push(option);
+        this.setState({ customColumns });
+      }
+    }
+    if (existing === false) {
+      const option = createOption(this.columnref.current.value);
+      customColumns.push(option);
+      this.setState({ customColumns });
+    }
+  }
+
   handleSortOrderChange = async (value, action) => {
-    this.setState({ sortoptions: value })
+    this.setState({ sortoptions: value });
+  }
+
+  handleColumnOrderChange = async (value, action) => {
+    this.setState({ customColumns: value });
   }
 
   resetProfileState = (rsOnly = false) => {
@@ -1067,35 +1113,37 @@ loading setlists into Rocksmith 2014.
                         placeholder="Global Sort Order"
                         value={this.state.sortoptions}
                       />
-                      <select
-                        ref={this.sortfieldref}
-                        style={{ marginLeft: 20 + 'px', width: 40 + '%' }}
-                        id="sortfield">
-                        <option value="song">Song</option>
-                        <option value="artist">Artist</option>
-                        <option value="album">Album</option>
-                        <option value="mastery">Mastery</option>
-                        <option value="tuning_weight">Tuning</option>
-                        <option value="count">Playcount</option>
-                        <option value="difficulty">Difficulty</option>
-                        <option value="arrangement">Arrangement</option>
-                        <option value="sa_highest_badge">Highest Badge</option>
-                      </select>
-                      <select
-                        ref={this.sortorderref}
-                        style={{ marginLeft: 16 + 'px', width: 20 + '%' }}
-                        id="sortorder">
-                        <option value="asc">Asc</option>
-                        <option value="desc">Desc</option>
-                      </select>
-                      <span
-                        onClick={this.addSortOption}
-                        style={{
-                          fontSize: 17 + 'px',
-                          marginLeft: 12 + 'px',
-                          borderBottom: '1px dotted',
-                          cursor: 'pointer',
-                        }}>Add</span>
+                      <div style={{ float: 'right' }}>
+                        <select
+                          ref={this.sortfieldref}
+                          style={{ marginLeft: 20 + 'px' }}
+                          id="sortfield">
+                          <option value="song">Song</option>
+                          <option value="artist">Artist</option>
+                          <option value="album">Album</option>
+                          <option value="mastery">Mastery</option>
+                          <option value="tuning_weight">Tuning</option>
+                          <option value="count">Playcount</option>
+                          <option value="difficulty">Difficulty</option>
+                          <option value="arrangement">Arrangement</option>
+                          <option value="sa_highest_badge">Highest Badge</option>
+                        </select>
+                        <select
+                          ref={this.sortorderref}
+                          style={{ marginLeft: 16 + 'px' }}
+                          id="sortorder">
+                          <option value="asc">Asc</option>
+                          <option value="desc">Desc</option>
+                        </select>
+                        <span
+                          onClick={this.addSortOption}
+                          style={{
+                            fontSize: 17 + 'px',
+                            marginLeft: 12 + 'px',
+                            borderBottom: '1px dotted',
+                            cursor: 'pointer',
+                          }}>Add</span>
+                      </div>
                     </div>
                     <br />
                     <div className="">
@@ -1105,7 +1153,68 @@ loading setlists into Rocksmith 2014.
                     </div>
                   </Fragment>
                   <Fragment>
+                    <br /><br />
+                    <span style={{ float: 'left' }}>
+                      <a>
+                        Custom Columns
+                      </a>
+                    </span>
+                    <div style={{
+                      float: 'right',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      width: 50 + '%',
+                    }}>
+                      <CreatableSelect
+                        components={{
+                          DropdownIndicator: null,
+                        }}
+                        styles={customColumnsCustomStyles}
+                        isClearable
+                        isMulti
+                        menuIsOpen={false}
+                        onChange={this.handleColumnOrderChange}
+                        placeholder="Columns Order"
+                        value={this.state.customColumns}
+                      />
+                      <div style={{ float: 'right' }}>
+                        <select
+                          ref={this.columnref}
+                          style={{ marginLeft: 20 + 'px' }}
+                          id="sortfield">
+                          <option value="song">Song</option>
+                          <option value="artist">Artist</option>
+                          <option value="album">Album</option>
+                          <option value="mastery">Mastery</option>
+                          <option value="tuning_weight">Tuning</option>
+                          <option value="count">Playcount</option>
+                          <option value="difficulty">Difficulty</option>
+                          <option value="arrangement">Arrangement</option>
+                          <option value="sa_highest_badge">Badges</option>
+                          <option value="songLength">Song Length</option>
+                          <option value="maxNotes">Notes</option>
+                          <option value="tempo">Tempo</option>
+                          <option value="date_las">Last Played</option>
+                        </select>
+                        <span
+                          onClick={this.addCustomColumn}
+                          style={{
+                            fontSize: 17 + 'px',
+                            marginLeft: 12 + 'px',
+                            borderBottom: '1px dotted',
+                            cursor: 'pointer',
+                          }}>Add</span>
+                      </div>
+                    </div>
                     <br />
+                    <div className="">
+                      <span style={{ color: '#ccc' }}>
+                        Set the columns shown in Songs &gt; Owned and Setlists
+                      </span>
+                    </div>
+                  </Fragment>
+                  <Fragment>
+                    <br /><br /><br />
                     <span style={{ float: 'left' }}>
                       <a>
                         Show Stats Overlay
@@ -1115,9 +1224,9 @@ loading setlists into Rocksmith 2014.
                       float: 'right',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
-                      width: 400 + 'px',
+                      width: 100 + '%',
                       textAlign: 'right',
-                      marginTop: 30 + 'px',
+                      marginTop: -20 + 'px',
                     }}>
                       <input
                         type="checkbox"

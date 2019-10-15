@@ -595,6 +595,7 @@ class App extends Component {
                       } else {
                         this.switchNavbarColor("black")
                       }
+                      this.setState({ appTitle: this.state.currentChildTab.name });
                     });
                   }}
                   className={showmstat}>
