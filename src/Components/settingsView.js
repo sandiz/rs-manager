@@ -3,7 +3,8 @@ import { withI18n, Trans } from 'react-i18next';
 import Collapsible from 'react-collapsible';
 import CreatableSelect from "react-select/creatable";
 import PropTypes from 'prop-types';
-import Select from 'react-select';
+import Select, { components } from 'react-select';
+import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import getProfileConfig, {
   updateSteamLoginSecureCookie, getSteamLoginSecureCookie, updateProfileConfig,
   getScoreAttackConfig, updateScoreAttackConfig, updateUseCDLCConfig,
@@ -103,6 +104,36 @@ export const defaultCustomColumns = [
   { label: 'difficulty', value: 'difficulty' },
   { label: 'sa_highest_badge', value: 'sa_highest_badge' },
 ]
+export const allCustomColumns = [
+  { label: 'song', value: 'song' },
+  { label: 'artist', value: 'artist' },
+  { label: 'album', value: 'album' },
+  { label: 'arrangement', value: 'arrangement' },
+  { label: 'mastery', value: 'mastery' },
+  { label: 'tuning_weight', value: 'tuning_weight' },
+  { label: 'count', value: 'count' },
+  { label: 'difficulty', value: 'difficulty' },
+  { label: 'sa_highest_badge', value: 'sa_highest_badge' },
+  { label: 'maxNotes', value: 'maxNotes' },
+  { label: 'tempo', value: 'tempo' },
+  { label: 'date_las', value: 'date_las' },
+];
+export function arrayMove(array, from, to) {
+  array = array.slice();
+  array.splice(to < 0 ? array.length + to : to, 0, array.splice(from, 1)[0]);
+  return array;
+}
+const SortableMultiValue = SortableElement(props => {
+  const onMouseDown = e => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+  const innerProps = { onMouseDown };
+  //eslint-disable-next-line
+  return <components.MultiValue {...props} innerProps={innerProps} />;
+});
+const SortableSelect = SortableContainer(Select);
+
 class SettingsView extends React.Component {
   constructor(props) {
     super(props);
@@ -577,6 +608,12 @@ class SettingsView extends React.Component {
     this.setState({ customColumns: value });
   }
 
+  onColumnSortEnd = ({ oldIndex, newIndex }) => {
+    const { customColumns } = this.state;
+    const newValue = arrayMove(customColumns, oldIndex, newIndex);
+    this.setState({ customColumns: newValue });
+  }
+
   resetProfileState = (rsOnly = false) => {
     this.setState({
       currentRSProfile: '',
@@ -921,6 +958,7 @@ loading setlists into Rocksmith 2014.
                   triggerWhenOpen={collapseButton(this.props.t("Advanced"))}
                   transitionTime={200}
                   easing="ease-in"
+                  overflowWhenOpen="unset"
                 >
                   <span style={{ float: 'left' }}>
                     <a>
@@ -1154,67 +1192,45 @@ loading setlists into Rocksmith 2014.
                   </Fragment>
                   <Fragment>
                     <br /><br />
-                    <span style={{ float: 'left' }}>
-                      <a>
-                        Custom Columns
+                    <div style={{ display: 'flex' }}>
+                      <div style={{ width: '50%', textAlign: 'left' }}>
+                        <a>
+                          Custom Columns
                       </a>
-                    </span>
-                    <div style={{
-                      float: 'right',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      width: 50 + '%',
-                    }}>
-                      <CreatableSelect
-                        components={{
-                          DropdownIndicator: null,
-                        }}
-                        styles={customColumnsCustomStyles}
-                        isClearable
-                        isMulti
-                        menuIsOpen={false}
-                        onChange={this.handleColumnOrderChange}
-                        placeholder="Columns Order"
-                        value={this.state.customColumns}
-                      />
-                      <div style={{ float: 'right' }}>
-                        <select
-                          ref={this.columnref}
-                          style={{ marginLeft: 20 + 'px' }}
-                          id="sortfield">
-                          <option value="song">Song</option>
-                          <option value="artist">Artist</option>
-                          <option value="album">Album</option>
-                          <option value="mastery">Mastery</option>
-                          <option value="tuning_weight">Tuning</option>
-                          <option value="count">Playcount</option>
-                          <option value="difficulty">Difficulty</option>
-                          <option value="arrangement">Arrangement</option>
-                          <option value="sa_highest_badge">Badges</option>
-                          <option value="songLength">Song Length</option>
-                          <option value="maxNotes">Notes</option>
-                          <option value="tempo">Tempo</option>
-                          <option value="date_las">Last Played</option>
-                        </select>
-                        <span
-                          onClick={this.addCustomColumn}
-                          style={{
-                            fontSize: 17 + 'px',
-                            marginLeft: 12 + 'px',
-                            borderBottom: '1px dotted',
-                            cursor: 'pointer',
-                          }}>Add</span>
-                      </div>
-                    </div>
-                    <br />
-                    <div className="">
-                      <span style={{ color: '#ccc' }}>
-                        Set the columns shown in Songs &gt; Owned and Setlists
+                        <div className="">
+                          <span style={{ color: '#ccc' }}>
+                            Set the columns shown in Songs &gt; Owned and Setlists
                       </span>
+                        </div>
+                      </div>
+                      <div style={{
+                        textOverflow: 'ellipsis',
+                        width: 50 + '%',
+                      }}>
+                        <SortableSelect
+                          // react-sortable-hoc props:
+                          axis="xy"
+                          onSortEnd={this.onColumnSortEnd}
+                          distance={4}
+                          // small fix for https://github.com/clauderic/react-sortable-hoc/pull/352:
+                          // getHelperDimensions={({ node }) => node.getBoundingClientRect()}
+                          // react-select props:
+                          isMulti
+                          isClearable
+                          styles={customColumnsCustomStyles}
+                          options={allCustomColumns}
+                          value={this.state.customColumns}
+                          onChange={this.handleColumnOrderChange}
+                          components={{
+                            MultiValue: SortableMultiValue,
+                          }}
+                          closeMenuOnSelect
+                        />
+                      </div>
                     </div>
                   </Fragment>
                   <Fragment>
-                    <br /><br /><br />
+                    <br />
                     <span style={{ float: 'left' }}>
                       <a>
                         Show Stats Overlay

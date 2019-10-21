@@ -20,14 +20,14 @@ body {
     font-family: "Roboto Condensed", sans-serif;
     background: black;
     user-select: none;
-    -webkit-app-region: drag;
+    /*-webkit-app-region: drag;*/
 }
 
 [draggable=true],
 button,
 iframe,
 input {
-    -webkit-app-region: no-drag;
+    /*-webkit-app-region: no-drag;*/
 }
 
 /* Turn on custom 8px wide scrollbar */
