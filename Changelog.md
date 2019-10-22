@@ -1,3 +1,8 @@
+v2.7.5
+- add drag drop to custom columns setting option
+- update packages to latest (also removes functions that are deprecated by react)
+- convert dlc name/tags formatter to flex
+- update react-select api usage
 v2.7.0
 - add custom columns settings option
 - add generateColumns api to generate columns based on the above setting

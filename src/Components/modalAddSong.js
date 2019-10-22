@@ -41,7 +41,9 @@ class AddSongModal extends React.Component {
     }
 
     handleTagsChange = async (newValue) => {
-        this.setState({ selectedSongs: newValue });
+        let ss = []
+        if (newValue) ss = newValue;
+        this.setState({ selectedSongs: ss });
     }
 
     addToSetlist = async () => {

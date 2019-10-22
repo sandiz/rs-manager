@@ -236,7 +236,7 @@ export const sortOrderCustomStyles = {
     ...styles, marginLeft: 20 + 'px',
   }),
   control: styles => ({
-    ...styles, backgroundColor: 'white', color: 'black', width: 255 + 'px', fontSize: 15 + 'px',
+    ...styles, backgroundColor: 'white', color: 'black', width: 100 + '%', fontSize: 15 + 'px',
   }),
   option: (styles, {
     data, isDisabled, isFocused, isSelected,
@@ -430,22 +430,26 @@ class SetlistOptions extends React.Component {
         });
       }
       else {
-        const viewsql = nextprops.info.view_sql;
-        let jsonObj = [];
-        try {
-          if (viewsql.length > 0) jsonObj = JSON.parse(viewsql);
-        }
-        catch (e) {
-          jsonObj = []
-        }
-        this.setState({
-          numResults: 0,
-          filters: jsonObj === null ? [] : jsonObj,
-        }, () => this.runQuery())
-        // run viewsql and find results
+        this.triggerFilterUpdate(nextprops)
       }
     }
     return nextprops.showOptions;
+  }
+
+  triggerFilterUpdate = (nextprops) => {
+    const viewsql = nextprops.info.view_sql;
+    let jsonObj = [];
+    try {
+      if (viewsql.length > 0) jsonObj = JSON.parse(viewsql);
+    }
+    catch (e) {
+      jsonObj = []
+    }
+    this.setState({
+      numResults: 0,
+      filters: jsonObj === null ? [] : jsonObj,
+    }, () => this.runQuery())
+    // run viewsql and find results
   }
 
   handleChange = (event) => {
@@ -461,8 +465,8 @@ class SetlistOptions extends React.Component {
     this.setState({
       isGenerated: e.currentTarget.value === "on",
       isManual: false,
-      filters: [],
     });
+    this.triggerFilterUpdate(this.props);
   }
 
   handleManual = (e) => {
@@ -741,7 +745,9 @@ class SetlistOptions extends React.Component {
   }
 
   handleSortOrderChange = async (value, action) => {
-    this.setState({ sortoptions: value })
+    let so = [];
+    if (value) so = value;
+    this.setState({ sortoptions: so })
   }
 
   render = () => {
@@ -766,7 +772,9 @@ class SetlistOptions extends React.Component {
                 <tbody>
                   <tr style={{ backgroundColor: 'inherit', border: 'none', color: 'black' }}>
                     <td style={{ border: 'none', width: 20 + '%', borderRight: '1px solid' }}><Trans i18nKey="name">Name</Trans></td>
-                    <td style={{ border: 'none', width: 80 + '%', textAlign: 'left' }}>
+                    <td style={{
+                      border: 'none', width: 80 + '%', textAlign: 'left', height: '52px',
+                    }}>
                       <input type="text" defaultValue={this.state.setlistName} onChange={this.handleChange} style={{ marginLeft: 30 + 'px', paddingLeft: 10 + 'px', width: 80 + '%' }} />
                       <div
                         style={{ cursor: 'pointer' }}
@@ -832,7 +840,7 @@ class SetlistOptions extends React.Component {
                 <tbody>
                   <tr style={{ backgroundColor: 'inherit', border: 'none', color: 'black' }}>
                     <td style={{ border: 'none', width: 20 + '%', borderRight: '1px solid' }}><Trans i18nKey="folder">Folder</Trans></td>
-                    <td style={{ border: 'none', width: 30 + '%', textAlign: 'left' }}>
+                    <td style={{ border: 'none', width: 31 + '%', textAlign: 'left' }}>
                       <select
                         style={{ marginLeft: 30 + 'px', width: 90 + '%' }}
                         id="folder"
@@ -924,11 +932,11 @@ class SetlistOptions extends React.Component {
                                 }}>
                                 <thead>
                                   <tr>
-                                    <td><Trans i18nKey="filterType">Filter Type</Trans></td>
-                                    <td><Trans i18nKey="comparator">Comparator</Trans></td>
-                                    <td><Trans i18nKey="value">Value</Trans></td>
-                                    <td><Trans i18nKey="logicChain">Logic Chain</Trans></td>
-                                    <td><Trans i18nKey="delete">Delete</Trans></td>
+                                    <td style={{ width: 20 + '%' }}><Trans i18nKey="filterType">Filter Type</Trans></td>
+                                    <td style={{ width: 20 + '%' }}><Trans i18nKey="comparator">Comparator</Trans></td>
+                                    <td style={{ width: 45 + '%' }}><Trans i18nKey="value">Value</Trans></td>
+                                    <td style={{ width: 15 + '%' }}><Trans i18nKey="logicChain">Logic Chain</Trans></td>
+                                    <td style={{ width: 5 + '%' }}><Trans i18nKey="delete">Delete</Trans></td>
                                   </tr>
                                 </thead>
                                 <tbody>
@@ -942,7 +950,7 @@ class SetlistOptions extends React.Component {
                                           <td style={{ width: 20 + '%' }}>
                                             {this.generateFilterComparatorOptions(filter, index)}
                                           </td>
-                                          <td style={{ width: 40 + '%' }}>
+                                          <td style={{ width: 45 + '%' }}>
                                             {this.generateFilterValueOptions(filter, index)}
                                           </td>
                                           {
@@ -951,7 +959,7 @@ class SetlistOptions extends React.Component {
                                                 <td style={{ width: 15 + '%' }}>
                                                   {this.generateFilterChainOptions(filter, index)}
                                                 </td>
-                                              ) : <td />
+                                              ) : <td style={{ width: 15 + '%' }}> - </td>
                                           }
                                           <td style={{ width: 5 + '%' }}>
                                             <button

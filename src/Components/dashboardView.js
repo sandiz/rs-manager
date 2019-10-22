@@ -469,6 +469,10 @@ class DashboardView extends React.Component {
           weekly.title = value;
           weekly.url = post.url;
         }
+        else {
+          weekly.title = "";
+          weekly.url = "https://www.reddit.com/r/rocksmith";
+        }
       }
       const title = weekly.title.split("by");
       const artist = title[1] ? unescape(title[1]).trim() : ""

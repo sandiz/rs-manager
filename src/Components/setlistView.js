@@ -143,7 +143,6 @@ class SetlistView extends React.Component {
     shouldComponentUpdate = async (nextprops, nextstate) => {
         if (this.props === nextprops) { return false; }
         if (nextprops.currentChildTab === null) { return false; }
-        if (this.lastChildID === nextprops.currentChildTab.id) { return false; }
         this.saveSearch();
 
         this.lastChildID = nextprops.currentChildTab.id;
@@ -431,7 +430,9 @@ class SetlistView extends React.Component {
     }
 
     handlePathChange = (selectedPathOption) => {
-        this.setState({ selectedPathOption }, () => this.refreshView());
+        let spo = []
+        if (selectedPathOption) spo = selectedPathOption;
+        this.setState({ selectedPathOption: spo }, () => this.refreshView());
     }
 
     handleSearchChange = (e) => {
