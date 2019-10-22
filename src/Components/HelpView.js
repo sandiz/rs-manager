@@ -110,7 +110,7 @@ export default class HelpView extends React.Component {
           }
           else {
             //if rate limited open page in browser
-            const { value: text } = await Swal({
+            const { value: text } = await Swal.fire({
               type: 'info',
               text: 'Github is throttling requests from this ip address. Click Ok to open in browser',
               showCancelButton: true,
