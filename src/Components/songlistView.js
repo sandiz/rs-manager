@@ -613,6 +613,15 @@ export function hideHighestBadge(cell, row, rowIndex, colIndex) {
     display: "none",
   };
 }
+export function lastPlayedStyle(cell, row, rowIndex, colIndex) {
+  return {
+    width: '10%',
+    padding: '10px !important',
+  };
+}
+export function lastPlayedClass(cell, row, rowIndex, colIndex) {
+  return 'sortable';
+}
 
 export const RemoteAll = ({
   keyField,
@@ -701,7 +710,7 @@ export const BaseColumnDefs = [
   { dataField: "songLength", text: "Duration", hidden: true, sort: true, formatter: songLengthFormatter },
   { dataField: "maxNotes", text: "Notes", hidden: true, sort: true },
   { dataField: "tempo", text: "BPM", hidden: true, sort: true },
-  { dataField: "date_las", text: "Last Played", hidden: true, sort: true, formatter: lastPlayedFormatter },
+  { dataField: "date_las", text: "Last Played", hidden: true, sort: true, style: lastPlayedStyle, formatter: lastPlayedFormatter, classes: lastPlayedClass, },
   { dataField: "date_sa", text: "LastPlayed", hidden: true, sort: true },
 ];
 /* eslint-enable */
@@ -737,6 +746,8 @@ export const generateColumns = (customColumns, customData = {}, t, forceShow = [
     // then check if it needs to be forceShown eg: rsLive
     item.hidden = forceShow.includes(dataField) ? false : item.hidden;
     item.formatter = "formatter" in matrix ? matrix.formatter : null;
+    item.style = "style" in matrix ? matrix.style : null;
+    item.classes = "classes" in matrix ? matrix.classes : null;
     switch (dataField) {
       case "song":
       case "artist":

@@ -432,7 +432,7 @@ table td {
 
 table thead {
     border: 1px solid black !important;
-    line-height: 10px;
+    line-height: 15px;
 }
 
 table tbody tr {
@@ -1594,4 +1594,7 @@ hr {
 }
 
 .score-pad {
+}
+.sortable {
+    padding: 10px !important;
 }
