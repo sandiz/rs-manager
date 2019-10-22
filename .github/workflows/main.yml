@@ -45,7 +45,7 @@ jobs:
           node-version: '12.x'
       - name: Run build script (windows)
         run: |
-          yarn install & yarn dist-win
+          npm install --vs2015 -g windows-build-tools & yarn install & yarn dist-win
       - uses: sandiz/upload-release-action@releases/v1
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
