@@ -315,11 +315,16 @@ class SongDetailView extends React.Component {
   handleTagsChange = async (newValue) => {
     //const tags = newValue.map(i => i.value);
     await executeRawSql(`delete from dlc_tags where appid='${this.props.dlcappid}'`)
-    for (let i = 0; i < newValue.length; i += 1) {
-      //eslint-disable-next-line
-      await addTag(this.props.dlcappid, newValue[i].value);
+    if (newValue) {
+      for (let i = 0; i < newValue.length; i += 1) {
+        //eslint-disable-next-line
+        await addTag(this.props.dlcappid, newValue[i].value);
+      }
+      this.setState({ tags: newValue });
     }
-    this.setState({ tags: newValue });
+    else {
+      this.setState({ tags: [] })
+    }
   }
 
   render = () => {
