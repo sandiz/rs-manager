@@ -293,8 +293,8 @@ class SongDetailView extends React.Component {
 
   showLocalNote = async () => {
     const notes = await getNotes(this.props.songID)
-    const { value: text } = await Swal({
-      inputValue: unescape(notes.local_note),
+    const { value: text } = await Swal.fire({
+      inputValue: notes.local_note ? unescape(notes.local_note) : "",
       input: 'textarea',
       inputPlaceholder: 'Type your note here...',
       showCancelButton: true,
@@ -303,7 +303,7 @@ class SongDetailView extends React.Component {
     })
     if (typeof text !== 'undefined' && this.props.songID.length > 0) {
       await updateNotes(this.props.songID, text);
-      Swal({
+      Swal.fire({
         text: 'Note Saved!',
         //animation: false,
         confirmButtonClass: 'local-note-btn-class',
@@ -657,8 +657,8 @@ class SongDetailView extends React.Component {
                     type="button"
                     style={{ width: 100 + '%' }}
                     className={songliststyle}
-                    onClick={async () => {
-                      await this.showLocalNote();
+                    onClick={() => {
+                      this.showLocalNote();
                     }}>
                     <span><Trans i18nKey="addNote">Add Note</Trans></span>
                   </button>
