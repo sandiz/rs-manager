@@ -236,7 +236,7 @@ export const sortOrderCustomStyles = {
     ...styles, marginLeft: 20 + 'px',
   }),
   control: styles => ({
-    ...styles, backgroundColor: 'white', color: 'black', width: 255 + 'px', fontSize: 15 + 'px',
+    ...styles, backgroundColor: 'white', color: 'black', width: 100 + '%', fontSize: 15 + 'px',
   }),
   option: (styles, {
     data, isDisabled, isFocused, isSelected,

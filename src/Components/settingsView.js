@@ -151,8 +151,8 @@ class SettingsView extends React.Component {
       showPSStats: false,
       steamID: '',
       steamAPIKey: '',
-      sortoptions: defaultSortOption,
-      customColumns: defaultCustomColumns,
+      sortoptions: [...defaultSortOption],
+      customColumns: [...defaultCustomColumns],
       showSetlistOverlayAlways: false,
       isSudoWhitelisted: false,
       currentZoomFactor: 1,
@@ -448,7 +448,7 @@ class SettingsView extends React.Component {
     await updateSteamAPIKey(this.state.steamAPIKey);
     await updateImportRSMPath(this.state.pathToImportRSM);
     if (this.state.sortoptions.length === 0) {
-      await setStateAsync(this, { sortoptions: defaultSortOption });
+      await setStateAsync(this, { sortoptions: [...defaultSortOption] });
       await updateDefaultSortOption(this.state.sortoptions)
     }
     else {
@@ -601,11 +601,15 @@ class SettingsView extends React.Component {
   }
 
   handleSortOrderChange = async (value, action) => {
-    this.setState({ sortoptions: value });
+    let v = [];
+    if (value) v = value;
+    this.setState({ sortoptions: v });
   }
 
   handleColumnOrderChange = async (value, action) => {
-    this.setState({ customColumns: value });
+    let v = [];
+    if (value) v = value;
+    this.setState({ customColumns: v });
   }
 
   onColumnSortEnd = ({ oldIndex, newIndex }) => {
@@ -1129,65 +1133,68 @@ loading setlists into Rocksmith 2014.
                   </Fragment>
                   <Fragment>
                     <br />
-                    <span style={{ float: 'left' }}>
-                      <a>
-                        Default Sort Field/Order
-                      </a>
-                    </span>
-                    <div style={{
-                      float: 'right',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                    }}>
-                      <CreatableSelect
-                        components={{
-                          DropdownIndicator: null,
-                        }}
-                        styles={sortOrderCustomStyles}
-                        isClearable
-                        isMulti
-                        menuIsOpen={false}
-                        onChange={this.handleSortOrderChange}
-                        placeholder="Global Sort Order"
-                        value={this.state.sortoptions}
-                      />
-                      <div style={{ float: 'right' }}>
-                        <select
-                          ref={this.sortfieldref}
-                          style={{ marginLeft: 20 + 'px' }}
-                          id="sortfield">
-                          <option value="song">Song</option>
-                          <option value="artist">Artist</option>
-                          <option value="album">Album</option>
-                          <option value="mastery">Mastery</option>
-                          <option value="tuning_weight">Tuning</option>
-                          <option value="count">Playcount</option>
-                          <option value="difficulty">Difficulty</option>
-                          <option value="arrangement">Arrangement</option>
-                          <option value="sa_highest_badge">Highest Badge</option>
-                        </select>
-                        <select
-                          ref={this.sortorderref}
-                          style={{ marginLeft: 16 + 'px' }}
-                          id="sortorder">
-                          <option value="asc">Asc</option>
-                          <option value="desc">Desc</option>
-                        </select>
-                        <span
-                          onClick={this.addSortOption}
-                          style={{
-                            fontSize: 17 + 'px',
-                            marginLeft: 12 + 'px',
-                            borderBottom: '1px dotted',
-                            cursor: 'pointer',
-                          }}>Add</span>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <div style={{ width: '50%', textAlign: 'left' }}>
+                        <div>
+                          <a>
+                            Default Sort Field/Order
+                          </a>
+                        </div>
+                        <div className="">
+                          <span style={{ color: '#ccc' }}>
+                            Set default sorting field and order for Songs-&gt;Owned and Setlists.
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                    <br />
-                    <div className="">
-                      <span style={{ color: '#ccc' }}>
-                        Set default sorting field and order for Songs-&gt;Owned and Setlists.
-                      </span>
+                      <div style={{
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        width: 50 + '%',
+                      }}>
+                        <CreatableSelect
+                          components={{
+                            DropdownIndicator: null,
+                          }}
+                          styles={sortOrderCustomStyles}
+                          isClearable
+                          isMulti
+                          menuIsOpen={false}
+                          onChange={this.handleSortOrderChange}
+                          placeholder="Global Sort Order"
+                          value={this.state.sortoptions}
+                        />
+                        <div style={{ textAlign: 'right' }}>
+                          <select
+                            ref={this.sortfieldref}
+                            style={{ marginLeft: 20 + 'px' }}
+                            id="sortfield">
+                            <option value="song">Song</option>
+                            <option value="artist">Artist</option>
+                            <option value="album">Album</option>
+                            <option value="mastery">Mastery</option>
+                            <option value="tuning_weight">Tuning</option>
+                            <option value="count">Playcount</option>
+                            <option value="difficulty">Difficulty</option>
+                            <option value="arrangement">Arrangement</option>
+                            <option value="sa_highest_badge">Highest Badge</option>
+                          </select>
+                          <select
+                            ref={this.sortorderref}
+                            style={{ marginLeft: 16 + 'px' }}
+                            id="sortorder">
+                            <option value="asc">Asc</option>
+                            <option value="desc">Desc</option>
+                          </select>
+                          <span
+                            onClick={this.addSortOption}
+                            style={{
+                              fontSize: 17 + 'px',
+                              marginLeft: 12 + 'px',
+                              borderBottom: '1px dotted',
+                              cursor: 'pointer',
+                            }}>Add</span>
+                        </div>
+                      </div>
                     </div>
                   </Fragment>
                   <Fragment>
