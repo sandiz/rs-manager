@@ -22,6 +22,9 @@ import diff1 from '../assets/diff-icons/diff_1.svg';
 import diff2 from '../assets/diff-icons/diff_2.svg';
 import diff3 from '../assets/diff-icons/diff_3.svg';
 import diff4 from '../assets/diff-icons/diff_4.svg';
+import globalNote from '../assets/tree-icons/global.svg';
+import localNote from '../assets/tree-icons/local.svg';
+
 import { profileWorker } from '../lib/libworker';
 import { DispatcherService, DispatchEvents } from '../lib/libdispatcher';
 
@@ -124,14 +127,6 @@ export function unescapeFormatter(cell, row, rowIndex, extraData) {
   else {
     return (
       <Fragment>
-        <div
-          style={{
-            position: 'relative',
-            top: 11 + 'px',
-          }}
-          key={row.id}>
-          {cell}
-        </div>
         <ReactTooltip
           id={row.id + "_gn"}
           aria-haspopup="true"
@@ -172,37 +167,28 @@ export function unescapeFormatter(cell, row, rowIndex, extraData) {
             }} />
           }
         </ReactTooltip>
-        <div
-          style={{
-            position: 'relative',
-            top: -6 + 'px',
-            left: gnote.length > 0 ? "-17px" : "0px",
-            height: 100 + '%',
-            width: 10 + '%',
-            float: 'right',
-            display: lnote.length > 0 ? "inherit" : "none",
-          }}
-          className="local-note"
-          data-tip
-          data-for={row.id + "_ln"}
-          data-class="tooltipClass"
-        />
-        <div
-          style={{
-            position: 'relative',
-            top: -6 + 'px',
-            //left: 92 + '%',
-            left: lnote.length > 0 ? "30px" : "0px",
-            height: 100 + '%',
-            width: 10 + '%',
-            float: 'right',
-            display: gnote.length > 0 ? "inherit" : "none",
-          }}
-          className="global-note"
-          data-tip
-          data-for={row.id + "_gn"}
-          data-class="tooltipClass"
-        />
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div
+            style={{
+              width: 100 + '%',
+              textAlign: 'center',
+            }}
+            key={row.id}>
+            {cell}
+          </div>
+          <div>
+            {
+              lnote === ""
+                ? null
+                : (<img className="gn-style" data-tip data-for={row.id + "_ln"} data-class="tooltipClass" src={localNote} alt="" />)
+            }
+            {
+              gnote === ""
+                ? null
+                : (<img className="gn-style" data-tip data-for={row.id + "_gn"} data-class="tooltipClass" src={globalNote} alt="" />)
+            }
+          </div>
+        </div>
       </Fragment>
     );
   }
@@ -750,8 +736,6 @@ export const generateColumns = (customColumns, customData = {}, t, forceShow = [
     item.classes = "classes" in matrix ? matrix.classes : null;
     switch (dataField) {
       case "song":
-      case "artist":
-      case "album":
         item.formatExtraData = { globalNotes: customData.globalNotes };
         break;
       case "sa_highest_badge":

@@ -1501,6 +1501,9 @@ hr {
     width: 40px;
     margin-top: -3px;
 }
+.gn-style {
+    width: 26px;
+}
 
 .switch-candy-rs a{
     background-color: #c7b99a;
