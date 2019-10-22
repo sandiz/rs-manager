@@ -23,10 +23,10 @@ const parse = require('csv-parse/lib/es5/sync');
 
 const customStyles = {
   container: styles => ({
-    ...styles, display: 'flex', marginTop: -8 + 'px', marginBottom: 5 + 'px',
+    ...styles, display: 'flex', marginTop: -8 + 'px', marginBottom: 5 + 'px', justifyContent: 'center',
   }),
   control: styles => ({
-    ...styles, backgroundColor: 'white', color: 'black', width: 25 + '%', left: 37 + '%',
+    ...styles, backgroundColor: 'white', color: 'black', width: 25 + '%',
   }),
   option: (styles, {
     data, isDisabled, isFocused, isSelected,
@@ -48,7 +48,7 @@ const customStyles = {
     ...styles,
   }),
   menu: styles => ({
-    ...styles, width: 25 + '%', left: 35 + '%',
+    ...styles, width: 25 + '%',
   }),
 }
 
@@ -158,8 +158,8 @@ class SongAvailableView extends React.Component {
           let count = 0;
           if (row.tags) {
             const splittags = row.tags.split("|");
-            count = splittags.length;
-            for (let i = 0; i < splittags.length; i += 1) {
+            count = (splittags.length > 12) ? 12 : splittags.length;
+            for (let i = 0; i < count; i += 1) {
               const tag = splittags[i];
               tags.push(<a
                 key={tag}
@@ -173,17 +173,16 @@ class SongAvailableView extends React.Component {
             }
           }
           return (
-            <div>
-              <span style={{
-                float: 'left',
-                marginTop: 4 + 'px',
-                marginLeft: 2 + 'px',
-              }}> {cell} </span>
-              <span style={{
+            <div className="flex-container" style={{ justifyContent: "space-between" }}>
+              <div style={{
+                marginTop: (count > 6) ? '25px' : '4px',
+                marginLeft: 10 + 'px',
+              }}> {cell} </div>
+              <div style={{
                 textAlign: 'right',
-                float: 'right',
                 marginTop: (count > 6) ? '10px' : '0px',
-              }}> {tags} </span>
+                marginBottom: (count > 6) ? '10px' : '0px',
+              }}> {tags} </div>
             </div>
           );
         },
@@ -818,8 +817,9 @@ class SongAvailableView extends React.Component {
     }
   }
 
-  handleTagsChange = (newValue) => {
-    const tags = newValue.map(i => i.value);
+  handleTagsChange = (newValue, action) => {
+    let tags = [];
+    if (newValue) tags = newValue.map(i => i.value);
     this.setState({ selectedTags: tags }, () => this.refreshTable());
   }
 

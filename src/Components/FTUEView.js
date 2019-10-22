@@ -31,7 +31,7 @@ class FTUEView extends React.Component {
     }
   }
 
-  componentWillMount = async () => {
+  componentDidMount = async () => {
     const currentSteamProfile = await getSteamNameFromSteamID();
     const steamProfileOptions = await getSteamProfiles();
     const prfldb = await getProfileConfig();
