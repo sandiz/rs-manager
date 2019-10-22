@@ -1,3 +1,6 @@
+v2.7.5
+- add drag drop to custom columns setting option
+- update packages to latest (also removes functions that are deprecated by react)
 v2.7.0
 - add custom columns settings option
 - add generateColumns api to generate columns based on the above setting
