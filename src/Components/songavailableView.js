@@ -48,7 +48,7 @@ const customStyles = {
     ...styles,
   }),
   menu: styles => ({
-    ...styles, width: 25 + '%', left: 35 + '%',
+    ...styles, width: 25 + '%', left: 37 + '%',
   }),
 }
 
