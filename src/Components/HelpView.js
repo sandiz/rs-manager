@@ -139,11 +139,8 @@ export default class HelpView extends React.Component {
     const htmlurl = this.state.currentIndex < this.state.changelog.length ? this.state.changelog[this.state.currentIndex].html_url : ""
     const releasename = this.state.currentIndex < this.state.changelog.length ? this.state.changelog[this.state.currentIndex].name : ""
     const publishedate = this.state.currentIndex < this.state.changelog.length ? this.state.changelog[this.state.currentIndex].published_at : ""
-    const dllink = this.state.currentIndex < this.state.changelog.length ? this.state.changelog[this.state.currentIndex].assets[0].browser_download_url : ""
-    const dlname = this.state.currentIndex < this.state.changelog.length ? this.state.changelog[this.state.currentIndex].assets[0].name : ""
-
-    const dllink2 = this.state.currentIndex < this.state.changelog.length ? this.state.changelog[this.state.currentIndex].assets[1].browser_download_url : ""
-    const dlname2 = this.state.currentIndex < this.state.changelog.length ? this.state.changelog[this.state.currentIndex].assets[1].name : ""
+    const assets = this.state.currentIndex < this.state.changelog.length
+      ? this.state.changelog[this.state.currentIndex].assets : [];
 
     const body = this.state.currentIndex < this.state.changelog.length ? this.state.changelog[this.state.currentIndex].body : ""
     return (
@@ -291,24 +288,31 @@ export default class HelpView extends React.Component {
                 </div>
                 <div>
                   Download &nbsp;&nbsp;&nbsp;
-                <a
-                    href="#"
-                    style={{
-                      color: 'blue',
-                      fontWeight: "normal",
-                      borderBottom: "1px solid",
-                    }}
-                    onClick={() => window.shell.openExternal(dllink)}
-                  >{dlname}</a>&nbsp;
-                |&nbsp;&nbsp;<a
-                    href="#"
-                    style={{
-                      color: 'blue',
-                      fontWeight: "normal",
-                      borderBottom: "1px solid",
-                    }}
-                    onClick={() => window.shell.openExternal(dllink2)}
-                  >{dlname2}</a>
+                  {
+                    assets.map(item => {
+                      const url = item.browser_download_url;
+                      const name = item.name;
+                      if (name.includes("dmg") || name.includes("exe") || name.includes("zip")) {
+                        return (
+                          <span key={url}>
+                            <a
+                              href="#"
+                              style={{
+                                color: 'blue',
+                                fontWeight: "normal",
+                                borderBottom: "1px solid",
+                              }}
+                              onClick={() => window.shell.openExternal(url)}
+                            >{name}</a>
+                            &nbsp; | &nbsp;
+                          </span>
+                        );
+                      }
+                      else {
+                        return null;
+                      }
+                    })
+                  }
                 </div>
                 <div>
                   <a
