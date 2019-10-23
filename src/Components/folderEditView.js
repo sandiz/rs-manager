@@ -250,6 +250,7 @@ export default class FolderEditView extends React.Component {
                           fontSize: 16 + 'px',
                           maxHeight: 350 + 'px',
                           overflow: 'auto',
+                          marginTop: 15 + 'px',
                         }}>
                           {this.getSetlistInput()}
                         </div>
