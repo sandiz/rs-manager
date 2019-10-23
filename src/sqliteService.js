@@ -1089,7 +1089,7 @@ export async function getAllSetlistNoFolderPaged(start, count = 10, name = "", s
   }
   return null;
 }
-export async function getAllSetlistNoFolder() {
+export async function getAllSetlistNoFolder(parentFolder = "") {
   //console.log("__db_call__: getAllSetlist");
   let sql = ''
   sql = `
@@ -1102,7 +1102,7 @@ export async function getAllSetlistNoFolder() {
       (is_folder is NULL)
     )
     ORDER BY
-    name collate nocase asc 
+    parent_folder='${parentFolder}' collate nocase desc 
     `
   const tableState = db !== null && await isTablePresent("setlist_meta");
   if (tableState) {
