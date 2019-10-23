@@ -37,7 +37,7 @@ export default class FolderEditView extends React.Component {
   }
 
   refresh = async () => {
-    const allsetlists = await getAllSetlistNoFolder();
+    const allsetlists = await getAllSetlistNoFolder(this.state.folder.id);
     const checkedsetlist = []
 
     for (let k = 0; k < allsetlists.length; k += 1) {
