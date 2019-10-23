@@ -578,7 +578,7 @@ export function arrClass(cell, row, rowIndex, colIndex) {
 }
 export function tuningClass(cell, row, rowIndex, colIndex) {
   return {
-    width: '8%',
+    width: '10%',
     cursor: 'pointer',
   };
 }
@@ -680,7 +680,7 @@ export const BaseColumnDefs = [
   { dataField: "json", text: "json", hidden: true, sort: false },
   { dataField: "arrangement", text: "Arrangement", hidden: true, sort: true, style: arrClass, formatter: arrangmentFormatter },
   { dataField: "mastery", text: "Mastery", hidden: true, sort: true, style: masteryClass, formatter: round100Formatter, },
-  { dataField: "tuning_weight", text: "Tuning", hidden: true, sort: true, style: tuningClass, formatter: tuningFormatter, },
+  { dataField: "tuning_weight", text: "Tuning", hidden: true, sort: true, style: tuningClass, formatter: tuningFormatter, classes: lastPlayedClass, },
   { dataField: "count", text: "Count", hidden: true, sort: true, formatter: countFormmatter, },
   { dataField: "difficulty", text: "Difficulty", hidden: true, sort: true, classes: difficultyClass, formatter: difficultyFormatter },
   { dataField: "sa_playcount", text: "Play Count", hidden: true, sort: true },
