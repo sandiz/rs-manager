@@ -322,6 +322,7 @@ class RSLiveView extends React.Component {
     this.recordTitleRef = React.createRef();
     this.recordTimer = null;
     this.lastUpdateTS = new Date();
+    this.loadColumns();
   }
 
   componentDidMount = async () => {
@@ -338,16 +339,7 @@ class RSLiveView extends React.Component {
     }
     const isSudoWhitelisted = await getIsSudoWhitelistedConfig();
     console.log("is sudo whitelisted", isSudoWhitelisted);
-
-    const showSAStats = await getScoreAttackConfig();
-    const customColumns = await getCustomCulumnsConfig();
-    const columns = generateColumns(customColumns,
-      { globalNotes: {}, showSAStats },
-      this.props.t);
-    const rpcolumns = generateColumns(customColumns,
-      { globalNotes: {}, showSAStats },
-      this.props.t, ['date_las']);
-    this.setState({ isSudoWhitelisted, columns, rpcolumns });
+    this.setState({ isSudoWhitelisted });
   }
 
   componentWillUnmount = async () => {
@@ -355,6 +347,17 @@ class RSLiveView extends React.Component {
     DispatcherService.off(DispatchEvents.PROFILE_UPDATED, this.refresh);
     if (this.fetchrstimer) clearInterval(this.fetchrstimer);
     window.libRecord.stopRecording(); //stop recording if necessary
+  }
+
+  loadColumns = async () => {
+    const showSAStats = await getScoreAttackConfig();
+    const customColumns = await getCustomCulumnsConfig();
+    this.state.columns = generateColumns(customColumns,
+      { globalNotes: {}, showSAStats },
+      this.props.t);
+    this.state.rpcolumns = generateColumns(customColumns,
+      { globalNotes: {}, showSAStats },
+      this.props.t, ['date_las']);
   }
 
   animatedNumber = (number) => {
