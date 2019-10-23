@@ -468,6 +468,7 @@ class DashboardView extends React.Component {
           const [keyIgnored, value] = post.title.split(":");
           weekly.title = value;
           weekly.url = post.url;
+          break;
         }
         else {
           weekly.title = "";
