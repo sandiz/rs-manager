@@ -301,7 +301,7 @@ export async function getRocksmithInstallFolder() {
     //verify windows
     const basic = window.path.join(
       getWinSteamPath(),
-      `steamapps/common/Rocksmith2014`, // fixed install dir in mac
+      `steamapps/common/Rocksmith2014`,
     )
     if (window.electronFS.existsSync(basic)) return basic;
 

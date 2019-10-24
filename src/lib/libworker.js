@@ -11,10 +11,11 @@ import {
 } from '../sqliteService';
 import { toasterError } from '../App';
 import getProfileConfig, { updateProfileConfig } from '../configService'
-import readProfile from '../steamprofileService';
+import readProfile, { getRocksmithInstallFolder } from '../steamprofileService';
 import readPSARC from '../psarcService';
 
 const { remote } = window.require('electron');
+const chokidar = window.require('chokidar');
 const parse = require("csv-parse/lib/sync");
 const albumArt = require('./../lib/album-art');
 
@@ -78,18 +79,24 @@ class psarcWorker {
         }
     }
 
-    static importFiles = async () => {
-        let files = await remote.dialog.showOpenDialog({
-            properties: ["openFile", "multiSelections"],
-            filters: [
-                { name: 'PSARC', extensions: ['psarc'] },
-            ],
-        });
-        if (files === null || typeof files === 'undefined' || files.filePaths.length <= 0 || files.canceled) {
-            DispatcherService.dispatch(DispatchEvents.PSARCS_IMPORTED, []);
-            return;
+    static importFiles = async (externalFiles = []) => {
+        let files = [];
+        if (externalFiles.length === 0) {
+            files = await remote.dialog.showOpenDialog({
+                properties: ["openFile", "multiSelections"],
+                filters: [
+                    { name: 'PSARC', extensions: ['psarc'] },
+                ],
+            });
+            if (files === null || typeof files === 'undefined' || files.filePaths.length <= 0 || files.canceled) {
+                DispatcherService.dispatch(DispatchEvents.PSARCS_IMPORTED, []);
+                return;
+            }
+            files = files.filePaths;
         }
-        files = files.filePaths;
+        else {
+            files = externalFiles;
+        }
         const info = { files: 0, imports: 0 };
         let progress = 0;
         const toastID = this.psarcToaster(null, 0, info);
@@ -774,21 +781,169 @@ class imageWorker {
 
 
 class metaWorker {
+    static markAsCDLC = false;
+
     static importDLCandStats = async (dir) => {
         DispatcherService.on(DispatchEvents.PSARCS_IMPORTED, this.importFinished);
         psarcWorker.importDirectory([dir]);
     }
 
+    static importDLCandStatsFromFileArray = async (filePaths = [], markAsCDLC) => {
+        DispatcherService.on(DispatchEvents.PSARCS_IMPORTED, this.importFinished);
+        this.markAsCDLC = markAsCDLC;
+        await psarcWorker.importFiles(filePaths);
+        this.markAsCDLC = false;
+    }
+
     static importFinished = async (results) => {
         DispatcherService.off(DispatchEvents.PSARCS_IMPORTED, this.importFinished);
-        await profileWorker.songListUpdate(results, false);
+        await profileWorker.songListUpdate(results, this.markAsCDLC);
         await profileWorker.startWork();
     }
 }
 
+class fileWatcherWorker {
+    constructor() {
+        this.watcher = null;
+        this.history = {};
+        this.toastID = null;
+        this.toastMarkAsCDLC = false;
+    }
+
+    accept = async () => {
+        if (this.watcher) {
+            this.stop();
+            if (this.toastID) toast.dismiss(this.toastID);
+            await metaWorker.importDLCandStatsFromFileArray(
+                Object.keys(this.history),
+                this.toastMarkAsCDLC,
+            );
+            this.dismiss();
+            this.start();
+        }
+    }
+
+    dismiss = async () => {
+        if (this.toastID) toast.dismiss(this.toastID);
+        this.history = [];
+        this.toastID = null;
+        this.toastMarkAsCDLC = false;
+    }
+
+    onCDLC = (event) => {
+        this.toastMarkAsCDLC = !this.toastMarkAsCDLC;
+        this.toaster();
+    }
+
+    fileAdded = async (filePath) => {
+        console.log("chokidar fileAdd", filePath);
+        let psarcEnd = "";
+        if (window.os.platform() === "darwin") {
+            psarcEnd = "_m.psarc";
+        }
+        else {
+            psarcEnd = "_p.psarc";
+        }
+        if (filePath.endsWith(psarcEnd)) {
+            const keys = Object.keys(this.history);
+            if (!keys.includes(filePath) && keys.length <= 30) {
+                const data = await readPSARC(filePath);
+                if (data != null && data.length > 0 && typeof data[0] === 'object') {
+                    const item = data[0];
+                    if ("song" in item && "artist" in item) {
+                        this.history[filePath] = item;
+                        this.toaster();
+                    }
+                }
+            }
+        }
+    }
+
+    fileRemoved = async (filePath) => {
+        console.log("chokidar fileRemoved", filePath);
+        let keys = Object.keys(this.history);
+        if (filePath in this.history) {
+            delete this.history[filePath];
+        }
+        keys = Object.keys(this.history);
+        if (keys <= 0) this.dismiss();
+        else this.toaster();
+    }
+
+    toaster = () => {
+        const d = (t) => (
+            <div>
+                <span className="toast-msg toast-msg-success"> New PSARCs found</span>
+                <hr style={{ marginBottom: 7 + 'px' }} />
+                {
+                    Object.keys(this.history).map((key, idx) => {
+                        const item = this.history[key];
+                        return (
+                            <div
+                                key={item.id}
+                                onClick={() => window.shell.showItemInFolder(key)}>
+                                <span>{idx + 1}.</span>
+                                <span className="toast-msg">{item.song} - {item.artist}</span>
+                            </div>
+                        );
+                    })
+                }
+                <div style={{ textAlign: 'left' }} className="toast-buttons">
+                    <a className="border-dashed-bottom" type="submit" onClick={this.accept}>Import</a>&nbsp;|&nbsp;
+                    <a className="border-dashed-bottom" type="submit" onClick={this.dismiss}>Dismiss</a>
+                    <span style={{ float: 'right' }}>
+                        <label className="" htmlFor="markascdlc" style={{ paddingRight: 10 + 'px' }}>
+                            mark as cdlc
+                        </label>
+                        <input id="markascdlc" type="checkbox" onChange={this.onCDLC} checked={t} />
+                    </span>
+                </div>
+            </div>
+        )
+        if (this.toastID == null) {
+            this.toastID = toast(d(this.toastMarkAsCDLC), {
+                autoClose: false,
+                closeOnClick: false,
+                className: "toast-bg toast-watcher",
+                onClose: this.dismiss,
+            });
+        }
+        else {
+            toast.update(this.toastID, {
+                render: d(this.toastMarkAsCDLC),
+            });
+        }
+    }
+
+    start = async () => {
+        const rsFolder = await getRocksmithInstallFolder();
+        if (rsFolder) {
+            console.log("chokidar: watching dir for new psarcs", rsFolder);
+            const folderPattern = [`${rsFolder}/**/*.psarc`];
+            this.watcher = chokidar.watch(folderPattern, {
+                //eslint-disable-next-line
+                ignored: /(^|[\/\\])\../, // ignore dotfiles
+                persistent: true,
+                ignoreInitial: true,
+            });
+            this.watcher.on('add', filePath => this.fileAdded(filePath));
+            this.watcher.on('unlink', filePath => this.fileRemoved(filePath));
+        }
+    }
+
+    stop = async () => {
+        if (this.watcher) {
+            this.watcher.close();
+            this.watcher = null;
+        }
+    }
+}
+
+const fileWatcher = new fileWatcherWorker();
 export {
     profileWorker,
     psarcWorker,
     imageWorker,
     metaWorker,
+    fileWatcher,
 }
