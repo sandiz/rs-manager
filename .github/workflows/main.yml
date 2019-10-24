@@ -46,7 +46,7 @@ jobs:
       - name: Run build script (windows)
         run: |
           npm install --vs2015 -g windows-build-tools & yarn install & yarn dist-win
-      - uses: sandiz/upload-release-action@releases/v2
+      - uses: sandiz/upload-release-action@releases/v1
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: 'release-builds/Rocksmith*'
