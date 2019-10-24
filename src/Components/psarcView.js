@@ -99,6 +99,7 @@ class PSARCView extends React.Component {
             display: '',
           },
         }),
+        classes: 'sortable',
       },
       {
         dataField: "arrangement",
@@ -142,6 +143,7 @@ class PSARCView extends React.Component {
             cursor: 'pointer',
           };
         },
+        classes: 'sortable',
         hidden: false,
       },
     ];

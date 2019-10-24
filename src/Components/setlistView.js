@@ -849,10 +849,9 @@ class SetlistView extends React.Component {
                         showDetail={this.state.showDetail}
                         close={() => this.setState({ showDetail: false })}
                         isSetlist
-                        removeFromSetlist={this.removeFromSetlist}
-                        removeFromSetlistByID={this.removeFromSetlistByID}
                         isGenerated={this.state.setlistMeta.is_generated === "true"}
                         isRSSetlist={this.state.setlistMeta.is_rssetlist === "true"}
+                        refreshView={this.refresh}
                     />
                 </div>
                 <div className={setlistinitclass}>

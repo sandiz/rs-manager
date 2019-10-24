@@ -8,8 +8,6 @@ import PropTypes from 'prop-types';
 import moment from 'moment';
 import {
   getSongsOwned, countSongsOwned,
-  initSongsOwnedDB,
-  removeFromSongsOwned, addToIgnoreArrangements,
 } from '../sqliteService';
 import {
   getScoreAttackConfig, getDefaultSortOptionConfig, getCustomCulumnsConfig,
@@ -772,6 +770,7 @@ class SonglistView extends React.Component {
       showDetail: false,
       showSong: '',
       showArtist: '',
+      showSongID: '',
       sortOptions: defaultSortOption,
       columns: BaseColumnDefs,
     };
@@ -792,7 +791,6 @@ class SonglistView extends React.Component {
   }
 
   componentDidMount = async () => {
-    await initSongsOwnedDB();
     const so = await countSongsOwned();
     this.props.updateHeader(
       this.tabname,
@@ -875,16 +873,6 @@ class SonglistView extends React.Component {
       filters: {},
       sortOptions,
     })
-  }
-
-  removeFromDB = async () => {
-    await removeFromSongsOwned(this.state.showSongID);
-    await this.refreshView();
-  }
-
-  ignoreArrangement = async () => {
-    await addToIgnoreArrangements(this.state.showSongID)
-    await this.refreshView();
   }
 
   handleTableChange = async (type, {
@@ -984,8 +972,6 @@ class SonglistView extends React.Component {
             album={this.state.showAlbum}
             showDetail={this.state.showDetail}
             close={() => this.setState({ showDetail: false })}
-            removeFromDB={this.removeFromDB}
-            ignoreArrangement={this.ignoreArrangement}
             isSongview
             isSetlist={false}
             songID={this.state.showSongID}

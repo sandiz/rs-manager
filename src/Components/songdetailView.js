@@ -9,7 +9,8 @@ import AsyncSelect from 'react-select/async';
 import {
   saveSongToSetlist, getSongByID,
   updateCDLCStat, updateSAFCStat, saveSongByIDToSetlist,
-  updateNotes, getNotes, getAllTags, executeRawSql, addTag,
+  updateNotes, getNotes, getAllTags, executeRawSql,
+  addTag, removeFromSongsOwned, addToIgnoreArrangements,
 } from '../sqliteService';
 import { getScoreAttackConfig } from '../configService';
 import { expandButton, collapseButton } from "./settingsView";
@@ -80,6 +81,7 @@ class SongDetailView extends React.Component {
       sa_fc_hard: null,
       sa_fc_master: null,
       tags: [],
+      songID: '',
     }
     this.maxResults = 10;
     this.modal_div = null;
@@ -92,7 +94,17 @@ class SongDetailView extends React.Component {
     if (nextprops.showDetail && nextprops !== this.props) {
       //search youtube
       this.shown = true;
-      const { song, artist } = nextprops;
+      const {
+        song, artist, songID, songData,
+      } = nextprops;
+      if (songID === '') {
+        if ("id" in songData) {
+          this.setState({ songID: songData.id });
+        }
+      }
+      else {
+        this.setState({ songID });
+      }
       const ptsearchterm = unescape(song) + " " + unescape(artist) + " rocksmith";
       const mvsearchterm = unescape(song) + " " + unescape(artist) + " music video";
       console.log("searching for ", ptsearchterm, mvsearchterm);
@@ -195,8 +207,8 @@ class SongDetailView extends React.Component {
 
   addToSetlist = async (addSongID = false) => {
     if (addSongID) {
-      //console.log("Saving id to setlist", this.props.songID, this.state.currentSetlist);
-      await saveSongByIDToSetlist(this.state.currentSetlist, this.props.songID);
+      //console.log("Saving id to setlist", this.state.songID, this.state.currentSetlist);
+      await saveSongByIDToSetlist(this.state.currentSetlist, this.state.songID);
     }
     else {
       //console.log("saving all arrangements to setlist", this.state.currentSetlist);
@@ -212,7 +224,7 @@ class SongDetailView extends React.Component {
 
   generateSetlistOptions = async () => {
     const showsastats = await getScoreAttackConfig();
-    const songDetails = await getSongByID(this.props.songID);
+    const songDetails = await getSongByID(this.state.songID);
     const isTrueSet = (songDetails.is_cdlc === 'true');
     const tags = await getAllTags(this.props.dlcappid)
     const ft = tags.map((x) => {
@@ -253,12 +265,13 @@ class SongDetailView extends React.Component {
   updateCDLCStatus = async (status) => {
     //console.log(status);
     //this.setState({ is_cdlc: status });
-    await updateCDLCStat(this.props.songID, status);
-    const songDetails = await getSongByID(this.props.songID);
+    await updateCDLCStat(this.state.songID, status);
+    const songDetails = await getSongByID(this.state.songID);
     const isTrueSet = (songDetails.is_cdlc === 'true');
     this.setState({
       is_cdlc: isTrueSet,
     });
+    this.props.refreshView();
   }
 
   updateSAStat = async (saType, date) => {
@@ -281,18 +294,19 @@ class SongDetailView extends React.Component {
       default:
         break;
     }
-    await updateSAFCStat(key, Date.parse(date.toDate()), this.props.songID);
-    const songDetails = await getSongByID(this.props.songID);
+    await updateSAFCStat(key, Date.parse(date.toDate()), this.state.songID);
+    const songDetails = await getSongByID(this.state.songID);
     this.setState({
       sa_fc_easy: songDetails.sa_fc_easy == null ? null : moment(songDetails.sa_fc_easy),
       sa_fc_medium: songDetails.sa_fc_medium == null ? null : moment(songDetails.sa_fc_medium),
       sa_fc_hard: songDetails.sa_fc_hard == null ? null : moment(songDetails.sa_fc_hard),
       sa_fc_master: songDetails.sa_fc_master == null ? null : moment(songDetails.sa_fc_master),
     })
+    this.props.refreshView();
   }
 
   showLocalNote = async () => {
-    const notes = await getNotes(this.props.songID)
+    const notes = await getNotes(this.state.songID)
     const { value: text } = await Swal.fire({
       inputValue: notes.local_note ? unescape(notes.local_note) : "",
       input: 'textarea',
@@ -301,8 +315,8 @@ class SongDetailView extends React.Component {
       animation: false,
       confirmButtonClass: 'local-note-btn-class',
     })
-    if (typeof text !== 'undefined' && this.props.songID.length > 0) {
-      await updateNotes(this.props.songID, text);
+    if (typeof text !== 'undefined' && this.state.songID.length > 0) {
+      await updateNotes(this.state.songID, text);
       Swal.fire({
         text: 'Note Saved!',
         //animation: false,
@@ -327,11 +341,21 @@ class SongDetailView extends React.Component {
     }
   }
 
+  removeFromDB = async () => {
+    await removeFromSongsOwned(this.state.songID);
+    this.props.refreshView();
+  }
+
+  ignoreArrangement = async () => {
+    await addToIgnoreArrangements(this.state.songID)
+    this.props.refreshView();
+  }
+
   render = () => {
     const cdlcyesstyle = this.state.is_cdlc ? "song-detail-option" : "song-detail-option-disabled";
     const cdlcnostyle = this.state.is_cdlc ? "song-detail-option-disabled" : "song-detail-option";
     const songliststyle = "extraPadding download " + (this.props.isSongview && !this.props.isDashboard ? "" : "hidden");
-    const songliststylegeneric = (this.props.isSongview && !this.props.isDashboard ? "" : "hidden");
+    const songliststylegeneric = ((this.props.isSetlist || this.props.isSongview) && !this.props.isDashboard) ? "" : "hidden";
     const ptstyle = "extraPadding download " + (!this.state.showPlaythrough ? "" : "isDisabled");
     const mvstyle = "extraPadding download " + (!this.state.showMusicVideo ? "" : "isDisabled");
     const ptdivstyle = this.state.showPlaythrough ? "dblock" : "hidden";
@@ -486,7 +510,7 @@ class SongDetailView extends React.Component {
                     <span
                       className="song-detail-option"
                       style={{ userSelect: 'text' }}>
-                      {this.props.songID}
+                      {this.state.songID}
                     </span>
                   </div>
                 </div>
@@ -669,7 +693,7 @@ class SongDetailView extends React.Component {
                     style={{ width: 100 + '%' }}
                     className={songliststyle}
                     onClick={async () => {
-                      await this.props.removeFromDB();
+                      await this.removeFromDB();
                       this.handleHide();
                     }}>
                     <span><Trans i18nKey="deleteSongFromDB">Delete Song from DB</Trans></span>
@@ -681,8 +705,8 @@ class SongDetailView extends React.Component {
                     style={{ width: 100 + '%' }}
                     className={songliststyle}
                     onClick={async () => {
-                      await this.props.removeFromDB();
-                      await this.props.ignoreArrangement();
+                      await this.removeFromDB();
+                      await this.ignoreArrangement();
                       this.handleHide();
                     }}>
                     <span><Trans i18nKey="deleteNeverImport">Delete and Never Import</Trans></span>
@@ -719,6 +743,8 @@ SongDetailView.propTypes = {
   song: PropTypes.string,
   artist: PropTypes.string,
   album: PropTypes.string,
+  //eslint-disable-next-line
+  songData: PropTypes.object,
   close: PropTypes.func,
   isSongview: PropTypes.bool,
   isSetlist: PropTypes.bool,
@@ -726,8 +752,7 @@ SongDetailView.propTypes = {
   isDashboard: PropTypes.bool,
   isWeekly: PropTypes.bool,
   dlcappid: PropTypes.string,
-  removeFromDB: PropTypes.func,
-  ignoreArrangement: PropTypes.func,
+  //eslint-disable-next-line
   songID: PropTypes.string,
   refreshView: PropTypes.func,
 }
@@ -736,6 +761,7 @@ SongDetailView.defaultProps = {
   song: '',
   artist: '',
   album: '',
+  songData: {},
   isSetlist: true,
   isDashboard: false,
   isSongview: false,
@@ -743,8 +769,6 @@ SongDetailView.defaultProps = {
   isWeekly: false,
   dlcappid: '',
   close: () => { },
-  removeFromDB: () => { },
-  ignoreArrangement: () => { },
   songID: '',
   refreshView: () => { },
 }
