@@ -28,6 +28,7 @@ import { getState } from './stateService';
 import { enableScroll, forceNoScroll } from './Components/songdetailView';
 import { getProfileName } from './steamprofileService';
 import { detectImportRSMPath } from './rsrtoolservice';
+import { fileWatcher } from './lib/libworker';
 
 const csvparse = require('csv-parse/lib/es5/sync');
 
@@ -146,6 +147,14 @@ class App extends Component {
     }
     const songs = await countSongsOwned(true);
     if (songs.count === 0) this.openFTUE();
+    else {
+      //check for config
+      fileWatcher.start();
+    }
+  }
+
+  componentWillUnmount = () => {
+    fileWatcher.stop();
   }
 
   getGlobalNotes = async () => {
