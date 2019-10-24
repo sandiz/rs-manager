@@ -139,17 +139,6 @@ $(document).ready(function () {
 
     });
 
-
-    // Header scroll class
-    $(window).scroll(function () {
-        if ($(this).scrollTop() > 50) {
-            $('#header').addClass('header-scrolled');
-        } else {
-            $('#header').removeClass('header-scrolled');
-        }
-    });
-
-
     $(".item").each(function (index) {
         $(this).data('index', index);
     });
