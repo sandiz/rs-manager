@@ -3,7 +3,7 @@ import moment from 'moment';
 import React from 'react';
 import { DispatcherService, DispatchEvents } from './libdispatcher';
 import {
-    initSongsOwnedDB, updateRecentlyPlayedSongsV2,
+    updateRecentlyPlayedSongsV2,
     updateMasteryandPlayedV2, updateScoreAttackStatsV2,
     saveHistoryV2, addToFavoritesV2, initSetlistPlaylistDB,
     createRSSongList, resetRSSongList, createSetlistFromDLCPack,
@@ -282,7 +282,6 @@ class profileWorker {
             const toastID = this.refreshToaster();
             const steamProfile = await readProfile(prfldb);
 
-            await initSongsOwnedDB();
             await updateProfileConfig(prfldb);
             const rpsongs = async (type) => {
                 const stats = steamProfile.Songs;
@@ -454,7 +453,6 @@ class profileWorker {
             return;
         }
         if (prfldb.length > 0) {
-            await initSongsOwnedDB();
             await updateProfileConfig(prfldb);
             const info = { changes: 0, name: setlist, id: '' }
             const steamProfile = await readProfile(prfldb);
@@ -730,7 +728,6 @@ class profileWorker {
         progress += 1
         info.arrangements = filtered.length;
         this.songListToaster(toastID, progress, info);
-        await initSongsOwnedDB();
         let changes = await updateSongsOwnedV2(filtered, markAsCDLC);
         console.log("inserts: " + changes);
 

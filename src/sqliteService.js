@@ -46,6 +46,8 @@ export async function initSongsOwnedDB(updateTab = "", updateFunc = null) {
   await db.run(createHistorySql)
   const createDLCTagsSql = "create table if not exists dlc_tags (appid char, tag char, primary key(appid, tag));";
   await db.run(createDLCTagsSql)
+  const createSongTagsSql = "create table if not exists song_tags(tag char, id char, primary key(tag, id));";
+  await db.run(createSongTagsSql);
   await initSetlistDB(); // init setlist db with songs db so all migrations can be in one place
   let version = await getUserVersion();
 
