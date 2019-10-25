@@ -847,7 +847,7 @@ export default async function updateSongsOwned(psarcResult, isCDLC = false) {
   }
 }
 export async function getSongsOwned(start = 0, count = 10, sortField = "mastery",
-  sortOrder = "desc", search = "", searchField = "", sortOptions = []) {
+  sortOrder = "desc", search = "", searchField = "", sortOptions = [], pathOptions = [], tagOptions = []) {
   if (db == null) {
     const dbfilename = window.sqlitePath;
     db = await window.sqlite.open(dbfilename);
@@ -879,6 +879,18 @@ export async function getSongsOwned(start = 0, count = 10, sortField = "mastery"
       break;
     default: break;
   }
+  let optionsSql = "";
+  if (pathOptions.length > 0) {
+    if (pathOptions.includes("pathLead")) {
+      optionsSql += `path_lead=1`
+    }
+    if (pathOptions.includes("pathRhythm")) {
+      optionsSql += (optionsSql.length > 0 ? " OR " : "") + (`path_rhythm=1`)
+    }
+    if (pathOptions.includes("pathBass")) {
+      optionsSql += (optionsSql.length > 0 ? " OR " : "") + (`path_bass=1`)
+    }
+  }
 
   let orderSql = `ORDER BY ${sortField} ${sortOrder}`;
   if (sortOptions.length > 0) {
@@ -887,15 +899,23 @@ export async function getSongsOwned(start = 0, count = 10, sortField = "mastery"
   }
 
   if (search === "" && searchField !== "cdlc" && searchField !== "odlc") {
+    let wheresql = "";
+    if (optionsSql.length > 0) {
+      wheresql = "WHERE " + optionsSql
+    }
     sql = `select c.acount as acount, c.songcount as songcount, *, group_concat(song_tags.tag, '|') as tags
           from songs_owned LEFT JOIN song_tags using (id),  (
           SELECT count(*) as acount, count(distinct songkey) as songcount
-            FROM songs_owned
+            FROM songs_owned ${wheresql}
           ) c 
+          ${wheresql}
           group by id
           ${orderSql} LIMIT ${start},${count}`;
   }
   else {
+    if (optionsSql.length > 0) {
+      searchSql = " AND " + optionsSql
+    }
     sql = `select c.acount as acount, c.songcount as songcount, *, group_concat(song_tags.tag, '|') as tags
           from songs_owned LEFT JOIN song_tags using (id), (
           SELECT count(*) as acount, count(distinct songkey) as songcount
