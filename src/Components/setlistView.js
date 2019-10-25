@@ -13,6 +13,7 @@ import {
     getSongsFromGeneratedPlaylist, removeSongFromSetlistByUniqKey,
     executeRawSql, getLeadStats, getRhythmStats, getBassStats, countSongsOwned,
     getSAStats,
+    getAllDistinceSongTags,
 } from '../sqliteService';
 import {
     getScoreAttackConfig,
@@ -152,6 +153,8 @@ class SetlistView extends React.Component {
 
             showExportOptions: false,
             showAddOptions: false,
+            songTags: [],
+            selectedSongTags: [],
         };
         this.search = null;
         this.rowEvents = {
@@ -190,11 +193,19 @@ class SetlistView extends React.Component {
         DispatcherService.on(DispatchEvents.SETLIST_IMPORTED, this.setlistImported);
 
         const showSAStats = await getScoreAttackConfig();
+        const songTags = await getAllDistinceSongTags();
+        const ft2 = songTags.map(x => {
+            const obj = {
+                value: x.tag,
+                label: x.tag,
+            }
+            return obj;
+        });
         const customColumns = await getCustomCulumnsConfig();
         const columns = generateColumns(customColumns,
             { globalNotes: this.props.globalNotes, showSAStats },
             this.props.t);
-        this.setState({ columns });
+        this.setState({ columns, songTags: ft2 });
     }
 
     componentWillUnmount = () => {
@@ -464,6 +475,12 @@ class SetlistView extends React.Component {
         this.setState({ selectedPathOption: spo }, () => this.refreshView());
     }
 
+    handleSongTagsChange = (selectedSongTagOption) => {
+        let spo = []
+        if (selectedSongTagOption) spo = selectedSongTagOption;
+        this.setState({ selectedSongTags: spo }, () => this.refreshView());
+    }
+
     handleSearchChange = (e) => {
         this.handleTableChange('filter', {
             page: 1,
@@ -514,6 +531,16 @@ class SetlistView extends React.Component {
     }
 
     refreshView = async () => {
+        const songTags = await getAllDistinceSongTags();
+        const ft2 = songTags.map(x => {
+            const obj = {
+                value: x.tag,
+                label: x.tag,
+            }
+            return obj;
+        });
+        this.setState({ songTags: ft2 });
+
         this.handleTableChange("cdm", {
             page: this.state.page,
             sizePerPage: this.state.sizePerPage,
@@ -553,6 +580,7 @@ class SetlistView extends React.Component {
             }
         } else {
             const pathOpts = this.state.selectedPathOption.map(x => x.value)
+            const tagOpts = this.state.selectedSongTags.map(x => x.value);
             output = await getSongsFromPlaylistDB(
                 this.lastChildID,
                 start,
@@ -563,6 +591,7 @@ class SetlistView extends React.Component {
                 document.getElementById("search_field") ? document.getElementById("search_field").value : "",
                 pathOpts,
                 sortOptions,
+                tagOpts,
             )
         }
         if (output.length > 0) {
@@ -687,7 +716,16 @@ class SetlistView extends React.Component {
                                         isSearchable={false}
                                         isClearable={false}
                                     />
-                                    <br />
+                                    <Select
+                                        placeholder="Filter by tags"
+                                        isSearchable={false}
+                                        isClearable={false}
+                                        isMulti
+                                        styles={customTagStyles}
+                                        options={this.state.songTags}
+                                        value={this.state.selectedSongTags}
+                                        onChange={this.handleSongTagsChange}
+                                    />
                                 </div>
                             ) : null
                     }

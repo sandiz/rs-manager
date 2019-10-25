@@ -935,7 +935,6 @@ export async function getSongsOwned(start = 0, count = 10, sortField = "mastery"
           group by id
           ${orderSql} LIMIT ${start},${count}`;
   }
-  console.log(sql);
   const output = await db.all(sql);
   return output
 }
@@ -1412,7 +1411,7 @@ export async function getSongsFromGeneratedPlaylist(
   }
   return [];
 }
-export async function getSongsFromPlaylistDB(dbname, start = 0, count = 10, sortField = "mastery", sortOrder = "desc", search = "", searchField = "", options = [], sortOptions = []) {
+export async function getSongsFromPlaylistDB(dbname, start = 0, count = 10, sortField = "mastery", sortOrder = "desc", search = "", searchField = "", options = [], sortOptions = [], tagOptions = []) {
   // console.log("__db_call__: getSongsFromPlaylistDB");
   if (db == null) {
     const dbfilename = window.sqlitePath;
@@ -1450,6 +1449,14 @@ export async function getSongsFromPlaylistDB(dbname, start = 0, count = 10, sort
     }
   }
 
+  if (tagOptions.length > 0) {
+    const items = tagOptions.map((x, idx) => {
+      if (idx === tagOptions.length - 1) return `"${x}"`;
+      return `"${x},"`;
+    });
+    optionsSql += (optionsSql.length > 0 ? " AND " : "") + `song_tags.tag in (${items})`
+  }
+
   let orderSql = `ORDER BY ${sortField} ${sortOrder}`;
   if (sortOptions.length > 0) {
     const gsql = generateOrderSql(sortOptions, true);
@@ -1464,7 +1471,7 @@ export async function getSongsFromPlaylistDB(dbname, start = 0, count = 10, sort
     sql = `select c.acount as acount, c.songcount as songcount, *, group_concat(song_tags.tag, '|') as tags
           from songs_owned LEFT JOIN song_tags using (id),  (
           SELECT count(*) as acount, count(distinct songkey) as songcount
-            FROM songs_owned
+            FROM songs_owned LEFT JOIN song_tags using (id)
             JOIN ${dbname} ON ${dbname}.uniqkey = songs_owned.uniqkey
           ) c 
           JOIN ${dbname} ON ${dbname}.uniqkey = songs_owned.uniqkey
@@ -1480,7 +1487,7 @@ export async function getSongsFromPlaylistDB(dbname, start = 0, count = 10, sort
     sql = `select c.acount as acount, c.songcount as songcount, *, group_concat(song_tags.tag, '|') as tags
           from songs_owned LEFT JOIN song_tags using (id), (
           SELECT count(*) as acount, count(distinct songkey) as songcount
-            FROM songs_owned
+            FROM songs_owned LEFT JOIN song_tags using (id)
             JOIN ${dbname} ON ${dbname}.uniqkey = songs_owned.uniqkey
             where 
             ${searchSql}
