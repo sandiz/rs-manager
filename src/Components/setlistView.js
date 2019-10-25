@@ -56,6 +56,35 @@ export const customPathStyles = {
         ...styles,
     }),
 }
+
+export const customTagStyles = {
+    container: styles => ({
+        ...styles, display: 'inline-flex', marginTop: 12 + 'px', marginLeft: 20 + 'px',
+    }),
+    control: styles => ({
+        ...styles, backgroundColor: 'white', color: 'black', width: 255 + 'px',
+    }),
+    option: (styles, {
+        data, isDisabled, isFocused, isSelected,
+    }) => {
+        return {
+            ...styles,
+            color: 'black',
+        };
+    },
+    multiValue: (styles, { data }) => {
+        return {
+            ...styles,
+        };
+    },
+    multiValueLabel: (styles, { data }) => ({
+        ...styles,
+    }),
+    multiValueRemove: (styles, { data }) => ({
+        ...styles,
+    }),
+}
+
 export const generateOrderSql = (sortOptions, withOrder = false) => {
     //song asc, mastery desc
     let ordersql = ""

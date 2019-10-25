@@ -891,6 +891,13 @@ export async function getSongsOwned(start = 0, count = 10, sortField = "mastery"
       optionsSql += (optionsSql.length > 0 ? " OR " : "") + (`path_bass=1`)
     }
   }
+  if (tagOptions.length > 0) {
+    const items = tagOptions.map((x, idx) => {
+      if (idx === tagOptions.length - 1) return `"${x}"`;
+      return `"${x},"`;
+    });
+    optionsSql += (optionsSql.length > 0 ? " AND " : "") + `song_tags.tag in (${items})`
+  }
 
   let orderSql = `ORDER BY ${sortField} ${sortOrder}`;
   if (sortOptions.length > 0) {
@@ -906,7 +913,7 @@ export async function getSongsOwned(start = 0, count = 10, sortField = "mastery"
     sql = `select c.acount as acount, c.songcount as songcount, *, group_concat(song_tags.tag, '|') as tags
           from songs_owned LEFT JOIN song_tags using (id),  (
           SELECT count(*) as acount, count(distinct songkey) as songcount
-            FROM songs_owned ${wheresql}
+            FROM songs_owned LEFT JOIN song_tags using (id) ${wheresql}
           ) c 
           ${wheresql}
           group by id
@@ -914,12 +921,12 @@ export async function getSongsOwned(start = 0, count = 10, sortField = "mastery"
   }
   else {
     if (optionsSql.length > 0) {
-      searchSql = " AND " + optionsSql
+      searchSql += ` AND (${optionsSql})`;
     }
     sql = `select c.acount as acount, c.songcount as songcount, *, group_concat(song_tags.tag, '|') as tags
           from songs_owned LEFT JOIN song_tags using (id), (
           SELECT count(*) as acount, count(distinct songkey) as songcount
-            FROM songs_owned
+            FROM songs_owned LEFT JOIN song_tags using (id)
             where 
             ${searchSql}
           ) c 
@@ -928,6 +935,7 @@ export async function getSongsOwned(start = 0, count = 10, sortField = "mastery"
           group by id
           ${orderSql} LIMIT ${start},${count}`;
   }
+  console.log(sql);
   const output = await db.all(sql);
   return output
 }
@@ -1467,7 +1475,7 @@ export async function getSongsFromPlaylistDB(dbname, start = 0, count = 10, sort
   }
   else {
     if (optionsSql.length > 0) {
-      searchSql = " AND " + optionsSql
+      searchSql = " AND (" + optionsSql + ")"
     }
     sql = `select c.acount as acount, c.songcount as songcount, *, group_concat(song_tags.tag, '|') as tags
           from songs_owned LEFT JOIN song_tags using (id), (
