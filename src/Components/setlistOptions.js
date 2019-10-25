@@ -125,8 +125,8 @@ function generateFCSql(filter) {
 }
 
 export function generateSql(filters, count = false) {
-  const countsql = count ? "count(*) as acount, count(distinct songkey) as songcount" : "*"
-  let sql = `select ${countsql} from songs_owned `;
+  const countsql = count ? "count(*) as acount, count(distinct songkey) as songcount" : "*,  group_concat(song_tags.tag, '|') as tags"
+  let sql = `select ${countsql} from songs_owned  LEFT JOIN song_tags using (id) `;
   for (let i = 0; i < filters.length; i += 1) {
     const filter = filters[i];
     if (i === 0) {

@@ -441,6 +441,21 @@ export async function addTag(appid, tag) {
   const op = await db.run(sql);
   return op;
 }
+export async function addSongTag(tag, id) {
+  const sql = `replace into song_tags values('${tag.toLowerCase()}', '${id}')`;
+  const op = await db.run(sql);
+  return op;
+}
+export async function getAllDistinceSongTags() {
+  const sql = `select distinct tag from song_tags`;
+  const op = await db.all(sql);
+  return op;
+}
+export async function getAllSongTags(id) {
+  const sql = `select distinct tag from song_tags where id = '${id}';`
+  const op = await db.all(sql);
+  return op;
+}
 export async function isSongIDIgnored(songid) {
   //  console.log("__db_call__: isDLCInDB");
   let sqlstr = "";
@@ -872,16 +887,17 @@ export async function getSongsOwned(start = 0, count = 10, sortField = "mastery"
   }
 
   if (search === "" && searchField !== "cdlc" && searchField !== "odlc") {
-    sql = `select c.acount as acount, c.songcount as songcount, *
-          from songs_owned,  (
+    sql = `select c.acount as acount, c.songcount as songcount, *, group_concat(song_tags.tag, '|') as tags
+          from songs_owned LEFT JOIN song_tags using (id),  (
           SELECT count(*) as acount, count(distinct songkey) as songcount
             FROM songs_owned
           ) c 
+          group by id
           ${orderSql} LIMIT ${start},${count}`;
   }
   else {
-    sql = `select c.acount as acount, c.songcount as songcount, *
-          from songs_owned, (
+    sql = `select c.acount as acount, c.songcount as songcount, *, group_concat(song_tags.tag, '|') as tags
+          from songs_owned LEFT JOIN song_tags using (id), (
           SELECT count(*) as acount, count(distinct songkey) as songcount
             FROM songs_owned
             where 
@@ -889,6 +905,7 @@ export async function getSongsOwned(start = 0, count = 10, sortField = "mastery"
           ) c 
           where
           ${searchSql}
+          group by id
           ${orderSql} LIMIT ${start},${count}`;
   }
   const output = await db.all(sql);
@@ -1356,7 +1373,7 @@ export async function getSongsFromGeneratedPlaylist(
         const gsql = generateOrderSql(sortOptions, true);
         if (gsql !== "") ordersql = gsql;
       }
-      sql += ` ${ordersql} LIMIT ${start},${count};`
+      sql += ` group by id ${ordersql} LIMIT ${start},${count};`
       const output = await db.all(sql);
       const output2 = await db.get(countsql)
       return [output, output2];
@@ -1416,14 +1433,15 @@ export async function getSongsFromPlaylistDB(dbname, start = 0, count = 10, sort
     if (optionsSql.length > 0) {
       wheresql = "WHERE " + optionsSql
     }
-    sql = `select c.acount as acount, c.songcount as songcount, *
-          from songs_owned,  (
+    sql = `select c.acount as acount, c.songcount as songcount, *, group_concat(song_tags.tag, '|') as tags
+          from songs_owned LEFT JOIN song_tags using (id),  (
           SELECT count(*) as acount, count(distinct songkey) as songcount
             FROM songs_owned
             JOIN ${dbname} ON ${dbname}.uniqkey = songs_owned.uniqkey
           ) c 
           JOIN ${dbname} ON ${dbname}.uniqkey = songs_owned.uniqkey
           ${wheresql}
+          group by id
           ${orderSql} LIMIT ${start},${count}
           `;
   }
@@ -1431,8 +1449,8 @@ export async function getSongsFromPlaylistDB(dbname, start = 0, count = 10, sort
     if (optionsSql.length > 0) {
       searchSql = " AND " + optionsSql
     }
-    sql = `select c.acount as acount, c.songcount as songcount, *
-          from songs_owned, (
+    sql = `select c.acount as acount, c.songcount as songcount, *, group_concat(song_tags.tag, '|') as tags
+          from songs_owned LEFT JOIN song_tags using (id), (
           SELECT count(*) as acount, count(distinct songkey) as songcount
             FROM songs_owned
             JOIN ${dbname} ON ${dbname}.uniqkey = songs_owned.uniqkey
@@ -1442,6 +1460,7 @@ export async function getSongsFromPlaylistDB(dbname, start = 0, count = 10, sort
           JOIN ${dbname} ON ${dbname}.uniqkey = songs_owned.uniqkey
           where
           ${searchSql}
+          group by id
           ${orderSql} LIMIT ${start},${count}
           `;
   }

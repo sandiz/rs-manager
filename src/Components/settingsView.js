@@ -117,6 +117,7 @@ export const allCustomColumns = [
   { label: 'maxNotes', value: 'maxNotes' },
   { label: 'tempo', value: 'tempo' },
   { label: 'date_las', value: 'date_las' },
+  { label: 'tags', value: 'tags' },
 ];
 export function arrayMove(array, from, to) {
   array = array.slice();

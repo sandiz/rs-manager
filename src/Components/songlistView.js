@@ -191,6 +191,47 @@ export function unescapeFormatter(cell, row, rowIndex, extraData) {
     );
   }
 }
+export function tagsFormatter(cell, row, rowIndex, extraData) {
+  if (cell) {
+    const items = cell.split("|");
+    return (
+      <div style={{ fontSize: 75 + '%' }}>
+        {
+          items.map((item, idx) => {
+            if (idx === items.length - 1) {
+              return (
+                <div
+                  key={item}
+                  style={{
+                    padding: 5 + 'px',
+                    backgroundColor: '#343a40',
+                    color: 'wheat',
+                    borderRadius: 5 + 'px',
+                  }}>{item}
+                </div>
+              );
+            }
+            return (
+              <div
+                key={item}
+                style={{
+                  padding: 5 + 'px',
+                  backgroundColor: '#343a40',
+                  color: 'wheat',
+                  marginBottom: 4 + 'px',
+                  borderRadius: 5 + 'px',
+                }}>{item}
+              </div>
+            );
+          })
+        }
+      </div>
+    )
+  }
+  else {
+    return <span>-</span>
+  }
+}
 export function difficultyFormatter(cell, row) {
   let diff = diff0;
   if (cell <= 20) {
@@ -696,6 +737,7 @@ export const BaseColumnDefs = [
   { dataField: "tempo", text: "BPM", hidden: true, sort: true },
   { dataField: "date_las", text: "Last Played", hidden: true, sort: true, style: lastPlayedStyle, formatter: lastPlayedFormatter, classes: lastPlayedClass, },
   { dataField: "date_sa", text: "LastPlayed", hidden: true, sort: true },
+  { dataField: "tags", "text": "Tags", hidden: false, sort: false, formatter: tagsFormatter, style: lastPlayedStyle, classes: lastPlayedClass, },
 ];
 /* eslint-enable */
 
@@ -889,8 +931,8 @@ class SonglistView extends React.Component {
     const output = await getSongsOwned(
       start,
       sizePerPage,
-      typeof sortField === 'undefined' ? "mastery" : sortField,
-      typeof sortOrder === 'undefined' ? "desc" : sortOrder,
+      sortField === null || typeof sortField === 'undefined' ? "mastery" : sortField,
+      sortOrder === null || typeof sortOrder === 'undefined' ? "desc" : sortOrder,
       this.search.value,
       document.getElementById("search_field") ? document.getElementById("search_field").value : "",
       sortOptions,

@@ -511,8 +511,8 @@ class SetlistView extends React.Component {
                 this.state.setlistMeta,
                 start,
                 sizePerPage,
-                typeof sortField === 'undefined' === null ? "mastery" : sortField,
-                typeof sortOrder === 'undefined' === null ? "desc" : sortOrder,
+                sortField === null || typeof sortField === 'undefined' === null ? "mastery" : sortField,
+                sortOrder === null || typeof sortOrder === 'undefined' === null ? "desc" : sortOrder,
                 sortOptions,
             )
             if (joinedoutput.length > 0) {
@@ -528,8 +528,8 @@ class SetlistView extends React.Component {
                 this.lastChildID,
                 start,
                 sizePerPage,
-                typeof sortField === 'undefined' === null ? "mastery" : sortField,
-                typeof sortOrder === 'undefined' === null ? "desc" : sortOrder,
+                sortField === null || typeof sortField === 'undefined' === null ? "mastery" : sortField,
+                sortOrder === null || typeof sortOrder === 'undefined' === null ? "desc" : sortOrder,
                 this.search ? this.search.value : "",
                 document.getElementById("search_field") ? document.getElementById("search_field").value : "",
                 pathOpts,
