@@ -8,7 +8,7 @@ import ReactTooltip from 'react-tooltip'
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import {
-  getSongsOwned, countSongsOwned,
+  getSongsOwned, countSongsOwned, getAllDistinceSongTags,
 } from '../sqliteService';
 import {
   getScoreAttackConfig, getDefaultSortOptionConfig, getCustomCulumnsConfig,
@@ -26,7 +26,7 @@ import localNote from '../assets/tree-icons/local.svg';
 
 import { profileWorker } from '../lib/libworker';
 import { DispatcherService, DispatchEvents } from '../lib/libdispatcher';
-import { pathOptions, customPathStyles } from './setlistView';
+import { pathOptions, customPathStyles, customTagStyles } from './setlistView';
 
 const Fragment = React.Fragment;
 
@@ -818,6 +818,8 @@ class SonglistView extends React.Component {
       sortOptions: defaultSortOption,
       columns: BaseColumnDefs,
       selectedPathOption: [],
+      songTags: [],
+      selectedSongTags: [],
     };
     this.tabname = "tab-songs"
     this.childtabname = "songs-owned"
@@ -845,11 +847,19 @@ class SonglistView extends React.Component {
     const showSAStats = await getScoreAttackConfig();
     const sortOptions = await getDefaultSortOptionConfig();
     const customColumns = await getCustomCulumnsConfig();
+    const songTags = await getAllDistinceSongTags();
+    const ft2 = songTags.map(x => {
+      const obj = {
+        value: x.tag,
+        label: x.tag,
+      }
+      return obj;
+    });
     const columns = generateColumns(customColumns,
       { globalNotes: this.props.globalNotes, showSAStats },
       this.props.t);
     this.setState({
-      totalSize: so.count, sortOptions, columns,
+      totalSize: so.count, sortOptions, columns, songTags: ft2,
     });
     const key = this.tabname + "-" + this.childtabname;
     const searchData = this.props.getSearch(key);
@@ -897,6 +907,12 @@ class SonglistView extends React.Component {
     this.setState({ selectedPathOption: spo }, () => this.refreshView());
   }
 
+  handleSongTagsChange = (selectedSongTagOption) => {
+    let spo = []
+    if (selectedSongTagOption) spo = selectedSongTagOption;
+    this.setState({ selectedSongTags: spo }, () => this.refreshView());
+  }
+
   updateMastery = async () => {
     profileWorker.startWork();
   }
@@ -916,8 +932,17 @@ class SonglistView extends React.Component {
   }
 
   refreshView = async () => {
-    this.setState({ songs: [] });
+    const songTags = await getAllDistinceSongTags();
+    const ft2 = songTags.map(x => {
+      const obj = {
+        value: x.tag,
+        label: x.tag,
+      }
+      return obj;
+    });
+    this.setState({ songs: [], songTags: ft2 });
     const sortOptions = await getDefaultSortOptionConfig();
+
     this.handleTableChange("cdm", {
       page: this.state.page,
       sizePerPage: this.state.sizePerPage,
@@ -937,7 +962,8 @@ class SonglistView extends React.Component {
   }) => {
     const zeroIndexPage = page - 1
     const start = zeroIndexPage * sizePerPage;
-    const pathOpts = this.state.selectedPathOption.map(x => x.value)
+    const pathOpts = this.state.selectedPathOption.map(x => x.value);
+    const tagOpts = this.state.selectedSongTags.map(x => x.value);
     const output = await getSongsOwned(
       start,
       sizePerPage,
@@ -947,6 +973,7 @@ class SonglistView extends React.Component {
       document.getElementById("search_field") ? document.getElementById("search_field").value : "",
       sortOptions,
       pathOpts,
+      tagOpts,
     )
     if (output.length > 0) {
       this.props.updateHeader(
@@ -1002,6 +1029,16 @@ class SonglistView extends React.Component {
             placeholder="Filter by path"
             isSearchable={false}
             isClearable={false}
+          />
+          <Select
+            placeholder="Filter by tags"
+            isSearchable={false}
+            isClearable={false}
+            isMulti
+            styles={customTagStyles}
+            options={this.state.songTags}
+            value={this.state.selectedSongTags}
+            onChange={this.handleSongTagsChange}
           />
         </div>
         <div className="centerButton list-unstyled" style={{ marginTop: 1 + 'px' }}>
