@@ -24,12 +24,12 @@ import AddSongModal from './modalAddSong';
 import { DispatcherService, DispatchEvents } from '../lib/libdispatcher';
 import { profileWorker } from '../lib/libworker';
 
-const options = [
+export const pathOptions = [
     { value: 'pathLead', label: 'Lead' },
     { value: 'pathRhythm', label: 'Rhythm' },
     { value: 'pathBass', label: 'Bass' },
 ];
-const customStyles = {
+export const customPathStyles = {
     container: styles => ({
         ...styles, display: 'inline-flex', marginTop: 12 + 'px',
     }),
@@ -651,8 +651,8 @@ class SetlistView extends React.Component {
                                     <Select
                                         value={this.state.selectedPathOption}
                                         onChange={this.handlePathChange}
-                                        options={options}
-                                        styles={customStyles}
+                                        options={pathOptions}
+                                        styles={customPathStyles}
                                         isMulti
                                         placeholder="Filter by path"
                                         isSearchable={false}

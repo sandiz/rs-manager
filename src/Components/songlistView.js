@@ -1,4 +1,5 @@
 import React from 'react'
+import Select from 'react-select';
 import { withI18n, Trans } from 'react-i18next';
 import BootstrapTable from 'react-bootstrap-table-next'
 import paginationFactory from 'react-bootstrap-table2-paginator';
@@ -25,6 +26,7 @@ import localNote from '../assets/tree-icons/local.svg';
 
 import { profileWorker } from '../lib/libworker';
 import { DispatcherService, DispatchEvents } from '../lib/libdispatcher';
+import { pathOptions, customPathStyles } from './setlistView';
 
 const Fragment = React.Fragment;
 
@@ -815,6 +817,7 @@ class SonglistView extends React.Component {
       showSongID: '',
       sortOptions: defaultSortOption,
       columns: BaseColumnDefs,
+      selectedPathOption: [],
     };
     this.tabname = "tab-songs"
     this.childtabname = "songs-owned"
@@ -888,6 +891,12 @@ class SonglistView extends React.Component {
     })
   }
 
+  handlePathChange = (selectedPathOption) => {
+    let spo = []
+    if (selectedPathOption) spo = selectedPathOption;
+    this.setState({ selectedPathOption: spo }, () => this.refreshView());
+  }
+
   updateMastery = async () => {
     profileWorker.startWork();
   }
@@ -928,6 +937,7 @@ class SonglistView extends React.Component {
   }) => {
     const zeroIndexPage = page - 1
     const start = zeroIndexPage * sizePerPage;
+    const pathOpts = this.state.selectedPathOption.map(x => x.value)
     const output = await getSongsOwned(
       start,
       sizePerPage,
@@ -936,6 +946,7 @@ class SonglistView extends React.Component {
       this.search.value,
       document.getElementById("search_field") ? document.getElementById("search_field").value : "",
       sortOptions,
+      pathOpts,
     )
     if (output.length > 0) {
       this.props.updateHeader(
@@ -981,8 +992,19 @@ class SonglistView extends React.Component {
             <option value="odlc">ODLC</option>
             <option value="id">SongID</option>
           </select>
+          <br />
+          <Select
+            value={this.state.selectedPathOption}
+            onChange={this.handlePathChange}
+            options={pathOptions}
+            styles={customPathStyles}
+            isMulti
+            placeholder="Filter by path"
+            isSearchable={false}
+            isClearable={false}
+          />
         </div>
-        <div className="centerButton list-unstyled">
+        <div className="centerButton list-unstyled" style={{ marginTop: 1 + 'px' }}>
           <button
             type="button"
             onClick={this.updateMastery}
