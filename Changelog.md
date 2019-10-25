@@ -1,4 +1,5 @@
 v3.0.2
+- add support for custom tags for arrangements
 v3.0.1
 - update all packages
 - add file watcher
