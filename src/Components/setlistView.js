@@ -718,7 +718,7 @@ class SetlistView extends React.Component {
                                     />
                                     <Select
                                         placeholder="Filter by tags"
-                                        isSearchable={false}
+                                        isSearchable
                                         isClearable={false}
                                         isMulti
                                         styles={customTagStyles}
