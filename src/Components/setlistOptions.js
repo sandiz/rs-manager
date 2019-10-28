@@ -187,6 +187,16 @@ export function generateSql(filters, count = false) {
         if (filter.value) sql += `${filter.type} = 1 `;
         else sql += `${filter.type} = 0 `;
         break;
+      case "tags":
+        {
+          const t = filter.value.split(",");
+          const items = t.map((x, idx) => {
+            x = x.trim();
+            return `"${x}"`;
+          });
+          sql += `song_tags.tag in (${items})`;
+        }
+        break;
       default:
         break;
     }
@@ -402,6 +412,11 @@ class SetlistOptions extends React.Component {
         type: "local_note",
         display: "Local Notes",
         cmp: ["like", "not like"],
+      },
+      {
+        type: "tags",
+        display: "Song Tags",
+        cmp: ["in"],
       },
     ];
     this.sortfieldref = React.createRef();
