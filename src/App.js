@@ -21,6 +21,7 @@ import {
   getAllSetlist, initSongsOwnedDB,
   getStarredSetlists, getChildOfSetlistFolder, countSongsOwned,
 } from './sqliteService';
+import './css/bootstrap.min.css'
 import './css/App.css';
 import HelpView from './Components/HelpView';
 import FTUEView from './Components/FTUEView';
