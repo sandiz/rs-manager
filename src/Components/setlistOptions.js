@@ -2,13 +2,15 @@ import React from 'react'
 import PropTypes from 'prop-types';
 import { withI18n, Trans } from 'react-i18next';
 import CreatableSelect from "react-select/creatable";
+import Select from 'react-select';
 
 import { enableScroll, forceNoScroll } from './songdetailView';
 import {
   deleteRSSongList, createRSSongList,
-  executeRawSql, getFolderSetlists,
+  executeRawSql, getFolderSetlists, getAllDistinceSongTags,
 } from '../sqliteService';
 import { allTunings } from './songlistView';
+import { setStateAsync } from '../configService';
 
 const Fragment = React.Fragment;
 const anyTunings = ["any_standard", "any_non_standard", "any_open", "any_drop"];
@@ -208,7 +210,6 @@ export function generateSql(filters, count = false) {
   return sql;
 }
 
-
 export const createOption = label => ({
   label,
   value: label,
@@ -268,6 +269,33 @@ export const sortOrderCustomStyles = {
     ...styles,
   }),
 }
+const songTagStyles = {
+  container: styles => ({
+    ...styles, display: 'inline-flex', width: 90 + '%',
+  }),
+  control: styles => ({
+    ...styles, backgroundColor: 'white', color: 'black', width: 100 + '%',
+  }),
+  option: (styles, {
+    data, isDisabled, isFocused, isSelected,
+  }) => {
+    return {
+      ...styles,
+      color: 'black',
+    };
+  },
+  multiValue: (styles, { data }) => {
+    return {
+      ...styles,
+    };
+  },
+  multiValueLabel: (styles, { data }) => ({
+    ...styles,
+  }),
+  multiValueRemove: (styles, { data }) => ({
+    ...styles,
+  }),
+}
 const defaultSortOption = []
 class SetlistOptions extends React.Component {
   constructor(props) {
@@ -284,6 +312,7 @@ class SetlistOptions extends React.Component {
       allFolders: null,
       selectedFolder: 'none',
       sortoptions: defaultSortOption,
+      songTags: [],
     }
     //tuning
     this.gates = ["and", "or", "and (", "or (", ")", ") and", ") or"]
@@ -421,6 +450,19 @@ class SetlistOptions extends React.Component {
     ];
     this.sortfieldref = React.createRef();
     this.sortorderref = React.createRef();
+    this.loadSongTags();
+  }
+
+  loadSongTags = async () => {
+    const songTags = await getAllDistinceSongTags();
+    const ft2 = songTags.map(x => {
+      const obj = {
+        value: x.tag,
+        label: x.tag,
+      }
+      return obj;
+    });
+    this.setState({ songTags: ft2 });
   }
 
   shouldComponentUpdate = async (nextprops, nextstate) => {
@@ -428,7 +470,7 @@ class SetlistOptions extends React.Component {
       const allFolders = await this.getAllFolders();
       const sortoptions = nextprops.info.sort_options
         ? JSON.parse(nextprops.info.sort_options) : [];
-      this.setState({
+      await setStateAsync(this, {
         setlistName: unescape(nextprops.info.name),
         isGenerated: nextprops.info.is_generated === "true",
         isManual: nextprops.info.is_manual === "true",
@@ -604,6 +646,30 @@ class SetlistOptions extends React.Component {
         </select>
       )
     }
+    else if (filter.type === "tags") {
+      const defValue = filter.value;
+      let opts = [];
+      if (defValue === "") opts = [];
+      else {
+        opts = defValue.split(",").map(x => {
+          return { label: x, value: x };
+        });
+      }
+      console.log(this.state.songTags)
+      return (
+        <Select
+          key={"input_" + filter.id}
+          placeholder="Filter by tags"
+          isSearchable
+          isClearable={false}
+          isMulti
+          styles={songTagStyles}
+          options={this.state.songTags}
+          value={opts}
+          onChange={event => this.handleSelectComponentChange(event, index)}
+        />
+      )
+    }
     return (
       <input
         key={"input_" + filter.id}
@@ -645,6 +711,18 @@ class SetlistOptions extends React.Component {
       }
       default:
         break;
+    }
+    this.setState({ filters });
+  }
+
+  handleSelectComponentChange = (selectedOptions, index) => {
+    const v = selectedOptions;
+    const { filters } = this.state;
+    if (v) {
+      filters[index].value = v.map(item => item.value).join(",");
+    }
+    else {
+      filters[index].value = "";
     }
     this.setState({ filters });
   }
@@ -965,7 +1043,7 @@ class SetlistOptions extends React.Component {
                                           <td style={{ width: 20 + '%' }}>
                                             {this.generateFilterComparatorOptions(filter, index)}
                                           </td>
-                                          <td style={{ width: 45 + '%' }}>
+                                          <td style={{ width: 45 + '%', overflow: 'unset' }}>
                                             {this.generateFilterValueOptions(filter, index)}
                                           </td>
                                           {
