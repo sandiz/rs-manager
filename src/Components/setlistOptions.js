@@ -655,7 +655,6 @@ class SetlistOptions extends React.Component {
           return { label: x, value: x };
         });
       }
-      console.log(this.state.songTags)
       return (
         <Select
           key={"input_" + filter.id}

@@ -356,7 +356,7 @@ class SongDetailView extends React.Component {
     if (newValue) {
       for (let i = 0; i < newValue.length; i += 1) {
         //eslint-disable-next-line
-        await addSongTag(newValue[i].value, this.state.songID);
+        await addSongTag(escape(newValue[i].value), this.state.songID);
       }
       this.setState({ songTags: newValue });
     }
