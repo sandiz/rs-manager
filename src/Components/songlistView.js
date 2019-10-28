@@ -203,6 +203,7 @@ export function tagsFormatter(cell, row, rowIndex, extraData) {
             if (idx === items.length - 1) {
               return (
                 <div
+                  className={"songlist-tag-" + item}
                   key={item}
                   style={{
                     padding: 5 + 'px',
@@ -215,6 +216,7 @@ export function tagsFormatter(cell, row, rowIndex, extraData) {
             }
             return (
               <div
+                className={"songlist-tag-" + item}
                 key={item}
                 style={{
                   padding: 5 + 'px',
