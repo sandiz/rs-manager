@@ -1,5 +1,6 @@
 v3.0.2
 - add support for custom tags for arrangements
+- add support for filtering by song tags in songowned, setlist (rs, manual, generated)
 v3.0.1
 - update all packages
 - add file watcher
