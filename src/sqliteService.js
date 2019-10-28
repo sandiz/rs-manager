@@ -893,8 +893,7 @@ export async function getSongsOwned(start = 0, count = 10, sortField = "mastery"
   }
   if (tagOptions.length > 0) {
     const items = tagOptions.map((x, idx) => {
-      if (idx === tagOptions.length - 1) return `"${x}"`;
-      return `"${x},"`;
+      return `"${x}"`;
     });
     optionsSql += (optionsSql.length > 0 ? " AND " : "") + `song_tags.tag in (${items})`
   }
@@ -1451,8 +1450,7 @@ export async function getSongsFromPlaylistDB(dbname, start = 0, count = 10, sort
 
   if (tagOptions.length > 0) {
     const items = tagOptions.map((x, idx) => {
-      if (idx === tagOptions.length - 1) return `"${x}"`;
-      return `"${x},"`;
+      return `"${x}"`;
     });
     optionsSql += (optionsSql.length > 0 ? " AND " : "") + `song_tags.tag in (${items})`
   }

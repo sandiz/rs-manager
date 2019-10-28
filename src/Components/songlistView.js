@@ -467,7 +467,7 @@ export function arrangmentFormatter(cell, row) {
               isCDLC
                 ? (
                   <tr className="row" key={"cdlc" + row.id}>
-                    <td style={{ width: 100 + '%', textAlign: 'center' }}>
+                    <td className="tooltip-technique-td" style={{ width: 100 + '%', textAlign: 'center' }}>
                       (C)ustom DLC
                     </td>
                   </tr>
@@ -478,16 +478,20 @@ export function arrangmentFormatter(cell, row) {
                 ? (
                   <React.Fragment>
                     <tr className="row conflicting-row" key={"cdlc" + row.id}>
-                      <td style={{
-                        width: 100 + '%',
-                        textAlign: 'center',
-                        color: 'red',
-                      }}>
+                      <td
+                        className="tooltip-technique-td"
+                        style={{
+                          width: 100 + '%',
+                          textAlign: 'center',
+                          color: 'red',
+                        }}>
                         Conflicting Arrangement Info*
                       </td>
                     </tr>
                     <tr>
-                      <td style={{ width: 100 + '%', textAlign: 'center' }}>
+                      <td
+                        className="tooltip-technique-td"
+                        style={{ width: 100 + '%', textAlign: 'center' }}>
                         ArrangementName: {cell} <br /><br />
                         BitMask: <br /><br />
                         pathLead: {arrprop.pathLead} <br /><br />
