@@ -6,11 +6,12 @@ import DatePicker from 'react-datepicker';
 import moment from 'moment';
 import Swal from 'sweetalert2'
 import AsyncSelect from 'react-select/async';
+import AsyncCreatableSelect from "react-select/async-creatable";
 import {
-  saveSongToSetlist, getSongByID,
-  updateCDLCStat, updateSAFCStat, saveSongByIDToSetlist,
+  getSongByID, updateCDLCStat, updateSAFCStat,
   updateNotes, getNotes, getAllTags, executeRawSql,
   addTag, removeFromSongsOwned, addToIgnoreArrangements,
+  getAllDistinceSongTags, addSongTag, getAllSongTags,
 } from '../sqliteService';
 import { getScoreAttackConfig } from '../configService';
 import { expandButton, collapseButton } from "./settingsView";
@@ -30,6 +31,23 @@ export function enableScroll() {
   document.getElementsByTagName("body")[0].style.overflow = "inherit";
   document.getElementsByTagName("html")[0].style.height = "100%";
   document.getElementsByTagName("html")[0].style.overflow = "inherit";
+}
+export function songTagOptions(inputValue) {
+  return new Promise(async (resolve, reject) => {
+    let tags = await getAllDistinceSongTags();
+    let ft = [];
+    if (inputValue) {
+      tags = tags.filter(i => i.tag.toLowerCase().includes(inputValue.toLowerCase()));
+    }
+    ft = tags.map((x) => {
+      const obj = {
+        value: x.tag,
+        label: x.tag,
+      }
+      return obj;
+    });
+    resolve(ft);
+  });
 }
 const customStyles = {
   container: styles => ({
@@ -69,7 +87,6 @@ class SongDetailView extends React.Component {
       showMusicVideo: false,
       pturl: '',
       mvurl: '',
-      currentSetlist: '',
       ptindex: 0,
       mvindex: 0,
       ptresults: null,
@@ -81,6 +98,7 @@ class SongDetailView extends React.Component {
       sa_fc_hard: null,
       sa_fc_master: null,
       tags: [],
+      songTags: [],
       songID: '',
     }
     this.maxResults = 10;
@@ -205,29 +223,20 @@ class SongDetailView extends React.Component {
     enableScroll();
   }
 
-  addToSetlist = async (addSongID = false) => {
-    if (addSongID) {
-      //console.log("Saving id to setlist", this.state.songID, this.state.currentSetlist);
-      await saveSongByIDToSetlist(this.state.currentSetlist, this.state.songID);
-    }
-    else {
-      //console.log("saving all arrangements to setlist", this.state.currentSetlist);
-      const { song, artist } = this.props;
-
-      await saveSongToSetlist(this.state.currentSetlist, unescape(song), unescape(artist));
-    }
-  }
-
-  saveSetlist = (e) => {
-    this.setState({ currentSetlist: e.target.value });
-  }
-
   generateSetlistOptions = async () => {
     const showsastats = await getScoreAttackConfig();
     const songDetails = await getSongByID(this.state.songID);
     const isTrueSet = (songDetails.is_cdlc === 'true');
     const tags = await getAllTags(this.props.dlcappid)
+    const songTags = await getAllSongTags(this.state.songID);
     const ft = tags.map((x) => {
+      const obj = {
+        value: x.tag,
+        label: x.tag,
+      }
+      return obj;
+    });
+    const ft2 = songTags.map(x => {
       const obj = {
         value: x.tag,
         label: x.tag,
@@ -242,6 +251,7 @@ class SongDetailView extends React.Component {
       sa_fc_hard: songDetails.sa_fc_hard == null ? null : moment(songDetails.sa_fc_hard),
       sa_fc_master: songDetails.sa_fc_master == null ? null : moment(songDetails.sa_fc_master),
       tags: ft,
+      songTags: ft2,
     })
   }
 
@@ -339,6 +349,21 @@ class SongDetailView extends React.Component {
     else {
       this.setState({ tags: [] })
     }
+  }
+
+  handleSongTagsChange = async (newValue) => {
+    await executeRawSql(`delete from song_tags where id='${this.state.songID}'`)
+    if (newValue) {
+      for (let i = 0; i < newValue.length; i += 1) {
+        //eslint-disable-next-line
+        await addSongTag(escape(newValue[i].value), this.state.songID);
+      }
+      this.setState({ songTags: newValue });
+    }
+    else {
+      this.setState({ songTags: [] })
+    }
+    this.props.refreshView();
   }
 
   removeFromDB = async () => {
@@ -502,6 +527,7 @@ class SongDetailView extends React.Component {
               transitionTime={200}
               easing="ease-in"
               close
+              overflowWhenOpen="visible"
             >
               <div className="options-flex">
                 <div style={{ flexBasis: 100 + '%' }} className="options-flex-div">
@@ -675,6 +701,23 @@ class SongDetailView extends React.Component {
                 </div>
               </div>
               <br />
+              {
+                this.props.isSetlist || this.props.isSongview
+                  ? (
+                    <AsyncCreatableSelect
+                      value={this.state.songTags}
+                      styles={customStyles}
+                      isMulti
+                      placeholder="Song Tags.."
+                      isSearchable
+                      isClearable
+                      cacheOptions
+                      defaultOptions
+                      loadOptions={songTagOptions}
+                      onChange={this.handleSongTagsChange}
+                    />
+                  ) : null
+              }
               <div className="options-flex-center" style={{ height: 70 + 'px' }}>
                 <div style={{ marginRight: 30 + 'px' }} className="options-flex-div">
                   <button

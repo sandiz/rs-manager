@@ -1,4 +1,5 @@
 import React from 'react'
+import Select from 'react-select';
 import { withI18n, Trans } from 'react-i18next';
 import BootstrapTable from 'react-bootstrap-table-next'
 import paginationFactory from 'react-bootstrap-table2-paginator';
@@ -7,7 +8,7 @@ import ReactTooltip from 'react-tooltip'
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import {
-  getSongsOwned, countSongsOwned,
+  getSongsOwned, countSongsOwned, getAllDistinceSongTags,
 } from '../sqliteService';
 import {
   getScoreAttackConfig, getDefaultSortOptionConfig, getCustomCulumnsConfig,
@@ -25,6 +26,7 @@ import localNote from '../assets/tree-icons/local.svg';
 
 import { profileWorker } from '../lib/libworker';
 import { DispatcherService, DispatchEvents } from '../lib/libdispatcher';
+import { pathOptions, customPathStyles, customTagStyles } from './setlistView';
 
 const Fragment = React.Fragment;
 
@@ -189,6 +191,36 @@ export function unescapeFormatter(cell, row, rowIndex, extraData) {
         </div>
       </Fragment>
     );
+  }
+}
+export function tagsFormatter(cell, row, rowIndex, extraData) {
+  if (cell) {
+    const items = cell.split("|");
+    return (
+      <div style={{ fontSize: 75 + '%' }}>
+        {
+          items.map((item, idx) => {
+            if (idx === items.length - 1) {
+              return (
+                <div
+                  className={"tag songlist-tag-" + item}
+                  key={item}>{item}
+                </div>
+              );
+            }
+            return (
+              <div
+                className={"tag-last songlist-tag-" + item}
+                key={item}>{item}
+              </div>
+            );
+          })
+        }
+      </div>
+    )
+  }
+  else {
+    return <span>-</span>
   }
 }
 export function difficultyFormatter(cell, row) {
@@ -424,7 +456,7 @@ export function arrangmentFormatter(cell, row) {
               isCDLC
                 ? (
                   <tr className="row" key={"cdlc" + row.id}>
-                    <td style={{ width: 100 + '%', textAlign: 'center' }}>
+                    <td className="tooltip-technique-td" style={{ width: 100 + '%', textAlign: 'center' }}>
                       (C)ustom DLC
                     </td>
                   </tr>
@@ -435,16 +467,20 @@ export function arrangmentFormatter(cell, row) {
                 ? (
                   <React.Fragment>
                     <tr className="row conflicting-row" key={"cdlc" + row.id}>
-                      <td style={{
-                        width: 100 + '%',
-                        textAlign: 'center',
-                        color: 'red',
-                      }}>
+                      <td
+                        className="tooltip-technique-td"
+                        style={{
+                          width: 100 + '%',
+                          textAlign: 'center',
+                          color: 'red',
+                        }}>
                         Conflicting Arrangement Info*
                       </td>
                     </tr>
                     <tr>
-                      <td style={{ width: 100 + '%', textAlign: 'center' }}>
+                      <td
+                        className="tooltip-technique-td"
+                        style={{ width: 100 + '%', textAlign: 'center' }}>
                         ArrangementName: {cell} <br /><br />
                         BitMask: <br /><br />
                         pathLead: {arrprop.pathLead} <br /><br />
@@ -696,6 +732,7 @@ export const BaseColumnDefs = [
   { dataField: "tempo", text: "BPM", hidden: true, sort: true },
   { dataField: "date_las", text: "Last Played", hidden: true, sort: true, style: lastPlayedStyle, formatter: lastPlayedFormatter, classes: lastPlayedClass, },
   { dataField: "date_sa", text: "LastPlayed", hidden: true, sort: true },
+  { dataField: "tags", "text": "Tags", hidden: false, sort: false, formatter: tagsFormatter, style: lastPlayedStyle, classes: lastPlayedClass, },
 ];
 /* eslint-enable */
 
@@ -773,6 +810,9 @@ class SonglistView extends React.Component {
       showSongID: '',
       sortOptions: defaultSortOption,
       columns: BaseColumnDefs,
+      selectedPathOption: [],
+      songTags: [],
+      selectedSongTags: [],
     };
     this.tabname = "tab-songs"
     this.childtabname = "songs-owned"
@@ -800,11 +840,19 @@ class SonglistView extends React.Component {
     const showSAStats = await getScoreAttackConfig();
     const sortOptions = await getDefaultSortOptionConfig();
     const customColumns = await getCustomCulumnsConfig();
+    const songTags = await getAllDistinceSongTags();
+    const ft2 = songTags.map(x => {
+      const obj = {
+        value: x.tag,
+        label: x.tag,
+      }
+      return obj;
+    });
     const columns = generateColumns(customColumns,
       { globalNotes: this.props.globalNotes, showSAStats },
       this.props.t);
     this.setState({
-      totalSize: so.count, sortOptions, columns,
+      totalSize: so.count, sortOptions, columns, songTags: ft2,
     });
     const key = this.tabname + "-" + this.childtabname;
     const searchData = this.props.getSearch(key);
@@ -846,6 +894,18 @@ class SonglistView extends React.Component {
     })
   }
 
+  handlePathChange = (selectedPathOption) => {
+    let spo = []
+    if (selectedPathOption) spo = selectedPathOption;
+    this.setState({ selectedPathOption: spo }, () => this.refreshView());
+  }
+
+  handleSongTagsChange = (selectedSongTagOption) => {
+    let spo = []
+    if (selectedSongTagOption) spo = selectedSongTagOption;
+    this.setState({ selectedSongTags: spo }, () => this.refreshView());
+  }
+
   updateMastery = async () => {
     profileWorker.startWork();
   }
@@ -865,8 +925,17 @@ class SonglistView extends React.Component {
   }
 
   refreshView = async () => {
-    this.setState({ songs: [] });
+    const songTags = await getAllDistinceSongTags();
+    const ft2 = songTags.map(x => {
+      const obj = {
+        value: x.tag,
+        label: x.tag,
+      }
+      return obj;
+    });
+    this.setState({ songs: [], songTags: ft2 });
     const sortOptions = await getDefaultSortOptionConfig();
+
     this.handleTableChange("cdm", {
       page: this.state.page,
       sizePerPage: this.state.sizePerPage,
@@ -886,14 +955,18 @@ class SonglistView extends React.Component {
   }) => {
     const zeroIndexPage = page - 1
     const start = zeroIndexPage * sizePerPage;
+    const pathOpts = this.state.selectedPathOption.map(x => x.value);
+    const tagOpts = this.state.selectedSongTags.map(x => x.value);
     const output = await getSongsOwned(
       start,
       sizePerPage,
-      typeof sortField === 'undefined' ? "mastery" : sortField,
-      typeof sortOrder === 'undefined' ? "desc" : sortOrder,
+      sortField === null || typeof sortField === 'undefined' ? "mastery" : sortField,
+      sortOrder === null || typeof sortOrder === 'undefined' ? "desc" : sortOrder,
       this.search.value,
       document.getElementById("search_field") ? document.getElementById("search_field").value : "",
       sortOptions,
+      pathOpts,
+      tagOpts,
     )
     if (output.length > 0) {
       this.props.updateHeader(
@@ -939,8 +1012,29 @@ class SonglistView extends React.Component {
             <option value="odlc">ODLC</option>
             <option value="id">SongID</option>
           </select>
+          <br />
+          <Select
+            value={this.state.selectedPathOption}
+            onChange={this.handlePathChange}
+            options={pathOptions}
+            styles={customPathStyles}
+            isMulti
+            placeholder="Filter by path"
+            isSearchable={false}
+            isClearable={false}
+          />
+          <Select
+            placeholder="Filter by tags"
+            isSearchable
+            isClearable={false}
+            isMulti
+            styles={customTagStyles}
+            options={this.state.songTags}
+            value={this.state.selectedSongTags}
+            onChange={this.handleSongTagsChange}
+          />
         </div>
-        <div className="centerButton list-unstyled">
+        <div className="centerButton list-unstyled" style={{ marginTop: 1 + 'px' }}>
           <button
             type="button"
             onClick={this.updateMastery}

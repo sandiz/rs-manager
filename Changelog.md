@@ -1,3 +1,12 @@
+v3.0.2
+- add support for custom tags for arrangements
+- add support for filtering by song tags in songowned, setlist (rs, manual, generated)
+- add support for custom css
+v3.0.1
+- update all packages
+- add file watcher
+v3.0.0
+- meta release containing v2.2.0 - v2.7.5
 v2.7.5
 - add drag drop to custom columns setting option
 - update packages to latest (also removes functions that are deprecated by react)

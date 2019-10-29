@@ -1611,3 +1611,18 @@ hr {
 .border-dashed-bottom {
     border-bottom: 1px dashed;
 }
+
+.tag {
+    padding: 5px;
+    background-color: #343a40;
+    color: wheat;
+    border-radius: 5px;
+}
+
+.tag-last {
+    padding: 5px;
+    background-color: #343a40;
+    color: wheat;
+    margin-bottom: 4px;
+    border-radius: 5px;
+}
