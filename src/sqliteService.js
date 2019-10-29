@@ -441,6 +441,21 @@ export async function addTag(appid, tag) {
   const op = await db.run(sql);
   return op;
 }
+export async function addSongTag(tag, id) {
+  const sql = `replace into song_tags values('${tag.toLowerCase()}', '${id}')`;
+  const op = await db.run(sql);
+  return op;
+}
+export async function getAllDistinceSongTags() {
+  const sql = `select distinct tag from song_tags`;
+  const op = await db.all(sql);
+  return op;
+}
+export async function getAllSongTags(id) {
+  const sql = `select distinct tag from song_tags where id = '${id}';`
+  const op = await db.all(sql);
+  return op;
+}
 export async function isSongIDIgnored(songid) {
   //  console.log("__db_call__: isDLCInDB");
   let sqlstr = "";
@@ -832,7 +847,7 @@ export default async function updateSongsOwned(psarcResult, isCDLC = false) {
   }
 }
 export async function getSongsOwned(start = 0, count = 10, sortField = "mastery",
-  sortOrder = "desc", search = "", searchField = "", sortOptions = []) {
+  sortOrder = "desc", search = "", searchField = "", sortOptions = [], pathOptions = [], tagOptions = []) {
   if (db == null) {
     const dbfilename = window.sqlitePath;
     db = await window.sqlite.open(dbfilename);
@@ -864,6 +879,24 @@ export async function getSongsOwned(start = 0, count = 10, sortField = "mastery"
       break;
     default: break;
   }
+  let optionsSql = "";
+  if (pathOptions.length > 0) {
+    if (pathOptions.includes("pathLead")) {
+      optionsSql += `path_lead=1`
+    }
+    if (pathOptions.includes("pathRhythm")) {
+      optionsSql += (optionsSql.length > 0 ? " OR " : "") + (`path_rhythm=1`)
+    }
+    if (pathOptions.includes("pathBass")) {
+      optionsSql += (optionsSql.length > 0 ? " OR " : "") + (`path_bass=1`)
+    }
+  }
+  if (tagOptions.length > 0) {
+    const items = tagOptions.map((x, idx) => {
+      return `"${x}"`;
+    });
+    optionsSql += (optionsSql.length > 0 ? " AND " : "") + `song_tags.tag in (${items})`
+  }
 
   let orderSql = `ORDER BY ${sortField} ${sortOrder}`;
   if (sortOptions.length > 0) {
@@ -872,23 +905,33 @@ export async function getSongsOwned(start = 0, count = 10, sortField = "mastery"
   }
 
   if (search === "" && searchField !== "cdlc" && searchField !== "odlc") {
-    sql = `select c.acount as acount, c.songcount as songcount, *
-          from songs_owned,  (
+    let wheresql = "";
+    if (optionsSql.length > 0) {
+      wheresql = "WHERE " + optionsSql
+    }
+    sql = `select c.acount as acount, c.songcount as songcount, *, group_concat(song_tags.tag, '|') as tags
+          from songs_owned LEFT JOIN song_tags using (id),  (
           SELECT count(*) as acount, count(distinct songkey) as songcount
-            FROM songs_owned
+            FROM songs_owned LEFT JOIN song_tags using (id) ${wheresql}
           ) c 
+          ${wheresql}
+          group by id
           ${orderSql} LIMIT ${start},${count}`;
   }
   else {
-    sql = `select c.acount as acount, c.songcount as songcount, *
-          from songs_owned, (
+    if (optionsSql.length > 0) {
+      searchSql += ` AND (${optionsSql})`;
+    }
+    sql = `select c.acount as acount, c.songcount as songcount, *, group_concat(song_tags.tag, '|') as tags
+          from songs_owned LEFT JOIN song_tags using (id), (
           SELECT count(*) as acount, count(distinct songkey) as songcount
-            FROM songs_owned
+            FROM songs_owned LEFT JOIN song_tags using (id)
             where 
             ${searchSql}
           ) c 
           where
           ${searchSql}
+          group by id
           ${orderSql} LIMIT ${start},${count}`;
   }
   const output = await db.all(sql);
@@ -1356,7 +1399,7 @@ export async function getSongsFromGeneratedPlaylist(
         const gsql = generateOrderSql(sortOptions, true);
         if (gsql !== "") ordersql = gsql;
       }
-      sql += ` ${ordersql} LIMIT ${start},${count};`
+      sql += ` group by id ${ordersql} LIMIT ${start},${count};`
       const output = await db.all(sql);
       const output2 = await db.get(countsql)
       return [output, output2];
@@ -1367,7 +1410,7 @@ export async function getSongsFromGeneratedPlaylist(
   }
   return [];
 }
-export async function getSongsFromPlaylistDB(dbname, start = 0, count = 10, sortField = "mastery", sortOrder = "desc", search = "", searchField = "", options = [], sortOptions = []) {
+export async function getSongsFromPlaylistDB(dbname, start = 0, count = 10, sortField = "mastery", sortOrder = "desc", search = "", searchField = "", options = [], sortOptions = [], tagOptions = []) {
   // console.log("__db_call__: getSongsFromPlaylistDB");
   if (db == null) {
     const dbfilename = window.sqlitePath;
@@ -1405,6 +1448,13 @@ export async function getSongsFromPlaylistDB(dbname, start = 0, count = 10, sort
     }
   }
 
+  if (tagOptions.length > 0) {
+    const items = tagOptions.map((x, idx) => {
+      return `"${x}"`;
+    });
+    optionsSql += (optionsSql.length > 0 ? " AND " : "") + `song_tags.tag in (${items})`
+  }
+
   let orderSql = `ORDER BY ${sortField} ${sortOrder}`;
   if (sortOptions.length > 0) {
     const gsql = generateOrderSql(sortOptions, true);
@@ -1416,25 +1466,26 @@ export async function getSongsFromPlaylistDB(dbname, start = 0, count = 10, sort
     if (optionsSql.length > 0) {
       wheresql = "WHERE " + optionsSql
     }
-    sql = `select c.acount as acount, c.songcount as songcount, *
-          from songs_owned,  (
+    sql = `select c.acount as acount, c.songcount as songcount, *, group_concat(song_tags.tag, '|') as tags
+          from songs_owned LEFT JOIN song_tags using (id),  (
           SELECT count(*) as acount, count(distinct songkey) as songcount
-            FROM songs_owned
+            FROM songs_owned LEFT JOIN song_tags using (id)
             JOIN ${dbname} ON ${dbname}.uniqkey = songs_owned.uniqkey
           ) c 
           JOIN ${dbname} ON ${dbname}.uniqkey = songs_owned.uniqkey
           ${wheresql}
+          group by id
           ${orderSql} LIMIT ${start},${count}
           `;
   }
   else {
     if (optionsSql.length > 0) {
-      searchSql = " AND " + optionsSql
+      searchSql = " AND (" + optionsSql + ")"
     }
-    sql = `select c.acount as acount, c.songcount as songcount, *
-          from songs_owned, (
+    sql = `select c.acount as acount, c.songcount as songcount, *, group_concat(song_tags.tag, '|') as tags
+          from songs_owned LEFT JOIN song_tags using (id), (
           SELECT count(*) as acount, count(distinct songkey) as songcount
-            FROM songs_owned
+            FROM songs_owned LEFT JOIN song_tags using (id)
             JOIN ${dbname} ON ${dbname}.uniqkey = songs_owned.uniqkey
             where 
             ${searchSql}
@@ -1442,6 +1493,7 @@ export async function getSongsFromPlaylistDB(dbname, start = 0, count = 10, sort
           JOIN ${dbname} ON ${dbname}.uniqkey = songs_owned.uniqkey
           where
           ${searchSql}
+          group by id
           ${orderSql} LIMIT ${start},${count}
           `;
   }

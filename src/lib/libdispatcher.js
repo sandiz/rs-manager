@@ -66,6 +66,7 @@ export const DispatchEvents = {
     ALBUM_COVER_QUERY: "album_cover_query",     /* fired when album cover has been queried */
     PSARCS_IMPORTED: "psarcs_imported",         /* fired when psarc import finishes */
     SONG_LIST_UPDATED: "song_list_updated",     /* fired when songs_owned db is updated with new songs */
+    CUSTOM_CSS_CHANGED: "custom_css_changed",   /* fired when custom css is changed */
 }
 
 export const DispatcherService = new Dispatcher();

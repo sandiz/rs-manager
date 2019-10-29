@@ -13,6 +13,7 @@ import {
     getSongsFromGeneratedPlaylist, removeSongFromSetlistByUniqKey,
     executeRawSql, getLeadStats, getRhythmStats, getBassStats, countSongsOwned,
     getSAStats,
+    getAllDistinceSongTags,
 } from '../sqliteService';
 import {
     getScoreAttackConfig,
@@ -24,12 +25,12 @@ import AddSongModal from './modalAddSong';
 import { DispatcherService, DispatchEvents } from '../lib/libdispatcher';
 import { profileWorker } from '../lib/libworker';
 
-const options = [
+export const pathOptions = [
     { value: 'pathLead', label: 'Lead' },
     { value: 'pathRhythm', label: 'Rhythm' },
     { value: 'pathBass', label: 'Bass' },
 ];
-const customStyles = {
+export const customPathStyles = {
     container: styles => ({
         ...styles, display: 'inline-flex', marginTop: 12 + 'px',
     }),
@@ -56,6 +57,35 @@ const customStyles = {
         ...styles,
     }),
 }
+
+export const customTagStyles = {
+    container: styles => ({
+        ...styles, display: 'inline-flex', marginTop: 12 + 'px', marginLeft: 20 + 'px',
+    }),
+    control: styles => ({
+        ...styles, backgroundColor: 'white', color: 'black', width: 255 + 'px',
+    }),
+    option: (styles, {
+        data, isDisabled, isFocused, isSelected,
+    }) => {
+        return {
+            ...styles,
+            color: 'black',
+        };
+    },
+    multiValue: (styles, { data }) => {
+        return {
+            ...styles,
+        };
+    },
+    multiValueLabel: (styles, { data }) => ({
+        ...styles,
+    }),
+    multiValueRemove: (styles, { data }) => ({
+        ...styles,
+    }),
+}
+
 export const generateOrderSql = (sortOptions, withOrder = false) => {
     //song asc, mastery desc
     let ordersql = ""
@@ -123,6 +153,8 @@ class SetlistView extends React.Component {
 
             showExportOptions: false,
             showAddOptions: false,
+            songTags: [],
+            selectedSongTags: [],
         };
         this.search = null;
         this.rowEvents = {
@@ -161,11 +193,19 @@ class SetlistView extends React.Component {
         DispatcherService.on(DispatchEvents.SETLIST_IMPORTED, this.setlistImported);
 
         const showSAStats = await getScoreAttackConfig();
+        const songTags = await getAllDistinceSongTags();
+        const ft2 = songTags.map(x => {
+            const obj = {
+                value: x.tag,
+                label: x.tag,
+            }
+            return obj;
+        });
         const customColumns = await getCustomCulumnsConfig();
         const columns = generateColumns(customColumns,
             { globalNotes: this.props.globalNotes, showSAStats },
             this.props.t);
-        this.setState({ columns });
+        this.setState({ columns, songTags: ft2 });
     }
 
     componentWillUnmount = () => {
@@ -435,6 +475,12 @@ class SetlistView extends React.Component {
         this.setState({ selectedPathOption: spo }, () => this.refreshView());
     }
 
+    handleSongTagsChange = (selectedSongTagOption) => {
+        let spo = []
+        if (selectedSongTagOption) spo = selectedSongTagOption;
+        this.setState({ selectedSongTags: spo }, () => this.refreshView());
+    }
+
     handleSearchChange = (e) => {
         this.handleTableChange('filter', {
             page: 1,
@@ -485,6 +531,16 @@ class SetlistView extends React.Component {
     }
 
     refreshView = async () => {
+        const songTags = await getAllDistinceSongTags();
+        const ft2 = songTags.map(x => {
+            const obj = {
+                value: x.tag,
+                label: x.tag,
+            }
+            return obj;
+        });
+        this.setState({ songTags: ft2 });
+
         this.handleTableChange("cdm", {
             page: this.state.page,
             sizePerPage: this.state.sizePerPage,
@@ -511,8 +567,8 @@ class SetlistView extends React.Component {
                 this.state.setlistMeta,
                 start,
                 sizePerPage,
-                typeof sortField === 'undefined' === null ? "mastery" : sortField,
-                typeof sortOrder === 'undefined' === null ? "desc" : sortOrder,
+                sortField === null || typeof sortField === 'undefined' === null ? "mastery" : sortField,
+                sortOrder === null || typeof sortOrder === 'undefined' === null ? "desc" : sortOrder,
                 sortOptions,
             )
             if (joinedoutput.length > 0) {
@@ -524,16 +580,18 @@ class SetlistView extends React.Component {
             }
         } else {
             const pathOpts = this.state.selectedPathOption.map(x => x.value)
+            const tagOpts = this.state.selectedSongTags.map(x => x.value);
             output = await getSongsFromPlaylistDB(
                 this.lastChildID,
                 start,
                 sizePerPage,
-                typeof sortField === 'undefined' === null ? "mastery" : sortField,
-                typeof sortOrder === 'undefined' === null ? "desc" : sortOrder,
+                sortField === null || typeof sortField === 'undefined' === null ? "mastery" : sortField,
+                sortOrder === null || typeof sortOrder === 'undefined' === null ? "desc" : sortOrder,
                 this.search ? this.search.value : "",
                 document.getElementById("search_field") ? document.getElementById("search_field").value : "",
                 pathOpts,
                 sortOptions,
+                tagOpts,
             )
         }
         if (output.length > 0) {
@@ -651,14 +709,23 @@ class SetlistView extends React.Component {
                                     <Select
                                         value={this.state.selectedPathOption}
                                         onChange={this.handlePathChange}
-                                        options={options}
-                                        styles={customStyles}
+                                        options={pathOptions}
+                                        styles={customPathStyles}
                                         isMulti
                                         placeholder="Filter by path"
                                         isSearchable={false}
                                         isClearable={false}
                                     />
-                                    <br />
+                                    <Select
+                                        placeholder="Filter by tags"
+                                        isSearchable
+                                        isClearable={false}
+                                        isMulti
+                                        styles={customTagStyles}
+                                        options={this.state.songTags}
+                                        value={this.state.selectedSongTags}
+                                        onChange={this.handleSongTagsChange}
+                                    />
                                 </div>
                             ) : null
                     }

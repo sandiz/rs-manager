@@ -10,7 +10,8 @@ import FolderEditView from './Components/folderEditView';
 import DashboardView from './Components/dashboardView';
 import getProfileConfig, {
   getShowSetlistOverlayAlwaysConfig,
-  getCurrentZoomFactorConfig, getImportRSMConfig, updateImportRSMPath, getSteamNameFromSteamID,
+  getCurrentZoomFactorConfig, getImportRSMConfig, updateImportRSMPath,
+  getSteamNameFromSteamID, getCustomCSSConfig,
 } from './configService';
 import SongAvailableView from './Components/songavailableView';
 import SetlistView from './Components/setlistView';
@@ -21,6 +22,7 @@ import {
   getAllSetlist, initSongsOwnedDB,
   getStarredSetlists, getChildOfSetlistFolder, countSongsOwned,
 } from './sqliteService';
+import './css/bootstrap.min.css'
 import './css/App.css';
 import HelpView from './Components/HelpView';
 import FTUEView from './Components/FTUEView';
@@ -29,6 +31,7 @@ import { enableScroll, forceNoScroll } from './Components/songdetailView';
 import { getProfileName } from './steamprofileService';
 import { detectImportRSMPath } from './rsrtoolservice';
 import { fileWatcher } from './lib/libworker';
+import { DispatcherService, DispatchEvents } from './lib/libdispatcher';
 
 const csvparse = require('csv-parse/lib/es5/sync');
 
@@ -119,6 +122,7 @@ class App extends Component {
     this.updateProfile();
     this.refreshTabs();
     this.getGlobalNotes();
+    this.applyCustomCSS();
     // default tabs on startup
     //sthis.handleChange(this.state.TabsData[0]);
     //this.props.handleChange(TabsData[2], TabsData[2].child[0])
@@ -132,6 +136,7 @@ class App extends Component {
     if (!Number.isNaN(parseFloat(zoomF))) {
       window.webFrame.setZoomFactor(zoomF);
     }
+    DispatcherService.on(DispatchEvents.CUSTOM_CSS_CHANGED, this.applyCustomCSS);
   }
 
   componentDidMount = async () => {
@@ -155,6 +160,23 @@ class App extends Component {
 
   componentWillUnmount = () => {
     fileWatcher.stop();
+    DispatcherService.off(DispatchEvents.CUSTOM_CSS_CHANGED, this.applyCustomCSS);
+  }
+
+  applyCustomCSS = async () => {
+    const css = await getCustomCSSConfig();
+    if (css !== '') {
+      const items = document.getElementsByTagName("style");
+      for (let i = 0; i < items.length; i += 1) {
+        const item = items[i];
+        if (item.id === "rs-manager-custom-css") document.head.removeChild(item);
+      }
+    }
+    const item = document.createElement("style");
+    item.innerHTML = css;
+    item.id = "rs-manager-custom-css";
+    document.head.appendChild(item);
+    console.log("appeneded css: ", css, item);
   }
 
   getGlobalNotes = async () => {
