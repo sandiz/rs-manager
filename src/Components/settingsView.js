@@ -1362,6 +1362,18 @@ loading setlists into Rocksmith 2014.
                       border: "1px solid steelblue",
                       borderRadius: 4 + 'px',
                     }} />
+                  <br />
+                  <div style={{ color: '#ccc' }}>
+                    Supported CSS class names:<br />
+                    <ol style={{ paddingLeft: 16 + 'px' }}>
+                      <li>
+                        <div>
+                          <span>.songlist-tag-<span>tagName</span> </span>
+                          <span style={{ float: 'right' }}> classname to control background and text color for tags</span>
+                        </div>
+                      </li>
+                    </ol>
+                  </div>
                 </Collapsible>
                 <br />
                 <Collapsible
