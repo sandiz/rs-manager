@@ -40,6 +40,7 @@ function getDefaultSettings() {
   obj.currentZoomFactor = 1;
   obj.pathToImportRSM = '';
   obj.customColumns = defaultCustomColumns;
+  obj.customCSS = "";
   return obj;
 }
 export async function getConfig(type) {
@@ -129,6 +130,9 @@ export async function updateCurrentZoomFactor(current) {
 export async function updateImportRSMPath(current) {
   await updateConfig("pathToImportRSM", current);
 }
+export async function updateCustomCSSConfig(current) {
+  await updateConfig("customCSS", btoa(current));
+}
 
 export default async function getProfileConfig() {
   const d = await getConfig("prfldb");
@@ -215,6 +219,11 @@ export async function getCurrentZoomFactorConfig() {
 export async function getImportRSMConfig() {
   const d = await getConfig("pathToImportRSM");
   return d;
+}
+export async function getCustomCSSConfig() {
+  const d = await getConfig("customCSS");
+  if (d === '') return '';
+  return atob(d);
 }
 export async function getRSProfileFromPrfldb() {
   const prfldb = await getProfileConfig()

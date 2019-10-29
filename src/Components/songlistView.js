@@ -203,28 +203,15 @@ export function tagsFormatter(cell, row, rowIndex, extraData) {
             if (idx === items.length - 1) {
               return (
                 <div
-                  className={"songlist-tag-" + item}
-                  key={item}
-                  style={{
-                    padding: 5 + 'px',
-                    backgroundColor: '#343a40',
-                    color: 'wheat',
-                    borderRadius: 5 + 'px',
-                  }}>{item}
+                  className={"tag songlist-tag-" + item}
+                  key={item}>{item}
                 </div>
               );
             }
             return (
               <div
-                className={"songlist-tag-" + item}
-                key={item}
-                style={{
-                  padding: 5 + 'px',
-                  backgroundColor: '#343a40',
-                  color: 'wheat',
-                  marginBottom: 4 + 'px',
-                  borderRadius: 5 + 'px',
-                }}>{item}
+                className={"tag-last songlist-tag-" + item}
+                key={item}>{item}
               </div>
             );
           })

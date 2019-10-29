@@ -25,6 +25,8 @@ import getProfileConfig, {
   getSteamNameFromSteamID,
   getCustomCulumnsConfig,
   updateCustomColumnConfig,
+  getCustomCSSConfig,
+  updateCustomCSSConfig,
 } from '../configService';
 import {
   resetDB, isTablePresent, deleteRSSongList,
@@ -165,6 +167,7 @@ class SettingsView extends React.Component {
       profileAboutToSave: false,
       profileSaved: false,
       cookieSaved: false,
+      customCSS: '',
     };
     this.loadState();
     this.sortfieldref = React.createRef();
@@ -413,6 +416,7 @@ class SettingsView extends React.Component {
     const q = await getCurrentZoomFactorConfig();
     const r = await getImportRSMConfig();
     const s = await getCustomCulumnsConfig();
+    const t = await getCustomCSSConfig();
     setStateAsync(this, {
       prfldb: d,
       steamLoginSecure: e,
@@ -430,6 +434,7 @@ class SettingsView extends React.Component {
       currentZoomFactor: q,
       pathToImportRSM: r,
       customColumns: s,
+      customCSS: t,
     });
   }
 
@@ -448,6 +453,7 @@ class SettingsView extends React.Component {
     await updateMasteryThreshold(this.state.masteryThreshold);
     await updateSteamAPIKey(this.state.steamAPIKey);
     await updateImportRSMPath(this.state.pathToImportRSM);
+    await updateCustomCSSConfig(this.state.customCSS);
     if (this.state.sortoptions.length === 0) {
       await setStateAsync(this, { sortoptions: [...defaultSortOption] });
       await updateDefaultSortOption(this.state.sortoptions)
@@ -477,6 +483,7 @@ class SettingsView extends React.Component {
     document.getElementsByTagName("html")[0].scrollTop = 0;
     this.props.refreshTabs();
     this.setState({ profileSaved: false, profileAboutToSave: false, cookieSaved: false })
+    DispatcherService.dispatch(DispatchEvents.CUSTOM_CSS_CHANGED);
   }
 
   enterPrfldb = async () => {
@@ -611,6 +618,10 @@ class SettingsView extends React.Component {
     let v = [];
     if (value) v = value;
     this.setState({ customColumns: v });
+  }
+
+  handleCustomCSS = (event) => {
+    this.setState({ customCSS: event.target.value });
   }
 
   onColumnSortEnd = ({ oldIndex, newIndex }) => {
@@ -1327,6 +1338,30 @@ loading setlists into Rocksmith 2014.
                       </span>
                     </div>
                   </Fragment>
+                </Collapsible>
+                <br />
+                <Collapsible
+                  trigger={expandButton(this.props.t("Custom CSS"))}
+                  triggerWhenOpen={collapseButton(this.props.t("Custom CSS"))}
+                  transitionTime={200}
+                  easing="ease-in"
+                  overflowWhenOpen="unset"
+                >
+                  <textarea
+                    value={this.state.customCSS}
+                    onChange={this.handleCustomCSS}
+                    className="alert-info"
+                    style={{
+                      width: 100 + '%',
+                      height: 200 + 'px',
+                      overflow: 'auto',
+                      overflowX: 'hidden',
+                      textAlign: 'left',
+                      wordBreak: 'break-all',
+                      userSelect: 'text',
+                      border: "1px solid steelblue",
+                      borderRadius: 4 + 'px',
+                    }} />
                 </Collapsible>
                 <br />
                 <Collapsible
