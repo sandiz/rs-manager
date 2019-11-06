@@ -142,12 +142,12 @@ async function createWindow() {
             contextIsolation: false,
             nodeIntegrationInWorker: true
         },
+        autoHideMenuBar: true,
     });
     // Let us register listeners on the window, so we can update the state
     // automatically (the listeners will be removed when the window is closed)
     // and restore the maximized or full screen state
     mainWindowState.manage(mainWindow);
-    mainWindow.setAutoHideMenuBar(true);
     mainWindow.setMinimumSize(1700, 1070);
     //mainWindow.maximize();
     if (isDev) {
