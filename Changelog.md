@@ -1,3 +1,6 @@
+v3.0.3
+- bump all package versions to latest (nov 2019) (electron@7)
+- react-datepicker still pinned to 1.8.0
 v3.0.2
 - add support for custom tags for arrangements
 - add support for filtering by song tags in songowned, setlist (rs, manual, generated)
