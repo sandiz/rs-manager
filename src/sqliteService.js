@@ -1399,7 +1399,7 @@ export async function getSongsFromGeneratedPlaylist(
         const gsql = generateOrderSql(sortOptions, true);
         if (gsql !== "") ordersql = gsql;
       }
-      sql += ` group by id ${ordersql} LIMIT ${start},${count};`
+      sql += ` ${ordersql} LIMIT ${start},${count};`
       const output = await db.all(sql);
       const output2 = await db.get(countsql)
       return [output, output2];
