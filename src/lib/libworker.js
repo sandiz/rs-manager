@@ -868,13 +868,16 @@ class fileWatcherWorker {
     }
 
     toaster = () => {
+        const {
+            history, accept, dismiss, onCDLC,
+        } = this;
         const d = (t) => (
             <div>
                 <span className="toast-msg toast-msg-success"> New PSARCs found</span>
                 <hr style={{ marginBottom: 7 + 'px' }} />
                 {
-                    Object.keys(this.history).map((key, idx) => {
-                        const item = this.history[key];
+                    Object.keys(history).map((key, idx) => {
+                        const item = history[key];
                         return (
                             <div
                                 key={item.id}
@@ -886,13 +889,13 @@ class fileWatcherWorker {
                     })
                 }
                 <div style={{ textAlign: 'left' }} className="toast-buttons">
-                    <a className="border-dashed-bottom" type="submit" onClick={this.accept}>Import</a>&nbsp;|&nbsp;
-                    <a className="border-dashed-bottom" type="submit" onClick={this.dismiss}>Dismiss</a>
+                    <a className="border-dashed-bottom" type="submit" onClick={accept}>Import</a>&nbsp;|&nbsp;
+                    <a className="border-dashed-bottom" type="submit" onClick={dismiss}>Dismiss</a>
                     <span style={{ float: 'right' }}>
                         <label className="" htmlFor="markascdlc" style={{ paddingRight: 10 + 'px' }}>
                             mark as cdlc
                         </label>
-                        <input id="markascdlc" type="checkbox" onChange={this.onCDLC} checked={t} />
+                        <input id="markascdlc" type="checkbox" onChange={onCDLC} checked={t} />
                     </span>
                 </div>
             </div>

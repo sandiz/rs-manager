@@ -934,14 +934,12 @@ class SettingsView extends React.Component {
                       textAlign: 'right',
                       marginTop: 12 + 'px',
                     }}>
-                      {
-                        <input
-                          type="text"
-                          style={{ width: 400 + 'px', textAlign: 'right', paddingRight: 5 + 'px' }}
-                          value={this.state.pathToImportRSM}
-                          onChange={e => this.setState({ pathToImportRSM: e.target.value })}
-                        />
-                      }
+                      <input
+                        type="text"
+                        style={{ width: 400 + 'px', textAlign: 'right', paddingRight: 5 + 'px' }}
+                        value={this.state.pathToImportRSM}
+                        onChange={e => this.setState({ pathToImportRSM: e.target.value })}
+                      />
                     </span>
                     <br />
                     <div className="">
@@ -1302,10 +1300,7 @@ loading setlists into Rocksmith 2014.
                           <span style={{ color: '#ccc' }}>
                             if true, you&#39;ll have to create a file
                           in /etc/sudoers.d/ with the values<br />
-                            {
-                              //eslint-disable-next-line
-                              <span style={{ userSelect: 'text' }}>%staff ALL=(ALL) NOPASSWD:&lt;path to Rocksmith Manager.app&gt;/Contents/Resources/app/src/tools/rocksniff_mac</span>
-                            }
+                            <span style={{ userSelect: 'text' }}>%staff ALL=(ALL) NOPASSWD:&lt;path to Rocksmith Manager.app&gt;/Contents/Resources/app/src/tools/rocksniff_mac</span>
                           </span>
                         </div>
                       </Fragment>

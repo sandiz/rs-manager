@@ -68,7 +68,8 @@
         "no-underscore-dangle": "off",
         "no-multi-spaces": "off",
         "no-trailing-spaces": "off",
-        "class-methods-use-this": "off"
+        "class-methods-use-this": "off",
+        "react/no-danger": "off"
     },
     "parser": "babel-eslint",
     "extends": "airbnb",

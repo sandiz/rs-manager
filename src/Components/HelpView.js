@@ -147,107 +147,105 @@ export default class HelpView extends React.Component {
       <div className="">
         <div className=" justify-content-lg-center">
           <div className="col  settings ta-center" style={{ backgroundColor: bgColor }}>
-            {
-              (
+            (
                 <div>
-                  <br />
-                  <a
-                    style={{
-                      color: 'blue',
-                      fontWeight: this.state.defaultReadme === "changelog" ? "bolder" : "normal",
-                      borderBottom: this.state.defaultReadme === "changelog" ? "1px solid" : "none",
-                    }}
-                    href="#"
-                    onClick={() => this.changeTo('changelog')}>Changelog</a>&nbsp;
+              <br />
+              <a
+                style={{
+                  color: 'blue',
+                  fontWeight: this.state.defaultReadme === "changelog" ? "bolder" : "normal",
+                  borderBottom: this.state.defaultReadme === "changelog" ? "1px solid" : "none",
+                }}
+                href="#"
+                onClick={() => this.changeTo('changelog')}>Changelog</a>&nbsp;
                   | <a
-                    style={{
-                      color: 'blue',
-                      fontWeight: this.state.defaultReadme === "getting-started" ? "bolder" : "normal",
-                      borderBottom: this.state.defaultReadme === "getting-started" ? "1px solid" : "none",
-                    }}
-                    href="#"
-                    onClick={() => this.changeTo('getting-started')}>Getting Started</a>&nbsp;
+                style={{
+                  color: 'blue',
+                  fontWeight: this.state.defaultReadme === "getting-started" ? "bolder" : "normal",
+                  borderBottom: this.state.defaultReadme === "getting-started" ? "1px solid" : "none",
+                }}
+                href="#"
+                onClick={() => this.changeTo('getting-started')}>Getting Started</a>&nbsp;
                   | <a
-                    style={{
-                      color: 'blue',
-                      fontWeight: this.state.defaultReadme === "dashboard" ? "bolder" : "normal",
-                      borderBottom: this.state.defaultReadme === "dashboard" ? "1px solid" : "none",
-                    }}
-                    href="#"
-                    onClick={() => this.changeTo('dashboard')}>Dashboard</a>&nbsp;
+                style={{
+                  color: 'blue',
+                  fontWeight: this.state.defaultReadme === "dashboard" ? "bolder" : "normal",
+                  borderBottom: this.state.defaultReadme === "dashboard" ? "1px solid" : "none",
+                }}
+                href="#"
+                onClick={() => this.changeTo('dashboard')}>Dashboard</a>&nbsp;
                     | <a
-                    style={{
-                      color: 'blue',
-                      fontWeight: this.state.defaultReadme === "songs-owned" ? "bolder" : "normal",
-                      borderBottom: this.state.defaultReadme === "songs-owned" ? "1px solid" : "none",
-                    }}
-                    href="#"
-                    onClick={() => this.changeTo('songs-owned')}>Songs Owned</a>&nbsp;
+                style={{
+                  color: 'blue',
+                  fontWeight: this.state.defaultReadme === "songs-owned" ? "bolder" : "normal",
+                  borderBottom: this.state.defaultReadme === "songs-owned" ? "1px solid" : "none",
+                }}
+                href="#"
+                onClick={() => this.changeTo('songs-owned')}>Songs Owned</a>&nbsp;
                     | <a
-                    style={{
-                      color: 'blue',
-                      fontWeight: this.state.defaultReadme === "song-details" ? "bolder" : "normal",
-                      borderBottom: this.state.defaultReadme === "song-details" ? "1px solid" : "none",
-                    }}
-                    href="#"
-                    onClick={() => this.changeTo('song-details')}>Song Details</a>&nbsp;
+                style={{
+                  color: 'blue',
+                  fontWeight: this.state.defaultReadme === "song-details" ? "bolder" : "normal",
+                  borderBottom: this.state.defaultReadme === "song-details" ? "1px solid" : "none",
+                }}
+                href="#"
+                onClick={() => this.changeTo('song-details')}>Song Details</a>&nbsp;
                     | <a
-                    style={{
-                      color: 'blue',
-                      fontWeight: this.state.defaultReadme === "dlc-catalog" ? "bolder" : "normal",
-                      borderBottom: this.state.defaultReadme === "dlc-catalog" ? "1px solid" : "none",
-                    }}
-                    href="#"
-                    onClick={() => this.changeTo('dlc-catalog')}>DLC Catalog</a>&nbsp;
+                style={{
+                  color: 'blue',
+                  fontWeight: this.state.defaultReadme === "dlc-catalog" ? "bolder" : "normal",
+                  borderBottom: this.state.defaultReadme === "dlc-catalog" ? "1px solid" : "none",
+                }}
+                href="#"
+                onClick={() => this.changeTo('dlc-catalog')}>DLC Catalog</a>&nbsp;
                     | <a
-                    style={{
-                      color: 'blue',
-                      fontWeight: this.state.defaultReadme === "setlists" ? "bolder" : "normal",
-                      borderBottom: this.state.defaultReadme === "setlists" ? "1px solid" : "none",
-                    }}
-                    href="#"
-                    onClick={() => this.changeTo('setlists')}>Setlists</a>&nbsp;
+                style={{
+                  color: 'blue',
+                  fontWeight: this.state.defaultReadme === "setlists" ? "bolder" : "normal",
+                  borderBottom: this.state.defaultReadme === "setlists" ? "1px solid" : "none",
+                }}
+                href="#"
+                onClick={() => this.changeTo('setlists')}>Setlists</a>&nbsp;
                     | <a
-                    style={{
-                      color: 'blue',
-                      fontWeight: this.state.defaultReadme === "setlist-option" ? "bolder" : "normal",
-                      borderBottom: this.state.defaultReadme === "setlist-option" ? "1px solid" : "none",
-                    }}
-                    href="#"
-                    onClick={() => this.changeTo('setlist-option')}>Setlist Options</a>&nbsp;
+                style={{
+                  color: 'blue',
+                  fontWeight: this.state.defaultReadme === "setlist-option" ? "bolder" : "normal",
+                  borderBottom: this.state.defaultReadme === "setlist-option" ? "1px solid" : "none",
+                }}
+                href="#"
+                onClick={() => this.changeTo('setlist-option')}>Setlist Options</a>&nbsp;
                     | <a
-                    style={{
-                      color: 'blue',
-                      fontWeight: this.state.defaultReadme === "psarc-explorer" ? "bolder" : "normal",
-                      borderBottom: this.state.defaultReadme === "psarc-explorer" ? "1px solid" : "none",
-                    }}
-                    href="#"
-                    onClick={() => this.changeTo('psarc-explorer')}>psarc Explorer</a>&nbsp;
+                style={{
+                  color: 'blue',
+                  fontWeight: this.state.defaultReadme === "psarc-explorer" ? "bolder" : "normal",
+                  borderBottom: this.state.defaultReadme === "psarc-explorer" ? "1px solid" : "none",
+                }}
+                href="#"
+                onClick={() => this.changeTo('psarc-explorer')}>psarc Explorer</a>&nbsp;
                     | <a
-                    style={{
-                      color: 'blue',
-                      fontWeight: this.state.defaultReadme === "rs-live" ? "bolder" : "normal",
-                      borderBottom: this.state.defaultReadme === "rs-live" ? "1px solid" : "none",
-                    }}
-                    href="#"
-                    onClick={() => this.changeTo('rs-live')}>Rocksmith Live</a>&nbsp;
+                style={{
+                  color: 'blue',
+                  fontWeight: this.state.defaultReadme === "rs-live" ? "bolder" : "normal",
+                  borderBottom: this.state.defaultReadme === "rs-live" ? "1px solid" : "none",
+                }}
+                href="#"
+                onClick={() => this.changeTo('rs-live')}>Rocksmith Live</a>&nbsp;
                     |  <a
-                    style={{
-                      color: 'blue',
-                      fontWeight: this.state.defaultReadme === "tracking-options" ? "bolder" : "normal",
-                      borderBottom: this.state.defaultReadme === "tracking-options" ? "1px solid" : "none",
-                    }}
-                    href="#"
-                    onClick={() => this.changeTo('tracking-options')}>Tracking Modes</a>&nbsp;
+                style={{
+                  color: 'blue',
+                  fontWeight: this.state.defaultReadme === "tracking-options" ? "bolder" : "normal",
+                  borderBottom: this.state.defaultReadme === "tracking-options" ? "1px solid" : "none",
+                }}
+                href="#"
+                onClick={() => this.changeTo('tracking-options')}>Tracking Modes</a>&nbsp;
                     | {
-                    this.props.popupMode
-                      ? (
-                        <a style={{ color: 'blue' }} href="#" onClick={this.props.closeHelp}>Close Help</a>
-                      ) : null
-                  }
-                </div>
-              )
-            }
+                this.props.popupMode
+                  ? (
+                    <a style={{ color: 'blue' }} href="#" onClick={this.props.closeHelp}>Close Help</a>
+                  ) : null
+              }
+            </div>
+            )
 
             <br /><br />
             <div

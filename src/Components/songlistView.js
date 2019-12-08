@@ -140,12 +140,11 @@ export function unescapeFormatter(cell, row, rowIndex, extraData) {
             elem.style.top = top + "px";
           }}
         >
-          {
-            //eslint-disable-next-line
-            <div style={{ marginTop: 5 + 'px', textAlign: 'left' }} dangerouslySetInnerHTML={{
+          <div
+            style={{ marginTop: 5 + 'px', textAlign: 'left' }}
+            dangerouslySetInnerHTML={{
               __html: gnote,
             }} />
-          }
         </ReactTooltip>
         <ReactTooltip
           id={row.id + "_ln"}
@@ -160,12 +159,11 @@ export function unescapeFormatter(cell, row, rowIndex, extraData) {
             elem.style.top = top + "px";
           }}
         >
-          {
-            //eslint-disable-next-line
-            <div style={{ marginTop: 5 + 'px', textAlign: 'left' }} dangerouslySetInnerHTML={{
+          <div
+            style={{ marginTop: 5 + 'px', textAlign: 'left' }}
+            dangerouslySetInnerHTML={{
               __html: unescape(lnote),
             }} />
-          }
         </ReactTooltip>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div
