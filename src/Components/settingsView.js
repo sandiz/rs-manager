@@ -1329,7 +1329,7 @@ loading setlists into Rocksmith 2014.
                     <br />
                     <div className="">
                       <span style={{ color: '#ccc' }}>
-                        Set the current zoom level Range: 0.0 - 1.0 (default: 1.0)
+                        Set the current zoom level Range: 0.0 - 1.0 (default: 0.9)
                       </span>
                     </div>
                   </Fragment>

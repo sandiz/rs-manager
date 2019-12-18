@@ -37,7 +37,7 @@ function getDefaultSettings() {
   obj.defaultSortOption = defaultSortOption;
   obj.showSetlistOverlayAlways = false;
   obj.isSudoWhitelisted = false;
-  obj.currentZoomFactor = 1;
+  obj.currentZoomFactor = 0.9;
   obj.pathToImportRSM = '';
   obj.customColumns = defaultCustomColumns;
   obj.customCSS = "";
