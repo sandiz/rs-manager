@@ -234,7 +234,6 @@ function electronSteamAuth(config, windowParams) {
 
                 onCallback = async (url) => {
                     var query = nodeUrl.parse(url, true).query;
-                    console.log("onCallback", url, query);
                     if (query['openid.identity'] === undefined) {
                         reject(new Error('cannot authenticate through Steam'));
                         authWindow.removeAllListeners('closed');
@@ -251,7 +250,6 @@ function electronSteamAuth(config, windowParams) {
                         })
                         const cookie = sls[0].value
                         const cookieSess = sid[0].value
-                        console.log(cookie, cookieSess)
                         authWindow.removeAllListeners('closed');
                         setImmediate(function () {
                             authWindow.close();
@@ -269,7 +267,6 @@ function electronSteamAuth(config, windowParams) {
                 }
 
                 window.remote.session.defaultSession.webRequest.onBeforeRedirect((details, callback) => {
-                    console.log(details);
                     onCallback(details.redirectURL)
                 })
 
