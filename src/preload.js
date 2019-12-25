@@ -234,6 +234,7 @@ function electronSteamAuth(config, windowParams) {
 
                 onCallback = async (url) => {
                     var query = nodeUrl.parse(url, true).query;
+                    console.log("onCallback", url, query);
                     if (query['openid.identity'] === undefined) {
                         reject(new Error('cannot authenticate through Steam'));
                         authWindow.removeAllListeners('closed');
@@ -241,15 +242,20 @@ function electronSteamAuth(config, windowParams) {
                             authWindow.close();
                         });
                     } else {
-                        const sls = await getCookie({
+                        const sls = await window.remote.session.defaultSession.cookies.get({
                             name: 'steamLoginSecure',
                             domain: 'store.steampowered.com'
-                        });
-                        const sid = await getCookie({
+                        })
+                        const sid = await window.remote.session.defaultSession.cookies.get({
                             name: 'sessionid',
                         })
                         const cookie = sls[0].value
                         const cookieSess = sid[0].value
+                        console.log(cookie, cookieSess)
+                        authWindow.removeAllListeners('closed');
+                        setImmediate(function () {
+                            authWindow.close();
+                        });
                         resolve({
                             response_nonce: query['openid.response_nonce'],
                             assoc_handle: query['openid.assoc_handle'],
@@ -259,14 +265,11 @@ function electronSteamAuth(config, windowParams) {
                             cookie,
                             cookieSess,
                         });
-                        authWindow.removeAllListeners('closed');
-                        setImmediate(function () {
-                            authWindow.close();
-                        });
                     }
                 }
 
-                window.remote.session.defaultSession.webRequest.onBeforeRedirect({ urls: [] }, (details, callback) => {
+                window.remote.session.defaultSession.webRequest.onBeforeRedirect((details, callback) => {
+                    console.log(details);
                     onCallback(details.redirectURL)
                 })
 

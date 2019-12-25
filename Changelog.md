@@ -1,4 +1,4 @@
-v3.0.4
+v3.0.5
 - bump all package versions to latest (dec 2019)
 - react-datepicker still pinned to 1.8.0
 - i18next pinned to 15.1.3
