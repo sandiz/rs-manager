@@ -1,4 +1,9 @@
+v3.0.6
+- fix for update toaster popping too many times in rslive
+- fix for performance regression with highcharts (pinned to 6.2.0)
 v3.0.5
+- fix for steam login not working (electron cookie api change)
+v3.0.4
 - bump all package versions to latest (dec 2019)
 - react-datepicker still pinned to 1.8.0
 - i18next pinned to 15.1.3
