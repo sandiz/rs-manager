@@ -206,8 +206,8 @@ class psarcWorker {
 
 class profileWorker {
     /* copies stats from rocksmith profile */
-    static startWork = async () => {
-        await this.refreshStats();
+    static startWork = async (showToaster = true) => {
+        await this.refreshStats(showToaster);
         DispatcherService.dispatch(DispatchEvents.PROFILE_UPDATED, {});
     }
 
@@ -271,7 +271,7 @@ class profileWorker {
         }
     }
 
-    static refreshStats = async () => {
+    static refreshStats = async (showToaster = true) => {
         let progress = 0;
         const prfldb = await getProfileConfig();
         if (prfldb === '' || prfldb === null) {
@@ -279,7 +279,9 @@ class profileWorker {
             return;
         }
         if (prfldb.length > 0) {
-            const toastID = this.refreshToaster();
+            let toastID = -1;
+            if (showToaster) toastID = this.refreshToaster();
+
             const steamProfile = await readProfile(prfldb);
 
             await updateProfileConfig(prfldb);
@@ -297,7 +299,7 @@ class profileWorker {
                         idDateArray.push([keys[i], dateTS]);
                     }
                 }
-                console.log("rp songs: ", idDateArray.length);
+                //console.log("rp songs: ", idDateArray.length);
                 return updateRecentlyPlayedSongsV2(idDateArray, type);
             }
 
@@ -323,7 +325,7 @@ class profileWorker {
                     }
                 }
                 await saveHistoryV2(historyArray);
-                console.log("las items: ", idDateArray.length);
+                //console.log("las items: ", idDateArray.length);
                 return updateMasteryandPlayedV2(idDateArray);
             }
 
@@ -371,19 +373,22 @@ class profileWorker {
             progress += 1;
             info.rpchanges = changes;
             info.rpchanges2 = changes2;
-            this.refreshToaster(toastID, progress, info);
+            
+            if (toastID !== -1) this.refreshToaster(toastID, progress, info);
 
             changes = await lassongs();
             progress += 1;
             info.laschanges = changes;
-            this.refreshToaster(toastID, progress, info);
+            if (toastID !== -1) this.refreshToaster(toastID, progress, info);
 
             changes = await scoreattacksongs();
             progress += 1;
             info.scoreattackchanges = changes;
-            this.refreshToaster(toastID, progress, info);
+            if (toastID !== -1) this.refreshToaster(toastID, progress, info);
 
-            setTimeout(() => toast.done(toastID), 5000);
+            if (toastID !== -1) {
+                setTimeout(() => toast.done(toastID), 5000);
+            }
         }
     }
 
