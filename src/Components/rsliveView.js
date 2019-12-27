@@ -860,6 +860,7 @@ class RSLiveView extends React.Component {
         timeTotal,
         songKey: '',
         persistentID: '',
+        gameState: '',
         accuracy: 0,
         currentStreak: 0,
         highestStreak: 0,
