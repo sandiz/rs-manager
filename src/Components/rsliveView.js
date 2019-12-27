@@ -306,10 +306,10 @@ class RSLiveView extends React.Component {
     this.albumarturl = "";
     this.enablefakedata = false;
     this.fakedata = JSON.parse(`{"success":false,"currentState":0,"memoryReadout":{"songTimer":4.362,"songID":"Gree21Gu",
-    "persistentID":"CE42CBABEC6ABBF296E89310F120DC0E","totalNotesHit":0,"currentHitStreak":0,
-    "highestHitStreak":0,"totalNotesMissed":0,"currentMissStreak":0,"mode":2,"gameState":"LearnASong_Pause",
-    "currentPerfectHitStreak":0,"totalPerfectHits":0,"currentLateHitStreak":0,"totalLateHits":0,
-    "perfectPhrases":0,"goodPhrases":0,"passedPhrases":0,"failedPhrases":0,"TotalNotes":0},
+    "persistentID":"CE42CBABEC6ABBF296E89310F120DC0E","TotalNotesHit":0,"CurrentHitStreak":0,
+    "HighestHitStreak":0,"TotalNotesMissed":0,"CurrentMissStreak":0,"mode":2,"gameState":"LearnASong_Pause",
+    "CurrentPerfectHitStreak":0,"TotalPerfectHits":0,"CurrentLateHitStreak":0,"TotalLateHits":0,
+    "PerfectPhrases":0,"GoodPhrases":0,"PassedPhrases":0,"FailedPhrases":0,"TotalNotes":0},
     "songDetails":null,"albumCoverBase64":null,"Version":"0.1.4"}`);
     this.lastSongData = {
       notesHit: 0,
@@ -454,10 +454,11 @@ class RSLiveView extends React.Component {
 
     if (bucketIdx < 0 || bucketIdx >= notesBucket.length) return notesBucket;
 
-    const deltaNotesHit = memoryReadout.totalNotesHit - this.lastSongData.notesHit;
-    const deltaNotesMissed = memoryReadout.totalNotesMissed - this.lastSongData.notesMissed;
-    const deltaPerfects = memoryReadout.totalPerfectHits - this.lastSongData.perfectHits;
-    const deltaLates = memoryReadout.totalLateHits - this.lastSongData.lateHits;
+    const deltaNotesHit = memoryReadout.noteData.TotalNotesHit - this.lastSongData.notesHit;
+    const deltaNotesMissed = memoryReadout.noteData.TotalNotesMissed 
+    - this.lastSongData.notesMissed;
+    const deltaPerfects = memoryReadout.noteData.TotalPerfectHits - this.lastSongData.perfectHits;
+    const deltaLates = memoryReadout.noteData.TotalLateHits - this.lastSongData.lateHits;
 
     //console.log("bucket", bucketIdx, "nh", notesBucket[bucketIdx].notesHit,
     //  "nm", notesBucket[bucketIdx].notesMissed,
@@ -468,10 +469,10 @@ class RSLiveView extends React.Component {
     notesBucket[bucketIdx].perfectHits += deltaPerfects;
     notesBucket[bucketIdx].lateHits += deltaLates;
 
-    this.lastSongData.notesHit = memoryReadout.totalNotesHit;
-    this.lastSongData.notesMissed = memoryReadout.totalNotesMissed;
-    this.lastSongData.perfectHits = memoryReadout.totalPerfectHits;
-    this.lastSongData.lateHits = memoryReadout.totalLateHits;
+    this.lastSongData.notesHit = memoryReadout.noteData.TotalNotesHit;
+    this.lastSongData.notesMissed = memoryReadout.noteData.TotalNotesMissed;
+    this.lastSongData.perfectHits = memoryReadout.noteData.TotalPerfectHits;
+    this.lastSongData.lateHits = memoryReadout.noteData.TotalLateHits;
     this.lastSongData.lastTimer = memoryReadout.songTimer;
     this.lastSongData.lastBucket = bucketIdx;
 
@@ -542,8 +543,8 @@ class RSLiveView extends React.Component {
 
   parseSongResults = async (songData) => {
     const { songDetails, memoryReadout } = songData;
-    const tnh = memoryReadout ? memoryReadout.totalNotesHit : 0;
-    const tnm = memoryReadout ? memoryReadout.totalNotesMissed : 0;
+    const tnh = memoryReadout ? memoryReadout.noteData.TotalNotesHit : 0;
+    const tnm = memoryReadout ? memoryReadout.noteData.TotalNotesMissed : 0;
     let accuracy = tnh / (tnh + tnm);
     accuracy *= 100;
 
@@ -553,9 +554,9 @@ class RSLiveView extends React.Component {
     if (songDetails) {
       this.lastsongdetail = songDetails;
     }
-    const notesHit = memoryReadout ? memoryReadout.totalNotesHit : 0;
-    const notesMissed = memoryReadout ? memoryReadout.totalNotesMissed : 0;
-    const highestStreak = memoryReadout ? memoryReadout.highestHitStreak : 0;
+    const notesHit = memoryReadout ? memoryReadout.noteData.TotalNotesHit : 0;
+    const notesMissed = memoryReadout ? memoryReadout.noteData.TotalNotesMissed : 0;
+    const highestStreak = memoryReadout ? memoryReadout.noteData.HighestHitStreak : 0;
     if (memoryReadout
       && memoryReadout.songID.length > 0
       && memoryReadout.songID !== this.state.songKey) {
@@ -608,10 +609,10 @@ class RSLiveView extends React.Component {
     }
 
     const gameState = memoryReadout ? memoryReadout.gameState : "";
-    const perfectHits = memoryReadout ? memoryReadout.totalPerfectHits : 0;
-    const lateHits = memoryReadout ? memoryReadout.totalLateHits : 0;
-    const perfectPhrases = memoryReadout ? memoryReadout.perfectPhrases : 0;
-    const goodPhrases = memoryReadout ? memoryReadout.goodPhrases : 0;
+    const perfectHits = memoryReadout ? memoryReadout.noteData.TotalPerfectHits : 0;
+    const lateHits = memoryReadout ? memoryReadout.noteData.TotalLateHits : 0;
+    const perfectPhrases = memoryReadout ? memoryReadout.noteData.PerfectPhrases : 0;
+    const goodPhrases = memoryReadout ? memoryReadout.noteData.GoodPhrases : 0;
     const { notesBucket, chartOptions } = this.getNoteStats(memoryReadout);
     //console.log(chartOptions);
     this.setState({
@@ -623,7 +624,7 @@ class RSLiveView extends React.Component {
       totalNotes,
       timeCurrent: memoryReadout ? memoryReadout.songTimer : 0,
       songKey: memoryReadout ? memoryReadout.songID : "",
-      currentStreak: memoryReadout ? memoryReadout.currentHitStreak : 0,
+      currentStreak: memoryReadout ? memoryReadout.noteData.CurrentHitStreak : 0,
       highestStreak,
       notesHit,
       notesMissed,
