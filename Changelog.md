@@ -1,3 +1,5 @@
+v3.0.7
+- updated Rocksniffer to latest pointers
 v3.0.6
 - fix for update toaster popping too many times in rslive
 - fix for performance regression with highcharts (pinned to 6.2.0)
