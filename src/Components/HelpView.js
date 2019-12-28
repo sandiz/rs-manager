@@ -147,8 +147,7 @@ export default class HelpView extends React.Component {
       <div className="">
         <div className=" justify-content-lg-center">
           <div className="col  settings ta-center" style={{ backgroundColor: bgColor }}>
-            (
-                <div>
+            <div>
               <br />
               <a
                 style={{
@@ -245,8 +244,6 @@ export default class HelpView extends React.Component {
                   ) : null
               }
             </div>
-            )
-
             <br /><br />
             <div
               className={changelogdiv}
