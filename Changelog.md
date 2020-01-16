@@ -1,5 +1,8 @@
+v3.0.9
+- fix for inforgraphic not saving screenshot
+- updated infographic progress bar style
 v3.0.8
-- update packages to latest (dec 2019)
+- updated packages to latest (dec 2019)
 - psarcjs pinned to 0.1.4 (since we dont need the sng, dds write support)
 v3.0.7
 - updated Rocksniffer to latest pointers
