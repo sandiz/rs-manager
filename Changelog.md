@@ -1,3 +1,5 @@
+v3.0.10
+- RockSniffer mac port can now handle 64 bit Rocksmith
 v3.0.9
 - fix for inforgraphic not saving screenshot
 - updated infographic progress bar style
