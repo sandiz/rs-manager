@@ -117,6 +117,7 @@ class DashboardView extends React.Component {
         steam.getOwnedGames({
           appids_filter: [221680],
           steamid: steamID,
+          include_free_sub: false,
           include_played_free_games: false,
           include_appinfo: 1,
         }, (err, data) => {
