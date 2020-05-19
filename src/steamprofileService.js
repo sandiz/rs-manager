@@ -72,6 +72,7 @@ export async function getAllProfiles(prfldbdir) {
 }
 
 export async function getProfileName(prfldb) {
+  console.log("trying to get profile name for prfldb", prfldb);
   if (!prfldb || prfldb === '') return '';
   const parsed = window.path.parse(prfldb)
   const localProfiles = parsed.dir + "/LocalProfiles.json";
@@ -95,7 +96,7 @@ export async function getProfileName(prfldb) {
   catch (e) {
     console.log(e);
   }
-  return null;
+  return '';
 }
 
 export async function getOwnedPackages(cookie, cookieSess) {
@@ -235,7 +236,7 @@ export async function getTrackTags(artist, title, trackonly = false) {
     console.log(ex);
     console.log(text);
   }
-  return null;
+  return [];
 }
 
 export function getWinSteamPath() {
