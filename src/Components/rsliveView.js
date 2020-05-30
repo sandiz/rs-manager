@@ -897,7 +897,7 @@ class RSLiveView extends React.Component {
   }
 
   refreshStats = async () => {
-    profileWorker.startWork(false);
+    profileWorker.startWorkSilent();
   }
 
   refresh = async () => {

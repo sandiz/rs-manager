@@ -271,6 +271,106 @@ class profileWorker {
         }
     }
 
+    static startWorkSilent = async () => {
+        await this.refreshStatsSilent();
+        DispatcherService.dispatch(DispatchEvents.PROFILE_UPDATED, {});
+    }
+
+    static rpsongs = async (type, steamProfile) => {
+        const stats = steamProfile.Songs;
+        const sastats = steamProfile.SongsSA;
+        const idDateArray = [];
+        const keys = Object.keys(type === "las" ? stats : sastats);
+        for (let i = 0; i < keys.length; i += 1) {
+            const stat = stats[keys[i]];
+            if (!stat || typeof stat === 'undefined') continue;
+
+            if ("TimeStamp" in stat) {
+                const dateTS = stat.TimeStamp;
+                idDateArray.push([keys[i], dateTS]);
+            }
+        }
+        //console.log("rp songs: ", idDateArray.length);
+        return updateRecentlyPlayedSongsV2(idDateArray, type);
+    }
+
+    static lassongs = async (steamProfile) => {
+        const stats = steamProfile.Stats.Songs;
+        //const sastats = steamProfile.SongsSA;
+        const keys = Object.keys(stats);
+        const idDateArray = [];
+        const historyArray = [];
+        for (let i = 0; i < keys.length; i += 1) {
+            const stat = stats[keys[i]];
+            if (!stat || typeof stat === 'undefined') continue;
+            if ("MasteryPeak" in stat && "PlayedCount" in stat) {
+                const mastery = stat.MasteryPeak;
+                const played = stat.PlayedCount;
+                if ("MasteryLast" in stat && "DateLAS" in stat) {
+                    const masteryLast = stat.MasteryLast;
+                    const dateLAS = stat.DateLAS;
+                    const dateLASts = moment(dateLAS).unix();
+                    historyArray.push([keys[i], masteryLast, dateLASts]);
+                }
+                idDateArray.push([keys[i], mastery, played]);
+            }
+        }
+        await saveHistoryV2(historyArray);
+        //console.log("las items: ", idDateArray.length);
+        return updateMasteryandPlayedV2(idDateArray);
+    }
+
+    static scoreattacksongs = async (steamProfile) => {
+        const idDateArray = [];
+        const sastats = steamProfile.SongsSA;
+        const keys = Object.keys(sastats);
+        for (let i = 0; i < keys.length; i += 1) {
+            const stat = sastats[keys[i]];
+            if (!stat || typeof stat === 'undefined') continue;
+
+            let highestBadge = 0;
+            if ("Badges" in stat) {
+                if ("Easy" in stat.Badges && stat.Badges.Easy > 0) {
+                    stat.Badges.Easy += 10;
+                    highestBadge = stat.Badges.Easy;
+                }
+                if ("Medium" in stat.Badges && stat.Badges.Medium > 0) {
+                    stat.Badges.Medium += 20;
+                    highestBadge = stat.Badges.Medium;
+                }
+                if ("Hard" in stat.Badges && stat.Badges.Hard > 0) {
+                    stat.Badges.Hard += 30;
+                    highestBadge = stat.Badges.Hard;
+                }
+                if ("Master" in stat.Badges && stat.Badges.Master > 0) {
+                    stat.Badges.Master += 40;
+                    highestBadge = stat.Badges.Master;
+                }
+                idDateArray.push([keys[i], stat, highestBadge]);
+            }
+        }
+        //console.log("sa items: ", idDateArray.length)
+        return updateScoreAttackStatsV2(idDateArray);
+    }
+
+    static refreshStatsSilent = async () => {
+        console.log("refreshing stats silently...");
+        const prfldb = await getProfileConfig();
+        if (prfldb === '' || prfldb === null) {
+            return;
+        }
+        if (prfldb.length > 0) {
+            const steamProfile = await readProfile(prfldb);
+            await updateProfileConfig(prfldb);
+        
+            await this.rpsongs("las", steamProfile)
+            await this.rpsongs("sa", steamProfile);
+          
+            await this.lassongs(steamProfile);
+            await this.scoreattacksongs(steamProfile);
+        }
+    }
+
     static refreshStats = async (showToaster = true) => {
         let progress = 0;
         const prfldb = await getProfileConfig();
@@ -285,82 +385,7 @@ class profileWorker {
             const steamProfile = await readProfile(prfldb);
 
             await updateProfileConfig(prfldb);
-            const rpsongs = async (type) => {
-                const stats = steamProfile.Songs;
-                const sastats = steamProfile.SongsSA;
-                const idDateArray = [];
-                const keys = Object.keys(type === "las" ? stats : sastats);
-                for (let i = 0; i < keys.length; i += 1) {
-                    const stat = stats[keys[i]];
-                    if (!stat || typeof stat === 'undefined') continue;
-
-                    if ("TimeStamp" in stat) {
-                        const dateTS = stat.TimeStamp;
-                        idDateArray.push([keys[i], dateTS]);
-                    }
-                }
-                //console.log("rp songs: ", idDateArray.length);
-                return updateRecentlyPlayedSongsV2(idDateArray, type);
-            }
-
-            const lassongs = async () => {
-                const stats = steamProfile.Stats.Songs;
-                //const sastats = steamProfile.SongsSA;
-                const keys = Object.keys(stats);
-                const idDateArray = [];
-                const historyArray = [];
-                for (let i = 0; i < keys.length; i += 1) {
-                    const stat = stats[keys[i]];
-                    if (!stat || typeof stat === 'undefined') continue;
-                    if ("MasteryPeak" in stat && "PlayedCount" in stat) {
-                        const mastery = stat.MasteryPeak;
-                        const played = stat.PlayedCount;
-                        if ("MasteryLast" in stat && "DateLAS" in stat) {
-                            const masteryLast = stat.MasteryLast;
-                            const dateLAS = stat.DateLAS;
-                            const dateLASts = moment(dateLAS).unix();
-                            historyArray.push([keys[i], masteryLast, dateLASts]);
-                        }
-                        idDateArray.push([keys[i], mastery, played]);
-                    }
-                }
-                await saveHistoryV2(historyArray);
-                //console.log("las items: ", idDateArray.length);
-                return updateMasteryandPlayedV2(idDateArray);
-            }
-
-            const scoreattacksongs = async () => {
-                const idDateArray = [];
-                const sastats = steamProfile.SongsSA;
-                const keys = Object.keys(sastats);
-                for (let i = 0; i < keys.length; i += 1) {
-                    const stat = sastats[keys[i]];
-                    if (!stat || typeof stat === 'undefined') continue;
-
-                    let highestBadge = 0;
-                    if ("Badges" in stat) {
-                        if ("Easy" in stat.Badges && stat.Badges.Easy > 0) {
-                            stat.Badges.Easy += 10;
-                            highestBadge = stat.Badges.Easy;
-                        }
-                        if ("Medium" in stat.Badges && stat.Badges.Medium > 0) {
-                            stat.Badges.Medium += 20;
-                            highestBadge = stat.Badges.Medium;
-                        }
-                        if ("Hard" in stat.Badges && stat.Badges.Hard > 0) {
-                            stat.Badges.Hard += 30;
-                            highestBadge = stat.Badges.Hard;
-                        }
-                        if ("Master" in stat.Badges && stat.Badges.Master > 0) {
-                            stat.Badges.Master += 40;
-                            highestBadge = stat.Badges.Master;
-                        }
-                        idDateArray.push([keys[i], stat, highestBadge]);
-                    }
-                }
-                console.log("sa items: ", idDateArray.length)
-                return updateScoreAttackStatsV2(idDateArray);
-            }
+        
 
             const info = {
                 rpchanges: 0,
@@ -368,20 +393,20 @@ class profileWorker {
                 laschanges: 0,
                 scoreattackchanges: 0,
             };
-            let changes = await rpsongs("las")
-            const changes2 = await rpsongs("sa");
+            let changes = await this.rpsongs("las", steamProfile)
+            const changes2 = await this.rpsongs("sa", steamProfile);
             progress += 1;
             info.rpchanges = changes;
             info.rpchanges2 = changes2;
             
             if (toastID !== -1) this.refreshToaster(toastID, progress, info);
 
-            changes = await lassongs();
+            changes = await this.lassongs(steamProfile);
             progress += 1;
             info.laschanges = changes;
             if (toastID !== -1) this.refreshToaster(toastID, progress, info);
 
-            changes = await scoreattacksongs();
+            changes = await this.scoreattacksongs(steamProfile);
             progress += 1;
             info.scoreattackchanges = changes;
             if (toastID !== -1) this.refreshToaster(toastID, progress, info);
