@@ -219,12 +219,11 @@ class ExportSetlistModal extends React.Component {
             const options = {
                 defaultPath: window.remote.app.getPath('documents') + `/${unescape(setlist.name)}_export.json`,
             }
-            window.remote.dialog.showSaveDialog(null, options, async (path) => {
-                if (path) {
-                    await writeFile(path, JSON.stringify(songKeys));
-                    this.successMsg();
-                }
-            })
+            const saveDialogResults = await window.remote.dialog.showSaveDialog(null, options);
+            if (saveDialogResults.filePath) {
+                await writeFile(saveDialogResults.filePath, JSON.stringify(songKeys));
+                this.successMsg();
+            }
         }
         else {
             this.failureMsg("No songs found in setlist")
