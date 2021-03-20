@@ -186,6 +186,8 @@ export function generateSql(filters, count = false) {
       case "path_lead":
       case "path_rhythm":
       case "path_bass":
+      case "bonus_arr":
+      case "represent":
         if (filter.value) sql += `${filter.type} = 1 `;
         else sql += `${filter.type} = 0 `;
         break;
@@ -439,6 +441,16 @@ class SetlistOptions extends React.Component {
         cmp: ["is"],
       },
       {
+        type: "represent",
+        display: "Arr: Primary",
+        cmp: ["is"],
+      },
+      {
+        type: "bonus_arr",
+        display: "Arr: Bonus",
+        cmp: ["is"],
+      },
+      {
         type: "local_note",
         display: "Local Notes",
         cmp: ["like", "not like"],
@@ -628,7 +640,8 @@ class SetlistOptions extends React.Component {
     else if (
       filter.type === "is_cdlc" || filter.type === "capofret" || filter.type === "centoffset"
       || filter.type === "sa_fc_easy" || filter.type === "sa_fc_medium" || filter.type === "sa_fc_hard" || filter.type === "sa_fc_master"
-      || filter.type === "path_lead" || filter.type === "path_rhythm" || filter.type === "path_bass"
+      || filter.type === "path_lead" || filter.type === "path_rhythm" || filter.type === "path_bass" || filter.type === "bonus_arr"
+      || filter.type === "represent"
     ) {
       const defValue = filter.value;
       return (

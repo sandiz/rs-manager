@@ -23,6 +23,8 @@
        * Capo: expected: true/false
        * SA Easy/Medium/Hard/Master: custom dropdown options
        * FC Easy/Medium/Hard/Master: expected true/false
+       * Arr Primary: expected: true/false
+       * Arr Bonus: expected: true/false
        * Local notes: any string
  - Comparator:
     * (>=, <=, >, <, =) - number comparison
