@@ -7,7 +7,8 @@ import {
     updateMasteryandPlayedV2, updateScoreAttackStatsV2,
     saveHistoryV2, addToFavoritesV2, initSetlistPlaylistDB,
     createRSSongList, resetRSSongList, createSetlistFromDLCPack,
-    addToSteamDLCCatalogV2, updateSongsOwnedV2, removeIgnoredArrangements, updateCDLCStatV2,
+    addToSteamDLCCatalogV2, updateSongsOwnedV2, removeIgnoredArrangements,
+    updateCDLCStatV2, ownedCatalogSongNames,
 } from '../sqliteService';
 import { toasterError } from '../App';
 import getProfileConfig, { updateProfileConfig } from '../configService'
@@ -736,12 +737,12 @@ class profileWorker {
         }
     }
 
-    static startSongListUpdate = async (songs = [], markAsCDLC = false) => {
-        await this.songListUpdate(songs, markAsCDLC);
+    static startSongListUpdate = async (songs = [], markAsCDLC = false, catalogCheck = false) => {
+        await this.songListUpdate(songs, markAsCDLC, catalogCheck);
         DispatcherService.dispatch(DispatchEvents.SONG_LIST_UPDATED);
     }
 
-    static songListUpdate = async (songs, markAsCDLC) => {
+    static songListUpdate = async (songs, markAsCDLC, dlcCatalogCheck) => {
         console.log("--start songlist update--");
         let progress = 0;
         const info = {
@@ -750,9 +751,14 @@ class profileWorker {
         console.log("arrangements:", songs.length);
         console.log("mark as cdlc:", markAsCDLC);
 
+        const ownedSteamNames = dlcCatalogCheck ? await ownedCatalogSongNames() : [];
+
         const toastID = this.songListToaster(null, 0, info);
-        const filtered = songs.filter(item => (!item.song.startsWith("RS2 Test")
-            && !item.song.startsWith("RS2 Chord")))
+        const filtered = songs.filter(item => (
+            !item.song.startsWith("RS2 Test")
+            && !item.song.startsWith("RS2 Chord")
+            && (!dlcCatalogCheck || ownedSteamNames.includes(item.artist + ' - ' + item.song))
+        ))
         console.log("filtered: " + filtered.length);
 
         progress += 1
