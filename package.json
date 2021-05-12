@@ -32,7 +32,7 @@
     "line-by-line": "^0.1.6",
     "marked": "^0.8.0",
     "memorystream": "^0.3.1",
-    "merge": "^1.2.1",
+    "merge": "^2.1.1",
     "moment": "^2.22.2",
     "naudiodon": "^2.1.0",
     "node-abi": "^2.13.0",
