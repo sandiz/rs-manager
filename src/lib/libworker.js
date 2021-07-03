@@ -752,12 +752,13 @@ class profileWorker {
         console.log("mark as cdlc:", markAsCDLC);
 
         const ownedSteamNames = dlcCatalogCheck ? await ownedCatalogSongNames() : [];
+        const lowercaseNames = ownedSteamNames.map(item => this.simplifySongName(item));
 
         const toastID = this.songListToaster(null, 0, info);
         const filtered = songs.filter(item => (
             !item.song.startsWith("RS2 Test")
             && !item.song.startsWith("RS2 Chord")
-            && (!dlcCatalogCheck || ownedSteamNames.includes(item.artist + ' - ' + item.song))
+            && (!dlcCatalogCheck || lowercaseNames.includes(this.simplifySongName(item.artist + ' - ' + item.song)))
         ))
         console.log("filtered: " + filtered.length);
 
@@ -782,6 +783,10 @@ class profileWorker {
         }
         setTimeout(() => toast.dismiss(toastID), 5000);
         console.log("--end songlist update--");
+    }
+
+    static simplifySongName = (song) => {
+        return song.toLowerCase().replace(/[^a-z]/g, "");
     }
 }
 
