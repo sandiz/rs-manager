@@ -1291,6 +1291,11 @@ export async function getSongByIDs(ids = []) {
   const sql = `select * from songs_owned where id in (${items})`
   return db.all(sql);
 }
+export async function getSongByKeys(keys = []) {
+  const items = keys.map(pid => `'${pid}'`).join(',');
+  const sql = `select artist, album, song, arrangement, songkey, mastery from songs_owned where songkey in (${items})`
+  return db.all(sql);
+}
 export async function addtoRSSongList(tablename, songkey) {
   const sql = `replace into '${tablename}' (uniqkey) select uniqkey from songs_owned where songkey like '%${songkey}%'`
   const op = await db.run(sql)

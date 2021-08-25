@@ -1,14 +1,17 @@
 import React from 'react'
 import PropTypes from 'prop-types';
 import { withI18n, Trans } from 'react-i18next';
+import stringify from 'csv-stringify/lib/sync';
 import Select from 'react-select';
 import getProfileConfig, { writeFile, getImportRSMConfig, getSteamIDConfig } from '../configService';
-import { getSetlistMetaInfo, executeRawSql } from '../sqliteService';
+import { getSetlistMetaInfo, executeRawSql, getSongByKeys } from '../sqliteService';
 import { executeRSMRequest } from '../rsrtoolservice';
 import { getProfileName } from '../steamprofileService';
 import { generateSql } from './setlistOptions';
 
+
 const selectoptions = [
+    { value: 'csv', label: 'CSV' },
     { value: 'json', label: 'JSON' },
     { value: 'songlist', label: 'Rocksmith Song List' },
 ];
@@ -78,6 +81,9 @@ class ExportSetlistModal extends React.Component {
         }
         if (this.state.selectedOption.value === "json") {
             this.setlistExportToJSON(this.props.exportSetlistKey);
+        }
+        else if (this.state.selectedOption.value === 'csv') {
+            this.setlistExportToCSV(this.props.exportSetlistKey);
         }
         else {
             if (this.state.selectedSonglist === null) {
@@ -222,6 +228,33 @@ class ExportSetlistModal extends React.Component {
             const saveDialogResults = await window.remote.dialog.showSaveDialog(null, options);
             if (saveDialogResults.filePath) {
                 await writeFile(saveDialogResults.filePath, JSON.stringify(songKeys));
+                this.successMsg();
+            }
+        }
+        else {
+            this.failureMsg("No songs found in setlist")
+        }
+    }
+
+    setlistExportToCSV = async (key) => {
+        const songKeys = await this.setlistToSongKeys(key);
+        const setlist = await getSetlistMetaInfo(key);
+        let songs = await getSongByKeys(songKeys);
+        if (songKeys.length > 0) {
+            songs = songs.map((song) => {
+                return {
+                    ...song,
+                    artist: unescape(song.artist),
+                    album: unescape(song.album),
+                    song: unescape(song.song),
+                }
+            });
+            const options = {
+                defaultPath: window.remote.app.getPath('documents') + `/${unescape(setlist.name)}_export.csv`,
+            }
+            const saveDialogResults = await window.remote.dialog.showSaveDialog(null, options);
+            if (saveDialogResults.filePath) {
+                await writeFile(saveDialogResults.filePath, stringify(songs, { header: true }));
                 this.successMsg();
             }
         }
