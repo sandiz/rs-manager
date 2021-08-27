@@ -1,3 +1,5 @@
+import Highcharts from 'highcharts'
+import HighchartsReact from 'highcharts-react-official'
 import React from 'react'
 import PropTypes from 'prop-types';
 import { withI18n, Trans } from 'react-i18next';
@@ -11,9 +13,9 @@ import {
   getSongByID, updateCDLCStat, updateSAFCStat,
   updateNotes, getNotes, getAllTags, executeRawSql,
   addTag, removeFromSongsOwned, addToIgnoreArrangements,
-  getAllDistinceSongTags, addSongTag, getAllSongTags,
+  getAllDistinceSongTags, addSongTag, getAllSongTags, getHistory,
 } from '../sqliteService';
-import { getScoreAttackConfig } from '../configService';
+import { getScoreAttackConfig, setStateAsync } from '../configService';
 import { expandButton, collapseButton } from "./settingsView";
 import { DateAcquiredInput, tagOptions } from './songavailableView';
 
@@ -79,6 +81,111 @@ const customStyles = {
     ...styles, width: 50 + '%', left: 25 + '%',
   }),
 }
+const histChartOptions = {
+  credits: {
+    enabled: false,
+  },
+  chart: {
+    type: 'column',
+    height: 140,
+    backgroundColor: 'none',
+    style: {
+      font: 'Roboto Condensed',
+      color: "white",
+    },
+    animation: false,
+  },
+  xAxis: {
+    type: 'category',
+    labels: {
+      style: {
+        font: 'Roboto Condensed',
+        color: "white",
+      },
+    },
+    tickInterval: 1,
+    lineWidth: 1,
+    minorGridLineWidth: 0,
+    lineColor: '#EF7408',
+    minorTickLength: 0,
+    tickLength: 0,
+    min: 0,
+    minRange: 10,
+  },
+  yAxis: {
+    labels: {
+      style: {
+        font: 'Roboto Condensed',
+        color: "white",
+      },
+    },
+    title: {
+      text: '',
+      reserveSpace: false,
+    },
+    min: 0,
+    max: 110,
+    tickInterval: 10,
+    lineWidth: 1,
+    minorGridLineWidth: 0,
+    lineColor: 'black',
+    minorTickLength: 0,
+    tickLength: 0,
+    gridLineColor: 'transparent',
+  },
+  title: {
+    text: '',
+    floating: true,
+  },
+  tooltip: {
+    enabled: true,
+  },
+  legend: {
+    enabled: false,
+  },
+  plotOptions: {
+    series: {
+      animation: false,
+    },
+    column: {
+      // stacking: 'normal',
+      grouping: false,
+      shadow: false,
+      borderWidth: 1,
+      borderColor: 'black',
+      animation: false,
+      pointWidth: 30,
+      dataLabels: {
+        enabled: true,
+        crop: false,
+        overflow: 'none',
+        borderColor: 'black',
+        borderWidth: 0,
+        sahdow: false,
+        color: 'azure',
+        style: {
+          fontWeight: 'normal',
+          textOutline: "none",
+        },
+      },
+    },
+  },
+  series: [{
+    name: "A",
+    data: [[0, 0, 5]],
+    //colorByPoint: true,
+    //color: '#8900C2',
+    borderRadius: 3,
+    borderColor: 'black',
+    borderWidth: 1,
+  }, {
+    name: "B",
+    data: [],
+    pointPlacement: 0,
+    color: 'lightgreen', //2-rgb(200,247,73) 3-yellow
+  }],
+}
+
 class SongDetailView extends React.Component {
   constructor(props) {
     super(props)
@@ -100,6 +207,7 @@ class SongDetailView extends React.Component {
       tags: [],
       songTags: [],
       songID: '',
+      histChartOptions: { ...histChartOptions },
     }
     this.maxResults = 10;
     this.modal_div = null;
@@ -123,13 +231,15 @@ class SongDetailView extends React.Component {
       else {
         this.setState({ songID });
       }
+      await setStateAsync(this, { histChartOptions: { ...histChartOptions } });
+      await this.setHistory();
       const ptsearchterm = unescape(song) + " " + unescape(artist) + " rocksmith";
       const mvsearchterm = unescape(song) + " " + unescape(artist) + " music video";
       console.log("searching for ", ptsearchterm, mvsearchterm);
       this.getYoutubeResult(ptsearchterm, "div_playthrough");
       this.getYoutubeResult(mvsearchterm, "div_musicvideo");
       document.addEventListener("keydown", this.onKeyUp, false);
-      await this.generateSetlistOptions();
+      await this.generateSetlistOptions();      
     }
     return nextprops.showDetail;
   }
@@ -315,6 +425,36 @@ class SongDetailView extends React.Component {
     this.props.refreshView();
   }
 
+  setHistory = async () => {
+    const op = await getSongByID(this.state.songID);
+    const mastery = (op.mastery * 100).toFixed(2);
+    const series = this.state.histChartOptions.series;
+    series[0].data.length = 0;
+    series[0].data.push({
+      y: parseFloat(mastery),
+      name: "Best",
+      color: "lightgreen",
+    });
+    //read all history from history db
+    const history = await getHistory(this.state.songID);
+    for (let i = 0; i < history.length; i += 1) {
+      const hist = history[i]
+      const masteryLast = (hist.mastery * 100).toFixed(2);
+      const floatMastery = parseFloat(masteryLast)
+      series[0].data.push({
+        y: floatMastery,
+        name: i === history.length - 1 ? "Last" : moment(hist.timestamp * 1000).format("M/D LT"),
+        color: floatMastery >= 100 ? "lightgreen" : "#8900C2",
+      });
+    }
+    //add to chart
+    this.setState({
+      histChartOptions: {
+        series,
+      },
+    })
+  }
+
   showLocalNote = async () => {
     const notes = await getNotes(this.state.songID)
     const { value: text } = await Swal.fire({
@@ -391,8 +531,11 @@ class SongDetailView extends React.Component {
     let yttitle = "";
     if (this.state.showPlaythrough && this.state.ptresults !== null) {
       yttitle = this.state.ptindex < this.state.ptresults.length
-        ? this.state.ptresults[this.state.ptindex].snippet.title + " - " + this.state.ptresults[this.state.ptindex].snippet.channelTitle : ""
-      yttitle = "(" + (this.state.ptindex + 1) + "/" + this.state.ptresults.length + ") " + yttitle
+        ? this.state.ptresults[this.state.ptindex].snippet.title + " - " + this.state.ptresults[this.state.ptindex].snippet.channelTitle : "";
+      const txt = document.createElement("textarea");
+      txt.innerHTML = yttitle;
+      yttitle = txt.value;
+      yttitle = "(" + (this.state.ptindex + 1) + "/" + this.state.ptresults.length + ") " + unescape(yttitle)
       showleftarrow = this.state.ptindex <= 0 ? "hidden" : "dblock";
       showrightarrow = this.state.ptindex >= this.state.ptresults.length - 1 ? "hidden" : "dblock";
     }
@@ -412,6 +555,7 @@ class SongDetailView extends React.Component {
     }
     if (this.props.showDetail === false) { return null; }
     forceNoScroll();
+
     return (
       <div ref={(ref) => { this.modal_div = ref }} id="open-modal" className="modal-window" style={{ opacity: 1, pointerEvents: "auto" }}>
         <div id="modal-info" className={modalinfostyle}>
@@ -775,6 +919,25 @@ class SongDetailView extends React.Component {
                 />
               ) : null
           }
+        </div>
+        <div
+          id="progress-history"
+          style={{
+            marginTop: -10 + 'px',
+            padding: 10 + 'px',
+            width: 60 + '%',
+            backgroundColor: 'black',
+          }}>
+          <div style={{ textAlign: 'center' }}>    
+            <h4 style={{ fontSize: 150 + "%", fontWeight: 'bold', color: '#fff' }}>Progress</h4>
+          </div>
+          <div id="barChart" style={{ width: 700 + 'px !important', justifyContent: 'center', alignItems: 'center' }}>
+            <HighchartsReact
+              highcharts={Highcharts}
+              options={this.state.histChartOptions}
+              id="barChart"
+            />
+          </div>
         </div>
       </div>
     );

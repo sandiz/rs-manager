@@ -277,6 +277,7 @@ class RSLiveView extends React.Component {
     this.tabname = 'tab-rslive';
     this.rowEvents = {
       onClick: (e, row, rowIndex) => {
+        console.warn(e, row, rowIndex);
         this.setState({
           //showDetail: true,
           //showSong: row.song,
