@@ -737,6 +737,11 @@ export async function updateSongsOwnedV2(songs, isCDLC = false) {
   }
   return changes;
 }
+export async function ownedCatalogSongNames() {
+  const ownedSql = "SELECT name FROM songs_available WHERE owned = 'true';"
+  const ownedRows = await db.all(ownedSql);
+  return ownedRows.map((row) => { return row.name; });
+}
 export async function removeIgnoredArrangements() {
   const sql = "DELETE from songs_owned where id in (select id from ignored_arrangements);"
   const op = await db.run(sql);

@@ -202,7 +202,8 @@ class PSARCView extends React.Component {
   }
 
   updateSongList = async () => {
-    profileWorker.songListUpdate(this.state.files, this.markAsCDLC.checked);
+    const catalog = this.dlcCatalogOwnedCheck.checked;
+    profileWorker.songListUpdate(this.state.files, this.markAsCDLC.checked, catalog);
   }
 
   render = () => {
@@ -250,6 +251,21 @@ class PSARCView extends React.Component {
               id="cdlc"
               name="cdlc"
               value="cdlc"
+            />
+          </span>
+          <span style={{ display: `${hasdatastyle}` }}>
+            <label htmlFor="ownedCheck">
+              <Trans i18nKey="dlcCatalogOwnedCheck">
+                DLC Owned Check
+            </Trans>
+            </label>
+            <input
+              ref={(node) => { this.dlcCatalogOwnedCheck = node }}
+              style={{ margin: 7 + 'px' }}
+              type="checkbox"
+              id="ownedCheck"
+              name="ownedCheck"
+              value="ownedCheck"
             />
           </span>
         </div>
