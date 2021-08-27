@@ -255,8 +255,8 @@ class PSARCView extends React.Component {
           </span>
           <span style={{ display: `${hasdatastyle}` }}>
             <label htmlFor="ownedCheck">
-              <Trans i18nKey="dlcCatalogOwnedCheck">
-                DLC Owned Check
+              <Trans i18nKey="ownedCheck">
+                Verify Ownership
             </Trans>
             </label>
             <input
