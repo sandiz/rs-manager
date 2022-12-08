@@ -24,7 +24,7 @@
     "electron-is-dev": "^1.0.1",
     "electron-prompt": "^1.2.0",
     "electron-window-state": "^5.0.1",
-    "express": "^4.16.3",
+    "express": "^4.17.3",
     "find-process": "^1.4.3",
     "highcharts": "^6.2.0",
     "highcharts-react-official": "^2.0.0",
